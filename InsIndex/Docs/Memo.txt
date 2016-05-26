@@ -1,0 +1,30 @@
+InsIndex.exe
+
+Serialize関数内でReadString(CString)でShift-JISテキストファイルを読み込むと、Unicode (UTF-16)として読み込まれる。Shift-JISで書かれたテキストファイルの文字列を読み込んで処理するためには、VisualStudioのビルド構成を「マルチバイト文字セットを使用する」に変更する。
+
+ファイルへの書き込み
+CStdioFile::WriteString
+
+Javaのpropertiesファイルでは、日本語文字列はUnicodeエスケープ形式(\uXXXX)で記述される。Windowsで使われているマルチバイト形式文字列で処理するためには、ツールを使ってコード変換する必要がある。
+
+
+***********************
+<ToDo>
+- 書き込みファイルが既に存在する場合は、内容を消去してから書き込む
+- コメント行の"#"から先頭の間に空白文字がある場合の処理
+- インデックス文字列の外部設定可能化
+
+ファイル名とインデックス文字列の対応
+Application.properties	-A
+ApplicationResources.properties	-AR
+BulkAdministration.properties	-B
+CallRouting.properties	-C
+Device.properties	-D
+Ldap.properties	-L
+MediaResources.properties	-M
+System.properties	-S
+SystemTools.properties	-ST
+TypeTables.properties	-T
+User.properties	-U
+VoiceMail.properties	-V
+

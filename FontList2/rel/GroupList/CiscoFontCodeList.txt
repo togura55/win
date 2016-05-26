@@ -1,0 +1,145 @@
+Basic Latin	0000	007F
+Latin-1 Supplement	0080	00FF
+Latin Extended-A	0100	017F
+Latin Extended-B	0180	024F
+IPA Extensions	0250	02AF
+Spacing Modifier Letters	02B0	02FF
+Combining Diacritical Marks	0300	036F
+Greek and Coptic	0370	03FF
+Cyrillic	0400	04FF
+Latin Extended Additional	1E00	1EFF
+General Punctuation	2000	206F
+Superscripts and Subscripts	2070	209F
+Currency Symbols	20A0	20CF
+Letterlike Symbols	2100	214F
+Number Forms	2150	218F
+Mathematical Operators	2200	22FF
+Enclosed Alphanumerics	2460	24FF
+Box Drawing	2500	257F
+Geometric Shapes	25A0	25FF
+Miscellaneous Symbols	2600	26FF
+Dingbats	2700	27BF
+Supplemental Arrows-B	2900	297F
+Miscellaneous Mathematical Symbols-B	2980	29FF
+CJK Symbols and Punctuation	3000	303F
+Hiragana	3040	309F
+Katakana	30A0	30FF
+Enclosed CJK Letters and Months	3200	32FF
+CJK Compatibility	3300	33FF
+CJK Unified Ideographs Extension A	3400	34FF
+CJK Unified Ideographs Extension A	3500	35FF
+CJK Unified Ideographs Extension A	3600	36FF
+CJK Unified Ideographs Extension A	3700	37FF
+CJK Unified Ideographs Extension A	3800	38FF
+CJK Unified Ideographs Extension A	3900	39FF
+CJK Unified Ideographs Extension A	3A00	3AFF
+CJK Unified Ideographs Extension A	3B00	3BFF
+CJK Unified Ideographs Extension A	3C00	3CFF
+CJK Unified Ideographs Extension A	3D00	3DFF
+CJK Unified Ideographs Extension A	3E00	3EFF
+CJK Unified Ideographs Extension A	3F00	3FFF
+CJK Unified Ideographs Extension A	4000	40FF
+CJK Unified Ideographs Extension A	4100	41FF
+CJK Unified Ideographs Extension A	4200	42FF
+CJK Unified Ideographs Extension A	4300	43FF
+CJK Unified Ideographs Extension A	4400	44FF
+CJK Unified Ideographs Extension A	4500	45FF
+CJK Unified Ideographs Extension A	4600	46FF
+CJK Unified Ideographs Extension A	4700	47FF
+CJK Unified Ideographs Extension A	4800	48FF
+CJK Unified Ideographs Extension A	4900	49FF
+CJK Unified Ideographs Extension A	4A00	4AFF
+CJK Unified Ideographs Extension A	4B00	4BFF
+CJK Unified Ideographs Extension A	4C00	4CFF
+CJK Unified Ideographs Extension A	4D00	4DBF
+CJK Unified Ideographs	4E00	4EFF
+CJK Unified Ideographs	4F00	4FFF
+CJK Unified Ideographs	5000	50FF
+CJK Unified Ideographs	5100	51FF
+CJK Unified Ideographs	5200	52FF
+CJK Unified Ideographs	5300	53FF
+CJK Unified Ideographs	5400	54FF
+CJK Unified Ideographs	5500	55FF
+CJK Unified Ideographs	5600	56FF
+CJK Unified Ideographs	5700	57FF
+CJK Unified Ideographs	5800	58FF
+CJK Unified Ideographs	5900	59FF
+CJK Unified Ideographs	5A00	5AFF
+CJK Unified Ideographs	5B00	5BFF
+CJK Unified Ideographs	5C00	5CFF
+CJK Unified Ideographs	5D00	5DFF
+CJK Unified Ideographs	5E00	5EFF
+CJK Unified Ideographs	5F00	5FFF
+CJK Unified Ideographs	6000	60FF
+CJK Unified Ideographs	6100	61FF
+CJK Unified Ideographs	6200	62FF
+CJK Unified Ideographs	6300	63FF
+CJK Unified Ideographs	6400	64FF
+CJK Unified Ideographs	6500	65FF
+CJK Unified Ideographs	6600	66FF
+CJK Unified Ideographs	6700	67FF
+CJK Unified Ideographs	6800	68FF
+CJK Unified Ideographs	6900	69FF
+CJK Unified Ideographs	6A00	6AFF
+CJK Unified Ideographs	6B00	6BFF
+CJK Unified Ideographs	6C00	6CFF
+CJK Unified Ideographs	6D00	6DFF
+CJK Unified Ideographs	6E00	6EFF
+CJK Unified Ideographs	6F00	6FFF
+CJK Unified Ideographs	7000	70FF
+CJK Unified Ideographs	7100	71FF
+CJK Unified Ideographs	7200	72FF
+CJK Unified Ideographs	7300	73FF
+CJK Unified Ideographs	7400	74FF
+CJK Unified Ideographs	7500	75FF
+CJK Unified Ideographs	7600	76FF
+CJK Unified Ideographs	7700	77FF
+CJK Unified Ideographs	7800	78FF
+CJK Unified Ideographs	7900	79FF
+CJK Unified Ideographs	7A00	7AFF
+CJK Unified Ideographs	7B00	7BFF
+CJK Unified Ideographs	7C00	7CFF
+CJK Unified Ideographs	7D00	7DFF
+CJK Unified Ideographs	7E00	7EFF
+CJK Unified Ideographs	7F00	7FFF
+CJK Unified Ideographs	8000	80FF
+CJK Unified Ideographs	8100	81FF
+CJK Unified Ideographs	8200	82FF
+CJK Unified Ideographs	8300	83FF
+CJK Unified Ideographs	8400	84FF
+CJK Unified Ideographs	8500	85FF
+CJK Unified Ideographs	8600	86FF
+CJK Unified Ideographs	8700	87FF
+CJK Unified Ideographs	8800	88FF
+CJK Unified Ideographs	8900	89FF
+CJK Unified Ideographs	8A00	8AFF
+CJK Unified Ideographs	8B00	8BFF
+CJK Unified Ideographs	8C00	8CFF
+CJK Unified Ideographs	8D00	8DFF
+CJK Unified Ideographs	8E00	8EFF
+CJK Unified Ideographs	8F00	8FFF
+CJK Unified Ideographs	9000	90FF
+CJK Unified Ideographs	9100	91FF
+CJK Unified Ideographs	9200	92FF
+CJK Unified Ideographs	9300	93FF
+CJK Unified Ideographs	9400	94FF
+CJK Unified Ideographs	9500	95FF
+CJK Unified Ideographs	9600	96FF
+CJK Unified Ideographs	9700	97FF
+CJK Unified Ideographs	9800	98FF
+CJK Unified Ideographs	9900	99FF
+CJK Unified Ideographs	9A00	9AFF
+CJK Unified Ideographs	9B00	9BFF
+CJK Unified Ideographs	9C00	9CFF
+CJK Unified Ideographs	9D00	9DFF
+CJK Unified Ideographs	9E00	9EFF
+CJK Unified Ideographs	9F00	9FFF
+CJK Compatibility Ideographs	F900	F9FF
+CJK Compatibility Ideographs	FA00	FAFF
+Alphabetic Presentation Forms	FB00	FB4F
+CJK Compatibility Forms	FE30	FE4F
+Halfwidth and Fullwidth Forms	FF00	FFEF
+CJK Unified Ideographs Extension B	20000	200FF
+CJK Unified Ideographs Extension B	21500	215FF
+CJK Unified Ideographs Extension B	22900	229FF
+CJK Unified Ideographs Extension B	24100	241FF

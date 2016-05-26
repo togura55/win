@@ -1,0 +1,71 @@
+--- ToDo --------------------------------------------
+- Simply encription of password on file/registry
+- Hnadling command line option 
+- Testing error/warning cases
+- Asynchronous SMTP transport
+- Handling "rem" in lcd line 
+- file transferÇÃêîÇÉåÉ|Å[Ég
+- Check .NET version
+- Resource string ÇÃload
+
+--- Spec --------------------------------------------
+[QARepPars]
+- Log Parser
+- Notifier (SendMail)
+- Command Line Tool
+- Read configuration file
+
+
+[Notifier]
+- Subject (Title)
+- To
+- Cc
+- Bcc
+- Body (Contents)
+- Signature
+- SMTP Server Address
+- SMTP Port
+- SMTP Account
+- SMTP Password
+- Event Trigger (Immediate/Schedule)
+
+[Body Format]
+<Summary>
+ Total Time: HH:MM:SS, Start: YY/MM/DD HH:MM:SS, End: YY/MM/DD HH:MM:SS
+ Error: #
+ Warning: #
+<Download Process>
+ Total Time: HH:MM:SS, Start: YY/MM/DD HH:MM:SS, End: YY/MM/DD HH:MM:SS
+ Error: #
+ Warning: #
+ Error Details:
+  -
+ Warning Details:
+  -
+<Upload Process>
+ Total Time: HH:MM:SS, Start: YY/MM/DD HH:MM:SS, End: YY/MM/DD HH:MM:SS
+ Error: #
+ Warning: #
+ Error Details:
+  -
+ Warning Details:
+  -
+Signature
+
+[Log Parser]
+1. Start:/End: block
+2. Download block (Start Download Process/End Download Process)
+3. Upload block (Start Upload Process/End Upload Process)
+
+[Table of Check Statements]
+ignore_list
+- "Remote directory is now XXX"
+error_list
+- see Table of Statement -> Error Description 
+
+[Table of Statement -> Error Description]
+- cd XXX -> Directory XXX: no such file or directory
+- lcd XXX -> lcd: unable to change directory: "XXX"
+- command XXX -> local: unable to open XXX
+- command XXX -> remote: unable to open XXX
+-   -> psftp: unknown command "XXX"

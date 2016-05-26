@@ -1,0 +1,5 @@
+ExportCalender/MargeCalendar/AnalyzeCalendar
+
+概要：指定した週（今週/来週）のOutlookの表示カレンダー情報をCSV形式で出力し、週単位での付加状況を計算、表生成を行う。
+
+指定した週単位で区切った情報のみを有効な値として利用する。

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="F7803542-E5EC-4d34-9208-2E539B9D7DE4"
+           Name="ScrEdit"
+           Language="1041" Codepage="932"
+           Version="1.0.0.0"
+           Manufacturer="SDLKK"
+           UpgradeCode="5F6AD774-C1C9-488b-9B1B-8EDEFCDE12B3">
+    <Package Id = '*' Keywords='Installer'
+             Description='SrcEdit Installer'
+             Comments='SrcEsit is registered trademark of SDL'
+             InstallerVersion="200"
+             Manufacturer="SDLKK"
+             Compressed="yes"
+             Languages="1041"
+             SummaryCodepage='932' />
+
+    <Media Id="1"
+           Cabinet="ScrEditInst.cab"
+           EmbedCab="yes" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="FileMyCompany" Name="SDLKK">
+          <Directory Id="INSTALLLOCATION" Name="ScrEdit"/>
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <!--<Directory Id="MenuMyCompany" Name="SDLKK">-->
+          <Directory Id="APPLICATIONPROGRAMFOLDER" Name="ScrEdit"/>
+        <!--</Directory>-->
+      </Directory>
+    </Directory>
+
+    <DirectoryRef Id='INSTALLLOCATION'>
+      <Component Id="ProductComponent" Guid="0A6691F8-340D-4a7e-8A9D-E360FF3AC6EA">
+        <File Id='ScrEdit'
+               Name='ScrEdit.exe' DiskId='1'
+               Source='..\..\$(var.BuildType)\ScrEdit.exe'/>
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id='APPLICATIONPROGRAMFOLDER'>
+      <Component Id="ApplicationShortcut" Guid="A5A0AE43-1C38-4bbe-A9FB-1FA087167AAC">
+        <Shortcut Id="StartmenuScrEdit"
+                  Name="ScrEdit 1.0" WorkingDirectory='INSTALLDIR'
+                  Description="ScrEdit"
+                  Target="[INSTALLLOCATION]ScrEdit.exe"/>
+        <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
+        <!--<RemoveFile Id='MenuMyCompany' On='uninstall' Name='SDLKK'/>-->
+        <RegistryValue Root='HKCU'
+                       Key='Software\[Manufacturer]\[ProductName]\Config'
+                       Type='string' Name='ScriptFile' Value='' />
+        <RegistryValue Root='HKCU'
+                       Key='Software\[Manufacturer]\[ProductName]\Config'
+                       Type='integer' Name='UseDefaultScriptFile' Value='0' />
+      </Component>
+    </DirectoryRef>
+
+    <Feature Id="ProductFeature" Title="ScrEdit" Level="1">
+      <!-- TODO: Remove the comments around this ComponentRef element and the Component above in order to add resources to this installer. -->
+      <ComponentRef Id="ProductComponent" />
+      <ComponentRef Id="ApplicationShortcut" />
+    </Feature>
+
+    <!-- Setup UIにWiXUIダイアログを使用する -->
+    <!-- VSでは参照の追加にWixUIExtension.dllを追加する必要がある-->
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLLOCATION" />
+    <UIRef Id="WixUI_InstallDir"/>
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf"/>
+
+    <Property Id="ALLUSERS" Value="2" />
+    
+  </Product>
+</Wix>

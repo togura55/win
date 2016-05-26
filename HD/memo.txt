@@ -1,0 +1,38 @@
+<ToDo>
+[HdMgr]
+
+[HdPvr]WIXインストーラー作成
+[HdPvr]時間データが１桁の場合に02のような２桁形式で表示
+
+[Gen]
+StringのResourceファイル化
+
+
+---------------------------
+HdPvrのステートモード
+WAIT_COMMAND
+WAIT_RESPONCE
+WAIT_DATA_HEADER
+WAIT_DATA_PAYLOAD
+
+コマンドバイト
+0x01: Send Client Status
+0x02: Send Data Stream
+0x03: Set Mode
+0x04:
+0x05:
+0x10: Get Server Status
+0x11: Get List
+0x12:
+
+----------------------------
+Description
+
+HdMgr
+録画情報の設定を行うUIを持つクライアントアプリケーション
+録画設定情報の追加、取得、表示、を行う。
+
+HdPvr
+HdMgrからの録画設定情報をIP通信（Winsock)経由で受信するPVRアプリケーション
+録画設定情報の更新、ステータス送信、状態の保存、を行う。
+

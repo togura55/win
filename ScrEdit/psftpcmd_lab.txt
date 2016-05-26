@@ -1,0 +1,32 @@
+cd /LabShare/CUCIMOC/8.5/Screenshots
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\CUCIMOC\8.5\Screenshots
+mget *.*
+del *.*
+
+cd /LabShare/CUC/8.5/Screenshots
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\CUC\8.5.0\Screenshots
+mget *.*
+del *.*
+
+cd /LabShare/CUCM/8.0/Screenshots
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\CUCM\8.0\Screenshots
+mget *.*
+del *.*
+
+cd /LabShare/CUCM/8.5/Screenshots
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\CUCM\8.5\Screenshots
+mget *.*
+del *.*
+
+cd /LabShare/CUP/CUPS/8.5/Screenshots
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\CUP\CUPS\8.5\Screenshots
+mget *.*
+del *.*
+
+cd /LabShare/CUP/CUPC/8.5/Screenshots
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\CUP\CUPC\8.5\Screenshots
+mget *.*
+del *.*
+
+bye
+

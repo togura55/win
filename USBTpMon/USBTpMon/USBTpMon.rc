@@ -1,0 +1,350 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#ifndef APSTUDIO_INVOKED
+#include "targetver.h"
+#endif
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// ニュートラル resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
+#ifdef _WIN32
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+#pragma code_page(932)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About USBTpMon"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,20,20
+    LTEXT           "USBTpMon, Version 1.0",IDC_TXT_ABOUTAPPNAME,42,14,114,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2011",IDC_TXT_ABOUTCOPYRIGHT,42,26,114,8
+    DEFPUSHBUTTON   "OK",IDOK,113,41,50,14,WS_GROUP
+END
+
+IDD_USBTPMON_DIALOG DIALOGEX 0, 0, 320, 200
+STYLE DS_LOCALEDIT | DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "USBTpMon"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,263,179,50,14
+    PUSHBUTTON      "",IDC_PBTN_START,249,7,64,30
+    LTEXT           "スタティック",IDC_TXT_DETECTSENSOR,127,41,81,8
+    PUSHBUTTON      "",IDC_PBTN_LED0,7,61,64,28
+    PUSHBUTTON      "",IDC_PBTN_LED1,83,61,66,28
+    PUSHBUTTON      "",IDC_PBTN_HEATER,263,60,50,28
+    LTEXT           "スタティック",IDC_TXT_HEATERSTAT,167,68,81,8
+    LTEXT           "スタティック",IDC_TXT_HEATERDESC,7,90,306,28
+    LTEXT           "スタティック",IDC_TXT_TEMP,7,132,61,27
+    LTEXT           "スタティック",IDC_TXT_HUMID,7,164,67,25
+    PUSHBUTTON      "",IDC_PBTN_DETECTSENSOR,7,7,64,30
+    CONTROL         "Check1",IDC_CB_AUTODETECT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,41,66,10
+    EDITTEXT        IDC_EDIT_CALIBTEMP,104,130,40,14
+    EDITTEXT        IDC_EDIT_CALIBHUMID,103,160,40,14,ES_AUTOHSCROLL
+    LTEXT           "スタティック",IDC_TXT_CALIBTEMP,57,133,41,8,0,WS_EX_RIGHT
+    LTEXT           "スタティック",IDC_TXT_CALIBHUMID,57,163,41,8,0,WS_EX_RIGHT
+    COMBOBOX        IDC_COMBO_ACTCONDITION,202,125,46,35,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_ACTVALUE,259,125,40,14,ES_AUTOHSCROLL
+    LTEXT           "スタティック",IDC_TXT_ACTTEMP,167,128,33,8
+    LTEXT           "スタティック",IDC_TXT_ACTION,168,153,33,8
+    GROUPBOX        "",IDC_STATIC,159,113,154,63
+    CONTROL         "",IDC_LIST_ACTION,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,204,143,98,32
+    CONTROL         "",IDC_LIST_SENSOR,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,85,7,150,30
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 163
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 55
+    END
+
+    IDD_USBTPMON_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 313
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 193
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // ニュートラル resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+#ifdef _WIN32
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#ifndef APSTUDIO_INVOKED\r\n"
+    "#include ""targetver.h""\r\n"
+    "#endif\r\n"
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\USBTpMon.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""     // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\USBTpMon.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PBTN_DETECTSENSOR   "センサ検出(&D)"
+    IDS_TXT_DETECTSENSOR_YES "センサ検出"
+    IDS_TXT_DETECTSENSOR_NO "センサ未検出"
+    IDS_PBTN_LED0           "LED &0"
+    IDS_PBTN_LED1           "LED &1"
+    IDS_PBTN_HEATER         "ヒーターON"
+    IDS_TXT_HEATERSTAT      "ヒーターの状態: %s"
+    IDS_TXT_ON              "ON"
+    IDS_TXT_OFF             "OFF"
+    IDS_TXT_HEATERDESC      "ヒーターをクリックするとセンサ内部の温度が上昇し、湿度は低下します。センサ診断用です。通常はOFFにします。"
+    IDS_TXT_TEMP            "温度: %.2f℃"
+    IDS_TXT_HUMID           "湿度: %.1f％RH"
+    IDS_PBTN_START          "開始(&S)"
+    IDS_PBTN_STOP           "停止(&S)"
+    IDS_CB_AUTODETECT       "自動検出を有効(&E)"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "USBTpMon(&A)..."
+    IDS_GEN_DLLNAME         "USBMeter.dll"
+    IDS_GEN_DLLLOADERR      "%s をロードできません"
+    IDS_GEN_DLLFUNCERR      "DLL function missing"
+    IDS_GEN_DATASUBDIRNAME  "data"
+    IDS_GEN_STREMPTYERR     "入力文字列が空白です"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TXT_TEMPDEF         "温度:"
+    IDS_TXT_HUMIDDEF        "湿度:"
+    IDS_TXT_CALIBTEMP       "較正値:"
+    IDS_TXT_CALIBHUMID      "較正値:"
+    IDS_TXT_ACTTEMP         "温度"
+    IDS_COMBO_SMALL         "<"
+    IDS_COMBO_LARGE         ">"
+    IDS_COMBO_NONE          "なし"
+    IDS_TXT_ACTION          "動作"
+    IDS_LIST_ACTEMAIL       "メール送信"
+    IDS_LIST_ACTRECORD      "記録"
+    IDS_LIST_ACTCMD         "コマンド実行"
+END
+
+#endif    // 日本語 resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// ニュートラル (システム標準) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEUSD)
+#ifdef _WIN32
+LANGUAGE LANG_NEUTRAL, SUBLANG_SYS_DEFAULT
+#pragma code_page(932)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "&About USBTpMon..."
+    IDS_GEN_DLLNAME         "USBMeter.dll"
+    IDS_GEN_DLLLOADERR      "Cannot load %s"
+    IDS_GEN_DLLFUNCERR      "DLL function missing"
+    IDS_GEN_DATASUBDIRNAME  "data"
+    IDS_GEN_STREMPTYERR     "Input strings are empty"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_PBTN_DETECTSENSOR   "&Detect Sensor"
+    IDS_TXT_DETECTSENSOR_YES "Sensor Detected"
+    IDS_TXT_DETECTSENSOR_NO "No Sensors Detected"
+    IDS_PBTN_LED0           "LED &0"
+    IDS_PBTN_LED1           "LED &1"
+    IDS_PBTN_HEATER         "Heater ON"
+    IDS_TXT_HEATERSTAT      "Heater Status: %s"
+    IDS_TXT_ON              "ON"
+    IDS_TXT_OFF             "OFF"
+    IDS_TXT_HEATERDESC      "Click a Heater ON button, then....."
+    IDS_TXT_TEMP            "Temp: %.2f"
+    IDS_TXT_HUMID           "Humid: %.1f%RH"
+    IDS_PBTN_START          "&Start"
+    IDS_PBTN_STOP           "&Stop"
+    IDS_CB_AUTODETECT       "&Enable Auto Detect"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TXT_TEMPDEF         "Temp.:"
+    IDS_TXT_HUMIDDEF        "Humid:"
+    IDS_TXT_CALIBTEMP       "Calib. Value:"
+    IDS_TXT_CALIBHUMID      "Calib. Value:"
+    IDS_TXT_ACTTEMP         "Temp."
+    IDS_COMBO_SMALL         "<"
+    IDS_COMBO_LARGE         ">"
+    IDS_COMBO_NONE          "none"
+    IDS_TXT_ACTION          "Action"
+    IDS_LIST_ACTEMAIL       "Send Email"
+    IDS_LIST_ACTRECORD      "Record"
+    IDS_LIST_ACTCMD         "Exec. Command"
+END
+
+#endif    // ニュートラル (システム標準) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 英語 (米国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "TODO: <Company name>"
+            VALUE "FileDescription", "TODO: <File description>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "USBTpMon.exe"
+            VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
+            VALUE "OriginalFilename", "USBTpMon.exe"
+            VALUE "ProductName", "TODO: <Product name>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+#endif    // 英語 (米国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "res\USBTpMon.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"     // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

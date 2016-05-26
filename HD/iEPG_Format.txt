@@ -1,0 +1,13 @@
+Content-type: application/x-tv-program-info; charset=Shift_JIS
+version: 1
+station: ＮＨＫ総合
+year: 2002
+month: 12
+date: 31
+start: 23:45
+end: 00:30
+program-title: ゆく年くる年
+program-subtitle: ゆく年くる年▽妙法寺ほか
+performer:森田美由紀
+
+空行をはさんでいるので、ここはメモ部です

@@ -1,0 +1,58 @@
+cd /XShare/config/download
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\tools\QARepSync\config\download
+put psftpcmd.txt
+
+
+cd /XShare/CUCIMOC/8.5
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\CUCIMOC\8.5
+rem put Product_QA_Report_B072.xlsx
+
+cd /XShare/CUCIMOC/8.5/Screenshots
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\CUCIMOC\8.5\Screenshots
+mput *.jpg *.bmp
+
+
+cd /XShare/CUC/8.5
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\CUC\8.5.0
+rem put Product_QA_Report_A038_SDL.xlsx
+
+cd /XShare/CUC/8.5/Screenshots
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\CUC\8.5.0\Screenshots
+mput *.jpg *.bmp
+
+
+cd /XShare/CUCM/8.5
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\CUCM\8.5
+rem put Product_QA_Report_A044_SDL.xlsx
+
+cd /XShare/CUCM/8.5/Screenshots
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\CUCM\8.5\Screenshots
+mput *.jpg *.bmp
+
+
+cd /XShare/CUP/CUPS/8.5
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\CUP\CUPS\8.5
+rem put Product_QA_Report_B087_SDL.xls
+
+cd /XShare/CUP/CUPS/8.5/Screenshots
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\CUP\CUPS\8.5\Screenshots
+mput *.jpg *.bmp
+
+
+cd /XShare/CUP/CUPC/8.5
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\CUP\CUPC\8.5
+rem put Product_QA_Report_B081_.xlsx
+
+cd /XShare/CUP/CUPC/8.5/Screenshots
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\CUP\CUPC\8.5\Screenshots
+mput *.jpg *.bmp
+
+cd /XShare/CiscoMobile/iPhone/8.1
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\CiscoMobile\iPhone\8.1
+rem put Product_QA_Report_B073.xlsx
+
+cd /XShare/CiscoMobile/iPhone/8.1/Screenshots
+lcd D:\SDLGen\18_Engineering\Projects\Cisco\CiscoMobile\iPhone\8.1\Screenshots
+mput *.png *.jpg *.bmp
+
+bye

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <SMTPServer>smtp.gmail.com</SMTPServer>
+  <SMTPServerPort>587</SMTPServerPort>
+  <SMTPAuth>true</SMTPAuth>
+  <SMTPSSL>true</SMTPSSL>
+  <From>test.sdljapan@gmail.com</From>
+  <To>togura@sdl.com</To>
+  <Cc />
+  <Bcc />
+  <Pwd>sdllab.2</Pwd>
+  <Subject />
+  <Body>This is a test mail</Body>
+  <Sign>SDL Japan Co., Ltd. All rights reserved. 2011</Sign>
+  <FromDisplayName>QARepPars Notifier</FromDisplayName>
+  <SimpleDesc>true</SimpleDesc>
+</Settings>
