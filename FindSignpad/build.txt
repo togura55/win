@@ -1,0 +1,13 @@
+<Notes>
+This tool was requested to be provided a customer who wants to detect the unexpected disconnect of device.
+
+<Build>
+- Interop.wgssSTU.dllは、STU SDKインストール後にコピーされるC:\Program Files (x86)\Wacom STU SDK\COM\bin\Win32下のものを「参照の追加」する
+
+<Install and Execution>
+- COM登録するwgssSTU.dllは、STU SDKインストール後にコピーされるC:\Program Files (x86)\Wacom STU SDK\COM\bin\Win32下のものをregsrv32で実行環境に登録する。
+- 実行ファイルと同じフォルダに以下のファイルが必要。
+　productid.lst
+　venderid.lst
+  Interop.wgssSTU.dll
+  config.lst

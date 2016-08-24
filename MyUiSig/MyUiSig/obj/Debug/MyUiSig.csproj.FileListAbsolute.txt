@@ -7,3 +7,26 @@ C:\Users\ogura.tsuyoshi\Documents\Visual Studio 2015\Projects\MyUiSig\MyUiSig\ob
 C:\Users\ogura.tsuyoshi\Documents\Visual Studio 2015\Projects\MyUiSig\MyUiSig\obj\Debug\MyUiSig.csproj.GenerateResource.Cache
 C:\Users\ogura.tsuyoshi\Documents\Visual Studio 2015\Projects\MyUiSig\MyUiSig\obj\Debug\MyUiSig.exe
 C:\Users\ogura.tsuyoshi\Documents\Visual Studio 2015\Projects\MyUiSig\MyUiSig\obj\Debug\MyUiSig.pdb
+C:\Users\ogura.tsuyoshi\Documents\GitHub\win\MyUiSig\MyUiSig\bin\Debug\sign_area.png
+C:\Users\ogura.tsuyoshi\Documents\GitHub\win\MyUiSig\MyUiSig\bin\Debug\sign_area.bmp
+C:\Users\ogura.tsuyoshi\Documents\GitHub\win\MyUiSig\MyUiSig\bin\Debug\MyUiSig.exe.config
+C:\Users\ogura.tsuyoshi\Documents\GitHub\win\MyUiSig\MyUiSig\bin\Debug\MyUiSig.exe
+C:\Users\ogura.tsuyoshi\Documents\GitHub\win\MyUiSig\MyUiSig\bin\Debug\MyUiSig.pdb
+C:\Users\ogura.tsuyoshi\Documents\GitHub\win\MyUiSig\MyUiSig\bin\Debug\Florentis.InteropFlSigCOM.dll
+C:\Users\ogura.tsuyoshi\Documents\GitHub\win\MyUiSig\MyUiSig\obj\Debug\MyUiSig.Form1.resources
+C:\Users\ogura.tsuyoshi\Documents\GitHub\win\MyUiSig\MyUiSig\obj\Debug\MyUiSig.Properties.Resources.resources
+C:\Users\ogura.tsuyoshi\Documents\GitHub\win\MyUiSig\MyUiSig\obj\Debug\MyUiSig.csproj.GenerateResource.Cache
+C:\Users\ogura.tsuyoshi\Documents\GitHub\win\MyUiSig\MyUiSig\obj\Debug\MyUiSig.exe
+C:\Users\ogura.tsuyoshi\Documents\GitHub\win\MyUiSig\MyUiSig\obj\Debug\MyUiSig.pdb
+C:\Users\ogura.tsuyoshi\Documents\GitHub\win\MyUiSig\MyUiSig\obj\Debug\MyUiSig.csprojResolveAssemblyReference.cache
+C:\Users\ogura.tsuyoshi\Desktop\MyUiSig\MyUiSig\bin\Debug\MyUiSig.exe.config
+C:\Users\ogura.tsuyoshi\Desktop\MyUiSig\MyUiSig\obj\Debug\MyUiSig.exe
+C:\Users\ogura.tsuyoshi\Desktop\MyUiSig\MyUiSig\obj\Debug\MyUiSig.pdb
+C:\Users\ogura.tsuyoshi\Desktop\MyUiSig\MyUiSig\obj\Debug\MyUiSig.Form1.resources
+C:\Users\ogura.tsuyoshi\Desktop\MyUiSig\MyUiSig\obj\Debug\MyUiSig.Properties.Resources.resources
+C:\Users\ogura.tsuyoshi\Desktop\MyUiSig\MyUiSig\obj\Debug\MyUiSig.csproj.GenerateResource.Cache
+C:\Users\ogura.tsuyoshi\Desktop\MyUiSig\MyUiSig\bin\Debug\sign_area.png
+C:\Users\ogura.tsuyoshi\Desktop\MyUiSig\MyUiSig\bin\Debug\sign_area.bmp
+C:\Users\ogura.tsuyoshi\Desktop\MyUiSig\MyUiSig\bin\Debug\MyUiSig.exe
+C:\Users\ogura.tsuyoshi\Desktop\MyUiSig\MyUiSig\bin\Debug\MyUiSig.pdb
+C:\Users\ogura.tsuyoshi\Desktop\MyUiSig\MyUiSig\bin\Debug\Florentis.InteropFlSigCOM.dll

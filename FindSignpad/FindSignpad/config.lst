@@ -1,0 +1,8 @@
+duration=1000
+showid=no
+autostart=no
+minimized=no
+logfile=log.txt
+showbuildversion=yes
+appendlog=yes
+logwhenchanged=yes
