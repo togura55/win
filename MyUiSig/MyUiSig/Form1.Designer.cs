@@ -31,10 +31,10 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.btnSign = new System.Windows.Forms.Button();
             this.wizCtl = new Florentis.AxWizCtl();
-            this.pbSignatureBox = new System.Windows.Forms.PictureBox();
+            this.sigImage = new System.Windows.Forms.PictureBox();
             this.txtName = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.wizCtl)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbSignatureBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.sigImage)).BeginInit();
             this.SuspendLayout();
             // 
             // btnSign
@@ -57,14 +57,14 @@
             this.wizCtl.TabIndex = 1;
             this.wizCtl.UseWaitCursor = true;
             // 
-            // pbSignatureBox
+            // sigImage
             // 
-            this.pbSignatureBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pbSignatureBox.Location = new System.Drawing.Point(482, 144);
-            this.pbSignatureBox.Name = "pbSignatureBox";
-            this.pbSignatureBox.Size = new System.Drawing.Size(214, 98);
-            this.pbSignatureBox.TabIndex = 2;
-            this.pbSignatureBox.TabStop = false;
+            this.sigImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.sigImage.Location = new System.Drawing.Point(482, 144);
+            this.sigImage.Name = "sigImage";
+            this.sigImage.Size = new System.Drawing.Size(214, 98);
+            this.sigImage.TabIndex = 2;
+            this.sigImage.TabStop = false;
             // 
             // txtName
             // 
@@ -79,14 +79,14 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(755, 376);
             this.Controls.Add(this.txtName);
-            this.Controls.Add(this.pbSignatureBox);
+            this.Controls.Add(this.sigImage);
             this.Controls.Add(this.wizCtl);
             this.Controls.Add(this.btnSign);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.wizCtl)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbSignatureBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.sigImage)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -96,7 +96,7 @@
 
         private System.Windows.Forms.Button btnSign;
         private Florentis.AxWizCtl wizCtl;
-        private System.Windows.Forms.PictureBox pbSignatureBox;
+        private System.Windows.Forms.PictureBox sigImage;
         private System.Windows.Forms.TextBox txtName;
     }
 }

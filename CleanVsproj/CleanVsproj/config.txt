@@ -1,0 +1,3 @@
+targetfolders=bin,obj,backup,bk,tags,branches
+exceptionpatterns=.git\refs\tags,distrib\bin
+logfile=.\list.txt

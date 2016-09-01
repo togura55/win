@@ -124,6 +124,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="button_ok.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="sign_area.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

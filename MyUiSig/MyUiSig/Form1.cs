@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Diagnostics;
+using System.IO;
 using Florentis;    // Signature SDK
 
 namespace MyUiSig
@@ -35,35 +37,42 @@ namespace MyUiSig
         // Loadで実行しないとダメ
         private void ShowCustomSignWindow()
         {
-            bool success = wizCtl.PadConnect();
-            if (success)
+            try
             {
-                if (wizCtl.PadWidth != 800)
+
+                bool success = wizCtl.PadConnect();
+                if (success)
                 {
- //                   success = false;
+                    if (wizCtl.PadWidth != 800)
+                    {
+                        //                   success = false;
+                    }
                 }
-            }
 
-            if (success != true)
+                if (success != true)
+                {
+                    MessageBox.Show("This demo is only for STU-530");
+                    return;
+                }
+
+                wizCtl.Reset();
+
+                wizCtl.AddObject(ObjectType.ObjectImage, "", "left", "top", "sign_area.png", null);
+                wizCtl.AddObject(ObjectType.ObjectImage, "OK", "200", "140", "button_ok.png", null);
+                //            wizCtl.AddObject(ObjectType.ObjectImage, "Cancel", "550", "300", "cancel_button.png", null);
+                wizCtl.AddObject(ObjectType.ObjectText, "who", "30", "220", "山田", null);
+                wizCtl.AddObject(ObjectType.ObjectText, "why", "200", "180", "Acknowledged and confirmed", null);
+                wizCtl.AddObject(ObjectType.ObjectSignature, "signature", 0, 0, sigObj, null);
+
+                callback.EventHandler = new WizardCallback.Handler(button_handler);
+                wizCtl.SetEventHandler(callback);
+
+                wizCtl.Display();
+            }
+            catch (Exception ex)
             {
-                MessageBox.Show("This demo is only for STU-530");
-                return;
+                Debug.Print("ShowCustomSignWindow: {0}", ex.Message);
             }
-
-            wizCtl.Reset();
-
-            wizCtl.AddObject(ObjectType.ObjectImage, "", "left", "top", "sign_area.bmp", null);
-            //            wizCtl.AddObject(ObjectType.ObjectImage, "OK", "550", "384", "accept_button.png", null);
-            //            wizCtl.AddObject(ObjectType.ObjectImage, "Cancel", "550", "300", "cancel_button.png", null);
-            wizCtl.AddObject(ObjectType.ObjectText, "who", "30", "460", txtName.Text, null);
-            wizCtl.AddObject(ObjectType.ObjectText, "why", "334", "460", "Acknowledged and confirmed", null);
-            //            wizCtl.AddObject(ObjectType.ObjectSignature, "signature", 0, 0, sigObj, null);
-
-            callback.EventHandler = new WizardCallback.Handler(button_handler);
-            wizCtl.SetEventHandler(callback);
-
-
-            wizCtl.Display();
         }
 
         private void button_handler(object clt, object id, object type)
@@ -72,7 +81,7 @@ namespace MyUiSig
             {
                 case "OK":
                     {
-                        //ShowSignature();
+                        ShowSignature();
                         //loadColors();
                         break;
                     }
@@ -87,6 +96,45 @@ namespace MyUiSig
                         break;
                     }
             }
+        }
+        private void ShowSignature()
+        {
+            try
+            {
+                Debug.Print("scriptCompleted");
+                //           SigObj sigObj = (SigObj)SigCtl.Signature;
+
+                if (sigObj.IsCaptured)
+                {
+                    sigObj.set_ExtraData("AdditionalData", "C# Wizard test: Additional data");
+                    String filename = "sig1.png";
+                    sigObj.RenderBitmap(filename, 200, 150, "image/png", 0.5f, 0xff0000, 0xffffff, -1.0f, -1.0f, RBFlags.RenderOutputFilename | RBFlags.RenderColor32BPP | RBFlags.RenderEncodeData);
+                    using (FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read))
+                    {
+                        sigImage.Image = System.Drawing.Image.FromStream(fs);     // display image on window
+                        fs.Close();
+                    }
+
+                    sigImage.Load(filename);
+                }
+                closeWizard();
+            }
+            catch(Exception ex)
+            {
+                Debug.Print(ex.Message);
+            }
+
+        }
+
+        private void closeWizard()
+        {
+            Debug.Print("closeWizard()");
+//            ScriptIsRunning = false;
+            wizCtl.Reset();
+            wizCtl.Display();
+            wizCtl.PadDisconnect();
+            callback.EventHandler = null;       // remove handler
+            wizCtl.SetEventHandler(callback);
         }
 
         private void Form1_Load(object sender, EventArgs e)

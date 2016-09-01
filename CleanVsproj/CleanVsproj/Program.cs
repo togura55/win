@@ -123,6 +123,7 @@ namespace CleanVsproj
             }
             co.SplitParams();
 
+
             //指定ディレクトリ下での列挙
             //string[] extensions = { "vbproj", "csproj" };
             string[] dirs = { "bin", "obj", "backup", "bk", "tags" , "branches"}; 
