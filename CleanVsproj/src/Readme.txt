@@ -4,7 +4,7 @@ Command-line program for Windows
 
 <Supported Environmrnt>
 - Windows XP SP2 and later
-- .NET Framework 2.0 and later
+- .NET Framework 4 and later
 
 <Command Line Option>
 SYNOPSYS
