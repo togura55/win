@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="143"><sie_bunmyaku bunmyakucode="3"><trans><ptxt>BUMPER BEAM<break/>EXTENSION<break/>BRACKET</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="6"><trans><ptxt>BULKHEAD<break/>SUPPORT</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="7"><trans><ptxt>BUMPER BEAM EXTENSION</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="8"><trans><ptxt>Japan production models:<break/>Front (<num value="3" id="1"/>), Left rear (<num value="2" id="2"/>), Right rear (<num value="3" id="3"/>)/<break/>Except Japan production models:<break/>Front (<num value="3" id="4"/>), Rear (<num value="3" id="5"/>)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="10"><trans><ptxt>BULKHEAD<break/>SIDE STAY</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="12"><trans><ptxt>BULKHEAD <break/>UPPER FRAME</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="14"><trans><ptxt>UPPER FRAME BRACKET</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="15"><trans><ptxt>LOWER <break/>CROSSMEMBER <break/>PLATE<break/>(For some models)</ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>

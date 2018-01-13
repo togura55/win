@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="97"><sie_bunmyaku bunmyakucode="1"><trans><ptxt>F, f<break/>Front Floor Lower Frame Rear <break/>Mounting Hole <jittai moji="phiv;"/><num value="11" id="1"/> (<num value="0.43" id="2"/>)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="2"><trans><ptxt>G, g<break/>Rear Frame A Front Locating <break/>Hole <jittai moji="phiv;"/><num value="15" id="1"/> (<num value="0.59" id="2"/>)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="3"><trans><ptxt>H<break/>Rear Floor Crossmember Left <break/>Locating Hole <jittai moji="phiv;"/><num value="13" id="1"/> (<num value="0.51" id="2"/>)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="4"><trans><ptxt>J, j<break/>Rear Frame B Rear Locating <break/>Hole <jittai moji="phiv;"/><num value="25" id="1"/> (<num value="0.98" id="2"/>)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="42"><trans><ptxt>I, i<break/>Rear Frame A Rear Locating <break/>Hole <jittai moji="phiv;"/><num value="13" id="1"/> (<num value="0.51" id="2"/>)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="50"><trans><ptxt>h<break/>Rear Floor Crossmember Right <break/>Locating Hole <jittai moji="phiv;"/><num value="18" id="1"/> (<num value="0.71" id="2"/>)</ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>

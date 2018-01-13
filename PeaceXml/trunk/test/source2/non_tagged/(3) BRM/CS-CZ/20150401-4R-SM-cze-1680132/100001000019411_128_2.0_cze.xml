@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/SM-TRANS.DTD"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="128"><sie_bunmyaku bunmyakucode="7"><trans><s1><ptxt>When lifting the front of the vehicle, set the parking brake. When lifting the rear of the vehicle, put the shift lever in P.</ptxt></s1></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="9"><trans><fig-step-grp><s1><ptxt>Position the floor jack under the front jacking bracket (A) or the rear jacking bracket (B). Center the jacking bracket on the jack lift platform (C), and jack up the vehicle high enough to fit the safety stands under it.</ptxt></s1><attention><ptxt>Be sure the floor jack is properly placed to avoid damaging the vehicle.</ptxt></attention><figure><graphic/></figure><s1><ptxt>Position the safety stands under the support points, and adjust them so the vehicle is level side-to-side.</ptxt></s1><s1><ptxt>Lower the vehicle onto the stands.</ptxt></s1></fig-step-grp></trans></sie_bunmyaku></sie_bunmyaku_list>

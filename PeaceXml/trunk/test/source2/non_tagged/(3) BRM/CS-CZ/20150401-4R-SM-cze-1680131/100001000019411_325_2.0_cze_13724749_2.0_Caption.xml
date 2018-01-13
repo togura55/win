@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680131" outlineid="325"><sie_bunmyaku bunmyakucode="5"><trans><ptxt>CENTER PILLAR<break/>INNER SEPARATOR</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="6"><trans><ptxt>SIDE SILL <break/>STIFFENER <break/>COMPLETE</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="8"><trans><ptxt>MOUNTING<break/>BOLTS<break/><num value="8" id="1"/> x <num value="1.25" id="2"/> mm</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="9"><trans><ptxt>CENTER PILLAR <break/>STIFFENER</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="15"><trans><ptxt>CENTER <break/>INNER<break/>PILLAR</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="17"><trans><ptxt>Refer to the side sill <break/>outer panel for the <break/>side sill cutting section.</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="18"><trans><ptxt>CENTER PILLAR<break/>STIFFENER<break/>(Lower part)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="21"><trans><ptxt>FRONT PILLAR<break/>INNER SEPARATOR</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="23"><trans><ptxt>FRONT PILLAR<break/>LOWER CORNER<break/>STIFFENER</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="30"><trans><ptxt>FRONT INNER<break/>PILLAR</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="31"><trans><ptxt>BULKHEADS</ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>

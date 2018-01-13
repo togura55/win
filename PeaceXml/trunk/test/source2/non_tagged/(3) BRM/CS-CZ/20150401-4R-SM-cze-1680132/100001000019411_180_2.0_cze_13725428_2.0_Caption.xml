@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="180"><sie_bunmyaku bunmyakucode="1"><trans><ptxt>Main welding current</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="2"><trans><ptxt>Main welding<break/>time</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="3"><trans><ptxt>The pre-heat time is half<break/>the main welding time.</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="4"><trans><ptxt>The pre-heat current is half<break/>the main welding current.</ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>

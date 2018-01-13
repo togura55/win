@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680131" outlineid="198"><sie_bunmyaku bunmyakucode="1"><trans><ptxt>REAR BUMPER<break/>BEAM</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="3"><trans><ptxt>FRONT BUMPER <break/>BEAM</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="4"><trans><ptxt>FRONT FENDER<break/>BRACKET</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="5"><trans><ptxt><num value="10" id="1"/> x <num value="1.25" id="2"/> mm<break/><num value="38" id="3"/> N·m (<num value="3.9" id="4"/> kgf·m, <break/><num value="28" id="5"/> lbf·ft)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="9"><trans><ptxt>FRONT FLOOR<break/>LOWER FRAME</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="11"><trans><ptxt>FRONT BULKHEAD <break/>LOWER PLATE</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="14"><trans><ptxt>FILLER GUARD STAY</ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>

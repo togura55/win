@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="90"><sie_bunmyaku bunmyakucode="1"><trans><ptxt>I3, i3<break/>Rear Bumper Mounting <break/>Hole <jittai moji="phiv;"/><num value="7" id="1"/> (<num value="0.28" id="2"/>)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="13"><trans><ptxt>I2, i2<break/>Taillight Mounting Hole <jittai moji="phiv;"/><num value="6" id="1"/> (<num value="0.24" id="2"/>)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="22"><trans><ptxt>I1, i1<break/>Tailgate Support Strut Upper Bracket<break/>Upper Mounting Hole <jittai moji="phiv;"/><num value="9" id="1"/> (<num value="0.35" id="2"/>)</ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>

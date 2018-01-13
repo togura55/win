@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/SM-TRANS.DTD"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="83"><sie_bunmyaku bunmyakucode="1"><trans><fig-text-grp><ptxt>Unit: mm (in)/<jittai moji="phiv;"/>: Inner diameter</ptxt><table><tgroup><colspec/><colspec/><colspec/><tbody><row><entry/><entry><ptxt>Except KM and KQ models</ptxt></entry><entry><ptxt>KM and KQ models</ptxt></entry></row><row><entry><ptxt><gaiji>ᫎ</gaiji></ptxt></entry><entry><ptxt><num value="197" id="1"/> (<num value="7.76" id="2"/>)</ptxt></entry><entry><ptxt><num value="196" id="3"/> (<num value="7.72" id="4"/>)</ptxt></entry></row><row><entry><ptxt><gaiji>᫏</gaiji></ptxt></entry><entry><ptxt><num value="1005" id="5"/> (<num value="39.57" id="6"/>)</ptxt></entry><entry><ptxt><num value="1004" id="7"/> (<num value="39.53" id="8"/>)</ptxt></entry></row><row><entry><ptxt><gaiji>᫐</gaiji></ptxt></entry><entry><ptxt><num value="258" id="9"/> (<num value="10.16" id="10"/>)</ptxt></entry><entry><ptxt><num value="259" id="11"/> (<num value="10.20" id="12"/>)</ptxt></entry></row></tbody></tgroup></table><figure><graphic/></figure></fig-text-grp></trans></sie_bunmyaku></sie_bunmyaku_list>

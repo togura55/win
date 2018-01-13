@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/SM-TRANS.DTD"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680131" outlineid="350"><sie_bunmyaku bunmyakucode="2"><trans><fig-text-grp><ptxt>The welding symbols in the removal/installation have these meanings. The welding symbols with dashed lines have a meaning of the spot welding of the part which is not visible.</ptxt><break/><ptxt><symbol01/> and <symbol02/>: 2-Plate spot welding</ptxt><ptxt><symbol03/> and <symbol04/>: 3-Plate spot welding</ptxt><ptxt><symbol05/> and <symbol06/>: 4-Plate spot welding</ptxt><ptxt><symbol07/>: MAG plug welding</ptxt><ptxt><symbol08/>: MAG welding (butt or fillet)</ptxt><ptxt><symbol09/>: MIG brazing</ptxt><ptxt>L and L*=Welding length; unit: mm (in)</ptxt><ptxt>( ) and ( )*: The number of welds</ptxt><figure><graphic/></figure></fig-text-grp></trans></sie_bunmyaku></sie_bunmyaku_list>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/SM-TRANS.DTD"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680131" outlineid="354"><sie_bunmyaku bunmyakucode="2"><trans><entry><ptxt>This supplement contains information for the <num value="2015" id="1"/> model-series Fit. Refer to the <num value="2015" id="2"/> Fit/Jazz Body Repair Manual, P/N 62T5A30, for service procedures and data not included in this supplement.</ptxt><ptxt>Please read through these instructions and familiarize yourself with them before actually using this manual.</ptxt><ptxt>NOTE: Refer to the appropriate Fit/Jazz Shop Manual for specifications, wire harness locations, safety stand support points, etc.</ptxt><ptxt>Additionally, we have just completed and introduced the following manuals for your convenience. We strongly recommend you to refer to these manuals also before carrying out your job.<break/></ptxt><list1><item><ptxt>Body Repair Manual - Paint Basic P/N 62PRM30 for the outline of Paint Repair.</ptxt></item><item><ptxt>Body Repair Manual - Body Basic P/N 62BRM30 for the outline of Body Repair.</ptxt></item><item><ptxt>Body Repair Manual - Paint Basic Supplement P/N 62PRM31 and P/N 62PRM32.</ptxt></item><item><ptxt>Body Repair Manual - Body Basic Supplement P/N 62BRM31.</ptxt></item></list1></entry></trans></sie_bunmyaku></sie_bunmyaku_list>

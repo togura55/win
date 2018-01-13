@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/SM-TRANS.DTD"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="127"><sie_bunmyaku bunmyakucode="1"><trans><title>Front Passenger&apos;s Under Floor</title></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="2"><trans><title>Front Passenger&apos;s Doorjamb</title></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="3"><trans><title>Driver&apos;s Doorjamb (KQ models)</title></trans></sie_bunmyaku></sie_bunmyaku_list>

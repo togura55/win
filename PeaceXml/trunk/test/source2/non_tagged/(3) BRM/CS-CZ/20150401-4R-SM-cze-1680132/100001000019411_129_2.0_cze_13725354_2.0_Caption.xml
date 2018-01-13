@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="129"><sie_bunmyaku bunmyakucode="4"><trans><ptxt><num value="1,470" id="1"/> mm (<num value="57.9" id="2"/> in)<num value="*1" id="3"/><break/><num value="1,465" id="4"/> mm (<num value="57.7" id="5"/> in)<num value="*2" id="6"/></ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="5"><trans><ptxt><num value="1,480" id="1"/> mm (<num value="58.3" id="2"/> in)<num value="*1" id="3"/><break/><num value="1,475" id="4"/> mm (<num value="58.1" id="5"/> in)<num value="*2" id="6"/></ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="7"><trans><ptxt><num value="*1" id="1"/>: With <num value="15" id="2"/> inch wheel<break/><num value="*2" id="3"/>: With <num value="16" id="4"/> inch wheel</ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>

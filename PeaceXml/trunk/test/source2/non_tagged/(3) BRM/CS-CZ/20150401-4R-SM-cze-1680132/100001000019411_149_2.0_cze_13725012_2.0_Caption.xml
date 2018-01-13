@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="149"><sie_bunmyaku bunmyakucode="4"><trans><ptxt>GUSSET<break/>PLATE</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="7"><trans><ptxt>SIDE FRAME <break/>GUSSET</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="9"><trans><ptxt>WHEELHOUSE<break/>GUSSET</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="10"><trans><ptxt>SIDE FRAME<break/>GUSSET</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="14"><trans><ptxt>Inside of the front <break/>side backplate</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="15"><trans><ptxt>FRONT SIDE <break/>BACKPLATE</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="26"><trans><ptxt>FRONT <break/>SIDE<break/>FRAME</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="33"><trans><ptxt>(A):</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="35"><trans><ptxt>Passenger&apos;s side:<break/>2-Plate spot welding</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="36"><trans><ptxt>LHD model is shown; RHD model is symmetrical.</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="37"><trans><ptxt>Right side: 2-Plate<break/>spot welding</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="38"><trans><ptxt>Right side: 3-Plate<break/>spot welding</ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>
