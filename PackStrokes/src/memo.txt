@@ -1,0 +1,43 @@
+Class Name:
+StrokeCollection
+
+Summary:
+ストロークデータを指定領域情報に従ってまとめる
+
+Properties
+　Region
+ Hwstring
+ Stroke
+
+＜データ構造＞
+＜Regionリスト＞
+uint Region[].x
+uint Region[].y
+uint Region[].index　// 領域ID
+xxxx Region[].Stroke[][]
+
+
+＜Hand Writting String リスト＞
+Hwstring[].Stroke[]　　　　　
+Hwstring[].regionIndex　　//この文字列はどの領域かを示す
+Hwstring[].Text
+Hwstring[].Attribute
+
+
+↑ これを「文字認識エンジン」に喰わせればよい、という流れ。
+
+＜ストローク リスト＞
+Stroke[].PathPart
+Stroke[].xMax
+Stroke[].yMax
+Stroke[].regionIndex
+
+↑　PathPartクラスの派生（拡張）を考える？
+
+Stroke[]を全て集めたら（Start/Endボタンで確定？）、Region[]と対応付けてregionIndexを付与、Hwstring[]リストを作成する。
+
+　↓
+BaXter XMLで保存するか？　→　ひとつのデモオプションとして有り。
+
+
+
