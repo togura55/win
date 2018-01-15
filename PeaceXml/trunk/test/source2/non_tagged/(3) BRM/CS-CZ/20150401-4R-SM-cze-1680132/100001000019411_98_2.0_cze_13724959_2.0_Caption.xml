@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="98"><sie_bunmyaku bunmyakucode="1"><trans><ptxt>N, n<break/>Front Inside Sill Rear Locating <break/>Hole <jittai moji="phiv;"/><num value="25" id="1"/> (<num value="0.98" id="2"/>)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="2"><trans><ptxt>M, m<break/>Front Inside Sill Front Locating <break/>Hole <jittai moji="phiv;"/><num value="25" id="1"/> (<num value="0.98" id="2"/>)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="23"><trans><ptxt>I, i<break/>Rear Frame A Rear Locating <break/>Hole <jittai moji="phiv;"/><num value="13" id="1"/> (<num value="0.51" id="2"/>)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="26"><trans><ptxt>D, d<break/>Front Subframe Rear Mounting <break/>Hole <jittai moji="phiv;"/><num value="16" id="1"/> (<num value="0.63" id="2"/>)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="33"><trans><ptxt>O, o<break/>Trailing Arm Outer Bracket Locating <break/>Hole <jittai moji="phiv;"/><num value="20" id="1"/> (<num value="0.79" id="2"/>)</ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>

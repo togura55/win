@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="130"><sie_bunmyaku bunmyakucode="12"><trans><ptxt>FRONT DOOR <break/>UPPER HINGE</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="14"><trans><ptxt>TORX BOLT<break/><num value="8" id="1"/> x <num value="1.25" id="2"/> mm<break/><num value="29" id="3"/> N·m <break/>(<num value="3.0" id="4"/> kgf·m, <num value="21" id="5"/> lbf·ft)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="16"><trans><ptxt>FRONT DOOR <break/>LOWER HINGE</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="18"><trans><ptxt>FUEL FILL<break/>DOOR</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="21"><trans><ptxt>REAR DOOR <break/>UPPER HINGE</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="22"><trans><ptxt>REAR DOOR <break/>LOWER HINGE</ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>

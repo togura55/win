@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/SM-TRANS.DTD"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="177"><sie_bunmyaku bunmyakucode="1"><trans><title>Sheet Type</title></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="2"><trans><fig-text-grp><ptxt>Cut new insulators, and apply as indicated.</ptxt><ptxt>NOTE: Before applying, clean and degrease the floor.</ptxt><figure><graphic/></figure><figure><graphic/></figure></fig-text-grp></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="3"><trans><title>Coating Type</title></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="4"><trans><fig-text-grp><ptxt>Apply sealer which has soundproof and vibration-proof properties in areas shown in this illustrations.</ptxt><ptxt>NOTE: Before applying, clean and degrease the floor.</ptxt><figure><graphic/></figure></fig-text-grp></trans></sie_bunmyaku></sie_bunmyaku_list>

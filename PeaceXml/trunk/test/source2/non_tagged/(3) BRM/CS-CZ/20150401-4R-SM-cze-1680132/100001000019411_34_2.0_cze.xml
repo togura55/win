@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/SM-TRANS.DTD"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="34"><sie_bunmyaku bunmyakucode="2"><trans><ptxt>Observe the following precautions to maintain a safe painting work area:</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="3"><trans><list1><item><ptxt>Wear an approved respirator and eye protection when painting.</ptxt></item><item><ptxt>Wear approved gloves and appropriate clothing when painting. Avoid contact with skin.</ptxt></item><item><ptxt>Spray paint only in a well-ventilated area.</ptxt></item><item><ptxt>Cover spilled paint with sand, or wipe it up at once.</ptxt></item><item><ptxt>If paint gets in your mouth or on your skin, rinse and wash thoroughly with water. If paint gets in your eyes, flush with water and get prompt medical attention.</ptxt></item><item><ptxt>After the painting work is finished, wash your face and gargle with water.</ptxt></item><item><ptxt>Paint is flammable. Store it in a safe place, and keep it away from sparks, flames, or cigarettes.</ptxt></item></list1></trans></sie_bunmyaku></sie_bunmyaku_list>

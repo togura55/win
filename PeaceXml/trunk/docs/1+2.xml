@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<root_element>
+<hogehoge path="xxxx" filename="yyyy">
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680131" outlineid="198"><sie_bunmyaku bunmyakucode="1"><trans><ptxt>REAR BUMPER<break/>BEAM</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="3"><trans><ptxt>FRONT BUMPER <break/>BEAM</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="4"><trans><ptxt>FRONT FENDER<break/>BRACKET</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="5"><trans><ptxt><num value="10" id="1"/> x <num value="1.25" id="2"/> mm<break/><num value="38" id="3"/> N·m (<num value="3.9" id="4"/> kgf·m, <break/><num value="28" id="5"/> lbf·ft)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="9"><trans><ptxt>FRONT FLOOR<break/>LOWER FRAME</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="11"><trans><ptxt>FRONT BULKHEAD <break/>LOWER PLATE</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="14"><trans><ptxt>FILLER GUARD STAY</ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>
+</hogehoge>
+<hogehoge path="zzzz" filename="aaaa">
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680131" outlineid="208"><sie_bunmyaku bunmyakucode="1"><trans><ptxt>NOTE: Avoid MAG welding for high-strength steel (<nodivide><num value="1500" id="1"/> MPa</nodivide>) parts.</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="2"><trans><ptxt>If a high-strength steel part (<num value="340" id="1"/> MPa or higher) is MAG welded, the welding wire used must have a tensile strength equal to, or greater than, the lowest tensile strength of the parts being welded. The wire below, or equivalent, may be used for <num value="980" id="2"/> MPa or less (except butt welding for <num value="980" id="3"/> MPa) high-strength steel welding.</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="3"><trans><title>Welding Specifications for High-Strength Steel (Except <num value="1500" id="1"/> MPa)</title></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="4"><trans><entry><ptxt>Welding wire</ptxt></entry></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="5"><trans><entry><ptxt>Example: Bosch Automotive Service Solutions solid wire (SSJ-DS980J)</ptxt></entry></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="6"><trans><entry><ptxt>Shielding gas</ptxt></entry></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="7"><trans><entry><ptxt>Gas mixture: Ar <num value="80" id="1"/>%, CO<sub><num value="2" id="2"/></sub> <num value="20" id="3"/>%</ptxt></entry></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="8"><trans><ptxt>NOTE: For details concerning the welding wire, confirm the product specifications issued by the welding wire manufacturer.</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="11"><trans><title>Sheet thickness vs. plug hole diameter; unit: mm (in)</title></trans></sie_bunmyaku></sie_bunmyaku_list>
+</hogehoge>
+</root_element>

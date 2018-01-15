@@ -1,0 +1,51 @@
+
+
+<クラスメンバ>
+sourcePath
+destPath
+destFilename
+extension
+capacity
+rootElementName = "sdlj_root"
+subElementName = "sdlj_files"
+filesAttrName = "filename"
+pathAttrName = "path"
+headerAttrName
+
+<XmlFileクラスメンバ>
+FilePath
+FileName
+FileSize
+ContentsSize
+
+
+<ヘッダー部>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sie_bunmyaku_list SYSTEM "./config/caption_trans.dtd" PUBLIC "-//Honda_Service//Dtd ipas //EN">
+
+<ボディー部>
+ヘッダー部以降
+
+----------------------
+<コマンドライン パラメータ>
+/ui:gui UIモードGUI（既定）
+/ui:cli UIモードCLI
+
+/mo:m 動作モード ファイル統合（既定）
+/mo:s 動作モード ファイル分割
+
+/sp:xxx  ソースパス (UIモードCLI時は必須）
+/dp:xxx  出力パス (UIモードCLI時は必須）
+/df:xxx  出力ファイル名（既定値 ソースディレクトリ名）
+/ex:xxx  拡張子（既定値 "xml"）
+/ca:xxx  統合ファイル上限容量KB（既定値 "1")
+/re:xxx  ルート要素文字列（既定値 "sdlj_root")
+/se:xxx  サブ要素文字列（既定値 "sdlj_files")
+/fa:xxx  ファイル名属性値文字列（既定値 "filename")
+/pa:xxx  パス名属性値文字列（既定値 "path"）
+/ha:xxx  ヘッダー名属性値文字列（既定値 "header"）
+
+
+/h:on/off ヘルプコンテンツ表示 / 非表示(既定)
+/v:on/off バージョン情報表示 / 非表示（既定）
+/ci:on/off CLIインジケータ表示 / 非表示(既定)

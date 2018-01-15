@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="124"><sie_bunmyaku bunmyakucode="2"><trans><ptxt>LEFT SIDE CURTAIN AIRBAG*</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="3"><trans><ptxt>RIGHT SIDE CURTAIN AIRBAG*</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="4"><trans><ptxt>RIGHT SIDE <break/>IMPACT SENSOR (SECOND)*</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="5"><trans><ptxt>LEFT SIDE IMPACT SENSOR<break/>(SECOND)*</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="7"><trans><ptxt>*: <emph01>With side curtain airbag</emph01><break/><emph02>This illustration shows LHD model.</emph02></ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>

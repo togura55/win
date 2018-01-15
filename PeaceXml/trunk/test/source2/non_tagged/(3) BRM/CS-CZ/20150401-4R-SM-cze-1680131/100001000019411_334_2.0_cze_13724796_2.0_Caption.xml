@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680131" outlineid="334"><sie_bunmyaku bunmyakucode="6"><trans><ptxt>REAR FRAME<break/>UPPER STIFFENER</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="7"><trans><ptxt>REAR <break/>PANEL</ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>

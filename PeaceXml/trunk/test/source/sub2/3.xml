@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680131" outlineid="208"><sie_bunmyaku bunmyakucode="3"><trans><ptxt><emph01>BEAD</emph01></ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="4"><trans><ptxt><emph01>[SECTION: BB]</emph01></ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="5"><trans><ptxt><emph01>Bead protrusion<break/>at the rear side</emph01></ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="6"><trans><ptxt><emph01>Approx. <num value="4" id="1"/> mm (<num value="0.16" id="2"/> in)</emph01></ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="7"><trans><ptxt><emph01>Approx. <num value="2" id="1"/> mm (<num value="0.079" id="2"/> in)</emph01></ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>

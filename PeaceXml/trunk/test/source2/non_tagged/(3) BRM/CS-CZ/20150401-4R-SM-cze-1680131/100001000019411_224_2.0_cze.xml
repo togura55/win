@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/SM-TRANS.DTD"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680131" outlineid="224"><sie_bunmyaku bunmyakucode="1"><trans><entry><ptxt>NOTE: Refer to the <num value="2015" id="1"/> Fit/Jazz Body Repair Manual, P/N 62T5A30 for items not shown in this section.</ptxt></entry></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="3"><trans><entry><ptxt>Mexico production models have been added; The body component parts and the related replacement procedures are different.</ptxt></entry></trans></sie_bunmyaku></sie_bunmyaku_list>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="84"><sie_bunmyaku bunmyakucode="4"><trans><ptxt><num value="B5" id="1"/>, b5 <break/>Front Fender Rear <break/>Mounting Hole <jittai moji="phiv;"/><num value="7" id="2"/> (<num value="0.28" id="3"/>)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="30"><trans><ptxt><num value="B6" id="1"/>, b6<break/>Front Windshield Lower <break/>Locating Hole <jittai moji="phiv;"/><num value="12" id="2"/> (<num value="0.47" id="3"/>)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="31"><trans><ptxt><num value="B1" id="1"/>, b1<break/>Front Bulkhead Upper Frame <break/>Bracket Locating Hole <jittai moji="phiv;"/><num value="15" id="2"/> (<num value="0.59" id="3"/>)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="32"><trans><ptxt><num value="B2" id="1"/>, b2<break/>Front Fender Bracket Front <break/>Mounting Hole <jittai moji="phiv;"/><num value="7" id="2"/> (<num value="0.28" id="3"/>)</ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>

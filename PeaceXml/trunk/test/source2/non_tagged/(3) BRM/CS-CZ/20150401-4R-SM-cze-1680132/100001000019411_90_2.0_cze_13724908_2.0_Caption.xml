@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="90"><sie_bunmyaku bunmyakucode="1"><trans><ptxt>F3, f3<break/>Rear Seat Belt Lower Anchor <break/>Mounting Hole <jittai moji="phiv;"/><num value="12" id="1"/> (<num value="0.47" id="2"/>)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="7"><trans><ptxt>I6</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="8"><trans><ptxt>i6</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="9"><trans><ptxt>f3</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="15"><trans><ptxt>I5, i5<break/>Rear Panel Side Stiffener Flange <break/>Corner End</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="16"><trans><ptxt>I6, i6<break/>Rear Trim Upper Stiffener Locating <break/>Hole <jittai moji="phiv;"/><num value="11" id="1"/> (<num value="0.43" id="2"/>)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="21"><trans><ptxt>I5</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="22"><trans><ptxt>i5</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="25"><trans><ptxt>I4, i4<break/>Quarter Pillar Trim Clip<break/>Mounting Hole <jittai moji="phiv;"/><num value="8.5" id="1"/> (<num value="0.335" id="2"/>)</ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>

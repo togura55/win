@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/SM-TRANS.DTD"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="138"><sie_bunmyaku bunmyakucode="1"><trans><ptxt>Various high-strength steel materials with different sheet thicknesses and strengths are applied in many places that vary by body design in order to increase collision safety performance, body stiffness and weight reduction. Stiffening members inside each part (patch, stiffener, etc.) are also specified in detail.</ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>

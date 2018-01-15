@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="92"><sie_bunmyaku bunmyakucode="2"><trans><ptxt>L<break/>Roof Panel Convex Bead</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="3"><trans><ptxt>M<break/>Rear Panel Side Stiffener <break/>Flange Corner End (<num value="2" id="1"/> places)</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="4"><trans><ptxt>N<break/>Rear Panel Upper Stiffener <break/>Flange Notch</ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>

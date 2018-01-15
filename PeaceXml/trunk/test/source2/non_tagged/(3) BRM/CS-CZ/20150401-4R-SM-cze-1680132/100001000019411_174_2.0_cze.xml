@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/SM-TRANS.DTD"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="174"><sie_bunmyaku bunmyakucode="1"><trans><fig-text-grp><ptxt>NOTE:</ptxt><list1><item><ptxt>Check the front side frame position for damage.</ptxt></item><item><ptxt>If the damage is limited to the front portion of the front side frame, remove the front bulkhead, the bulkhead support, the bumper beam extension bracket, and the bumper beam patch, and replace them.</ptxt></item><item><ptxt>Cut the [X] and [Y] positions of the front side frame and the front side backplate, and replace them.</ptxt></item></list1><break/><break/><figure><graphic/></figure></fig-text-grp></trans></sie_bunmyaku></sie_bunmyaku_list>

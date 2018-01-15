@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/SM-TRANS.DTD"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="135"><sie_bunmyaku bunmyakucode="1"><trans><fig-text-grp><ptxt>The door and front bumper reinforcement beams are made from high-strength steel.<break/>Japan production models: The center pillar stiffener is made from high-strength steel (<num value="1500" id="1"/> MPa).</ptxt><ptxt>If high-strength steel is heated, the strength of the steel is reduced. If high-strength steel is damaged, for example, in a collision, and the reinforcement beams or the high-strength steel (<num value="1500" id="2"/> MPa) parts are bent, the beams or the high-strength steel (<num value="1500" id="3"/> MPa) parts may crack when attempting to straighten them. If a door beam is damaged, the whole door panel assembly must be replaced.</ptxt><ptxt>For this reason, the door, front bumper reinforcement beams, and the high-strength steel (<num value="1500" id="4"/> MPa) parts should NEVER be repaired; they must be replaced if they are damaged.</ptxt><figure><graphic/></figure></fig-text-grp></trans></sie_bunmyaku></sie_bunmyaku_list>

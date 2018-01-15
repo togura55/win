@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="116"><sie_bunmyaku bunmyakucode="3"><trans><ptxt>FLOOR<break/>PANEL</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="4"><trans><ptxt>REAR<break/>WHEELHOUSE</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="5"><trans><ptxt>REAR INNER<break/>PANEL</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="6"><trans><ptxt>OUTER<break/>PANEL</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="9"><trans><ptxt>FRONT DAMPER <break/>BASE</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="10"><trans><ptxt>FLOOR PANEL</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="12"><trans><ptxt>REAR DAMPER<break/>BASE</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="15"><trans><ptxt>SIDE SILL<break/>STIFFENER</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="23"><trans><ptxt>Coating <break/>areas</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="32"><trans><ptxt>SIDE SILL<break/>STIFFENER</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="34"><trans><ptxt>EXHAUST PIPE<break/>SLIDER</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="42"><trans><ptxt>SIDE SILL<break/>STIFFENER</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="43"><trans><ptxt>SIDE SILL<break/>EXTENSION</ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>

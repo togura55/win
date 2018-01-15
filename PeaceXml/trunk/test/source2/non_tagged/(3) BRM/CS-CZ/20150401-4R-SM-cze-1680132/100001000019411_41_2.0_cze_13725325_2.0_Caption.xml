@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/caption_trans.dtd"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680132" outlineid="41"><sie_bunmyaku bunmyakucode="2"><trans><ptxt><emph01>NOTE: Make sure to coat the flange on the rear wheel arch.</emph01></ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="10"><trans><ptxt>REAR INNER<break/>PANEL</ptxt></trans></sie_bunmyaku></sie_bunmyaku_list>

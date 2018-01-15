@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sie_bunmyaku_list PUBLIC "-//Honda_Service//Dtd ipas //EN" "./config/SM-TRANS.DTD"[
+<!ENTITY % sdatacharaents SYSTEM "./config/sdatacharaents.txt" >
+%sdatacharaents;
+<!ENTITY % specent SYSTEM "./ent/spec-ent.ent" >
+%specent;
+]>
+<sie_bunmyaku_list translangcode="cze" honyakuiraino="1680131" outlineid="328"><sie_bunmyaku bunmyakucode="2"><trans><fig-text-grp><ptxt>NOTE:</ptxt><list1><item><ptxt>Welding symbols (The welding symbols with dashed lines have a meaning of the spot welding of the part which is not visible)</ptxt><ptxt><symbol01/> and <symbol02/>: 2-Plate spot welding; <symbol03/> and <symbol04/>: 3-Plate spot welding; <symbol05/> and <symbol06/>: 4-Plate spot welding; <symbol07/>: MAG plug welding; <symbol08/>: MAG welding <nodivide>L=Welding</nodivide> length; unit: mm (in)</ptxt></item><item><ptxt>( ): The number of welds</ptxt></item></list1><figure><graphic/></figure><figure><graphic/></figure></fig-text-grp></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="4"><trans><ptxt>NOTE: This section explains the procedures after removal of all related parts. For the related parts&apos; removal procedure, refer to the appropriate Shop Manual.</ptxt></trans></sie_bunmyaku><sie_bunmyaku bunmyakucode="5"><trans><fig-text-grp><list1><item><ptxt>Leave the front roof rail, roof arch A, and the rear roof rail to the body, and replace the roof panel.</ptxt></item><item><ptxt>Check the front roof rail, roof arch A, and the rear roof rail positions for damage. If necessary, replace them.</ptxt></item></list1><break/><break/><figure><graphic/></figure></fig-text-grp></trans></sie_bunmyaku></sie_bunmyaku_list>
