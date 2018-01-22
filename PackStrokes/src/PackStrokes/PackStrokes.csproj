@@ -73,6 +73,9 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BaXterX">
+      <HintPath>..\BaXterX\BaXterX.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -85,19 +88,19 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Wacom.Devices.NET">
-      <HintPath>..\..\..\OneDrive - Wacom AAD\SDKs\Barbera\samples\PackStrokes\src\Sdk\x64\Wacom.Devices.NET.dll</HintPath>
+      <HintPath>..\Sdk\x86\Wacom.Devices.NET.dll</HintPath>
     </Reference>
     <Reference Include="Wacom.Ink.Model.NET">
-      <HintPath>..\..\..\OneDrive - Wacom AAD\SDKs\Barbera\samples\PackStrokes\src\Sdk\x64\Wacom.Ink.Model.NET.dll</HintPath>
+      <HintPath>..\Sdk\x86\Wacom.Ink.Model.NET.dll</HintPath>
     </Reference>
     <Reference Include="Wacom.Ink.NET">
-      <HintPath>..\..\..\OneDrive - Wacom AAD\SDKs\Barbera\samples\PackStrokes\src\Sdk\x64\Wacom.Ink.NET.dll</HintPath>
+      <HintPath>..\Sdk\x86\Wacom.Ink.NET.dll</HintPath>
     </Reference>
     <Reference Include="Wacom.SmartPad.NET">
-      <HintPath>..\..\..\OneDrive - Wacom AAD\SDKs\Barbera\samples\PackStrokes\src\Sdk\x64\Wacom.SmartPad.NET.dll</HintPath>
+      <HintPath>..\Sdk\x86\Wacom.SmartPad.NET.dll</HintPath>
     </Reference>
     <Reference Include="Wacom.Usb.Net">
-      <HintPath>..\..\..\OneDrive - Wacom AAD\SDKs\Barbera\samples\PackStrokes\src\Sdk\x64\Wacom.Usb.Net.dll</HintPath>
+      <HintPath>..\Sdk\x86\Wacom.Usb.Net.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

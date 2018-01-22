@@ -28,25 +28,37 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.Pbtn_start = new System.Windows.Forms.Button();
+            this.PbtnStart = new System.Windows.Forms.Button();
+            this.PbtnFileOpen = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // Pbtn_start
+            // PbtnStart
             // 
-            this.Pbtn_start.Location = new System.Drawing.Point(73, 192);
-            this.Pbtn_start.Name = "Pbtn_start";
-            this.Pbtn_start.Size = new System.Drawing.Size(148, 36);
-            this.Pbtn_start.TabIndex = 0;
-            this.Pbtn_start.Text = "button1";
-            this.Pbtn_start.UseVisualStyleBackColor = true;
-            this.Pbtn_start.Click += new System.EventHandler(this.Pbtn_start_Click);
+            this.PbtnStart.Location = new System.Drawing.Point(73, 192);
+            this.PbtnStart.Name = "PbtnStart";
+            this.PbtnStart.Size = new System.Drawing.Size(148, 36);
+            this.PbtnStart.TabIndex = 0;
+            this.PbtnStart.Text = "button1";
+            this.PbtnStart.UseVisualStyleBackColor = true;
+            this.PbtnStart.Click += new System.EventHandler(this.PbtnStart_Click);
+            // 
+            // PbtnFileOpen
+            // 
+            this.PbtnFileOpen.Location = new System.Drawing.Point(76, 144);
+            this.PbtnFileOpen.Name = "PbtnFileOpen";
+            this.PbtnFileOpen.Size = new System.Drawing.Size(144, 36);
+            this.PbtnFileOpen.TabIndex = 1;
+            this.PbtnFileOpen.Text = "button1";
+            this.PbtnFileOpen.UseVisualStyleBackColor = true;
+            this.PbtnFileOpen.Click += new System.EventHandler(this.PbtnFileOpen_Click);
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 261);
-            this.Controls.Add(this.Pbtn_start);
+            this.Controls.Add(this.PbtnFileOpen);
+            this.Controls.Add(this.PbtnStart);
             this.Name = "FormMain";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.FormMain_Load);
@@ -56,7 +68,8 @@
 
         #endregion
 
-        private System.Windows.Forms.Button Pbtn_start;
+        private System.Windows.Forms.Button PbtnStart;
+        private System.Windows.Forms.Button PbtnFileOpen;
     }
 }
 
