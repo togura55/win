@@ -1,28 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using System.IO;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 using Wacom.Ink;
 using BaXterX;
-using System.IO;
-using System.Diagnostics;
+using Wacom.Devices;
+using Wacom.Devices.Enumeration;
+
+
 
 namespace PackStrokes
 {
     using InkPath = Wacom.Ink.Path; // resolve ref to System.IO.Path
-    
 
     public partial class FormMain : Form
     {
         string csv = string.Empty;
-
         StrokeCollection sc;
+
+        InkDeviceWatcherUSB m_watcherUSB;
+        InkDeviceInfo m_connectingDeviceInfo;
+        ObservableCollection<InkDeviceInfo> m_deviceInfos = new ObservableCollection<InkDeviceInfo>();
+        int indexDevices;
 
         public FormMain()
         {
@@ -36,6 +40,11 @@ namespace PackStrokes
             this.Text = @"PackStroke";
             PbtnStart.Text = @"Start";
             PbtnFileOpen.Text = @"File...";
+            PbtnScanDevices.Text = @"Find Devices";
+            PbtnConnect.Text = @"Connect";
+            tbBle.Text = @"";
+
+            PbtnConnect.Enabled = false;
         }
 
         private void PbtnStart_Click(object sender, EventArgs e)
@@ -50,19 +59,19 @@ namespace PackStrokes
             InkPath p;
 
             // 1st stroke
-            data = new List<float> { 20,21,1, 20,22,1};
+            data = new List<float> { 20, 21, 1, 20, 22, 1 };
             stride = 3;
             p = new InkPath(data, stride, PathFormat.XYA);
             sc.CreateStroke(p);
 
             // 2nd stroke
-            data = new List<float> { 21,30,1, 25,30,1, 24,40,1 };
+            data = new List<float> { 21, 30, 1, 25, 30, 1, 24, 40, 1 };
             stride = 3;
             p = new InkPath(data, stride, PathFormat.XYA);
             sc.CreateStroke(p);
 
             // 3rd stroke
-            data = new List<float> { 210,13,1, 212,30,1, 220,23,1 };
+            data = new List<float> { 210, 13, 1, 212, 30, 1, 220, 23, 1 };
             stride = 3;
             p = new InkPath(data, stride, PathFormat.XYA);
             sc.CreateStroke(p);
@@ -210,6 +219,121 @@ namespace PackStrokes
             {
                 Console.WriteLine(e);
             }
+        }
+
+        private void ListViewDevices_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listViewDevices.SelectedItems.Count > 0)
+            {
+                indexDevices = listViewDevices.SelectedItems[0].Index;
+            }
+        }
+
+        private void PbtnScanDevices_Click(object sender, EventArgs e)
+        {
+            // CDL-Classic only supports the USB connection
+            if (m_watcherUSB.Status != DeviceWatcherStatus.Started &&
+  m_watcherUSB.Status != DeviceWatcherStatus.Stopping &&
+  m_watcherUSB.Status != DeviceWatcherStatus.EnumerationCompleted)
+            {
+                m_watcherUSB.Start();
+//                BtnUsbScanSetScanningAndDisabled();
+//                TextBoxUsbSetText();
+            }
+        }
+
+        private async void PbtnConnect_Click(object sender, EventArgs e)
+        {
+ //           int index = listViewDevices.SelectedIndex;
+
+            if ((indexDevices < 0) || (indexDevices >= m_deviceInfos.Count))
+                return;
+
+            IDigitalInkDevice device = null;
+            m_connectingDeviceInfo = m_deviceInfos[indexDevices];
+
+            PbtnConnect.Enabled = false;
+
+            StopScanning();
+
+            try
+            {
+                device = await InkDeviceFactory.Instance.CreateDeviceAsync(m_connectingDeviceInfo, 
+                    AppObjects.Instance.AppId, true, false, OnDeviceStatusChanged);
+            }
+            catch (Exception ex)
+            {
+                StringBuilder sb = new StringBuilder($"Device creation failed:\n{ex.Message}");
+                string indent = "  ";
+                for (Exception inner = ex.InnerException; inner != null; inner = inner.InnerException)
+                {
+                    sb.Append($"\n{indent}{inner.Message}");
+                    indent = indent + "  ";
+                }
+
+                MessageBox.Show(sb.ToString());
+            }
+
+            if (device == null)
+            {
+                m_connectingDeviceInfo = null;
+                PbtnConnect.Enabled = true;
+                StartScanning();
+                return;
+            }
+
+            AppObjects.Instance.DeviceInfo = m_connectingDeviceInfo;
+            AppObjects.Instance.Device = device;
+            m_connectingDeviceInfo = null;
+
+            await AppObjects.SerializeDeviceInfoAsync(AppObjects.Instance.DeviceInfo);
+
+            //if (NavigationService.CanGoBack)
+            //{
+            //    NavigationService.GoBack();
+            //}
+        }
+
+        private void OnDeviceStatusChanged(object sender, DeviceStatusChangedEventArgs e)
+        {
+            var ignore = Task.Run(() =>
+            {
+                tbBle.Text = AppObjects.GetStringForDeviceStatus(e.Status); // FIX: make a switch on the transport protocol to switch the message for each text boxF
+            });
+        }
+
+        private void StartScanning()
+        {
+            StartWatchers();
+
+            BtnUsbScanSetScanningAndDisabled();
+            //TextBoxBleSetText();
+            //TextBoxUsbSetText();
+        }
+
+        private void StopScanning()
+        {
+            StopWatchers();
+
+            //BtnUsbScanSetScanAndDisabled();
+            //TextBoxBleSetEmpty();
+            //TextBoxUsbSetEmpty();
+        }
+
+        private void StartWatchers()
+        {
+            m_watcherUSB.Start();
+        }
+
+        private void StopWatchers()
+        {
+            m_watcherUSB.Stop();
+        }
+
+        private void BtnUsbScanSetScanningAndDisabled()
+        {
+            //btnUsbScan.Content = "Scanning";
+            //btnUsbScan.IsEnabled = false;
         }
     }
 }
