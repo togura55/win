@@ -24,11 +24,17 @@ namespace PackStrokes
             public Point max;
             public uint index;
             public List<Stroke> strokes;
+            public string fieldData;
+            public string fieldTag;
+            public string fieldId;
 
             public Region()
             {
                 index = 0;
                 strokes = new List<Stroke>();
+                fieldData = string.Empty;
+                fieldTag = string.Empty;
+                fieldId = string.Empty;
             }
         }
         public List<Region> regions;
@@ -87,7 +93,8 @@ namespace PackStrokes
             strokes = new List<Stroke>();
         }
 
-        public bool CreateRegion(uint topX, uint topY, uint bottomX, uint bottomY)
+        public bool CreateRegion(float topX, float topY, float bottomX, float bottomY,
+                        string fieldTag = "",string fieldData = "",string fieldId = "")
         {
             if (topX >= bottomX || topY >= bottomY)
                 return false;
@@ -98,6 +105,9 @@ namespace PackStrokes
             item.max.x = bottomX;
             item.max.y = bottomY;
             item.index = (uint)regions.Count;
+            item.fieldData = fieldData;
+            item.fieldTag = fieldTag;
+            item.fieldId = fieldId;
             regions.Add(item);
 
             return true;

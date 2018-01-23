@@ -16,15 +16,19 @@ using System.Diagnostics;
 namespace PackStrokes
 {
     using InkPath = Wacom.Ink.Path; // resolve ref to System.IO.Path
+    
 
     public partial class FormMain : Form
     {
-        string path = string.Empty;
         string csv = string.Empty;
+
+        StrokeCollection sc;
 
         public FormMain()
         {
             InitializeComponent();
+
+            sc = new StrokeCollection();
         }
 
         private void FormMain_Load(object sender, EventArgs e)
@@ -36,8 +40,6 @@ namespace PackStrokes
 
         private void PbtnStart_Click(object sender, EventArgs e)
         {
-            StrokeCollection sc = new StrokeCollection();
-
             // Define Regions
             sc.CreateRegion(10, 10, 110, 60);
             sc.CreateRegion(200, 10, 300, 60);
@@ -90,18 +92,18 @@ namespace PackStrokes
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
+                string path = string.Empty;
                 path = ofd.FileName;    // full path + filename + extension
-
- //               textBoxReadFile.Text = path;
+                                        //               textBoxReadFile.Text = path;
+                ReadBaxter(path);
             }
         }
 
-        public void ReadBaxter()
+        public void ReadBaxter(string path)
         {
             try
             {
                 Reader reader = new Reader();   // BaXter
-                                                //                StreamReader stream = new StreamReader(path, Encoding.GetEncoding("euc-jp"));
                 StreamReader stream = new StreamReader(path, Encoding.GetEncoding("UTF-8"));
 
                 reader.readFromStream(stream.BaseStream);
@@ -184,14 +186,21 @@ namespace PackStrokes
                         //                        richTextBoxResult.AppendText("\t Completion Time: "
                         //                            + field.completionTime + Environment.NewLine);
 
-                        csv += (field.pdfID
-                            + "," + field.tag
-                            + "," + field.data
-                            + ", " + field.locationX
-                            + ", " + field.locationY
-                            + ", " + field.locationH
-                            + ", " + field.locationW
-                            + Environment.NewLine);
+                        sc.CreateRegion(float.Parse(field.locationX),
+                            float.Parse(field.locationY),
+                            float.Parse(field.locationX) + float.Parse(field.locationW),
+                            float.Parse(field.locationY) + float.Parse(field.locationH),
+                            field.tag, field.data, field.pdfID
+                            );
+
+                        //csv += (field.pdfID
+                        //    + "," + field.tag
+                        //    + "," + field.data
+                        //    + ", " + field.locationX
+                        //    + ", " + field.locationY
+                        //    + ", " + field.locationH
+                        //    + ", " + field.locationW
+                        //    + Environment.NewLine);
                     }
                 }
 
