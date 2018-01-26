@@ -13,7 +13,6 @@ using Wacom.Devices;
 using Wacom.Devices.Enumeration;
 
 
-
 namespace PackStrokes
 {
     using InkPath = Wacom.Ink.Path; // resolve ref to System.IO.Path
@@ -28,11 +27,25 @@ namespace PackStrokes
         ObservableCollection<InkDeviceInfo> m_deviceInfos = new ObservableCollection<InkDeviceInfo>();
         int indexDevices;
 
+        public ObservableCollection<InkDeviceInfo> DeviceInfos
+        {
+            get
+            {
+                return m_deviceInfos;
+            }
+        }
+
         public FormMain()
         {
             InitializeComponent();
 
+//            this.DataContext = this;
+
             sc = new StrokeCollection();
+
+            m_watcherUSB = new InkDeviceWatcherUSB();  // Only for USB connection
+            m_watcherUSB.DeviceAdded += OnDeviceAdded;
+            m_watcherUSB.DeviceRemoved += OnDeviceRemoved;
         }
 
         private void FormMain_Load(object sender, EventArgs e)
@@ -43,6 +56,7 @@ namespace PackStrokes
             PbtnScanDevices.Text = @"Find Devices";
             PbtnConnect.Text = @"Connect";
             tbBle.Text = @"";
+            tbUsb.Text = @"";
 
             PbtnConnect.Enabled = false;
         }
@@ -231,15 +245,36 @@ namespace PackStrokes
 
         private void PbtnScanDevices_Click(object sender, EventArgs e)
         {
-            // CDL-Classic only supports the USB connection
-            if (m_watcherUSB.Status != DeviceWatcherStatus.Started &&
-  m_watcherUSB.Status != DeviceWatcherStatus.Stopping &&
-  m_watcherUSB.Status != DeviceWatcherStatus.EnumerationCompleted)
+            try
             {
-                m_watcherUSB.Start();
-//                BtnUsbScanSetScanningAndDisabled();
-//                TextBoxUsbSetText();
+                // init
+                AppObjects.Instance.DeviceInfo = null;
+
+                if (AppObjects.Instance.Device != null)
+                {
+                    AppObjects.Instance.Device.Close();
+                    AppObjects.Instance.Device = null;
+                }
+
+                StartScanning();
+ //               KeepAlive = true;
+
+
+                // CDL-Classic only supports the USB connection
+                if (m_watcherUSB.Status != DeviceWatcherStatus.Started &&
+                    m_watcherUSB.Status != DeviceWatcherStatus.Stopping &&
+                    m_watcherUSB.Status != DeviceWatcherStatus.EnumerationCompleted)
+                {
+                    m_watcherUSB.Start();
+                    BtnUsbScanSetScanningAndDisabled();
+                    TextBoxUsbSetText();
+                }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("{0}", ex);
+            }
+
         }
 
         private async void PbtnConnect_Click(object sender, EventArgs e)
@@ -302,6 +337,41 @@ namespace PackStrokes
             });
         }
 
+        private void OnDeviceAdded(object sender, InkDeviceInfo info)
+        {
+            //var ignore = Task.Run( () =>
+            //{
+            m_deviceInfos.Add(info);
+            //});
+        }
+
+        private void OnDeviceRemoved(object sender, InkDeviceInfo info)
+        {
+            //var ignore = Task.Run( () =>
+            //{
+            RemoveDevice(info);
+            //});
+        }
+
+        private void RemoveDevice(InkDeviceInfo info)
+        {
+            int index = -1;
+
+            for (int i = 0; i < m_deviceInfos.Count; i++)
+            {
+                if (m_deviceInfos[i].DeviceId == info.DeviceId)
+                {
+                    index = i;
+                    break;
+                }
+            }
+
+            if (index != -1)
+            {
+                m_deviceInfos.RemoveAt(index);
+            }
+        }
+
         private void StartScanning()
         {
             StartWatchers();
@@ -334,6 +404,32 @@ namespace PackStrokes
         {
             //btnUsbScan.Content = "Scanning";
             //btnUsbScan.IsEnabled = false;
+        }
+
+        private void BtnUsbScanSetScanAndDisabled()
+        {
+            PbtnScanDevices.Text = "Scan";
+            PbtnScanDevices.Enabled = false;
+        }
+
+        private void TextBoxBleSetText()
+        {
+            tbUsb.Text = "Connect the device to a USB port and turn it on.";
+        }
+
+        private void TextBoxBleSetEmpty()
+        {
+            tbBle.Text = string.Empty;
+        }
+
+        private void TextBoxUsbSetText()
+        {
+            tbUsb.Text = "Connect the device to a USB port and turn it on.";
+        }
+
+        private void TextBoxUsbSetEmpty()
+        {
+            tbUsb.Text = string.Empty;
         }
     }
 }
