@@ -1,31 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using System.Windows.Forms;
-
-using System.IO;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
 
 using Wacom.Ink;
 using BaXterX;
 using Wacom.Devices;
 using Wacom.Devices.Enumeration;
-
+using System.Collections.ObjectModel;
+using Microsoft.Win32;
+using System.IO;
 
 namespace PackStrokes
 {
     using InkPath = Wacom.Ink.Path; // resolve ref to System.IO.Path
 
-    public partial class FormMain : Form
+    /// <summary>
+    /// MainWindow.xaml の相互作用ロジック
+    /// </summary>
+    public partial class MainWindow : Window
     {
         string csv = string.Empty;
-        StrokeCollection sc;
+        public StrokeCollection sc;
 
         InkDeviceWatcherUSB m_watcherUSB;
         InkDeviceInfo m_connectingDeviceInfo;
-        ObservableCollection<InkDeviceInfo> m_deviceInfos = new ObservableCollection<InkDeviceInfo>();
-        int indexDevices;
+        public ObservableCollection<InkDeviceInfo> m_deviceInfos = new ObservableCollection<InkDeviceInfo>();
 
         public ObservableCollection<InkDeviceInfo> DeviceInfos
         {
@@ -33,13 +43,14 @@ namespace PackStrokes
             {
                 return m_deviceInfos;
             }
+            set { }
         }
 
-        public FormMain()
+        public MainWindow()
         {
             InitializeComponent();
 
-//            this.DataContext = this;
+            this.DataContext = m_deviceInfos;
 
             sc = new StrokeCollection();
 
@@ -48,20 +59,20 @@ namespace PackStrokes
             m_watcherUSB.DeviceRemoved += OnDeviceRemoved;
         }
 
-        private void FormMain_Load(object sender, EventArgs e)
+        void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            this.Text = @"PackStroke";
-            PbtnStart.Text = @"Start";
-            PbtnFileOpen.Text = @"File...";
-            PbtnScanDevices.Text = @"Find Devices";
-            PbtnConnect.Text = @"Connect";
-            tbBle.Text = @"";
-            tbUsb.Text = @"";
+            this.Title = @"PackStroke";
+            PbtnStart.Content = @"Start";
+            PbtnFileOpen.Content = @"File...";
+            PbtnScanDevices.Content = @"Find Devices";
+            PbtnConnect.Content = @"Connect";
+            tbBle.Content = @"";
+            tbUsb.Content = @"";
 
-            PbtnConnect.Enabled = false;
+            PbtnConnect.IsEnabled = false;
         }
 
-        private void PbtnStart_Click(object sender, EventArgs e)
+        private void PbtnStart_Click(object sender, RoutedEventArgs e)
         {
             // Define Regions
             sc.CreateRegion(10, 10, 110, 60);
@@ -97,30 +108,123 @@ namespace PackStrokes
             sc.StrokesToRegion();
         }
 
-        private void PbtnFileOpen_Click(object sender, EventArgs e)
+        private void PbtnFileOpen_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog ofd = new OpenFileDialog()
+            try
             {
-                FileName = string.Empty,
-                //           ofd.InitialDirectory = @"C:\";
-                InitialDirectory = string.Empty,  // current directory
-                Filter = "PDF File (*.pdf)|*.pdf|All Files(*.*)|*.*",
-                FilterIndex = 2,
-                //set the title
-                Title = "Please set the File",
-                RestoreDirectory = true,
-                CheckFileExists = true,
-                CheckPathExists = true
-            };
+                OpenFileDialog ofd = new OpenFileDialog()
+                {
+                    FileName = string.Empty,
+                    //           ofd.InitialDirectory = @"C:\";
+                    InitialDirectory = string.Empty,  // current directory
+                    Filter = "PDF File (*.pdf)|*.pdf|All Files(*.*)|*.*",
+                    FilterIndex = 2,
+                    //set the title
+                    Title = "Please set the File",
+                    RestoreDirectory = true,
+                    CheckFileExists = true,
+                    CheckPathExists = true
+                };
 
-            if (ofd.ShowDialog() == DialogResult.OK)
+                if (ofd.ShowDialog() == true)
+                {
+                    string path = string.Empty;
+                    path = ofd.FileName;    // full path + filename + extension
+                                            //               textBoxReadFile.Text = path;
+                    ReadBaxter(path);
+                }
+            }
+            catch (Exception ex)
             {
-                string path = string.Empty;
-                path = ofd.FileName;    // full path + filename + extension
-                                        //               textBoxReadFile.Text = path;
-                ReadBaxter(path);
+                Console.WriteLine(ex.Message);
             }
         }
+
+        private void PbtnScanDevices_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // init
+                AppObjects.Instance.DeviceInfo = null;
+
+                if (AppObjects.Instance.Device != null)
+                {
+                    AppObjects.Instance.Device.Close();
+                    AppObjects.Instance.Device = null;
+                }
+
+                StartScanning();
+                //               KeepAlive = true;
+
+
+                // CDL-Classic only supports the USB connection
+                if (m_watcherUSB.Status != DeviceWatcherStatus.Started &&
+                    m_watcherUSB.Status != DeviceWatcherStatus.Stopping &&
+                    m_watcherUSB.Status != DeviceWatcherStatus.EnumerationCompleted)
+                {
+                    m_watcherUSB.Start();
+                    BtnUsbScanSetScanningAndDisabled();
+                    TextBoxUsbSetText();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("{0}", ex);
+            }
+        }
+
+        private async void PbtnConnect_Click(object sender, RoutedEventArgs e)
+        {
+            int index = ListViewDevices.SelectedIndex;
+
+            if ((index < 0) || (index >= m_deviceInfos.Count))
+                return;
+
+            IDigitalInkDevice device = null;
+            m_connectingDeviceInfo = m_deviceInfos[index];
+
+            PbtnConnect.IsEnabled = false;
+
+            StopScanning();
+
+            try
+            {
+                device = await InkDeviceFactory.Instance.CreateDeviceAsync(m_connectingDeviceInfo,
+                    AppObjects.Instance.AppId, true, false, OnDeviceStatusChanged);
+            }
+            catch (Exception ex)
+            {
+                StringBuilder sb = new StringBuilder($"Device creation failed:\n{ex.Message}");
+                string indent = "  ";
+                for (Exception inner = ex.InnerException; inner != null; inner = inner.InnerException)
+                {
+                    sb.Append($"\n{indent}{inner.Message}");
+                    indent = indent + "  ";
+                }
+
+                MessageBox.Show(sb.ToString());
+            }
+
+            if (device == null)
+            {
+                m_connectingDeviceInfo = null;
+                PbtnConnect.IsEnabled = true;
+                StartScanning();
+                return;
+            }
+
+            AppObjects.Instance.DeviceInfo = m_connectingDeviceInfo;
+            AppObjects.Instance.Device = device;
+            m_connectingDeviceInfo = null;
+
+            await AppObjects.SerializeDeviceInfoAsync(AppObjects.Instance.DeviceInfo);
+
+            //if (NavigationService.CanGoBack)
+            //{
+            //    NavigationService.GoBack();
+            //}
+        }
+
 
         public void ReadBaxter(string path)
         {
@@ -235,122 +339,28 @@ namespace PackStrokes
             }
         }
 
-        private void ListViewDevices_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (listViewDevices.SelectedItems.Count > 0)
-            {
-                indexDevices = listViewDevices.SelectedItems[0].Index;
-            }
-        }
-
-        private void PbtnScanDevices_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                // init
-                AppObjects.Instance.DeviceInfo = null;
-
-                if (AppObjects.Instance.Device != null)
-                {
-                    AppObjects.Instance.Device.Close();
-                    AppObjects.Instance.Device = null;
-                }
-
-                StartScanning();
- //               KeepAlive = true;
-
-
-                // CDL-Classic only supports the USB connection
-                if (m_watcherUSB.Status != DeviceWatcherStatus.Started &&
-                    m_watcherUSB.Status != DeviceWatcherStatus.Stopping &&
-                    m_watcherUSB.Status != DeviceWatcherStatus.EnumerationCompleted)
-                {
-                    m_watcherUSB.Start();
-                    BtnUsbScanSetScanningAndDisabled();
-                    TextBoxUsbSetText();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("{0}", ex);
-            }
-
-        }
-
-        private async void PbtnConnect_Click(object sender, EventArgs e)
-        {
- //           int index = listViewDevices.SelectedIndex;
-
-            if ((indexDevices < 0) || (indexDevices >= m_deviceInfos.Count))
-                return;
-
-            IDigitalInkDevice device = null;
-            m_connectingDeviceInfo = m_deviceInfos[indexDevices];
-
-            PbtnConnect.Enabled = false;
-
-            StopScanning();
-
-            try
-            {
-                device = await InkDeviceFactory.Instance.CreateDeviceAsync(m_connectingDeviceInfo, 
-                    AppObjects.Instance.AppId, true, false, OnDeviceStatusChanged);
-            }
-            catch (Exception ex)
-            {
-                StringBuilder sb = new StringBuilder($"Device creation failed:\n{ex.Message}");
-                string indent = "  ";
-                for (Exception inner = ex.InnerException; inner != null; inner = inner.InnerException)
-                {
-                    sb.Append($"\n{indent}{inner.Message}");
-                    indent = indent + "  ";
-                }
-
-                MessageBox.Show(sb.ToString());
-            }
-
-            if (device == null)
-            {
-                m_connectingDeviceInfo = null;
-                PbtnConnect.Enabled = true;
-                StartScanning();
-                return;
-            }
-
-            AppObjects.Instance.DeviceInfo = m_connectingDeviceInfo;
-            AppObjects.Instance.Device = device;
-            m_connectingDeviceInfo = null;
-
-            await AppObjects.SerializeDeviceInfoAsync(AppObjects.Instance.DeviceInfo);
-
-            //if (NavigationService.CanGoBack)
-            //{
-            //    NavigationService.GoBack();
-            //}
-        }
-
         private void OnDeviceStatusChanged(object sender, DeviceStatusChangedEventArgs e)
         {
             var ignore = Task.Run(() =>
             {
-                tbBle.Text = AppObjects.GetStringForDeviceStatus(e.Status); // FIX: make a switch on the transport protocol to switch the message for each text boxF
+                tbBle.Content = AppObjects.GetStringForDeviceStatus(e.Status); // FIX: make a switch on the transport protocol to switch the message for each text boxF
             });
         }
 
         private void OnDeviceAdded(object sender, InkDeviceInfo info)
         {
-            //var ignore = Task.Run( () =>
-            //{
+            var ignore = Task.Run( () =>
+            {
             m_deviceInfos.Add(info);
-            //});
+            });
         }
 
         private void OnDeviceRemoved(object sender, InkDeviceInfo info)
         {
-            //var ignore = Task.Run( () =>
-            //{
+            var ignore = Task.Run( () =>
+            {
             RemoveDevice(info);
-            //});
+            });
         }
 
         private void RemoveDevice(InkDeviceInfo info)
@@ -408,28 +418,29 @@ namespace PackStrokes
 
         private void BtnUsbScanSetScanAndDisabled()
         {
-            PbtnScanDevices.Text = "Scan";
-            PbtnScanDevices.Enabled = false;
+            PbtnScanDevices.Content = "Scan";
+            PbtnScanDevices.IsEnabled = false;
         }
 
         private void TextBoxBleSetText()
         {
-            tbUsb.Text = "Connect the device to a USB port and turn it on.";
+            tbUsb.Content = "Connect the device to a USB port and turn it on.";
         }
 
         private void TextBoxBleSetEmpty()
         {
-            tbBle.Text = string.Empty;
+            tbBle.Content = string.Empty;
         }
 
         private void TextBoxUsbSetText()
         {
-            tbUsb.Text = "Connect the device to a USB port and turn it on.";
+            tbUsb.Content = "Connect the device to a USB port and turn it on.";
         }
 
         private void TextBoxUsbSetEmpty()
         {
-            tbUsb.Text = string.Empty;
+            tbUsb.Content = string.Empty;
         }
+
     }
 }
