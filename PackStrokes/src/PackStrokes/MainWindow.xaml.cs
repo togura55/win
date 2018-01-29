@@ -43,14 +43,13 @@ namespace PackStrokes
             {
                 return m_deviceInfos;
             }
-            set { }
         }
 
         public MainWindow()
         {
             InitializeComponent();
 
-            this.DataContext = m_deviceInfos;
+            this.DataContext = this;
 
             sc = new StrokeCollection();
 
@@ -154,7 +153,7 @@ namespace PackStrokes
                 }
 
                 StartScanning();
-                //               KeepAlive = true;
+  //                            KeepAlive = true;
 
 
                 // CDL-Classic only supports the USB connection
@@ -349,18 +348,26 @@ namespace PackStrokes
 
         private void OnDeviceAdded(object sender, InkDeviceInfo info)
         {
-            var ignore = Task.Run( () =>
+            try
             {
-            m_deviceInfos.Add(info);
-            });
+                //var ignore = Task.Run(() =>
+                //{
+                    m_deviceInfos.Add(info);
+                //});
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
         }
 
         private void OnDeviceRemoved(object sender, InkDeviceInfo info)
         {
-            var ignore = Task.Run( () =>
-            {
+            //var ignore = Task.Run( () =>
+            //{
             RemoveDevice(info);
-            });
+            //});
         }
 
         private void RemoveDevice(InkDeviceInfo info)

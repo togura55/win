@@ -13,12 +13,26 @@
             <ColumnDefinition Width="148*"/>
             <ColumnDefinition Width="123*"/>
         </Grid.ColumnDefinitions>
-        <ListView x:Name="ListViewDevices" HorizontalAlignment="Left" Height="92" Margin="27.077,30,0,0" VerticalAlignment="Top" Width="185" Grid.ColumnSpan="2" Grid.Column="1">
-            <ListView.View>
+        <ListView x:Name="ListViewDevices" 
+                  ItemsSource="{Binding DeviceInfos}" 
+                  HorizontalAlignment="Left" 
+                  Height="92" 
+                  Margin="27.077,30,0,0" 
+                  VerticalAlignment="Top" 
+                  Width="185" 
+                  Grid.ColumnSpan="2" 
+                  Grid.Column="1"
+                  >
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding DeviceName}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <!--<ListView.View>
                 <GridView>
                     <GridViewColumn/>
                 </GridView>
-            </ListView.View>
+            </ListView.View>-->
         </ListView>
         <Button x:Name="PbtnScanDevices" Content="Button" HorizontalAlignment="Left" Margin="27,167,0,0" VerticalAlignment="Top" Width="75" Grid.Column="1" Click="PbtnScanDevices_Click"/>
         <Button x:Name="PbtnConnect" Content="Button" HorizontalAlignment="Left" Margin="137,166,0,0" VerticalAlignment="Top" Width="75" Grid.ColumnSpan="2" Grid.Column="1" Click="PbtnConnect_Click"/>

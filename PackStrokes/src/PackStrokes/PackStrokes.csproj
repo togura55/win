@@ -36,7 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BaXterX">
-      <HintPath>..\..\..\Documents\GitHub\win\PackStrokes\src\BaXterX\BaXterX.dll</HintPath>
+      <HintPath>..\BaXterX\BaXterX.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -51,19 +51,19 @@
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="Wacom.Devices.NET">
-      <HintPath>..\..\..\Documents\GitHub\win\PackStrokes\src\Sdk\x86\Wacom.Devices.NET.dll</HintPath>
+      <HintPath>..\Sdk\x86\Wacom.Devices.NET.dll</HintPath>
     </Reference>
     <Reference Include="Wacom.Ink.Model.NET">
-      <HintPath>..\..\..\Documents\GitHub\win\PackStrokes\src\Sdk\x86\Wacom.Ink.Model.NET.dll</HintPath>
+      <HintPath>..\Sdk\x86\Wacom.Ink.Model.NET.dll</HintPath>
     </Reference>
     <Reference Include="Wacom.Ink.NET">
-      <HintPath>..\..\..\Documents\GitHub\win\PackStrokes\src\Sdk\x86\Wacom.Ink.NET.dll</HintPath>
+      <HintPath>..\Sdk\x86\Wacom.Ink.NET.dll</HintPath>
     </Reference>
     <Reference Include="Wacom.SmartPad.NET">
-      <HintPath>..\..\..\Documents\GitHub\win\PackStrokes\src\Sdk\x86\Wacom.SmartPad.NET.dll</HintPath>
+      <HintPath>..\Sdk\x86\Wacom.SmartPad.NET.dll</HintPath>
     </Reference>
     <Reference Include="Wacom.Usb.Net">
-      <HintPath>..\..\..\Documents\GitHub\win\PackStrokes\src\Sdk\x86\Wacom.Usb.Net.dll</HintPath>
+      <HintPath>..\Sdk\x86\Wacom.Usb.Net.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
