@@ -453,6 +453,9 @@ namespace PackStrokes
                 //var ignore = Task.Run(() =>
                 //{
                     m_deviceInfos.Add(info);
+
+                PbtnConnect.IsEnabled = true;  // ToDo: consider to be located more effective
+
                 //});
 
                 PbtnConnect.IsEnabled = !PbtnConnect.IsEnabled;
