@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 using Wacom.Devices;
 using Wacom.Ink;
 
-
 namespace PackStrokes
 {
-    public class StrokeCollection
+    public class StrokeAggregation
     {
         public struct Point
         {
@@ -86,15 +86,15 @@ namespace PackStrokes
         /// <summary>
         /// Constructor of the class
         /// </summary>
-        public StrokeCollection()
+        public StrokeAggregation()
         {
             regions = new List<Region>();
- //           hwstrings = new List<Hwstring>();
+            //           hwstrings = new List<Hwstring>();
             strokes = new List<Stroke>();
         }
 
         public bool CreateRegion(float topX, float topY, float bottomX, float bottomY,
-                        string fieldTag = "",string fieldData = "",string fieldId = "")
+                        string fieldTag = "", string fieldData = "", string fieldId = "")
         {
             if (topX >= bottomX || topY >= bottomY)
                 return false;
@@ -172,7 +172,7 @@ namespace PackStrokes
             st.regionIndex = 0;
 
             strokes.Add(st);
-            
+
             return true;
         }
 
@@ -189,18 +189,18 @@ namespace PackStrokes
                               s.max.x <= r.max.x && s.max.y <= r.max.y)
                         {
                             // このストロークは入っている
-                            r.strokes = new List<StrokeCollection.Stroke>(){s};
+                            r.strokes = new List<StrokeAggregation.Stroke>() { s };
 
                             break;
                         }
 
                         // ToDo: ストロークの一部がリージョン内にかかるケース
 
-                    // ToDo: ストロークがまったくリージョンにかからないケース
+                        // ToDo: ストロークがまったくリージョンにかからないケース
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(String.Format("{0}", ex));
                 return false;

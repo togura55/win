@@ -17,21 +17,29 @@ using Wacom.Ink;
 using BaXterX;
 using Wacom.Devices;
 using Wacom.Devices.Enumeration;
-using System.Collections.ObjectModel;
+
 using Microsoft.Win32;
 using System.IO;
+using System.Windows.Threading;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Windows.Ink;
+using System.Collections.ObjectModel;
+
 
 namespace PackStrokes
 {
     using InkPath = Wacom.Ink.Path; // resolve ref to System.IO.Path
+    using WinStroke = System.Windows.Ink.Stroke;
 
     /// <summary>
     /// MainWindow.xaml の相互作用ロジック
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         string csv = string.Empty;
-        public StrokeCollection sc;
+        public StrokeAggregation sa;
 
         InkDeviceWatcherUSB m_watcherUSB;
         InkDeviceInfo m_connectingDeviceInfo;
@@ -45,13 +53,32 @@ namespace PackStrokes
             }
         }
 
+        //---- Stroke collection used for real-time rendering 
+        private CancellationTokenSource m_cts = new CancellationTokenSource();
+
+        private StrokeCollection _strokes = new StrokeCollection();
+        private double m_scale = 1.0;
+        private Size m_deviceSize;
+        private bool m_addNewStrokeToModel = true;
+        private static float maxP = 1.402218f;
+        private static float pFactor = 1.0f / (maxP - 1.0f);
+        public event PropertyChangedEventHandler PropertyChanged;
+        public StrokeCollection Strokes //Used as databinding into XAML
+        {
+            get
+            {
+                return _strokes;
+            }
+        }
+        // -----
+
         public MainWindow()
         {
             InitializeComponent();
 
             this.DataContext = this;
 
-            sc = new StrokeCollection();
+            sa = new StrokeAggregation();
 
             m_watcherUSB = new InkDeviceWatcherUSB();  // Only for USB connection
             m_watcherUSB.DeviceAdded += OnDeviceAdded;
@@ -65,17 +92,26 @@ namespace PackStrokes
             PbtnFileOpen.Content = @"File...";
             PbtnScanDevices.Content = @"Find Devices";
             PbtnConnect.Content = @"Connect";
+            PbtnClear.Content = @"Clear";
+            PbtnRealTimeInk.Content = @"RealTimeInk";
+            PbtnStop.Content = @"Stop";
+            PbtnFileTransfer.Content = @"FileTransfer";
+
             tbBle.Content = @"";
             tbUsb.Content = @"";
 
             PbtnConnect.IsEnabled = false;
+            PbtnRealTimeInk.IsEnabled = false;
+            PbtnFileTransfer.IsEnabled = false;
+            PbtnStop.IsEnabled = false;
+            PbtnClear.IsEnabled = false;
         }
 
         private void PbtnStart_Click(object sender, RoutedEventArgs e)
         {
             // Define Regions
-            sc.CreateRegion(10, 10, 110, 60);
-            sc.CreateRegion(200, 10, 300, 60);
+            sa.CreateRegion(10, 10, 110, 60);
+            sa.CreateRegion(200, 10, 300, 60);
 
             // Simurate Input Strokes
             List<float> data;
@@ -86,25 +122,25 @@ namespace PackStrokes
             data = new List<float> { 20, 21, 1, 20, 22, 1 };
             stride = 3;
             p = new InkPath(data, stride, PathFormat.XYA);
-            sc.CreateStroke(p);
+            sa.CreateStroke(p);
 
             // 2nd stroke
             data = new List<float> { 21, 30, 1, 25, 30, 1, 24, 40, 1 };
             stride = 3;
             p = new InkPath(data, stride, PathFormat.XYA);
-            sc.CreateStroke(p);
+            sa.CreateStroke(p);
 
             // 3rd stroke
             data = new List<float> { 210, 13, 1, 212, 30, 1, 220, 23, 1 };
             stride = 3;
             p = new InkPath(data, stride, PathFormat.XYA);
-            sc.CreateStroke(p);
+            sa.CreateStroke(p);
 
 
             // ストロークをリージョンに当てはめる
             // 後から当てはめるか、
             // リアルタイムに当てはめるか sc.Regionがあるかどうか
-            sc.StrokesToRegion();
+            sa.StrokesToRegion();
         }
 
         private void PbtnFileOpen_Click(object sender, RoutedEventArgs e)
@@ -222,6 +258,69 @@ namespace PackStrokes
             //{
             //    NavigationService.GoBack();
             //}
+
+            PbtnRealTimeInk.IsEnabled = !PbtnRealTimeInk.IsEnabled;
+            PbtnFileTransfer.IsEnabled = !PbtnFileTransfer.IsEnabled;
+        }
+
+        private async void PbtnRealTimeInk_Click(object sender, RoutedEventArgs e)
+        {
+            IDigitalInkDevice device = AppObjects.Instance.Device;
+
+            device.Disconnected += OnDeviceDisconnected;
+
+//            NavigationService.Navigating += NavigationService_Navigating;
+//            NavigationService.Navigated += NavigationService_Navigated;
+
+            IRealTimeInkService service = device.GetService(InkDeviceService.RealTimeInk) as IRealTimeInkService;
+            service.NewPage += OnNewPage; //Clear page on new page or layer
+            service.NewLayer += OnNewPage;
+            CanvasMain.DataContext = this;
+//            m_Canvas.DataContext = this;
+            try
+            {
+                uint width = (uint)await device.GetPropertyAsync("Width", m_cts.Token);
+                uint height = (uint)await device.GetPropertyAsync("Height", m_cts.Token);
+                uint ptSize = (uint)await device.GetPropertyAsync("PointSize", m_cts.Token);
+
+
+                m_deviceSize.Width = width;
+                m_deviceSize.Height = height;
+
+                SetCanvasScaling();
+
+                service.StrokeStarted += Service_StrokeStarted;
+                service.StrokeUpdated += Service_StrokeUpdated;
+                service.StrokeEnded += Service_StrokeEnded;
+
+                if (!service.IsStarted)
+                {
+                    await service.StartAsync(true, m_cts.Token);
+                }
+
+                PbtnStop.IsEnabled = !PbtnStop.IsEnabled;
+                PbtnClear.IsEnabled = !PbtnClear.IsEnabled;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void PbtnFileTransfer_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void PbtnStop_Click(object sender, RoutedEventArgs e)
+        {
+            PbtnRealTimeInk.IsEnabled = !PbtnRealTimeInk.IsEnabled;
+            PbtnFileTransfer.IsEnabled = !PbtnFileTransfer.IsEnabled;
+        }
+
+        private void PbtnClear_Click(object sender, RoutedEventArgs e)
+        {
+
         }
 
 
@@ -312,7 +411,7 @@ namespace PackStrokes
                         //                        richTextBoxResult.AppendText("\t Completion Time: "
                         //                            + field.completionTime + Environment.NewLine);
 
-                        sc.CreateRegion(float.Parse(field.locationX),
+                        sa.CreateRegion(float.Parse(field.locationX),
                             float.Parse(field.locationY),
                             float.Parse(field.locationX) + float.Parse(field.locationW),
                             float.Parse(field.locationY) + float.Parse(field.locationH),
@@ -344,6 +443,7 @@ namespace PackStrokes
             {
                 tbBle.Content = AppObjects.GetStringForDeviceStatus(e.Status); // FIX: make a switch on the transport protocol to switch the message for each text boxF
             });
+
         }
 
         private void OnDeviceAdded(object sender, InkDeviceInfo info)
@@ -354,6 +454,8 @@ namespace PackStrokes
                 //{
                     m_deviceInfos.Add(info);
                 //});
+
+                PbtnConnect.IsEnabled = !PbtnConnect.IsEnabled;
             }
             catch(Exception ex)
             {
@@ -388,6 +490,142 @@ namespace PackStrokes
                 m_deviceInfos.RemoveAt(index);
             }
         }
+
+        // --- realtime Ink handlers ----
+        private void Service_StrokeEnded(object sender, StrokeEndedEventArgs e)
+        {
+            Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
+            {
+                var pathPart = e.PathPart;
+                var data = pathPart.Data.GetEnumerator();
+
+
+                //Data is stored XYW
+                float x = -1;
+                float y = -1;
+                float w = -1;
+
+                if (data.MoveNext())
+                {
+                    x = data.Current;
+                }
+
+                if (data.MoveNext())
+                {
+                    y = data.Current;
+                }
+
+                if (data.MoveNext())
+                {
+                    //Clamp to 0.0 -> 1.0
+                    w = Math.Max(0.0f, Math.Min(1.0f, (data.Current - 1.0f) * pFactor));
+                }
+
+                var point = new System.Windows.Input.StylusPoint(x * m_scale, y * m_scale, w);
+                Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
+                {
+                    _strokes[_strokes.Count - 1].StylusPoints.Add(point);
+ //                   NotifyPropertyChanged("Strokes");
+                }));
+
+                m_addNewStrokeToModel = true;
+
+            }));
+
+
+        }
+
+        private void Service_StrokeUpdated(object sender, StrokeUpdatedEventArgs e)
+        {
+            var pathPart = e.PathPart;
+            var data = pathPart.Data.GetEnumerator();
+
+            //Data is stored XYW
+            float x = -1;
+            float y = -1;
+            float w = -1;
+
+            if (data.MoveNext())
+            {
+                x = data.Current;
+            }
+
+            if (data.MoveNext())
+            {
+                y = data.Current;
+            }
+
+            if (data.MoveNext())
+            {
+                //Clamp to 0.0 -> 1.0
+                w = Math.Max(0.0f, Math.Min(1.0f, (data.Current - 1.0f) * pFactor));
+            }
+
+            var point = new System.Windows.Input.StylusPoint(x * m_scale, y * m_scale, w);
+            if (m_addNewStrokeToModel)
+            {
+                m_addNewStrokeToModel = false;
+                var points = new System.Windows.Input.StylusPointCollection();
+                points.Add(point);
+
+                var stroke = new WinStroke(points);
+                stroke.DrawingAttributes = m_DrawingAttributes;
+
+                Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
+                {
+                    _strokes.Add(stroke);
+                }));
+            }
+            else
+            {
+                Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
+                {
+                    _strokes[_strokes.Count - 1].StylusPoints.Add(point);
+                }));
+            }
+
+        }
+
+        private void Service_StrokeStarted(object sender, StrokeStartedEventArgs e)
+        {
+            m_addNewStrokeToModel = true;
+        }
+
+        private void OnNewPage(object sender, EventArgs e)
+        {
+            var ignore = Task.Run(() =>
+            {
+                _strokes.Clear();
+
+            });
+        }
+
+        private void OnDeviceDisconnected(object sender, EventArgs e)
+        {
+            AppObjects.Instance.Device = null;
+
+            MessageBox.Show($"The device {AppObjects.Instance.DeviceInfo.DeviceName} was disconnected.");
+
+ //           NavigationService.Navigate(new ScanAndConnectPage());
+        }
+
+        private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            SetCanvasScaling();
+        }
+
+        private void SetCanvasScaling()
+        {
+            IDigitalInkDevice device = AppObjects.Instance.Device;
+
+            if (device != null)
+            {
+                double sx = CanvasMain.ActualWidth / m_deviceSize.Width;
+                double sy = CanvasMain.ActualHeight / m_deviceSize.Height;
+                m_scale = Math.Min(sx, sy);
+            }
+        }
+        // ------
 
         private void StartScanning()
         {

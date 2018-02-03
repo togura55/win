@@ -6,21 +6,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PackStrokes"
         mc:Ignorable="d"
-        Title="MainWindow" Height="278.846" Width="303.846">
-    <Grid Height="248" VerticalAlignment="Top" HorizontalAlignment="Left" Width="294">
+        Title="MainWindow" Height="278.846" Width="611.802">
+    <Grid Height="248" VerticalAlignment="Top" HorizontalAlignment="Left" Width="602">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="23*"/>
-            <ColumnDefinition Width="148*"/>
-            <ColumnDefinition Width="123*"/>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="0*"/>
         </Grid.ColumnDefinitions>
         <ListView x:Name="ListViewDevices" 
                   ItemsSource="{Binding DeviceInfos}" 
                   HorizontalAlignment="Left" 
                   Height="92" 
-                  Margin="27.077,30,0,0" 
+                  Margin="27,30,0,0" 
                   VerticalAlignment="Top" 
-                  Width="185" 
-                  Grid.ColumnSpan="2" 
+                  Width="165" 
                   Grid.Column="1"
                   >
             <ListView.ItemTemplate>
@@ -34,12 +33,25 @@
                 </GridView>
             </ListView.View>-->
         </ListView>
-        <Button x:Name="PbtnScanDevices" Content="Button" HorizontalAlignment="Left" Margin="27,167,0,0" VerticalAlignment="Top" Width="75" Grid.Column="1" Click="PbtnScanDevices_Click"/>
-        <Button x:Name="PbtnConnect" Content="Button" HorizontalAlignment="Left" Margin="137,166,0,0" VerticalAlignment="Top" Width="75" Grid.ColumnSpan="2" Grid.Column="1" Click="PbtnConnect_Click"/>
-        <Button x:Name="PbtnStart" Content="Button" HorizontalAlignment="Left" Margin="27,211,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.482,3.285" Grid.Column="1" Click="PbtnStart_Click"/>
-        <Button x:Name="PbtnFileOpen" Content="Button" HorizontalAlignment="Left" Margin="137,210,0,0" VerticalAlignment="Top" Width="75" Grid.ColumnSpan="2" Grid.Column="1" Click="PbtnFileOpen_Click"/>
-        <Label x:Name="tbBle" Content="Label" Grid.Column="1" HorizontalAlignment="Left" Margin="27,127,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="tbUsb" Content="Label" Grid.Column="1" HorizontalAlignment="Left" Margin="137,127,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+        <Button x:Name="PbtnScanDevices" Content="Button" HorizontalAlignment="Left" Margin="27,167,0,0" VerticalAlignment="Top" Width="75" Grid.Column="1" Click="PbtnScanDevices_Click" Height="20"/>
+        <Button x:Name="PbtnConnect" Content="Button" HorizontalAlignment="Left" Margin="117,166,0,0" VerticalAlignment="Top" Width="75" Grid.Column="1" Click="PbtnConnect_Click" Height="20"/>
+        <Button x:Name="PbtnStart" Content="Button" HorizontalAlignment="Left" Margin="27,211,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.482,3.285" Grid.Column="1" Click="PbtnStart_Click" Height="20"/>
+        <Button x:Name="PbtnFileOpen" Content="Button" HorizontalAlignment="Left" Margin="117,210,0,0" VerticalAlignment="Top" Width="75" Grid.Column="1" Click="PbtnFileOpen_Click" Height="20"/>
+        <Label x:Name="tbBle" Content="Label" Grid.Column="1" HorizontalAlignment="Left" Margin="27,127,0,0" VerticalAlignment="Top" Height="26" Width="38"/>
+        <Label x:Name="tbUsb" Content="Label" Grid.Column="1" HorizontalAlignment="Left" Margin="137,127,0,0" VerticalAlignment="Top" Height="26" Width="38"/>
+        <ListBox x:Name="ListBoxPath" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="125" Margin="245,28,0,0" VerticalAlignment="Top" Width="155"/>
+        <InkCanvas x:Name="CanvasMain" Margin="433,10,0,0" EditingMode="None" 
+                   EditingModeInverted="None" MoveEnabled="False" ResizeEnabled="False" 
+                   Strokes="{Binding Path=Strokes}" Background="#FFE9E9E9" 
+                   RenderTransformOrigin="0.5,0.5" Grid.ColumnSpan="2" HorizontalAlignment="Left" Width="159" Height="220" VerticalAlignment="Top" >
+            <InkCanvas.DefaultDrawingAttributes>
+                <DrawingAttributes  x:Name="m_DrawingAttributes" Color="#FF114E8B" FitToCurve="True" Height="0.75" IgnorePressure="False" IsHighlighter="False" StylusTip="Ellipse" StylusTipTransform="Identity" Width="0.75"/>
+            </InkCanvas.DefaultDrawingAttributes>
+        </InkCanvas>
+        <Button x:Name="PbtnRealTimeInk" Grid.ColumnSpan="2" Content="Button" HorizontalAlignment="Left" Margin="245,175,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnRealTimeInk_Click"/>
+        <Button x:Name="PbtnFileTransfer" Grid.ColumnSpan="2" Content="Button" HorizontalAlignment="Left" Margin="325,174,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnFileTransfer_Click"/>
+        <Button x:Name="PbtnStop" Grid.ColumnSpan="2" Content="Button" HorizontalAlignment="Left" Margin="245,208,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnStop_Click"/>
+        <Button x:Name="PbtnClear" Grid.ColumnSpan="2" Content="Button" HorizontalAlignment="Left" Margin="325,207,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnClear_Click"/>
 
     </Grid>
 </Window>
