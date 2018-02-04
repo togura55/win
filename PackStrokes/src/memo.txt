@@ -1,5 +1,8 @@
+
+
+
 Class Name:
-StrokeCollection
+StrokeAggregation
 
 Summary:
 ストロークデータを指定領域情報に従ってまとめる
