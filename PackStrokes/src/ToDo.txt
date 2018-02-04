@@ -5,10 +5,8 @@
 - デバイス上の緑ランプの意味調べと消し方
 - 明示的なDisconnect処理
 - Disconnectイベントの処理
-- GetPropertyのプロパティ値の列挙できるか
 
-- StrokeRawData定義をきれいにする
+- GetPropertyのプロパティ値の列挙できるか
 - StrokeRawDataをPackStrokeと関連付ける
 
-- AnyCPUでのLibrary設定見直し
 

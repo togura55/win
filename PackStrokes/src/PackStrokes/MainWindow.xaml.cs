@@ -51,6 +51,8 @@ namespace PackStrokes
             }
         }
 
+        IDigitalInkDevice device;
+
         //---- Stroke collection used for real-time rendering 
         private CancellationTokenSource m_cts = new CancellationTokenSource();
 
@@ -69,6 +71,8 @@ namespace PackStrokes
             }
         }
         // -----
+        int PointCount;
+        int StrokeCount;
 
         public MainWindow()
         {
@@ -263,7 +267,7 @@ namespace PackStrokes
 
         private async void PbtnRealTimeInk_Click(object sender, RoutedEventArgs e)
         {
-            IDigitalInkDevice device = AppObjects.Instance.Device;
+            device = AppObjects.Instance.Device;
 
             device.Disconnected += OnDeviceDisconnected;
 
@@ -274,13 +278,15 @@ namespace PackStrokes
             service.NewPage += OnNewPage; //Clear page on new page or layer
             service.NewLayer += OnNewPage;
             CanvasMain.DataContext = this;
-//            m_Canvas.DataContext = this;
+
+            PointCount = 0;
+            StrokeCount = 0;
+
             try
             {
                 uint width = (uint)await device.GetPropertyAsync("Width", m_cts.Token);
                 uint height = (uint)await device.GetPropertyAsync("Height", m_cts.Token);
                 uint ptSize = (uint)await device.GetPropertyAsync("PointSize", m_cts.Token);
-
 
                 m_deviceSize.Width = width;
                 m_deviceSize.Height = height;
@@ -312,10 +318,14 @@ namespace PackStrokes
 
         private void PbtnStop_Click(object sender, RoutedEventArgs e)
         {
-            StopWatchers();
+            // Stop the RealtimeInk / FileTransfer
+            device.Close();
 
             PbtnRealTimeInk.IsEnabled = !PbtnRealTimeInk.IsEnabled;
             PbtnFileTransfer.IsEnabled = !PbtnFileTransfer.IsEnabled;
+
+            PointCount = 0;
+            StrokeCount = 0;
         }
 
         private void PbtnClear_Click(object sender, RoutedEventArgs e)
@@ -324,7 +334,6 @@ namespace PackStrokes
         }
 
 
- 
         private void OnDeviceStatusChanged(object sender, DeviceStatusChangedEventArgs e)
         {
             var ignore = Task.Run(() =>
@@ -381,7 +390,7 @@ namespace PackStrokes
         }
 
         // --- Realtime Ink handlers ----
-        public ObservableCollection<StrokeRawData> RawDataInfos
+        public ObservableCollection<StrokeRawData> StrokeRawDataInfos
         {
             get
             {
@@ -391,14 +400,19 @@ namespace PackStrokes
         public ObservableCollection<StrokeRawData> m_StrokeRawData = new ObservableCollection<StrokeRawData>();
         public class StrokeRawData
         {
+            public string PointCount { get; set; }
+            public string StrokeCount { get; set; }
             public string X { get; set; }
             public string Y { get; set; }
             public string W { get; set; }
-            public StrokeRawData(string x, string y, string w)
+            public string FormattedStrings { get; }
+            public StrokeRawData(string PointCount, string StrokeCount, string x, string y, string w)
             {
                 this.X = x;
                 this.Y = y;
                 this.W = w;
+                this.FormattedStrings = string.Format("[{0}][{1}] {2}",
+                    PointCount, StrokeCount, x + '\t' + y + '\t' + w);
             }
         }
 
@@ -450,7 +464,7 @@ namespace PackStrokes
 
 
                 // Add to ListBox
-                m_StrokeRawData.Add(new StrokeRawData(x.ToString(), y.ToString(), w.ToString()));
+                m_StrokeRawData.Add(new StrokeRawData(PointCount.ToString(), StrokeCount.ToString(),x.ToString(), y.ToString(), w.ToString()));
 
             }));
 
@@ -504,10 +518,12 @@ namespace PackStrokes
                 }));
             }
 
+            PointCount++;
+
             // Add to ListBox
             Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
             {
-                m_StrokeRawData.Add(new StrokeRawData(x.ToString(), y.ToString(), w.ToString()));
+                m_StrokeRawData.Add(new StrokeRawData(PointCount.ToString(), StrokeCount.ToString(), x.ToString(), y.ToString(), w.ToString()));
             }));
 
         }
@@ -515,6 +531,7 @@ namespace PackStrokes
         private void Service_StrokeStarted(object sender, StrokeStartedEventArgs e)
         {
             m_addNewStrokeToModel = true;
+            StrokeCount++;
         }
 
         private void OnNewPage(object sender, EventArgs e)

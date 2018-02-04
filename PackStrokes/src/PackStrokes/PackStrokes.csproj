@@ -115,19 +115,19 @@
       <HintPath>..\packages\Validation.2.2.8\lib\dotnet\Validation.dll</HintPath>
     </Reference>
     <Reference Include="Wacom.Devices.NET">
-      <HintPath>..\Sdk\x64\Wacom.Devices.NET.dll</HintPath>
+      <HintPath>..\Sdk\$(Platform)\Wacom.Devices.NET.dll</HintPath>
     </Reference>
     <Reference Include="Wacom.Ink.Model.NET">
-      <HintPath>..\Sdk\x64\Wacom.Ink.Model.NET.dll</HintPath>
+      <HintPath>..\Sdk\$(Platform)\Wacom.Ink.Model.NET.dll</HintPath>
     </Reference>
     <Reference Include="Wacom.Ink.NET">
-      <HintPath>..\Sdk\x64\Wacom.Ink.NET.dll</HintPath>
+      <HintPath>..\Sdk\$(Platform)\Wacom.Ink.NET.dll</HintPath>
     </Reference>
     <Reference Include="Wacom.SmartPad.NET">
-      <HintPath>..\Sdk\x64\Wacom.SmartPad.NET.dll</HintPath>
+      <HintPath>..\Sdk\$(Platform)\Wacom.SmartPad.NET.dll</HintPath>
     </Reference>
     <Reference Include="Wacom.Usb.Net">
-      <HintPath>..\Sdk\x64\Wacom.Usb.Net.dll</HintPath>
+      <HintPath>..\Sdk\$(Platform)\Wacom.Usb.Net.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
