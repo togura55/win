@@ -10,7 +10,8 @@
     <Grid Height="248" VerticalAlignment="Top" HorizontalAlignment="Left" Width="602">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0*"/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="177*"/>
+            <ColumnDefinition Width="124*"/>
             <ColumnDefinition Width="0*"/>
         </Grid.ColumnDefinitions>
         <ListView x:Name="ListViewDevices" 
@@ -40,22 +41,20 @@
                  TargetUpdated="ListBoxPath_TargetUpdated"
                  Grid.Column="1"
                  HorizontalAlignment="Left" Height="125"
-                 Margin="245,28,0,0" VerticalAlignment="Top" Width="155">
+                 Margin="245,28,0,0" VerticalAlignment="Top" Width="155" Grid.ColumnSpan="2">
         </ListBox>
-
-
-        <InkCanvas x:Name="CanvasMain" Margin="433,10,0,0" EditingMode="None" 
+        <InkCanvas x:Name="CanvasMain" Margin="78.985,10,0,0" EditingMode="None" 
                    EditingModeInverted="None" MoveEnabled="False" ResizeEnabled="False" 
                    Strokes="{Binding Path=Strokes}" Background="#FFE9E9E9" 
-                   RenderTransformOrigin="0.5,0.5" Grid.ColumnSpan="2" HorizontalAlignment="Left" Width="159" Height="220" VerticalAlignment="Top" >
+                   RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" Width="159" Height="220" VerticalAlignment="Top" Grid.Column="2" >
             <InkCanvas.DefaultDrawingAttributes>
                 <DrawingAttributes  x:Name="m_DrawingAttributes" Color="#FF114E8B" FitToCurve="True" Height="0.75" IgnorePressure="False" IsHighlighter="False" StylusTip="Ellipse" StylusTipTransform="Identity" Width="0.75"/>
             </InkCanvas.DefaultDrawingAttributes>
         </InkCanvas>
         <Button x:Name="PbtnRealTimeInk" Grid.ColumnSpan="2" Content="Button" HorizontalAlignment="Left" Margin="245,175,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnRealTimeInk_Click"/>
-        <Button x:Name="PbtnFileTransfer" Grid.ColumnSpan="2" Content="Button" HorizontalAlignment="Left" Margin="325,174,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnFileTransfer_Click"/>
+        <Button x:Name="PbtnFileTransfer" Grid.ColumnSpan="3" Content="Button" HorizontalAlignment="Left" Margin="325,174,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnFileTransfer_Click"/>
         <Button x:Name="PbtnStop" Grid.ColumnSpan="2" Content="Button" HorizontalAlignment="Left" Margin="245,208,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnStop_Click"/>
-        <Button x:Name="PbtnClear" Grid.ColumnSpan="2" Content="Button" HorizontalAlignment="Left" Margin="325,207,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnClear_Click"/>
+        <Button x:Name="PbtnClear" Grid.ColumnSpan="3" Content="Button" HorizontalAlignment="Left" Margin="325,207,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnClear_Click"/>
 
     </Grid>
 </Window>

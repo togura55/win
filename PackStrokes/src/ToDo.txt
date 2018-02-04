@@ -1,5 +1,4 @@
 
-- メインウインドウ上の黒い矩形ボタンを消す
 - ListBoxに#,St,X,Y,W並びで表示
 - ペンをはっきり描画
 - Stopで入力/表示/RealtimeInkを止める
@@ -11,5 +10,5 @@
 - StrokeRawData定義をきれいにする
 - StrokeRawDataをPackStrokeと関連付ける
 
-- AnyCPUでのlibrary設定見直し
-- OpenFileDialogをWPF/.NET版に移行
+- AnyCPUでのLibrary設定見直し
+
