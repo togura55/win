@@ -53,6 +53,7 @@ namespace PackStrokes
 
         IDigitalInkDevice device;
 
+
         //---- Stroke collection used for real-time rendering 
         private CancellationTokenSource m_cts = new CancellationTokenSource();
 
@@ -81,6 +82,8 @@ namespace PackStrokes
             this.DataContext = this;
 
             sa = new StrokeAggregation();
+            device = null;
+//            service = null;
 
             m_watcherUSB = new InkDeviceWatcherUSB();  // Only for USB connection
             m_watcherUSB.DeviceAdded += OnDeviceAdded;
@@ -271,8 +274,8 @@ namespace PackStrokes
 
             device.Disconnected += OnDeviceDisconnected;
 
-//            NavigationService.Navigating += NavigationService_Navigating;
-//            NavigationService.Navigated += NavigationService_Navigated;
+            //            NavigationService.Navigating += NavigationService_Navigating;
+            //            NavigationService.Navigated += NavigationService_Navigated;
 
             IRealTimeInkService service = device.GetService(InkDeviceService.RealTimeInk) as IRealTimeInkService;
             service.NewPage += OnNewPage; //Clear page on new page or layer
@@ -304,6 +307,7 @@ namespace PackStrokes
 
                 PbtnStop.IsEnabled = !PbtnStop.IsEnabled;
                 PbtnClear.IsEnabled = !PbtnClear.IsEnabled;
+                PbtnRealTimeInk.IsEnabled = !PbtnRealTimeInk.IsEnabled;
             }
             catch (Exception ex)
             {
@@ -316,9 +320,15 @@ namespace PackStrokes
 
         }
 
-        private void PbtnStop_Click(object sender, RoutedEventArgs e)
+        private async void PbtnStop_Click(object sender, RoutedEventArgs e)
         {
-            // Stop the RealtimeInk / FileTransfer
+            IRealTimeInkService service = AppObjects.Instance.Device.GetService(InkDeviceService.RealTimeInk) as IRealTimeInkService;
+            if ((service != null) && service.IsStarted)
+            {
+                await service.StopAsync(m_cts.Token);
+            }
+
+
             device.Close();
 
             PbtnRealTimeInk.IsEnabled = !PbtnRealTimeInk.IsEnabled;
