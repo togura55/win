@@ -53,7 +53,6 @@ namespace PackStrokes
 
         IDigitalInkDevice device;
 
-
         //---- Stroke collection used for real-time rendering 
         private CancellationTokenSource m_cts = new CancellationTokenSource();
 
@@ -112,6 +111,7 @@ namespace PackStrokes
             PbtnClear.IsEnabled = false;
         }
 
+        #region UI Control Handlers
         private void PbtnStart_Click(object sender, RoutedEventArgs e)
         {
             // Define Regions
@@ -231,6 +231,8 @@ namespace PackStrokes
             {
                 device = await InkDeviceFactory.Instance.CreateDeviceAsync(m_connectingDeviceInfo,
                     AppObjects.Instance.AppId, true, false, OnDeviceStatusChanged);
+
+
             }
             catch (Exception ex)
             {
@@ -266,6 +268,8 @@ namespace PackStrokes
 
             PbtnRealTimeInk.IsEnabled = !PbtnRealTimeInk.IsEnabled;
             PbtnFileTransfer.IsEnabled = !PbtnFileTransfer.IsEnabled;
+
+            DeviceStatus ds = device.DeviceStatus;
         }
 
         private async void PbtnRealTimeInk_Click(object sender, RoutedEventArgs e)
@@ -342,8 +346,9 @@ namespace PackStrokes
         {
 
         }
+        #endregion
 
-
+        #region Device event callbacks
         private void OnDeviceStatusChanged(object sender, DeviceStatusChangedEventArgs e)
         {
             var ignore = Task.Run(() =>
@@ -398,8 +403,9 @@ namespace PackStrokes
                 m_deviceInfos.RemoveAt(index);
             }
         }
+        #endregion
 
-        // --- Realtime Ink handlers ----
+        #region Realtime Ink manupilation
         public ObservableCollection<StrokeRawData> StrokeRawDataInfos
         {
             get
@@ -578,7 +584,7 @@ namespace PackStrokes
                 m_scale = Math.Min(sx, sy);
             }
         }
-        // ------
+#endregion
 
         private void StartScanning()
         {

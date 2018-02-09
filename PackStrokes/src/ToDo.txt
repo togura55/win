@@ -1,19 +1,11 @@
+- 明示的なDisconnect処理
+- Disconnectイベントの処理
+- Clearボタンイベントの実装
+- StrokeRawDataをPackStrokeと関連付ける
 
-- Stopで入力/表示/RealtimeInkを止める
-- デバイス上の緑ランプの意味と消し方
+-------------
+- Stopで入力/表示/RealtimeInkを止める: WILL-776
+  デバイス上の緑ランプの意味と消し方
 　　緑LEDは"アプリケーションステータスLED"
 　　緑LEDは、「アプリ側がワコム クリップボードで書き込んだ情報を「受信できる状態」であることを示しています」
 　　　IRealTimeInkService.StartAsync()発行後に点灯。消すには、StopAsync()
-   StartAsync()発行後、デバイスは何のコマンドを受けて、どういった状態になっているか？
-     →中島くんに聞く
-
-- 明示的なDisconnect処理
-- Disconnectイベントの処理
-
-- Clearボタンイベントの実装
-
-- GetPropertyのプロパティ値の列挙できるか
-- StrokeRawDataをPackStrokeと関連付ける
-
-- Readmeのbinへの自動展開設定
-
