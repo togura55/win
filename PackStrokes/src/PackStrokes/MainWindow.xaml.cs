@@ -82,7 +82,7 @@ namespace PackStrokes
 
             sa = new StrokeAggregation();
             device = null;
-//            service = null;
+            //            service = null;
 
             m_watcherUSB = new InkDeviceWatcherUSB();  // Only for USB connection
             m_watcherUSB.DeviceAdded += OnDeviceAdded;
@@ -103,6 +103,7 @@ namespace PackStrokes
 
             tbBle.Content = @"";
             tbUsb.Content = @"";
+            LabelInfo.Content = @"";
 
             PbtnConnect.IsEnabled = false;
             PbtnRealTimeInk.IsEnabled = false;
@@ -194,7 +195,7 @@ namespace PackStrokes
                 }
 
                 StartScanning();
-  //                            KeepAlive = true;
+                //                            KeepAlive = true;
 
 
                 // CDL-Classic only supports the USB connection
@@ -232,7 +233,6 @@ namespace PackStrokes
                 device = await InkDeviceFactory.Instance.CreateDeviceAsync(m_connectingDeviceInfo,
                     AppObjects.Instance.AppId, true, false, OnDeviceStatusChanged);
 
-
             }
             catch (Exception ex)
             {
@@ -268,6 +268,7 @@ namespace PackStrokes
 
             PbtnRealTimeInk.IsEnabled = !PbtnRealTimeInk.IsEnabled;
             PbtnFileTransfer.IsEnabled = !PbtnFileTransfer.IsEnabled;
+            LabelInfo.Content = @"";
 
             DeviceStatus ds = device.DeviceStatus;
         }
@@ -277,7 +278,6 @@ namespace PackStrokes
             device = AppObjects.Instance.Device;
 
             device.Disconnected += OnDeviceDisconnected;
-
             //            NavigationService.Navigating += NavigationService_Navigating;
             //            NavigationService.Navigated += NavigationService_Navigated;
 
@@ -364,13 +364,13 @@ namespace PackStrokes
             {
                 //var ignore = Task.Run(() =>
                 //{
-                    m_deviceInfos.Add(info);
+                m_deviceInfos.Add(info);
 
                 //});
 
                 PbtnConnect.IsEnabled = !PbtnConnect.IsEnabled;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
@@ -473,14 +473,14 @@ namespace PackStrokes
                 Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
                 {
                     _strokes[_strokes.Count - 1].StylusPoints.Add(point);
- //                   NotifyPropertyChanged("Strokes");
+                    //                   NotifyPropertyChanged("Strokes");
                 }));
 
                 m_addNewStrokeToModel = true;
 
 
                 // Add to ListBox
-                m_StrokeRawData.Add(new StrokeRawData(PointCount.ToString(), StrokeCount.ToString(),x.ToString(), y.ToString(), w.ToString()));
+                m_StrokeRawData.Add(new StrokeRawData(PointCount.ToString(), StrokeCount.ToString(), x.ToString(), y.ToString(), w.ToString()));
 
             }));
 
@@ -516,10 +516,10 @@ namespace PackStrokes
             if (m_addNewStrokeToModel)
             {
                 m_addNewStrokeToModel = false;
-                var points = new StylusPointCollection{ point };
+                var points = new StylusPointCollection { point };
                 points.Add(point);
 
-                var stroke = new WinStroke(points){ DrawingAttributes = m_DrawingAttributes};
+                var stroke = new WinStroke(points) { DrawingAttributes = m_DrawingAttributes };
 
                 Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
                 {
@@ -550,13 +550,28 @@ namespace PackStrokes
             StrokeCount++;
         }
 
-        private void OnNewPage(object sender, EventArgs e)
+        private async void OnNewPage(object sender, EventArgs e)
         {
-            var ignore = Task.Run(() =>
+            try
             {
-                _strokes.Clear();
+                var ignore = this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    LabelInfo.Content = "ActionButton was pressed.";
+                }));
 
-            });
+                //                MessageBox.Show("ActionButton was pressed."); 
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            //var ignore = Task.Run(() =>
+            //{
+
+            //    //                _strokes.Clear();
+            //});
+
         }
 
         private void OnDeviceDisconnected(object sender, EventArgs e)
@@ -565,7 +580,7 @@ namespace PackStrokes
 
             MessageBox.Show($"The device {AppObjects.Instance.DeviceInfo.DeviceName} was disconnected.");
 
- //           NavigationService.Navigate(new ScanAndConnectPage());
+            //           NavigationService.Navigate(new ScanAndConnectPage());
         }
 
         private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -584,7 +599,7 @@ namespace PackStrokes
                 m_scale = Math.Min(sx, sy);
             }
         }
-#endregion
+        #endregion
 
         private void StartScanning()
         {

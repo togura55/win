@@ -2,6 +2,9 @@
 - Disconnectイベントの処理
 - Clearボタンイベントの実装
 - StrokeRawDataをPackStrokeと関連付ける
+- RealtimeInkモードでのアクションボタンのコールバック設定
+IRealTimeInkService.NewPage += OnNewPage
+
 
 -------------
 - Stopで入力/表示/RealtimeInkを止める: WILL-776

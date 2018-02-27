@@ -51,10 +51,11 @@
                 <DrawingAttributes  x:Name="m_DrawingAttributes" Color="Black" FitToCurve="True" Height="2" IgnorePressure="False" IsHighlighter="False" StylusTip="Ellipse" StylusTipTransform="Identity" Width="2"/>
             </InkCanvas.DefaultDrawingAttributes>
         </InkCanvas>
-        <Button x:Name="PbtnRealTimeInk" Grid.ColumnSpan="2" Content="Button" HorizontalAlignment="Left" Margin="245,175,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnRealTimeInk_Click"/>
-        <Button x:Name="PbtnFileTransfer" Grid.ColumnSpan="3" Content="Button" HorizontalAlignment="Left" Margin="325,174,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnFileTransfer_Click"/>
-        <Button x:Name="PbtnStop" Grid.ColumnSpan="2" Content="Button" HorizontalAlignment="Left" Margin="245,208,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnStop_Click"/>
-        <Button x:Name="PbtnClear" Grid.ColumnSpan="3" Content="Button" HorizontalAlignment="Left" Margin="325,207,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnClear_Click"/>
+        <Button x:Name="PbtnRealTimeInk" Grid.ColumnSpan="2" Content="Button" HorizontalAlignment="Left" Margin="244,183,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnRealTimeInk_Click"/>
+        <Button x:Name="PbtnFileTransfer" Grid.ColumnSpan="3" Content="Button" HorizontalAlignment="Left" Margin="324,182,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnFileTransfer_Click"/>
+        <Button x:Name="PbtnStop" Grid.ColumnSpan="2" Content="Button" HorizontalAlignment="Left" Margin="244,216,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnStop_Click"/>
+        <Button x:Name="PbtnClear" Grid.ColumnSpan="3" Content="Button" HorizontalAlignment="Left" Margin="324,215,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnClear_Click"/>
+        <Label x:Name="LabelInfo" Grid.ColumnSpan="3" Content="Label" HorizontalAlignment="Left" Margin="244,157,0,0" VerticalAlignment="Top" Width="155" Height="25"/>
 
     </Grid>
 </Window>
