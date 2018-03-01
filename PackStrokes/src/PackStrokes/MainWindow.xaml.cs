@@ -550,7 +550,7 @@ namespace PackStrokes
             StrokeCount++;
         }
 
-        private async void OnNewPage(object sender, EventArgs e)
+        private void OnNewPage(object sender, EventArgs e)
         {
             try
             {
