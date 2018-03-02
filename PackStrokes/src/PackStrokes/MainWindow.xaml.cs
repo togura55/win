@@ -37,6 +37,15 @@ namespace PackStrokes
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        public ObservableCollection<string> LogMessages
+        {
+            get
+            {
+                return m_logMessages;
+            }
+        }
+        public ObservableCollection<string> m_logMessages = new ObservableCollection<string>();
+
         string csv = string.Empty;
         public StrokeAggregation sa;
 
@@ -344,7 +353,7 @@ namespace PackStrokes
 
         private void PbtnClear_Click(object sender, RoutedEventArgs e)
         {
-
+            LabelInfo.Content = string.Empty;
         }
         #endregion
 
@@ -441,6 +450,13 @@ namespace PackStrokes
             this.ListBoxPath.ScrollIntoView(this.ListBoxPath.Items[this.ListBoxPath.Items.Count - 1]);
         }
 
+        //private void StoreRawData(IEnumerator<float> d, ref StrokeAggregation s)
+        //{
+        //    uint stride = 3;
+        //    InkPath p = new InkPath((IEnumerable<float>)d, stride, PathFormat.XYA);
+        //    s.CreateStroke(p);  // Add stroke to list
+        //}
+
         private void Service_StrokeEnded(object sender, StrokeEndedEventArgs e)
         {
             Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
@@ -482,8 +498,11 @@ namespace PackStrokes
                 // Add to ListBox
                 m_StrokeRawData.Add(new StrokeRawData(PointCount.ToString(), StrokeCount.ToString(), x.ToString(), y.ToString(), w.ToString()));
 
-            }));
+                // Store the data
+                //StoreRawData(data, ref sa);
+                sa.CreateStroke(pathPart);
 
+            }));
         }
 
         private void Service_StrokeUpdated(object sender, StrokeUpdatedEventArgs e)
@@ -542,6 +561,9 @@ namespace PackStrokes
                 m_StrokeRawData.Add(new StrokeRawData(PointCount.ToString(), StrokeCount.ToString(), x.ToString(), y.ToString(), w.ToString()));
             }));
 
+            // Store the data
+//            StoreRawData(data, ref sa);
+            sa.CreateStroke(pathPart);
         }
 
         private void Service_StrokeStarted(object sender, StrokeStartedEventArgs e)
@@ -557,9 +579,31 @@ namespace PackStrokes
                 var ignore = this.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     LabelInfo.Content = "ActionButton was pressed.";
-                }));
 
-                //                MessageBox.Show("ActionButton was pressed."); 
+                    // StrokeAggregation
+                    // Segmentation: look-up regions correspond to strokes
+                    //  region existed?
+                    if (sa.IsStroke() && sa.IsRegion())
+                    {
+                        sa.StrokesToRegion();
+
+                        // regionsのloopで含まれるstroke numberを表示
+                        int r_count = 0;
+                        foreach (StrokeAggregation.Region r in sa.regions)
+                        {
+                            int s_count = 0;
+                            foreach (StrokeAggregation.Stroke s in r.strokes)
+                            {
+                                Console.WriteLine("{0}{1}",r_count,s_count);
+                                m_logMessages.Add(string.Format("{0}{1}", r_count, s_count));
+
+                                s_count++;
+                            }
+                            r_count++;
+                        }
+                    }
+
+                }));
 
             }
             catch (Exception ex)

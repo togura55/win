@@ -207,5 +207,21 @@ namespace PackStrokes
             }
             return true;
         }
+
+        public bool IsRegion()
+        {
+            bool res = false;
+            if (regions.Count != 0)
+                res = true;
+            return res;
+        }
+
+        public bool IsStroke()
+        {
+            bool res = false;
+            if (strokes.Count != 0)
+                res = true;
+            return res;
+        }
     }
 }

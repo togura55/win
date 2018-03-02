@@ -6,8 +6,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PackStrokes"
         mc:Ignorable="d"
-        Title="MainWindow" Height="278.846" Width="611.802">
-    <Grid Height="248" VerticalAlignment="Top" HorizontalAlignment="Left" Width="602">
+        Title="MainWindow" Height="379.928" Width="611.802">
+    <Grid Height="354" VerticalAlignment="Top" HorizontalAlignment="Left" Width="602" Margin="0,0,0,-1.5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0*"/>
             <ColumnDefinition Width="177*"/>
@@ -56,6 +56,9 @@
         <Button x:Name="PbtnStop" Grid.ColumnSpan="2" Content="Button" HorizontalAlignment="Left" Margin="244,216,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnStop_Click"/>
         <Button x:Name="PbtnClear" Grid.ColumnSpan="3" Content="Button" HorizontalAlignment="Left" Margin="324,215,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnClear_Click"/>
         <Label x:Name="LabelInfo" Grid.ColumnSpan="3" Content="Label" HorizontalAlignment="Left" Margin="244,157,0,0" VerticalAlignment="Top" Width="155" Height="25"/>
+        <ListBox x:Name="ListBoxMessage" 
+                 ItemsSource="{Binding LogMessages}" 
+                 Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="86" Margin="27,260,0,-98" VerticalAlignment="Top" Width="387"/>
 
     </Grid>
 </Window>
