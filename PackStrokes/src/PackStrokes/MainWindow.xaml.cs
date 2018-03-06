@@ -17,6 +17,7 @@ using Wacom.Ink;
 
 using Wacom.Devices;
 using Wacom.Devices.Enumeration;
+using Wacom.SmartPadCommunication;
 
 using Microsoft.Win32;
 using System.Windows.Threading;
@@ -289,6 +290,7 @@ namespace PackStrokes
             device.Disconnected += OnDeviceDisconnected;
             //            NavigationService.Navigating += NavigationService_Navigating;
             //            NavigationService.Navigated += NavigationService_Navigated;
+            device.BarCodeScanned += OnBarCodeScanned; // set barcode scanned event handler
 
             IRealTimeInkService service = device.GetService(InkDeviceService.RealTimeInk) as IRealTimeInkService;
             service.NewPage += OnNewPage; //Clear page on new page or layer
@@ -412,6 +414,23 @@ namespace PackStrokes
                 m_deviceInfos.RemoveAt(index);
             }
         }
+
+        private void OnBarCodeScanned(object sender, BarcodeScannedEventArgs e)
+        {
+            try
+            {
+                string barcode = Encoding.ASCII.GetString(e.BarcodeData);
+
+                var ignore = this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    m_logMessages.Add(string.Format($"Barcode scanned: {barcode}"));
+                }));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
         #endregion
 
         #region Realtime Ink manupilation
@@ -499,7 +518,6 @@ namespace PackStrokes
                 m_StrokeRawData.Add(new StrokeRawData(PointCount.ToString(), StrokeCount.ToString(), x.ToString(), y.ToString(), w.ToString()));
 
                 // Store the data
-                //StoreRawData(data, ref sa);
                 sa.CreateStroke(pathPart);
 
             }));
@@ -562,7 +580,6 @@ namespace PackStrokes
             }));
 
             // Store the data
-//            StoreRawData(data, ref sa);
             sa.CreateStroke(pathPart);
         }
 
