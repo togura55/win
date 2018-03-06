@@ -7,6 +7,10 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        
+        <Button x:Name="Pbtn_LiveConnect" Content="Button" HorizontalAlignment="Left" Margin="377,62,0,0" VerticalAlignment="Top" Width="75" Click="Pbtn_LiveConnect_Click"/>
+        <TextBox x:Name="TextBox_LiveConnectID" HorizontalAlignment="Left" Height="23" Margin="88,62,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="260"/>
+        <TextBlock x:Name="infoTextBlock" HorizontalAlignment="Left" Margin="88,110,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
+        <WebBrowser x:Name="webBrowser" Navigated="webBrowser_Navigated" HorizontalAlignment="Left" Height="100" Margin="88,170,0,0" VerticalAlignment="Top" Width="260"/>
+
     </Grid>
 </Window>
