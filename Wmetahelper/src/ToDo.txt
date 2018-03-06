@@ -1,0 +1,10 @@
+File Manager部
+OneDriverの指定フォルダ内の全ファイルを列挙し、プロパティ取得、ハッシュ値作成
+
+ReadeIDMF部
+ファイルからbaxter値の取得
+
+DataTransfer部
+指定値の出力
+
+
