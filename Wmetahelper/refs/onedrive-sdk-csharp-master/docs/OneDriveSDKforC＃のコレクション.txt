@@ -1,0 +1,74 @@
+OneDrive SDK for C＃のコレクション
+=====
+
+C＃用のOneDrive SDKをOneDriveのアイテムコレクションで使用することができます。
+
+##コレクションを入手する
+
+フォルダの子のようなコレクションを取得するには、 `GetAsync`を呼び出します：
+
+`` `csharp
+oneDriveClientを待つ
+          。ドライブ
+.Items [itemId]
+。子供
+。要求（）
+.GetAsync（）;
+`` ``
+
+`GetAsync`は成功すれば` ICollectionPage <T> `の実装を返し、エラーの場合は` OneDriveException`を投げます。子コレクションの場合、返される型は `IChlectionrenCollectionPage`です。これは` ICollectionPage <Item> 'を継承します。
+
+IChildrenCollectionPageには3つのプロパティがあります：
+
+|名前|説明|
+| -------------------- | ---------------------------- -------------------------------------------------- -------------------------------------------------- ------------- |
+| **現在のページ** | `IList <Item>` |
+| ** NextPageRequest ** |別のページが存在する場合、アイテムの次のページに移動するために使用される `IChildrenPageRequest`。次のページがない場合、この値はNULLになります。
+| ** AdditionData ** | IDictionary <文字列、オブジェクト>をサービスによって返される追加の値に置き換えます。この場合、なし。 |
+
+##コレクションに追加する
+
+フォルダの子のような一部のコレクションは変更できます。アイテムの子にフォルダを追加するには、 `AddAsync`メソッドを呼び出すことができます：
+
+`` `csharp
+var folderToCreate =新しいアイテム{名前= "新しいフォルダ"、フォルダ=新しいフォルダ（）};
+var newFolder = oneDriveClientを待つ
+                          。ドライブ
+.Items [itemId]
+。子供
+。要求（）
+.AddAsync（folderToCreate）;
+`` ``
+
+`AddAsync`は成功したときに作成されたアイテムを返し、エラーのときに` OneDriveException`をスローします。
+
+##コレクションを展開する
+
+コレクションを展開するには、expandの文字列値を指定してコレクション要求オブジェクトに対して `Expand`を呼び出します。
+
+`` `csharp
+var children = oneDriveClientを待つ
+                         。ドライブ
+.Items [itemId]
+。子供
+。要求（）
+.Expand（ "サムネイル"）
+.GetAsync（）;
+`` ``
+
+##特別コレクション
+
+一部のAPI呼び出しでは、プロパティが追加されたコレクションが返されます。これらのプロパティは、常に追加のデータ辞書に格納されます。これらのコレクションは、これらのプロパティを持つ独自のオブジェクト（ `ICollectionPage <T>`のサブクラス）でもあります。
+
+あなたが呼び出すアイテムのデルタを取得するには：
+
+`` `csharp
+var deltaCollectionPage = oneDriveClientを待機します。
+                                    。ドライブ
+.Items [itemId]
+δ（deltaToken）
+。要求（）
+.GetAsync（）;
+`` ``
+
+`IItemDeltaCollectionPage`は、` Token`プロパティと `DeltaLink`プロパティを持つ` ICollectionPage <Item> `オブジェクトです。より多くの変更をチェックしたいときは、トークンリンクを使って `Delta：`に渡すことができます。 `DeltaLink`プロパティでデルタリクエストを作成することもできます。 `NextPageRequest`はページングの目的で使用される` IItemDeltaRequest`であり、それ以上変更がなければnullになります。

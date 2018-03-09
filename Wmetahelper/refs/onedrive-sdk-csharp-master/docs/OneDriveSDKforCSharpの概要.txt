@@ -1,0 +1,113 @@
+OneDrive SDK for CSharpの概要
+=====
+
+OneDrive C＃SDKは、[OneDrive API]（https://github.com/onedrive/onedrive-api-docs/）のように設計されています。
+
+## OneDriveClient
+
+OneDrive APIにアクセスすると、すべての要求は** OneDriveClient **オブジェクトを介して行われます。詳細については、[認証]（/ docs / auth.md）を参照してください。
+
+##リソース・モデル
+
+
+[items]（/ docs / items.md）やドライブのようなリソースは、 `Item`と` Drive`で表されます。これらのオブジェクトには、リソースのプロパティを表すプロパティが含まれています。これらのオブジェクトはプロパティバッグであり、サービスに対して呼び出しを行うことはできません。
+
+アイテムの名前を取得するには、 `Name`プロパティを指定します。これらのプロパティのいずれかがいつでもnullになる可能性があります。アイテムがフォルダかどうかを確認するには、アイテムの `Folder`プロパティを指定することができます。アイテムがフォルダの場合、[folder]（https://github.com/OneDrive/onedrive-api-docs/blob/master/facets/folder_facet.md）で記述されたすべてのプロパティを含む `Folder`オブジェクト）ファセットが返されます。
+
+詳細は、「リソース・モデル」（https://github.com/onedrive/onedrive-api-docs/#resource-model）を参照してください。
+
+＃＃ リクエスト
+
+サービスに対して要求を行うには、要求ビルダーオブジェクトを使用して要求オブジェクトを構築します。リクエストビルダのタイプは、アドレス指定しているオブジェクトのタイプによって異なります。これは、OneDrive APIのURLの作成を模倣するためのものです。
+
+### 1.ビルダーのリクエスト
+
+リクエストを生成するには、リクエストビルダーオブジェクトの呼び出しを連鎖させます。 `OneDriveClient`オブジェクトから最初のリクエストビルダを取得します。あなたが呼び出すドライブリクエストビルダを取得するには：
+
+|タスク| SDK | URL |
+|：--------------- |：---------------------：|：------- ------------------------- |
+|ドライブを手に入れる| oneDriveClient.Drive | GET api.onedrive.com/v1.0/drive/ |
+ 
+呼び出しは `IDriveRequestBuilder`オブジェクトを返します。ドライブから、リクエストをチェーン化してAPI内の他のアイテム（アイテムなど）を取得することができます。
+
+|タスク| SDK | URL |
+|：--------------- |：------------------------------- -----：|：------------------------------------------ |
+|アイテムを入手| oneDriveClient.Drive.Items ["1234"] | GET api.onedrive.com/v1.0/drive/items/1234 |
+
+
+ここで `oneDriveClient.Drive`は` IItemsCollectionRequestBuilder`型の項目 `Items`を含む` IDriveRequestBuilder`を返します。そのビルダーにはアイテムIDのアクセサがあり、Items ["1234"]は `IItemRequestBuilder`を返します。
+
+同様にサムネイルを取得する：
+
+|タスク| SDK | URL |
+| ---------------- | -------------------------------- | -------------------------- |
+|サムネイルを取得する| ...アイテム["1234"]。サムネイル| ... / items / 1234 /サムネイル|
+
+
+ここで、 `oneDriveClient.Drive.Items [" 1234 "]`は、 `IThumbnailsCollectionRequestBuilder`型のサムネイルのプロパティを含む` IItemRequestBuilder`を返します。
+
+これは[サムネイルセット]（https://github.com/OneDrive/onedrive-api-docs/blob/master/resources/thumbnailSet.md）のコレクションを返します。コレクションに直接インデックスを付けるには、次の関数を呼び出します。
+
+|タスク| SDK | URL |
+| ------------------- | ----------------------------- -------- | ---------------------------- |
+|セットをサムネイルで取得...アイテム["1234"]。サムネイル["0"] | ...アイテム/ 1234 /サムネイル/ 0 |
+
+サムネイルセットを返し、特定の[サムネイル]（https://github.com/OneDrive/onedrive-api-docs/blob/master/resources/thumbnail.md）を取得するには、サムネイルの名前を追加しますこのようなURLには：
+
+|タスク| SDK | URL |
+| ----------------- | ----------------------------- |  - ----------------------- |
+| |サムネイルを取得する| ...サムネイル["0"]。小さい| ... /サムネイル/ 0 /小|
+
+
+### 2.呼び出しを要求する
+
+リクエストをビルドした後、リクエストビルダーで `Request`メソッドを呼び出します。これにより、サービスに対して呼び出しを行うために必要な要求オブジェクトが構築されます。
+
+あなたが呼ぶアイテム：
+
+`` `csharp
+var itemRequest = oneDriveClient
+                      。ドライブ
+.Items [itemId]
+。要求（）;
+`` ``
+
+すべてのリクエストビルダは、リクエストオブジェクトを生成できる `Request`メソッドを持っています。要求オブジェクトは、要求のタイプに応じて異なるメソッドを持つことがあります。あなたが呼び出すアイテムを取得するには：
+
+`` `csharp
+var item = oneDriveClientを待つ
+                     。ドライブ
+.Items [itemId]
+。要求（）
+.GetAsync（）;
+`` ``
+
+詳細は、[items]（/ docs / items.md）と[errors]（/ docs / errors.md）を参照してください。
+
+##クエリオプション
+
+リソースの特定のプロパティだけを取得する場合は、それらを選択できます。アイテムの名前とIDだけを取得する方法は次のとおりです。
+
+`` `csharp
+var item = oneDriveClientを待つ
+                     。ドライブ
+.Items [itemId]
+。要求（）
+.Select（ "name、id"）
+.GetAsync（）;
+`` ``
+
+`Name`と` Id`以外のすべてのプロパティは、その項目でnullになります。
+
+リソースの特定のプロパティを展開するには、次のような同様の展開メソッドを呼び出すことができます。
+
+`` `csharp
+var item = oneDriveClientを待つ
+                     。ドライブ
+.Items [itemId]
+。要求（）
+.Expand（ "サムネイル、子（展開=サムネイル）"）
+.GetAsync（）;
+`` ``
+
+上記の呼び出しでは、アイテムのサムネイルと子、さらにすべての子のサムネイルが展開されます。

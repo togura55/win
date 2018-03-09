@@ -1,0 +1,35 @@
+OneDrive SDK for C＃のエラー処理
+=====
+
+OneDrive SDK for C＃のエラーは、OneDriveサービスから返されたエラーと同様に動作します。それらについての詳細はこちら[https://github.com/OneDrive/onedrive-api-docs/blob/master/misc/errors.md]を参照してください。
+
+サービスに対して要求を行うたびに、エラーの可能性があります。サービスへのすべての要求がエラーを返すことがわかります。エラーの場合、要求はサービスエラーの詳細を含む `Error`オブジェクトを含む` OneDriveException`オブジェクトをスローします。
+
+##エラーを確認する
+
+ネットワーク通話中に発生する可能性があるエラーの種類はいくつかあります。これらのエラーコードは、[OneDriveErrorCodes.cs]（../ src / OneDriveSdk / Enums / OneDriveErrorCodes.cs）で定義されています。
+
+###エラーコードを確認する
+エラーコード値に `IsMatch`を呼び出すことで、エラーに特定のコードがあるかどうかを簡単に確認できます。 `IsMatch`は大文字と小文字を区別しません：
+`` `csharp
+if（exception.IsMatch（OneDriveErrorCode.AccessDenied.ToString（））
+{
+        //アクセス拒否エラーを処理する
+}
+`` ``
+
+各エラーオブジェクトはコードだけでなく `Message`プロパティも持っています。このメッセージはデバッグ目的であり、ユーザーに表示されることを意図したものではありません。一般的なエラーコードは[OneDriveErrorCodes.cs]（../ src / OneDriveSdk / Enums / OneDriveErrorCodes.cs）で定義されています。
+
+
+###認証エラー
+
+認証処理中にエラーが発生する可能性があります。認証エラーには「AuthenticationFailed」というコードが含まれます。認証が取り消されたエラーは、コード「AuthenticationCancelled」を持つでしょう。
+
+`` `csharp
+if（exception.IsMatch（OneDriveErrorCode.AuthenticationFailure.ToString（））
+{
+        //認証エラーを処理する
+}
+`` ``
+
+`Message`プロパティは、利用可能であれば、より詳細なエラー情報を含みます。
