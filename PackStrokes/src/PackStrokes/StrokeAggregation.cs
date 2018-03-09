@@ -11,6 +11,8 @@ namespace PackStrokes
 {
     public class StrokeAggregation
     {
+        public uint strokeIndex;
+
         public struct Point
         {
             public float x;
@@ -57,6 +59,7 @@ namespace PackStrokes
             public List<PathEx> pathexs;
             public Point min;
             public Point max;
+            public uint index;  // stroke index
             public uint regionIndex;
 
             public Stroke()
@@ -65,6 +68,7 @@ namespace PackStrokes
                 min.x = min.y = float.MaxValue;
                 max.x = max.y = 0;
                 regionIndex = 0;
+                index = 0;
             }
         }
         public List<Stroke> strokes;
@@ -88,6 +92,8 @@ namespace PackStrokes
         /// </summary>
         public StrokeAggregation()
         {
+            strokeIndex = 0;
+
             regions = new List<Region>();
             //           hwstrings = new List<Hwstring>();
             strokes = new List<Stroke>();
@@ -170,9 +176,11 @@ namespace PackStrokes
             st.pathexs.Add(pe);
 
             st.regionIndex = 0;
+            st.index = strokeIndex;
 
             strokes.Add(st);
 
+            strokeIndex++;
             return true;
         }
 
@@ -189,7 +197,8 @@ namespace PackStrokes
                               s.max.x <= r.max.x && s.max.y <= r.max.y)
                         {
                             // このストロークは入っている
-                            r.strokes = new List<StrokeAggregation.Stroke>() { s };
+                            //                            r.strokes = new List<StrokeAggregation.Stroke>() { s };
+                            r.strokes.Add(s);
 
                             break;
                         }

@@ -120,6 +120,13 @@ namespace PackStrokes
             PbtnFileTransfer.IsEnabled = false;
             PbtnStop.IsEnabled = false;
             PbtnClear.IsEnabled = false;
+
+            // for debug
+            // Define Regions
+            sa.CreateRegion(10, 10, 110, 60);
+            sa.CreateRegion(500, 500, 7000, 7000);
+            sa.CreateRegion(7001, 500, 14000, 7000);
+
         }
 
         #region UI Control Handlers
@@ -611,9 +618,7 @@ namespace PackStrokes
                             int s_count = 0;
                             foreach (StrokeAggregation.Stroke s in r.strokes)
                             {
-                                Console.WriteLine("{0}{1}",r_count,s_count);
-                                m_logMessages.Add(string.Format("{0}{1}", r_count, s_count));
-
+                                m_logMessages.Add(string.Format("{0},{1}", r_count, s.index));
                                 s_count++;
                             }
                             r_count++;
