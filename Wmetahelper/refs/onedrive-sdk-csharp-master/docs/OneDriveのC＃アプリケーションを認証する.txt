@@ -1,29 +1,29 @@
-OneDriveのC＃アプリケーションを認証する
+OneDriveのC#アプリケーションを認証する
 =====
 
-OneDriveを使用するようにアプリケーションを認証するには、Microsoft.Graphから `IAuthenticationProvider`を実装し、その上に` AuthenticateAsync`を呼び出すオブジェクトをインスタンス化する必要があります。次に、 `OneDriveClient`オブジェクトを作成し、authプロバイダを引数として渡す必要があります。ユーザーがパスワードを変更した場合、アプリは再認証する必要があります。あなたが `401`エラーコードを見た場合、これが最も可能性が高いです。詳細については、「OneDrive C＃SDKのエラーコード」（errors.md）を参照してください。
+OneDriveを使用するようにアプリケーションを認証するには、Microsoft.Graphから `IAuthenticationProvider`を実装し、その上に` AuthenticateAsync`を呼び出すオブジェクトをインスタンス化する必要があります。次に、 `OneDriveClient`オブジェクトを作成し、authプロバイダを引数として渡す必要があります。ユーザーがパスワードを変更した場合、アプリは再認証する必要があります。あなたが `401`エラーコードを見た場合、これが最も可能性が高いです。詳細については、「OneDrive C#SDKのエラーコード」(errors.md)を参照してください。
 
-**注**このトピックは、あなたがアプリ認証に精通していることを前提としています。 OneDriveでの認証の詳細については、[OneDrive APIの認証]（https://dev.onedrive.com/auth/readme.htm）を参照してください。
+**注**このトピックは、あなたがアプリ認証に精通していることを前提としています。 OneDriveでの認証の詳細については、[OneDrive APIの認証](https://dev.onedrive.com/auth/readme.htm)を参照してください。
 
 ##標準認証コンポーネント
 
 IAuthenticationProviderを実装する場合、標準的なパラメータセットが必要です。
 
-|パラメータ|説明|
-|：---------- |：------------ |
+|   パラメータ   |    説明             |
+|：---------- |：------------------- |
 | _clientId_ |アプリのクライアントID。必須。 |
-| _returnUrl_ |リダイレクトURL。必須。 |
-| _baseUrl_ |ターゲットのOneDriveサービスが見つかるURL。必須。 |
-| _scopes_ |あなたのアプリがユーザーから要求する許可。必須。 |
-| _クライアント_ _秘密_ |あなたのアプリ用に作成されたクライアントシークレット。オプション。 Windowsストア8.1、Windows Phone 8.1、およびユニバーサルWindowsプラットフォーム（UWP）アプリケーションでは使用できません。 |
+| _returnUrl_| リダイレクトURL。必須。    |
+| _baseUrl_  |ターゲットのOneDriveサービスが見つかるURL。必須。 |
+| _scopes_   |あなたのアプリがユーザーから要求する許可。必須。 |
+| _client\_secret_ |あなたのアプリ用に作成されたクライアントシークレット。オプション。 Windowsストア8.1、Windows Phone 8.1、およびユニバーサルWindowsプラットフォーム(UWP)アプリケーションでは使用できません。 |
 
-_clientId_、_returnURL_、_scopes_、および_client\_secret_に加えて、メソッドはクライアントタイプ、信任状キャッシュ、HTTPプロバイダ、およびサービス情報プロバイダまたはWeb認証UIの実装を取り込みます。提供されない場合は、各項目のデフォルトの実装が使用されます。
+_clientId_、_returnURL_、_scopes_、および_client\_secret_に加えて、メソッドはクライアントタイプ、credentialキャッシュ、HTTPプロバイダ、およびサービス情報プロバイダまたはWeb認証UIの実装を取り込みます。提供されない場合は、各項目のデフォルトの実装が使用されます。
 
 ### ClientType
-単一のクライアントは、OneDrive for BusinessまたはOneDrive for Businessのみを呼び出すことができ、両方を呼び出すことはできません。ターゲットサービスは、 `OneDriveClient`コンストラクタに渡された` IAuthenticationProvider`と_baseUrl_によって暗黙的に設定されます。
+単一のクライアントは、OneDrive for BusinessまたはOneDrive for Businessのみを呼び出すことができ、両方を呼び出すことはできません。ターゲットサービスは、 `OneDriveClient`コンストラクタに渡された`IAuthenticationProvider`と_baseUrl_によって暗黙的に設定されます。
 
 アプリケーションがOneDrive for ConsumerとOneDrive for Businessの両方と対話したい場合は、それぞれのクライアントを作成する必要があります。
 
 
-＃＃ 詳しくは
-詳細な情報とより完全な認証の例は、[MSA Auth Adapter]（https://github.com/OneDrive/onedrive-sdk-dotnet-msa-auth-adapter）にあります。
+## 詳しくは
+詳細な情報とより完全な認証の例は、[MSA Auth Adapter](https://github.com/OneDrive/onedrive-sdk-dotnet-msa-auth-adapter)にあります。

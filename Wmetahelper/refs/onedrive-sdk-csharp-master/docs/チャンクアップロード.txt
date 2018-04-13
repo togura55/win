@@ -1,54 +1,52 @@
 ＃チャンクアップロード
 ##大きなファイルのアップロードとアップロードの一時停止/再開
 
-チャンクアップロードは `Helpers.ChunkedUploadProvider`を使うと簡単です。大きなファイルをアップロードする最も簡単な方法
-次のようになります。
+チャンクアップロードは `Helpers.ChunkedUploadProvider`を使うと簡単です。大きなファイルをアップロードする最も簡単な方法は次のようになります。
 
 `` `csharp
-var session = await oneDriveClient.ItemWithPath（uploadPath）.CreateSession（）。Request（）。PostAsync（）;
-varプロバイダ=新しいChunkedUploadProvider（セッション、oneDriveClient、fileStream）;
+var session = await oneDriveClient.ItemWithPath(uploadPath).CreateSession().Request().PostAsync();
+var provider = new ChunkedUploadProvider(session, oneDriveClient, fileStream);
 
-var uploadedItem =プロバイダを待機します.UploadAsync（）;
+var uploadedItem = await provider.UploadAsync();
 `` ``
 
-あなたのファイルはデフォルトサイズのチャンク（5MiB）でアップロードされます。 `ChunkedUploadProvider`にパラメータを追加してチャンクサイズを調整することもできます
-コンストラクタ： `新しいChunkedUploadProvider（セッション、oneDriveClient、ファイルストリーム、1024 * 1024）; // 1 MiB`。
+あなたのファイルはデフォルトサイズのチャンク(5MiB)でアップロードされます。 `ChunkedUploadProvider`にパラメータを追加してチャンクサイズを調整することもできます
+コンストラクタ： `new new ChunkedUploadProvider(session, oneDriveClient, fileStream, 1024*1024); // 1 MiB`
 
 ##大量アップロードの制御と監視
 
-アップロードの進行状況を監視することができます（おそらく、ユーザーに進行状況バーを表示する）。あなたは、各チャンクをアップロードする細かい制御を得ることができます
-下のスケルトン。あなたは確かにいくつかの変更を加える必要があります。また、[ChunkedUploadProvider]（../ src / OneDriveSdk / Helpers / ChunkedUploadProvider.cs）が、
+アップロードの進行状況を監視することができます(おそらく、ユーザーに進行状況バーを表示する)。あなたは、各チャンクをアップロードする細かい制御を下のスケルトンから得ることができます。あなたはそれに対して確かにいくつかの変更をする必要があるでしょう。また、あなたは[ChunkedUploadProvider](../ src / OneDriveSdk / Helpers / ChunkedUploadProvider.cs)をチェックするでしょう。
 
 `` `csharp
 //プロバイダを取得する
-var myMaxChunkSize = 5 * 1024 * 1024; // 5MB
-var session = await oneDriveClient.ItemWithPath（uploadPath）.CreateSession（）。Request（）。PostAsync（）;
-varプロバイダ=新しいChunkedUploadProvider（セッション、oneDriveClient、fileStream、myMaxChunkSize）;
+var myMaxChunkSize = 5*1024*1024; // 5MB
+var session = await oneDriveClient.ItemWithPath(uploadPath).CreateSession().Request().PostAsync();
+var provider = new ChunkedUploadProvider(session, oneDriveClient, fileStream, myMaxChunkSize);
 
-//チャンクリクエストの必要性を設定する
-var chunkRequests = provider.GetUploadChunkRequests（）;
-var readBuffer =新しいバイト[myMaxChunkSize];
-var trackedExceptions =新しいリスト<例外>（）;
-アイテムitemResult = null;
+// チャンクリクエストの必要性を設定する
+var chunkRequests = provider.GetUploadChunkRequests();
+var readBuffer = new byte[myMaxChunkSize];
+var trackedExceptions = new List<Exception>();
+Item itemResult = null;
 
-//チャンクをアップロードする
-foreach（chunkRequestsのvarリクエスト）
+// チャンクをアップロードする
+foreach(var request in chunkRequests)
 {
     //ここであなたの更新を行います：更新プログレスバーなど
     // ...
     //チャンクリクエストを送信する
-    var result =プロバイダを待ちます.GetChunkRequestResponseAsync（request、readBuffer、trackedExceptions）;
+    var result = await provider.GetChunkRequestResponseAsync(request, readBuffer, trackedExceptions);
     
-    if（result.UploadSucceeded）
+    if(result.UploadSucceeded)
     {
         itemResult = result.ItemResponse;
     }
 }
 
-//アップロードが成功したことを確認する
-if（itemResult == null）
+// アップロードが成功したことを確認する
+if (itemResult == null)
 {
-    //アップロードをやり直してください
+    // アップロードのやり直し
     // ...
 }
-`` ``
+```

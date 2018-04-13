@@ -126,7 +126,6 @@ namespace PackStrokes
             sa.CreateRegion(10, 10, 110, 60);
             sa.CreateRegion(500, 500, 7000, 7000);
             sa.CreateRegion(7001, 500, 14000, 7000);
-
         }
 
         #region UI Control Handlers
@@ -190,6 +189,10 @@ namespace PackStrokes
                     path = ofd.FileName;    // full path + filename + extension
                                             //               textBoxReadFile.Text = path;
                     InkDocument.ReadBaxter(path, sa);
+
+//                    string url = @"http://www.domain.com/file.pdf";
+                    WebBrowser_ShowPDF.Navigate(path);
+
                 }
             }
             catch (Exception ex)
