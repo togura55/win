@@ -1,3 +1,5 @@
+Wacom STU-SDK 2.13.5
+
 <Notes>
 This tool was requested to be provided a customer who wants to detect the unexpected disconnect of device.
 

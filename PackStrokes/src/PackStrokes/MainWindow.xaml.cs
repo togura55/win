@@ -190,8 +190,9 @@ namespace PackStrokes
                                             //               textBoxReadFile.Text = path;
                     InkDocument.ReadBaxter(path, sa);
 
-//                    string url = @"http://www.domain.com/file.pdf";
-                    WebBrowser_ShowPDF.Navigate(path);
+                    //                    string url = @"http://www.domain.com/file.pdf";
+                    //                    WebBrowser_ShowPDF.Navigate(path);
+                    LoadPdfToImage(path);
 
                 }
             }
@@ -199,6 +200,17 @@ namespace PackStrokes
             {
                 Console.WriteLine(ex.Message);
             }
+        }
+
+        private void LoadPdfToImage(string url)
+        {
+            // イメージブラシの作成
+            ImageBrush imageBrush = new ImageBrush();
+            imageBrush.ImageSource = new System.Windows.Media.Imaging.BitmapImage(new Uri(url, UriKind.Relative));
+            imageBrush.Opacity = 0.3;
+
+            // ブラシを背景に設定する
+            CanvasMain.Background = imageBrush;
         }
 
         private void PbtnScanDevices_Click(object sender, RoutedEventArgs e)
