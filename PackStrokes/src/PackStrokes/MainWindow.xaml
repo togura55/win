@@ -21,9 +21,6 @@
             <ColumnDefinition Width="124*"/>
             <ColumnDefinition Width="0*"/>
         </Grid.ColumnDefinitions>
-        <WebBrowser x:Name="WebBrowser_ShowPDF"  
-                    Grid.Column="2" HorizontalAlignment="Left" Height="219" Margin="97.8,216,0,-55" VerticalAlignment="Top" Width="159"
-                    />
 
         <ListView x:Name="ListViewDevices" 
                   ItemsSource="{Binding DeviceInfos}" 

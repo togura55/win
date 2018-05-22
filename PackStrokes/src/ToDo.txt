@@ -1,4 +1,3 @@
-- PDFファイルの背景表示
 - 明示的なDisconnect処理
 - Disconnectイベントの処理
 - Clearボタンイベントの実装

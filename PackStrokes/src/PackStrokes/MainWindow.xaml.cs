@@ -220,8 +220,8 @@ namespace PackStrokes
             CanvasMain.Background = imageBrush;
         }
 
-//        private readonly string SOURCE_FILE_LOCATION = "test.pdf";
-//        private readonly string TARGET_FILE_LOCATION = "output.jpg";
+        //        private readonly string SOURCE_FILE_LOCATION = "test.pdf";
+        //        private readonly string TARGET_FILE_LOCATION = "output.jpg";
 
         public void GenerateSinglePageThumbnail(string source, string target)
         {
@@ -546,7 +546,7 @@ namespace PackStrokes
                 Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
                 {
                     _strokes[_strokes.Count - 1].StylusPoints.Add(point);
-                    //                   NotifyPropertyChanged("Strokes");
+                    //                  NotifyPropertyChanged("Strokes");
                 }));
 
                 m_addNewStrokeToModel = true;
