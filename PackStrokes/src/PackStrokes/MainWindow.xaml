@@ -7,6 +7,13 @@
         xmlns:local="clr-namespace:PackStrokes"
         mc:Ignorable="d"
         Title="MainWindow" Height="424.928" Width="632.802">
+    <Window.Resources>
+        <Style x:Key="WebBrowserStyle_ShowPDF" TargetType="{x:Type WebBrowser}" >
+            <Setter Property="OpacityMask" Value="{x:Null}"/>
+            <Setter Property="Opacity" Value="0.995"/>
+            <Setter Property="ClipToBounds" Value="False"/>
+        </Style>
+    </Window.Resources>
     <Grid Height="380" VerticalAlignment="Top" HorizontalAlignment="Left" Width="624" Margin="0,0,-20,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0*"/>
@@ -14,6 +21,7 @@
             <ColumnDefinition Width="124*"/>
             <ColumnDefinition Width="0*"/>
         </Grid.ColumnDefinitions>
+
         <ListView x:Name="ListViewDevices" 
                   ItemsSource="{Binding DeviceInfos}" 
                   HorizontalAlignment="Left" 
@@ -36,21 +44,12 @@
         <Label x:Name="tbBle" Content="Label" Grid.Column="1" HorizontalAlignment="Left" Margin="27,127,0,0" VerticalAlignment="Top" Height="26" Width="38"/>
         <Label x:Name="tbUsb" Content="Label" Grid.Column="1" HorizontalAlignment="Left" Margin="137,127,0,0" VerticalAlignment="Top" Height="26" Width="38"/>
         <ListBox x:Name="ListBoxPath" 
-                 ItemsSource="{Binding StrokeRawDataInfos, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnTargetUpdated=True}"
+                 ItemsSource="{Binding StrokeRawDataInfos, Mode=OneWay, NotifyOnTargetUpdated=True, UpdateSourceTrigger=PropertyChanged}"
                  DisplayMemberPath="FormattedStrings"
                  TargetUpdated="ListBoxPath_TargetUpdated"
                  Grid.Column="1"
                  HorizontalAlignment="Left" Height="125"
-                 Margin="221,28,0,0" VerticalAlignment="Top" Width="193" Grid.ColumnSpan="2">
-        </ListBox>
-        <InkCanvas x:Name="CanvasMain" Margin="68,11,0,0" EditingMode="None" 
-                   EditingModeInverted="None" MoveEnabled="False" ResizeEnabled="False" 
-                   Strokes="{Binding Path=Strokes}" Background="#FFE9E9E9" 
-                   RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" Width="159" Height="220" VerticalAlignment="Top" Grid.Column="2" >
-            <InkCanvas.DefaultDrawingAttributes>
-                <DrawingAttributes  x:Name="m_DrawingAttributes" Color="Black" FitToCurve="True" Height="2" IgnorePressure="False" IsHighlighter="False" StylusTip="Ellipse" StylusTipTransform="Identity" Width="2"/>
-            </InkCanvas.DefaultDrawingAttributes>
-        </InkCanvas>
+                 Margin="221,28,0,0" VerticalAlignment="Top" Width="193" Grid.ColumnSpan="2"/>
         <Button x:Name="PbtnRealTimeInk" Grid.ColumnSpan="2" Content="Button" HorizontalAlignment="Left" Margin="244,183,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnRealTimeInk_Click"/>
         <Button x:Name="PbtnFileTransfer" Grid.ColumnSpan="3" Content="Button" HorizontalAlignment="Left" Margin="324,182,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnFileTransfer_Click"/>
         <Button x:Name="PbtnStop" Grid.ColumnSpan="2" Content="Button" HorizontalAlignment="Left" Margin="244,216,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="PbtnStop_Click"/>
@@ -59,6 +58,15 @@
         <ListBox x:Name="ListBoxMessage" 
                  ItemsSource="{Binding LogMessages}" 
                  Grid.ColumnSpan="3" HorizontalAlignment="Left" Height="86" Margin="27,260,0,-98" VerticalAlignment="Top" Width="387"/>
+        <InkCanvas x:Name="CanvasMain" Margin="72.8,19,0,0" EditingMode="None" 
+                   EditingModeInverted="None" MoveEnabled="False" ResizeEnabled="False" 
+                   Strokes="{Binding Strokes}" Background="Transparent" 
+                   RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left" Width="159" Height="220" VerticalAlignment="Top" Grid.Column="2" 
+>
+            <InkCanvas.DefaultDrawingAttributes>
+                <DrawingAttributes  x:Name="m_DrawingAttributes" Color="Black" FitToCurve="True" Height="2" IgnorePressure="False" IsHighlighter="False" StylusTip="Ellipse" StylusTipTransform="Identity" Width="2"/>
+            </InkCanvas.DefaultDrawingAttributes>
+        </InkCanvas>
 
     </Grid>
 </Window>

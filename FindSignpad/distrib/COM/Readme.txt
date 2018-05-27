@@ -1,0 +1,1 @@
+Wacom STU-SDK 2.13.5

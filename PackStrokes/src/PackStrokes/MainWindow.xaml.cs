@@ -27,6 +27,10 @@ using System.Windows.Ink;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
+using System.IO;
+using NUnit.Framework;
+using GhostscriptSharp;
+
 
 namespace PackStrokes
 {
@@ -126,7 +130,6 @@ namespace PackStrokes
             sa.CreateRegion(10, 10, 110, 60);
             sa.CreateRegion(500, 500, 7000, 7000);
             sa.CreateRegion(7001, 500, 14000, 7000);
-
         }
 
         #region UI Control Handlers
@@ -190,12 +193,40 @@ namespace PackStrokes
                     path = ofd.FileName;    // full path + filename + extension
                                             //               textBoxReadFile.Text = path;
                     InkDocument.ReadBaxter(path, sa);
+
+                    //                    string url = @"http://www.domain.com/file.pdf";
+                    //                    WebBrowser_ShowPDF.Navigate(path);
+                    LoadPdfToImage(path);
+
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
+        }
+
+        private void LoadPdfToImage(string source)
+        {
+            string target = "output.jpg";
+            GenerateSinglePageThumbnail(source, target);
+
+            // イメージブラシの作成
+            ImageBrush imageBrush = new ImageBrush();
+            imageBrush.ImageSource = new System.Windows.Media.Imaging.BitmapImage(new Uri(target, UriKind.Relative));
+            imageBrush.Opacity = 0.3;
+
+            // ブラシを背景に設定する
+            CanvasMain.Background = imageBrush;
+        }
+
+        //        private readonly string SOURCE_FILE_LOCATION = "test.pdf";
+        //        private readonly string TARGET_FILE_LOCATION = "output.jpg";
+
+        public void GenerateSinglePageThumbnail(string source, string target)
+        {
+            GhostscriptWrapper.GeneratePageThumb(source, target, 1, 100, 100);
+            Assert.IsTrue(File.Exists(target));
         }
 
         private void PbtnScanDevices_Click(object sender, RoutedEventArgs e)
@@ -515,7 +546,7 @@ namespace PackStrokes
                 Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
                 {
                     _strokes[_strokes.Count - 1].StylusPoints.Add(point);
-                    //                   NotifyPropertyChanged("Strokes");
+                    //                  NotifyPropertyChanged("Strokes");
                 }));
 
                 m_addNewStrokeToModel = true;

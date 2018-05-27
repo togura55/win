@@ -1,0 +1,186 @@
+OneDrive SDK for C#のアイテム
+=====
+
+OneDrive SDK for C#のアイテムは、OneDrive APIのアイテムと同様に動作します。 OneDrive APIで説明されている項目のすべてのアクションは、SDKを通じて使用できます。詳細については、[Items Reference](https://dev.onedrive.com/README.htm#item-resource)を参照してください。
+
+以下の例では、アプリケーションに[OneDriveClient **]オブジェクトが[Authenticated](/ docs / auth.md)あると仮定しています。
+
+* [アイテムを取得](#get-an-item)
+* [アイテムの削除](#delete-an-item)
+* [アイテムの子供を得る](#get-children-for-an-item)
+* [フォルダの作成](#create-a-folder)
+* [アップロード内容](#uploading-contents)
+* [ダウンロードコンテンツ](#downloading-contents)
+* [アイテムの移動と更新](#moving-and-updating-an-item)
+* [アイテムのコピー](#copy-an-item)
+
+アイテムを取得する
+---------------
+### 1. IDで
+
+`` `csharp
+var item = await oneDriveClient
+                     .Items [itemId]
+                     .Request()
+                     .GetAsync();
+`` ``
+
+### 2.経路別
+
+`` `csharp
+var item = await oneDriveClient
+                     .Drive
+                     .Root
+                     .ItemWithPath( "path / to / file / txt")
+                     .Request()
+                     .GetAsync();
+`` ``
+
+親参照パスでアイテムにアクセスする：
+`` `csharp
+var item = await oneDriveClient
+                     .ItemWithPath(parentItem.ParentReference.Path + "/" + parentItem.Name + "/ relative / path")
+                     .Request()
+                     .GetAsync();
+`` ``
+
+アイテムを削除する
+---------------
+`` `csharp
+await oneDriveClient
+          .Drive
+          .Items [itemId]
+          .Request()
+          .DeleteAsync();
+`` ``
+
+アイテムの子供を取得する
+-------------------------
+
+コレクションの詳細[here](/ docs / collections.md)
+
+`` `csharp
+await oneDriveClient
+          .Drive
+          .Items [itemId]
+          .Child
+          .Request()
+          .GetAsync();
+`` ``
+
+フォルダを作成する
+-------------------------
+
+### 1.既知のフォルダIDへのPOST
+
+`` `csharp
+var folderToCreate =new Item{Folder=new Folder(), Name= "folder name"};
+var createdFolder = await oneDriveClient
+          .Drive
+          .Items [itemId]
+          .Child
+          .Request()
+          .AddAsync(folderToCreate);
+`` ``
+
+### 2.既知のフォルダIDにPUTする
+
+`` `csharp
+var folderToCreate = new Item { Folder = new Folder() };
+var createdFolder = await oneDriveClient
+          .drive
+          .Items [itemId]
+          .ItemWithPath("folder/subfolder")
+          .Request()
+          .CreateAsync(folderToCreate);
+`` ``
+
+### 3.与えられたパスでPUTする
+
+`` `csharp
+var folderToCreate = new Item { Folder = new Folder() };
+var createdFolder = await oneDriveClient
+          .Drive
+          .Root
+          .ItemWithPath("folder/subfolder")
+          .Request()
+          .CreateAsync(folderToCreate);
+`` ``
+
+注：指定されたパスが存在しない場合、パス内のすべてのフォルダー名も作成されます。
+
+コンテンツのアップロード
+------------------------------
+
+`` `csharp
+using(contentStream)
+{
+    var uploadedItem = await oneDriveClient
+                                 .Drive
+                                 .Root
+                                 .ItemWithPath( "path / to / file.txt")
+                                 .Contents
+                                 .Request()
+                                 .PutAsync <Item>(contentStream);
+}
+`` ``
+
+コンテンツのダウンロード
+------------------------------
+
+`` `csharp
+var contentStream = await oneDriveClient
+                              .Drive
+                              .Items [itemId]
+                              .Contents
+                              .Request()
+                              .GetAsync();
+`` ``
+
+アイテムの移動と更新
+--------------
+アイテムを[移動](https://dev.onedrive.com/items/move.htm)するには、親参照を更新する必要があります。
+
+`` `csharp
+var updateItem = new Item {ParentReference = new ItemReference {Id = newParentId}};
+var itemWithUpdates = await oneDriveClient
+                                .Drive
+                                .Items [itemId]
+                                .Request()
+                                .UpdateAsync(updateItem);
+`` ``
+
+アイテムの名前を変更するには、次の操作を実行します。
+
+`` `csharp
+var updateItem = new Item{Name = "New name！" };
+var itemWithUpdates = await oneDriveClient
+                                .Drive
+                                .Items [itemId]
+                                .Request()
+                                .UpdateAsync(updateItem);
+
+`` ``
+
+アイテムをコピーする
+---------------
+アイテムのコピーは[ここ](https://dev.onedrive.com/items/copy.htm)で説明されている非同期アクションです。
+
+`` `csharp
+var asyncStatus = await oneDriveClient
+                            .Drive
+                            .Items [itemId]
+                            .Copy(newItemName, new ItemReference {Id = copyLocationId})
+                            .Request()
+                            .PostAsync();
+`` ``
+
+`Copy`アクションは` IItemCopyAsyncMonitor`インスタンスを返します。インスタンスには完了のためにモニタURLをポーリングするメソッドがあります。ポーリングメソッドは完了時に作成されたアイテムを返します。
+
+コピーアクションが完了するまでポーリングするには：
+
+`` `csharp
+var newItem =await asyncStatus.CompleteOperationAsync(null、CancellationToken.None);
+`` ``
+
+`CompleteOperationAsync`は、進捗状況を報告するための` IProgress <AsyncOperationStatus> `と、アクションのキャンセルのための` CancellationToken`を取ります。キャンセルされない限り、メソッドは完了までポーリングします。
