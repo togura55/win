@@ -1,0 +1,563 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BaXterX</name>
+    </assembly>
+    <members>
+        <member name="T:BaXterX.ElementNames">
+            <summary>
+            Static class holding all String representations of possible Element Names.
+            Use these to search / delete within Objects.
+            </summary>
+        </member>
+        <member name="F:BaXterX.ElementNames.WGSS_NAMESPACE_URI">
+            <summary>
+            This is the RDF Namespace for BaXter metadata, embedded within any
+            resulting XMP blobs.
+            </summary>
+        </member>
+        <member name="F:BaXterX.ElementNames.WGSS_NAMESPACE_PREFIX">
+            <summary>
+            RDF Namespace Prefix for BaXter metadata.
+            </summary>
+        </member>
+        <member name="T:BaXterX.Document">
+            <summary>
+            This class represents a Barbera Metadata Format 'Document'.
+            Simply it inspects underlying XMP and populates it's properties to
+            provide a simple object like interface to client apps.
+            See BFF Specification 4. Document Level Definitions
+            </summary>
+        </member>
+        <member name="M:BaXterX.Document.#ctor(System.String)">
+            <summary>
+            Instantiate a Document object with existing XMP Metadata 
+            (ie extracted from a Root PDF Dictionary).
+            </summary>
+            <param name="xmp"></param>
+        </member>
+        <member name="M:BaXterX.Document.#ctor">
+            <summary>
+            Instantiate an empty Document object. You can then add properties
+            and later retrieve the XMP to insert to your document.
+            </summary>
+        </member>
+        <member name="M:BaXterX.Document.addPage(BaXterX.Page)">
+            <summary>
+            Add a Page object to this Document.
+            </summary>
+            <param name="page"></param>
+        </member>
+        <member name="P:BaXterX.Document.pages">
+            <summary>
+            Retrieve List of all Pages contained within this Document
+            </summary>
+        </member>
+        <member name="M:BaXterX.Document.exists(System.String)">
+            <summary>
+            Check if a specific BFF element exists in this Document.
+            </summary>
+            <param name="element_name"></param>
+            <returns>True if the field exists in Document Level</returns>
+        </member>
+        <member name="M:BaXterX.Document.eraseElement(System.String)">
+            <summary>
+            Remove an entire element node from the XMP.
+            </summary>
+            <param name="element_name"></param>
+        </member>
+        <member name="P:BaXterX.Document.authoringToolVersion">
+            <summary>
+            BFF Specification 4.1 Authoring Tool
+            </summary>
+        </member>
+        <member name="P:BaXterX.Document.authoringToolName">
+            <summary>
+            BFF Specification 4.1 Authoring Tool
+            </summary>
+        </member>
+        <member name="P:BaXterX.Document.clientAppVersion">
+            <summary>
+            BFF Specification 4.7 Client App 
+            </summary>
+        </member>
+        <member name="P:BaXterX.Document.clientAppOS">
+            <summary>
+            BFF Specification 4.7 Client App 
+            </summary>
+        </member>
+        <member name="P:BaXterX.Document.clientAppName">
+            <summary>
+            BFF Specification 4.7 Client App 
+            </summary>
+        </member>
+        <member name="P:BaXterX.Document.clientDeviceID">
+            <summary>
+            BFF Specification 4.8 Client Device
+            </summary>
+        </member>
+        <member name="P:BaXterX.Document.clientDeviceClass">
+            <summary>
+            BFF Specification 4.8 Client Device
+            </summary>
+        </member>
+        <member name="P:BaXterX.Document.clientDeviceName">
+            <summary>
+            BFF Specification 4.8 Client Device
+            </summary>
+        </member>
+        <member name="P:BaXterX.Document.completionTime">
+            <summary>
+            BFF Specification 4.4 Document Completion Time
+            </summary>
+        </member>
+        <member name="P:BaXterX.Document.pageCompletionOrder">
+            <summary>
+            BFF Specification 4.3 Page Completion Order
+            </summary>
+        </member>
+        <member name="P:BaXterX.Document.pageIDList">
+            <summary>
+            BFF Specification 4.2 Page ID list
+            </summary>
+        </member>
+        <member name="P:BaXterX.Document.smartPadID">
+            <summary>
+            BFF Specification 4.5 Smart Pad Device ID
+            </summary>
+        </member>
+        <member name="P:BaXterX.Document.smartPadDeviceName">
+            <summary>
+            BFF Specification 4.5 Smart Pad Device ID
+            </summary>
+        </member>
+        <member name="P:BaXterX.Document.smartPadUnit">
+            <summary>
+            BFF Specification 4.6 Smart Pad Device Characteristics
+            </summary>
+        </member>
+        <member name="P:BaXterX.Document.smartPadPPU">
+            <summary>
+            BFF Specification 4.6 Smart Pad Device Characteristics
+            </summary>
+        </member>
+        <member name="P:BaXterX.Document.smartPadWidth">
+            <summary>
+            BFF Specification 4.6 Smart Pad Device Characteristics
+            </summary>
+        </member>
+        <member name="P:BaXterX.Document.smartPadHeight">
+            <summary>
+            BFF Specification 4.6 Smart Pad Device Characteristics
+            </summary>
+        </member>
+        <member name="M:BaXterX.Document.toXMP">
+            <summary>
+            Convert this Page Object into compliant BFF XMP for insertion into
+            actual document / file.
+            </summary>
+        </member>
+        <member name="T:BaXterX.Field">
+            <summary>
+            This class represents a Barbera Metadata Format 'Field'.
+            Simply it inspects underlying XMP and populates it's properties to
+            provide a simple object like interface to client apps.
+            See BFF Specification 6. Object Level Definitions Section
+            </summary>
+        </member>
+        <member name="M:BaXterX.Field.#ctor(System.String)">
+            <summary>
+            Instantiate a Field object with existing XMP Metadata 
+            (ie extracted from a PDF Dictionary).
+            </summary>
+            <param name="xmp"></param>
+        </member>
+        <member name="M:BaXterX.Field.#ctor">
+            <summary>
+            Instantiate an empty Field object. You can then add properties
+            and later retrieve the XMP to insert to your document.
+            </summary>
+        </member>
+        <member name="M:BaXterX.Field.exists(System.String)">
+            <summary>
+            Check if a specific BFF element exists in this Field.
+            </summary>
+            <param name="element_name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BaXterX.Field.eraseElement(System.String)">
+            <summary>
+            Remove an entire element node from the XMP.
+            </summary>
+            <param name="element_name"></param>
+        </member>
+        <member name="P:BaXterX.Field.completionTime">
+            <summary>
+            BFF Specification 6.1.7 Completion Time
+            </summary>
+        </member>
+        <member name="P:BaXterX.Field.data">
+            <summary>
+            BFF Specification 6.1.8 Data
+            </summary>
+        </member>
+        <member name="P:BaXterX.Field.encrypted">
+            <summary>
+            BFF Specification 6.1.3.4 Signature
+            True if signature field contains encrypted data
+            </summary>
+        </member>
+        <member name="P:BaXterX.Field.keyName">
+            <summary>
+            BFF Specification 6.1.3.4 Signature
+            For encypted signatures, this is the name of the public key used to encrypt
+            </summary>
+        </member>
+        <member name="P:BaXterX.Field.locationX">
+            <summary>
+            BFF Specification 6.1.2 Field Location
+            </summary>
+        </member>
+        <member name="P:BaXterX.Field.locationY">
+            <summary>
+            BFF Specification 6.1.2 Field Location
+            </summary>
+        </member>
+        <member name="P:BaXterX.Field.locationW">
+            <summary>
+            BFF Specification 6.1.2 Field Location
+            </summary>
+        </member>
+        <member name="P:BaXterX.Field.locationH">
+            <summary>
+            BFF Specification 6.1.2 Field Location
+            </summary>
+        </member>
+        <member name="P:BaXterX.Field.name">
+            <summary>
+            BFF Specification 6.1.3.4 Signature
+            The signatory name
+            </summary>
+        </member>
+        <member name="P:BaXterX.Field.reason">
+            <summary>
+            BFF Specification 6.1.3.4 Signature
+            The signatory reason
+            </summary>
+        </member>
+        <member name="P:BaXterX.Field.required">
+            <summary>
+            BFF Specification 6.1.5 Required
+            The required element defines if a particular area on a page must be 
+            completed before the page can be ‘finished’.
+            </summary>
+        </member>
+        <member name="P:BaXterX.Field.tag">
+            <summary>
+            BFF Specification 6.1.4 Tag
+            The tag element gives a user configurable name for the particular field
+            </summary>
+        </member>
+        <member name="P:BaXterX.Field.type">
+            <summary>
+            BFF Specification 6.1.3 Field Type
+            The field type attribute defines the field type of the active area.
+            </summary>
+        </member>
+        <member name="P:BaXterX.Field.pdfID">
+            <summary>
+            BFF Specification 6.1.1 Field UUID
+            pdfID The Name of the underlying PDF objec
+            </summary>
+        </member>
+        <member name="P:BaXterX.Field.UUID">
+            <summary>
+            BFF Specification 6.1.1 Field UUID
+            Barbera Specific Field UUID
+            </summary>
+        </member>
+        <member name="P:BaXterX.Field.penData">
+            <summary>
+            BFF Specification 3.2 Pen Data
+            PenData associated with this Field.
+            </summary>
+        </member>
+        <member name="M:BaXterX.Field.penDataAppend(BaXterX.Stroke)">
+            <summary>
+            BFF Specification 3.2 Pen Data 
+            Append a stroke to existing Pen Data
+            </summary>
+        </member>
+        <member name="M:BaXterX.Field.penDataAppend(System.Collections.Generic.List{BaXterX.Stroke})">
+            <summary>
+            BFF Specification 3.2 Pen Data 
+            Append a List of strokes to existing Pen Data
+            </summary>
+        </member>
+        <member name="M:BaXterX.Field.penDataRemoveLastStroke">
+            <summary>
+            BFF Specification 3.2 Pen Data 
+            Remove the last stroke from this Fields PenData (ie. Undo).
+            </summary>
+        </member>
+        <member name="M:BaXterX.Field.toXMP">
+            <summary>
+            Convert this Field Object into compliant BFF XMP for insertion into
+            actual document / file.
+            </summary>
+        </member>
+        <member name="T:BaXterX.NonBarberaDocumentException">
+            <summary>
+            Type of exception thrown if the requested Document to be parsed
+            does not contain any Barbera Metadata.
+            </summary>
+        </member>
+        <member name="M:BaXterX.NonBarberaDocumentException.#ctor(System.String)">
+            <summary>
+            Type of exception thrown if the requested Document to be parsed
+            does not contain any Barbera Metadata.
+            </summary>
+        </member>
+        <member name="T:BaXterX.Reader">
+            <summary>
+            Top level Reader object. Use this to parse PDFs and inspect the resulting
+            metadata objects.
+            </summary>
+        </member>
+        <member name="M:BaXterX.Reader.#ctor">
+            <summary>
+            Instantiate a Reader object, ready for a Document to be parsed.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:BaXterX.Reader.readFromStream(System.IO.Stream)" -->
+        <member name="P:BaXterX.Reader.document">
+            <summary>
+            Access the underlying Document object owned by this Reader
+            </summary>
+        </member>
+        <member name="T:BaXterX.Page">
+            <summary>
+            This class represents a Barbera Metadata Format 'Page'.
+            Simply it inspects underlying XMP and populates it's properties to
+            provide a simple object like interface to client apps.
+            See BFF Specification 5. Page Level Definitions Section
+            </summary>
+        </member>
+        <member name="M:BaXterX.Page.#ctor(System.String)">
+            <summary>
+            Instantiate a Page object with existing XMP Metadata 
+            (ie extracted from a PDF Dictionary).
+            </summary>
+            <param name="xmp"></param>
+        </member>
+        <member name="M:BaXterX.Page.#ctor">
+            <summary>
+            Instantiate an empty Page object. You can then add properties
+            and later retrieve the XMP to insert to your document.
+            </summary>
+        </member>
+        <member name="M:BaXterX.Page.addField(BaXterX.Field)">
+            <summary>
+            Add a Field object to this Page.
+            </summary>
+            <param name="field"></param>
+        </member>
+        <member name="P:BaXterX.Page.fields">
+            <summary>
+            Retrieve List of all Fields contained within this Page
+            </summary>
+        </member>
+        <member name="M:BaXterX.Page.getFieldByUUID(System.String)">
+            <summary>
+            Retrieve a specific Field contained within this Page, by Barbera UUID.
+            </summary>
+            <param name="uuid"></param>
+            <returns>Field Object</returns>
+        </member>
+        <member name="M:BaXterX.Page.getFieldByPdfID(System.String)">
+            <summary>
+            Retrieve a specific Field contained within this Page, by PDFID.
+            </summary>
+            <param name="pdf_id"></param>
+            <returns>Field bject</returns>
+        </member>
+        <member name="M:BaXterX.Page.exists(System.String)">
+            <summary>
+            Check if a specific BFF element exists in this Field.
+            </summary>
+            <param name="element_name"></param>
+            <returns>True if the field exists</returns>
+        </member>
+        <member name="M:BaXterX.Page.eraseElement(System.String)">
+            <summary>
+            Remove an entire element node from the XMP.
+            </summary>
+            <param name="element_name"></param>
+        </member>
+        <member name="P:BaXterX.Page.fieldIDList">
+            <summary>
+            BFF Specification 5.2 Field IDs for Page
+            List of Field IDs associated with this page.
+            FieldIDs correspond to the underlying AcroForm object's PDFName (T:).
+            </summary>
+        </member>
+        <member name="P:BaXterX.Page.pdfPage">
+            <summary>
+            BFF Specification 5.1 Page ID
+            Page Number according to PDF Index
+            </summary>
+        </member>
+        <member name="P:BaXterX.Page.uuid">
+            <summary>
+            BFF Specification 5.1 Page ID
+            Barbera UUID of Page (Barcode)
+            </summary>
+        </member>
+        <member name="P:BaXterX.Page.penData">
+            <summary>
+            BFF Specification 3.2 PenData
+            List of all Pen Strokes associated with this page.
+            </summary>
+        </member>
+        <member name="M:BaXterX.Page.penDataAppend(BaXterX.Stroke)">
+            <summary>
+            BFF Specification 3.2 Pen Data 
+            Append a stroke to existing Pen Data
+            </summary>
+        </member>
+        <member name="M:BaXterX.Page.penDataAppend(System.Collections.Generic.List{BaXterX.Stroke})">
+            <summary>
+            BFF Specification 3.2 Pen Data 
+            Append a List of strokes to existing Pen Data
+            </summary>
+        </member>
+        <member name="M:BaXterX.Page.penDataRemoveLastStroke">
+            <summary>
+            BFF Specification 3.2 Pen Data 
+            Remove the last stroke from this Fields PenData (ie. Undo).
+            </summary>
+        </member>
+        <member name="M:BaXterX.Page.toXMP">
+            <summary>
+            Convert this Page Object into compliant BFF XMP for insertion into
+            actual document / file.
+            </summary>
+        </member>
+        <member name="M:BaXterX.PenData.StringToMemoryStream(System.String)">
+            <summary>
+            Converts a string to a MemoryStream.
+            </summary>
+        </member>
+        <member name="M:BaXterX.PenData.MemoryStreamToString(System.IO.MemoryStream)">
+            <summary>
+            Converts a MemoryStream to a string. Makes some assumptions about the content of the stream.
+            </summary>
+            <param name="ms"></param>
+            <returns></returns>
+        </member>
+        <member name="T:BaXterX.CompressedStroke">
+            <summary>
+            CompressedStrokes are used to actually store the information
+            in the PDF. Reading the object directly is useless. To read or append 
+            Strokes please use the regular Stroke class.
+            </summary>
+        </member>
+        <member name="T:BaXterX.Stroke">
+            <summary>
+            The Stroke class simply holds a list of Points.
+            Later these Strokes are combined to create PenData
+            </summary>
+        </member>
+        <member name="F:BaXterX.Stroke.points">
+            <summary>
+            Access the underlying Points associated with this Stroke
+            </summary>
+        </member>
+        <member name="M:BaXterX.Stroke.#ctor(System.Collections.Generic.List{BaXterX.Point})">
+            <summary>
+            Instantiate a Stroke with existing Points ready to be added to
+            PenData
+            </summary>
+            <param name="points"></param>
+        </member>
+        <member name="M:BaXterX.Stroke.#ctor(System.String)">
+            <summary>
+            Instantiate a Stroke from a serialised string
+            </summary>
+            <param name="stroke_string"></param>
+        </member>
+        <member name="M:BaXterX.Stroke.toString">
+            <summary>
+            Serialise the Stroke to a csv string.
+            </summary>
+            <returns>Serialised string</returns>
+        </member>
+        <member name="T:BaXterX.Point">
+            <summary>
+            The Point class holds coordinate and color information for a single
+            point in a stroke.
+            </summary>
+        </member>
+        <member name="F:BaXterX.Point.x">
+            <summary>
+            The X coordinate of the Point
+            </summary>
+        </member>
+        <member name="F:BaXterX.Point.y">
+            <summary>
+            The Y coordinate of the Point
+            </summary>
+        </member>
+        <member name="F:BaXterX.Point.w">
+            <summary>
+            The Width of the Point
+            </summary>
+        </member>
+        <member name="F:BaXterX.Point.ink_color">
+            <summary>
+            The colour of the Point
+            </summary>
+        </member>
+        <member name="M:BaXterX.Point.#ctor(System.String,System.String,System.String,System.String)">
+            <summary>
+            Create a Point object from existing coordinate data
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <param name="w"></param>
+            <param name="ink_color"></param>
+        </member>
+        <member name="M:BaXterX.Point.#ctor(System.String)">
+            <summary>
+            Create a Point object from csv string.
+            </summary>
+            <param name="point_string"></param>
+        </member>
+        <member name="M:BaXterX.Point.toString">
+            <summary>
+            Serialise the Point to a csv string.
+            </summary>
+            <returns>Serialised string</returns>
+        </member>
+        <member name="T:BaXterX.Utility">
+            <summary>
+            Static helper class containing Utility functions.
+            </summary>
+        </member>
+        <member name="M:BaXterX.Utility.containsBarberaMetadata(System.IO.Stream)">
+            <summary>
+            Check if a Stream contains any Barbera Metadata.
+            Use this before attempted a Read to avoid exceptions.
+            </summary>
+            <param name="xmp_stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BaXterX.Utility.containsBarberaMetadata(System.String)">
+            <summary>
+            Check if a String contains any Barbera Metadata
+            </summary>
+            <param name="xmp_string"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
