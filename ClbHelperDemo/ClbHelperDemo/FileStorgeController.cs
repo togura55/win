@@ -8,6 +8,7 @@ using System.Net.Http;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using System.Diagnostics;
+using System.IO;
 
 
 namespace ClbHelperDemo
@@ -223,7 +224,7 @@ namespace ClbHelperDemo
                 return id;
             }
 
-            public async Task GetFileList(StoredInkFile storedInkFile, string dirrectoryId = null)
+            public async Task GetFileList(StoredInkFile storedInkFile, string directoryId = null)
             {
                 try
                 {
@@ -231,8 +232,8 @@ namespace ClbHelperDemo
                     {
                         var drive = await OneDriveClientAuth.Drive.Request().GetAsync();
 
-                        var dirRequest = dirrectoryId == null ? OneDriveClientAuth.Drive.Root :
-                                                         OneDriveClientAuth.Drive.Items[dirrectoryId];
+                        var dirRequest = directoryId == null ? OneDriveClientAuth.Drive.Root :
+                                                         OneDriveClientAuth.Drive.Items[directoryId];
                         var objs = await dirRequest.Children.Request().GetAsync();
                         foreach (var obj in objs)
                         {
@@ -270,6 +271,36 @@ namespace ClbHelperDemo
             public string GetRefreshToken()
             {
                 return refreshToken;
+            }
+
+
+            public async Task<bool> IsFileExisted(string FileName, string DirId)
+            {
+                var requestPath = DirId == null ? OneDriveClientAuth.Drive.Root :
+                                                                OneDriveClientAuth.Drive.Items[DirId];
+
+                var children = await requestPath.Children
+                                                .Request()
+                                                .GetAsync();
+                return children.Any(item => item.Name == FileName);
+            }
+
+
+            public async Task<Stream> GetDownloadStreamAsync(string FileName, string DirId)
+            {
+                if (!(await IsFileExisted(FileName, DirId)))
+                {
+                    // 本来ならここで例外を投げたほうがいい
+                    return new MemoryStream();
+                }
+
+                var requestPath = DirId == null ? OneDriveClientAuth.Drive.Root :
+                                                         OneDriveClientAuth.Drive.Items[DirId];
+
+                return await requestPath.ItemWithPath(FileName)
+                                                        .Content
+                                                        .Request()
+                                                        .GetAsync();
             }
         }
     }

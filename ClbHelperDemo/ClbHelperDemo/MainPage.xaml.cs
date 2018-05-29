@@ -187,6 +187,14 @@ namespace ClbHelperDemo
 
         }
 
+        private async void Pbtn_ShowData_Click(object sender, RoutedEventArgs e)
+        {
+            string filename = string.Empty;
+            string directoryId = string.Empty;
+
+            string text = await DownloadContentAsync(filename, directoryId);
+        }
+
         private void StopPollingProc()
         {
             timer.Stop();
@@ -240,6 +248,19 @@ namespace ClbHelperDemo
                         "File: " + obj.Name.ToString());
                 }
             }
+        }
+
+
+        public async Task<string> DownloadContentAsync(string FileName, string DirId)
+        {
+            string text = null;
+
+            using (var fileStream = await oneDrive.GetDownloadStreamAsync(FileName, DirId))
+            {
+                text = new StreamReader(fileStream).ReadToEnd();
+            }
+
+            return text;
         }
     }
 }

@@ -29,6 +29,8 @@
         <TextBlock x:Name="textBlock_FolderName" HorizontalAlignment="Left" Margin="33,167,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <TextBlock x:Name="textBlock_Period" HorizontalAlignment="Left" Margin="33,125,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <TextBox x:Name="textBox_Period" HorizontalAlignment="Left" Margin="138,119,0,0" Text="TextBox" VerticalAlignment="Top"/>
+        <ListBox x:Name="listBox_Data" HorizontalAlignment="Left" Height="235" Margin="609,208,0,0" VerticalAlignment="Top" Width="416" BorderBrush="Black" BorderThickness="5" Visibility="Visible"/>
+        <Button x:Name="Pbtn_ShowData" Content="Button" HorizontalAlignment="Left" Margin="497,303,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.268,-0.512" Click="Pbtn_ShowData_Click"/>
 
     </Grid>
 </Page>
