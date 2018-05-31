@@ -20,6 +20,7 @@ using System.Windows;
 using Windows.System.Threading;
 using Windows.UI.Core;
 using Windows.Storage;
+using System.Diagnostics;
 
 // 空白ページの項目テンプレートについては、https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x411 を参照してください
 
@@ -74,15 +75,18 @@ namespace ClbHelperDemo
             textBox_Period.Text = period.ToString();
             textBox_Period.Visibility = Visibility.Collapsed;
             listBox_FileList.Visibility = Visibility.Collapsed;
+            Pbtn_ShowData.Content = "Show";
+            Pbtn_ShowData.Visibility = Visibility.Collapsed;
+            listBox_Data.Visibility = Visibility.Collapsed;
         }
 
-        //Resumingイベントのイベントハンドラ
+        //Resuming event handler
         private void OnResuming(object sender, object e)
         {
             //ここにデータ復元の処理を書く
         }
 
-        //Suspendingイベントのイベントハンドラ
+        //Suspending event handler
         private void OnSuspending(object sender, Windows.ApplicationModel.SuspendingEventArgs e)
         {
             //ここにデータ保存の処理を書く
@@ -104,7 +108,7 @@ namespace ClbHelperDemo
             if (val != null && val is string)
             {
                 this.refreshToken = (string)val;
-                textBlock_Response.Text = (string)val;
+                listBox_LogMessages.Items.Add((string)val); // for debug
             }
             else
             {
@@ -138,6 +142,8 @@ namespace ClbHelperDemo
                 textBox_Period.Visibility = Visibility.Visible;
 
                 listBox_FileList.Visibility = Visibility.Visible;
+                Pbtn_ShowData.Visibility = Visibility.Visible;
+                listBox_Data.Visibility = Visibility.Visible;
             }
             else
             {
@@ -250,7 +256,6 @@ namespace ClbHelperDemo
             }
         }
 
-
         public async Task<string> DownloadContentAsync(string FileName, string DirId)
         {
             string text = null;
@@ -262,5 +267,21 @@ namespace ClbHelperDemo
 
             return text;
         }
+
+        private void ListBox_FileList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                ListBox lb = (ListBox)sender;
+                if (lb == null) return;
+
+                textBlock_Response.Text = "   You selected " + lb.SelectedItem.ToString() + ".";
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
     }
 }
