@@ -34,11 +34,9 @@ namespace ClbHelperDemo
         // Folder path
         private string folderPath = "CLB Paper";
 
-        // The StoredInkFile object
         StoredInkFile storedInkFile;
-
-        // OneDriveController
         FileStorgeController.OneDrive oneDrive;
+        InkDocument inkDocument;
 
         // Polling period in seconds
         double period = 30;
@@ -48,6 +46,7 @@ namespace ClbHelperDemo
         private DispatcherTimer timer;
         private int count;
         private bool timer_flag = false;
+        private string FileName = string.Empty;
 
         public MainPage()
         {
@@ -59,6 +58,7 @@ namespace ClbHelperDemo
 
             storedInkFile = new StoredInkFile();
             oneDrive = new FileStorgeController.OneDrive();
+            inkDocument = new InkDocument();
 
             App.Current.Suspending += OnSuspending;
             App.Current.Resuming += OnResuming;
@@ -77,7 +77,7 @@ namespace ClbHelperDemo
             listBox_FileList.Visibility = Visibility.Collapsed;
             Pbtn_ShowData.Content = "Show";
             Pbtn_ShowData.Visibility = Visibility.Collapsed;
-            listBox_Data.Visibility = Visibility.Collapsed;
+            TextBox_Data.Visibility = Visibility.Collapsed;
         }
 
         //Resuming event handler
@@ -108,7 +108,7 @@ namespace ClbHelperDemo
             if (val != null && val is string)
             {
                 this.refreshToken = (string)val;
-                listBox_LogMessages.Items.Add((string)val); // for debug
+                listBox_LogMessages.Items.Add("refreshToken: " + (string)val); // for debug
             }
             else
             {
@@ -143,7 +143,7 @@ namespace ClbHelperDemo
 
                 listBox_FileList.Visibility = Visibility.Visible;
                 Pbtn_ShowData.Visibility = Visibility.Visible;
-                listBox_Data.Visibility = Visibility.Visible;
+                TextBox_Data.Visibility = Visibility.Visible;
             }
             else
             {
@@ -195,10 +195,25 @@ namespace ClbHelperDemo
 
         private async void Pbtn_ShowData_Click(object sender, RoutedEventArgs e)
         {
-            string filename = string.Empty;
-            string directoryId = string.Empty;
+//            string filename = string.Empty;
 
-            string text = await DownloadContentAsync(filename, directoryId);
+            // ToDo: get the filename which selected in the ListView
+
+            if (FileName != string.Empty && storedInkFile != null)
+            {
+                int index = storedInkFile.FindFileName(FileName);
+                if (index >= 0)
+                {
+                    string text = await DownloadContentAsync(FileName,
+                        storedInkFile.properties[index].DirId);
+
+                    //                    string id = storedInkFile.properties[index].Id;
+                    //                    string time = storedInkFile.properties[index].CreatedDateTime.ToString();
+                    //                    string size = storedInkFile.properties[index].Size.ToString();
+
+                    TextBox_Data.Text = text;
+                }
+            }
         }
 
         private void StopPollingProc()
@@ -262,7 +277,8 @@ namespace ClbHelperDemo
 
             using (var fileStream = await oneDrive.GetDownloadStreamAsync(FileName, DirId))
             {
-                text = new StreamReader(fileStream).ReadToEnd();
+                StreamReader sr = new StreamReader(fileStream);
+                text = inkDocument.ReadInkDocument(sr);
             }
 
             return text;
@@ -275,7 +291,8 @@ namespace ClbHelperDemo
                 ListBox lb = (ListBox)sender;
                 if (lb == null) return;
 
-                textBlock_Response.Text = "   You selected " + lb.SelectedItem.ToString() + ".";
+                FileName = lb.SelectedItem.ToString();
+                textBlock_Response.Text = "   You selected " + FileName + "."; // for debug
             }
             catch (Exception ex)
             {

@@ -245,7 +245,7 @@ namespace ClbHelperDemo
                             {
                                 if (!storedInkFile.IsExisted(obj))
                                 {
-                                    storedInkFile.Add(obj);
+                                    storedInkFile.Add(obj, directoryId);
 
                                     // Do actions for new files in here
                                     //
@@ -276,13 +276,30 @@ namespace ClbHelperDemo
 
             public async Task<bool> IsFileExisted(string FileName, string DirId)
             {
-                var requestPath = DirId == null ? OneDriveClientAuth.Drive.Root :
-                                                                OneDriveClientAuth.Drive.Items[DirId];
+                bool state = false;
 
-                var children = await requestPath.Children
-                                                .Request()
-                                                .GetAsync();
-                return children.Any(item => item.Name == FileName);
+                try
+                {
+                    var requestPath = DirId == null ? OneDriveClientAuth.Drive.Root :
+                                                      OneDriveClientAuth.Drive.Items[DirId];
+
+                    var children = await requestPath.Children
+                                                    .Request()
+                                                    .GetAsync();
+                    state = children.Any(item => item.Name == FileName);
+                }
+                catch (OneDriveException odex)
+                {
+                    Debug.WriteLine(odex.Message);
+                    throw odex;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    throw ex;
+                }
+
+                return state;
             }
 
 
@@ -294,13 +311,27 @@ namespace ClbHelperDemo
                     return new MemoryStream();
                 }
 
-                var requestPath = DirId == null ? OneDriveClientAuth.Drive.Root :
-                                                         OneDriveClientAuth.Drive.Items[DirId];
+                try
+                {
+                    var requestPath = DirId == null ? OneDriveClientAuth.Drive.Root :
+                                         OneDriveClientAuth.Drive.Items[DirId];
 
-                return await requestPath.ItemWithPath(FileName)
-                                                        .Content
-                                                        .Request()
-                                                        .GetAsync();
+                    return await requestPath.ItemWithPath(FileName)
+                                                            .Content
+                                                            .Request()
+                                                            .GetAsync();
+                }
+                catch (OneDriveException odex)
+                {
+                    Debug.WriteLine(odex.Message);
+                    throw odex;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    throw ex;
+                }
+
             }
         }
     }

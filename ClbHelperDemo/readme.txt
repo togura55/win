@@ -4,12 +4,11 @@ required Microsoft.OneDrive.Sdk v1.x, instead of 2.x
 操作：最初の1回はOneDriveにWeb UIで手動ログインが必要。
 
 ---- ToDo ---------------------
-- OneDriveファイルのストリームオープン
-- 変更があったファイルのBaXter参照
 - ２回目以降の自動ログイン
-- ListBox上で選択したファイルリストの属性表示
 - 起動時ロゴ
 - アイコン
+- InkDocumentをきれいに
+- MainPageコードをきれいに
 
 
 -  GetSilentlyAuthenticatedMicrosoftAccountClient って何に使うの？
