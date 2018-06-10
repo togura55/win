@@ -5,8 +5,6 @@ required Microsoft.OneDrive.Sdk v1.x, instead of 2.x
 
 ---- ToDo ---------------------
 - ２回目以降の自動ログイン
-- 起動時ロゴ
-- アイコン
 - InkDocumentをきれいに
 - MainPageコードをきれいに
 
