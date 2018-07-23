@@ -1,0 +1,26 @@
+---- ToDo --------------------------
+- RebootPCの多言語化
+
+------ Test Loop -------------------
+1) PCのUSBポートに、USBモードにしたPHU-111を接続
+2) PCを再起動
+3) サンプルアプリを起動
+4) "Scan for Devices"ボタンをクリック
+5) リストの"Wacom Clipboard PHU-111"を選択。
+6) "Connect"ボタンをクリック
+7) 正常かどうか確認。
+8) (2)から再実行
+
+
+1. 起動と同時に"Scan for Devices"ボタンを自動押し -> WriteLog
+2. デバイスが接続、検知されているものとして、"Connect"ボタンの自動押し -> WiteLog
+3. 正常の場合 WriteLog
+
+--------------------
+
+
+----- インストール、設定
+- RebootPCのスタートアップ起動の方法
+ファイルの場所を開いた状態で、Windows ロゴ キー  + R キーを押し、「shell:startup」と入力して [OK] を選択します。これにより、"スタートアップ" フォルダーが開きます。
+ファイルの場所からアプリのショートカットをコピーして、"スタートアップ" フォルダーに貼り付けます。
+https://support.microsoft.com/ja-jp/help/4026268/windows-10-change-startup-apps
