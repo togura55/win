@@ -21,6 +21,7 @@ using Windows.System.Threading;
 using Windows.UI.Core;
 using Windows.Storage;
 using System.Diagnostics;
+using Windows.ApplicationModel.Resources;
 
 // 空白ページの項目テンプレートについては、https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x411 を参照してください
 
@@ -47,12 +48,15 @@ namespace ClbHelperDemo
         private int count;
         private bool timer_flag = false;
         private string FileName = string.Empty;
+        private ResourceLoader resource;
 
         public MainPage()
         {
             this.InitializeComponent();
 
-            textBlock_Response.Text = "App is started.";
+            resource = ResourceLoader.GetForCurrentView();
+
+            TextBlock_Response.Text = resource.GetString("TextBlock_Response/Start");
 
             ReadLocalSettings();
 
@@ -63,6 +67,7 @@ namespace ClbHelperDemo
             App.Current.Suspending += OnSuspending;
             App.Current.Resuming += OnResuming;
 
+            Pbtn_Login.Content = resource.GetString("TextBlock_Response/SignIn");
             Pbtn_GetDriveId.Visibility = Visibility.Collapsed;
             Pbtn_GetFileList.Content = "List Files";
             Pbtn_GetFileList.Visibility = Visibility.Collapsed;
@@ -112,20 +117,20 @@ namespace ClbHelperDemo
             }
             else
             {
-                textBlock_Response.Text = "No settings";
+                TextBlock_Response.Text = resource.GetString("TextBlock_Response/NoSettings");
             }
         }
 
         private void Pbtn_Login_Click(object sender, RoutedEventArgs e)
         {
-            textBlock_Response.Text = "Login button is pressed.";
+            TextBlock_Response.Text = "Login button is pressed.";
 
             folderPath = textBox_FolderName.Text;
 
             if (oneDrive.OneDriveClientAuth == null)
             {
                 // Show in text box that we are connected.
-                textBlock_Response.Text = "We are now connected.";
+                TextBlock_Response.Text = "We are now connected.";
 
                 oneDrive.LoginByWebAuthentication();
                 //               LoginByAuthProvider();
@@ -147,7 +152,7 @@ namespace ClbHelperDemo
             }
             else
             {
-                textBlock_Response.Text = "No OneDriveClient objects.";
+                TextBlock_Response.Text = "No OneDriveClient objects.";
             }
         }
 
@@ -156,11 +161,11 @@ namespace ClbHelperDemo
             if (oneDrive.OneDriveClientAuth != null && oneDrive.OneDriveClientAuth.IsAuthenticated == true)
             {
                 var drive = await oneDrive.OneDriveClientAuth.Drive.Request().GetAsync();
-                textBlock_Response.Text = drive.Id.ToString();
+                TextBlock_Response.Text = drive.Id.ToString();
             }
             else
             {
-                textBlock_Response.Text = "We should never get here...";
+                TextBlock_Response.Text = "We should never get here...";
             }
 
         }
@@ -187,7 +192,7 @@ namespace ClbHelperDemo
                 }
                 else
                 {
-                    textBlock_Response.Text = "Unable to find a path: " + folderPath;
+                    TextBlock_Response.Text = "Unable to find a path: " + folderPath;
                 }
             }
 
@@ -250,7 +255,7 @@ namespace ClbHelperDemo
         {
             count++;
 
-            textBlock_Response.Text = "Polling Count = " + count.ToString();
+            TextBlock_Response.Text = "Polling Count = " + count.ToString();
 
             await oneDrive.GetFileList(storedInkFile, this.dirId);
             if (storedInkFile.count > 0)
@@ -292,7 +297,7 @@ namespace ClbHelperDemo
                 if (lb == null) return;
 
                 FileName = lb.SelectedItem.ToString();
-                textBlock_Response.Text = "   You selected " + FileName + "."; // for debug
+                TextBlock_Response.Text = "   You selected " + FileName + "."; // for debug
             }
             catch (Exception ex)
             {

@@ -14,7 +14,7 @@
         <Button x:Name="Pbtn_GetDriveId" Content="Get Drive Id" Background="AliceBlue" 
                 Foreground="DarkBlue" FontSize="12" FontWeight="Bold" Click="Pbtn_GetDriveId_Click"  
                 VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,19,29,0" Visibility="Visible"/>
-        <TextBlock x:Name="textBlock_Response"  HorizontalAlignment="Left" Margin="35,81,0,0" 
+        <TextBlock x:Name="TextBlock_Response"  HorizontalAlignment="Left" Margin="35,81,0,0" 
                    Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top" Height="29" Width="413"/>
         <Button x:Name="Pbtn_GetFileList" Content="Button" HorizontalAlignment="Left" Height="41" 
                 Margin="157,26,0,0" VerticalAlignment="Top" Width="160" 
