@@ -43,53 +43,6 @@ namespace RebootPC
         }
 
 
-        //// Read stored settings
-        //public void ReadSettings()
-        //{
-        //    try
-        //    {
-        //        // Deserialize
-        //        using (Stream stream = File.OpenRead("config.bin"))
-        //        {
-        //            BinaryReader reader = new BinaryReader(stream);
-
-        //            timeout = reader.ReadInt32();
-        //            maxCount = reader.ReadInt32();
-        //            mode = reader.ReadInt32();
-        //            start = reader.ReadBoolean();
-        //            counter = reader.ReadInt32();
-        //            filepath = reader.ReadString();
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
-
-        //public void WriteSettings()
-        //{
-        //    try
-        //    {
-        //        // Serialize
-        //        using (Stream stream = File.OpenWrite("config.bin"))
-        //        {
-        //            BinaryWriter writer = new BinaryWriter(stream);
-
-        //            writer.Write(timeout);
-        //            writer.Write(maxCount);
-        //            writer.Write(mode);
-        //            writer.Write(start);
-        //            writer.Write(counter);
-        //            writer.Write(filepath);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw ex;
-        //    }
-        //}
-
         public void Run(int mo, int timeout, bool nowarning = true)
         {
             string arguments = string.Empty;

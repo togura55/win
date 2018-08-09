@@ -23,39 +23,12 @@ namespace RebootPC
         //       private Timer timer = null;
         RebootPc rp = null;
 
-        private void lang()
-        {
-            try
-            {
-                string culture = Thread.CurrentThread.CurrentCulture.Name;
-                //               Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
-
-                // C#
-                // Declare a Resource Manager instance.
-                System.Resources.ResourceManager LocRM =
-                    new System.Resources.ResourceManager("RebootPC.Properties.Resources",
-                    Assembly.GetExecutingAssembly());
- //                   typeof(Form1).Assembly);
-                // Assign the string for the "strMessage" key to a message box.
-                MessageBox.Show(LocRM.GetString("GroupBox_Mode"));
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-
-        }
-
         public Form1()
         {
             InitializeComponent();
 
-            //               rp = new RebootPc();  
-//            lang();
-
             try
             {
-//                rp.ReadSettings();
                 rp = (RebootPc)XmlDeserialize(configfile);
             }
             catch (Exception ex)
@@ -63,7 +36,6 @@ namespace RebootPC
                 MessageBox.Show(ex.Message);
             }
 
-            //            if (stream != null)
             {
                 // Initialize UI strings
                 this.Text = string.Format("{0} {1}", GetAppName(), GetAppVersion());
@@ -103,6 +75,7 @@ namespace RebootPC
                 (AssemblyTitleAttribute)Attribute.GetCustomAttribute(Assembly.GetExecutingAssembly(), typeof(AssemblyTitleAttribute));
             return asmttl.Title;
         }
+
         private string GetAppVersion()
         {
             Assembly asm =Assembly.GetExecutingAssembly();
@@ -260,12 +233,10 @@ namespace RebootPC
 
         private void Pbtn_Start_Click(object sender, EventArgs e)
         {
-//            MessageBox.Show("Click");
             rp.start = !rp.start;
             Pbtn_Start.Text = (rp.start) ? Properties.Resources.Pbtn_Stop : Properties.Resources.Pbtn_Start;
 
             if (!rp.start)
-//                rp.WriteSettings();
                   XmlSerialize(configfile, rp);
             else
             {
@@ -283,7 +254,6 @@ namespace RebootPC
         {
             // Write state
             UpdateParam();  // UI to valuables
- //           rp.WriteSettings();
             XmlSerialize("config.xml", rp);
 
             Application.Exit();
@@ -293,14 +263,12 @@ namespace RebootPC
         {
             rp.ResetSettings();
             UpdateUi();
-//            rp.WriteSettings();
             XmlSerialize(configfile, rp);
         }
 
         private void Application_ApplicationExit(object sender, EventArgs e)
         {
             // Write state
-//            rp.WriteSettings();
             XmlSerialize(configfile, rp);
 
             //ApplicationExitイベントハンドラを削除
