@@ -1,3 +1,3 @@
 # Publisher
-Socket Client‚Ìƒgƒ‰ƒCƒAƒ‹
+Socket Clientã®ç·´ç¿’
 UWP platforms
