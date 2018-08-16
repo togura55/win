@@ -12,18 +12,29 @@ namespace ClbHelperDemo
 {
     public class InkDocument
     {
-        InkDocument()
+        public InkDocument()
         {
 
         }
 
-//        public static void ReadBaxter(string path, StrokeAggregation sa)
-        public static void ReadBaxter(string path)
+        public string ReadInkDocument(StreamReader stream)
         {
+            return ReadBaXter(stream);
+        }
+
+        //public string ReadInkDocument(string path)
+        //{
+        ////    StreamReader stream = new StreamReader(path, Encoding.GetEncoding("UTF-8"));
+        //     return ReadBaXter(stream);
+        //}
+
+        //        public static void ReadBaxter(string path, StrokeAggregation sa)
+        public static string ReadBaXter(StreamReader stream)
+        {
+            string result = string.Empty;
             try
             {
                 Reader reader = new Reader();   // BaXter
-                StreamReader stream = new StreamReader(path, Encoding.GetEncoding("UTF-8"));
 
                 reader.readFromStream(stream.BaseStream);
 
@@ -85,14 +96,26 @@ namespace ClbHelperDemo
                 {
                     if (field.type == "Signature")
                     {
-                        //                        richTextBoxResult.AppendText("Found a signature Field " + field.pdfID + Environment.NewLine);
-                        //                        richTextBoxResult.AppendText("\t Encrypted " + (field.encrypted ? "YES" : "NO") + Environment.NewLine);
-                        //                        richTextBoxResult.AppendText("\t Required " + (field.required ? "YES" : "NO") + Environment.NewLine);
-                        //                        richTextBoxResult.AppendText("\t Signatory Time  " + field.completionTime + Environment.NewLine);
-                        //                        richTextBoxResult.AppendText("\t FSS Data " + field.data + Environment.NewLine);
+                        result += ("Found a signature Field " + field.pdfID + Environment.NewLine);
+                        result += ("\t Encrypted " + (field.encrypted ? "YES" : "NO") + Environment.NewLine);
+                        result += ("\t Required " + (field.required ? "YES" : "NO") + Environment.NewLine);
+                        result += ("\t Signatory Time  " + field.completionTime + Environment.NewLine);
+                        result += ("\t FSS Data " + field.data + Environment.NewLine);
                     }
                     else if (field.type == "Text")
                     {
+                        result += ("Found a text Field: " + field.pdfID + Environment.NewLine);
+                        result += ("\t Tag: " + field.tag + Environment.NewLine);
+                        result += ("\t Handwriting Recognition Data: " + field.data + Environment.NewLine);
+                        result += ("\t Location XYHW: "
+                            + field.locationX + ", "
+                            + field.locationY + ", "
+                            + field.locationH + ", "
+                            + field.locationW + ", "
+                            + Environment.NewLine);
+                        result += ("\t Completion Time: "
+                            + field.completionTime + Environment.NewLine);
+
                         //                        richTextBoxResult.AppendText("Found a text Field: " + field.pdfID + Environment.NewLine);
                         //                        richTextBoxResult.AppendText("\t Tag: " + field.tag + Environment.NewLine);
                         //                        richTextBoxResult.AppendText("\t Handwriting Recognition Data: " + field.data + Environment.NewLine);
@@ -129,6 +152,8 @@ namespace ClbHelperDemo
             {
                 Debug.WriteLine(ex);
             }
+
+            return result;
         }
 
     }

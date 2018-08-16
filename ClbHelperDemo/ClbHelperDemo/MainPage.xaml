@@ -14,8 +14,8 @@
         <Button x:Name="Pbtn_GetDriveId" Content="Get Drive Id" Background="AliceBlue" 
                 Foreground="DarkBlue" FontSize="12" FontWeight="Bold" Click="Pbtn_GetDriveId_Click"  
                 VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,19,29,0" Visibility="Visible"/>
-        <TextBlock x:Name="textBlock_Response"  HorizontalAlignment="Left" Margin="35,81,0,0" 
-                   Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top" Height="29" Width="209"/>
+        <TextBlock x:Name="TextBlock_Response"  HorizontalAlignment="Left" Margin="35,81,0,0" 
+                   Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top" Height="29" Width="413"/>
         <Button x:Name="Pbtn_GetFileList" Content="Button" HorizontalAlignment="Left" Height="41" 
                 Margin="157,26,0,0" VerticalAlignment="Top" Width="160" 
                 Click="Pbtn_GetFileList_Click" Visibility="Visible"/>
@@ -23,12 +23,17 @@
                  Margin="35,475,0,0" VerticalAlignment="Top" Width="750"
                  BorderBrush="Black" BorderThickness="2" Visibility="Visible"/>
         <ListBox x:Name="listBox_FileList" HorizontalAlignment="Left" Height="235" Margin="35,208,0,0" 
-                 VerticalAlignment="Top" Width="424" BorderBrush="Black" BorderThickness="5" Visibility="Visible"/>
+                 VerticalAlignment="Top" Width="424" BorderBrush="Black" BorderThickness="5" Visibility="Visible"
+                 SelectionChanged="ListBox_FileList_SelectionChanged" SelectionMode="Single"/>
         <TextBox x:Name="textBox_FolderName" HorizontalAlignment="Left" Height="30" Margin="138,162,0,0" 
                  Text="TextBox" VerticalAlignment="Top" Width="216" Visibility="Visible"/>
         <TextBlock x:Name="textBlock_FolderName" HorizontalAlignment="Left" Margin="33,167,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <TextBlock x:Name="textBlock_Period" HorizontalAlignment="Left" Margin="33,125,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <TextBox x:Name="textBox_Period" HorizontalAlignment="Left" Margin="138,119,0,0" Text="TextBox" VerticalAlignment="Top"/>
+        <Button x:Name="Pbtn_ShowData" Content="Button" HorizontalAlignment="Left" Margin="519,303,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.268,-0.512" Click="Pbtn_ShowData_Click"/>
+        <TextBox x:Name="TextBox_Data" HorizontalAlignment="Left" Margin="642,208,0,0" Text="" VerticalAlignment="Top" Height="235" Width="339"
+                 AcceptsReturn="True" BorderBrush="Black" BorderThickness="2" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
+
 
     </Grid>
 </Page>

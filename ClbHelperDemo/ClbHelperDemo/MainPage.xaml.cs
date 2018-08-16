@@ -20,6 +20,8 @@ using System.Windows;
 using Windows.System.Threading;
 using Windows.UI.Core;
 using Windows.Storage;
+using System.Diagnostics;
+using Windows.ApplicationModel.Resources;
 
 // 空白ページの項目テンプレートについては、https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x411 を参照してください
 
@@ -33,11 +35,9 @@ namespace ClbHelperDemo
         // Folder path
         private string folderPath = "CLB Paper";
 
-        // The StoredInkFile object
         StoredInkFile storedInkFile;
-
-        // OneDriveController
         FileStorgeController.OneDrive oneDrive;
+        InkDocument inkDocument;
 
         // Polling period in seconds
         double period = 30;
@@ -47,21 +47,27 @@ namespace ClbHelperDemo
         private DispatcherTimer timer;
         private int count;
         private bool timer_flag = false;
+        private string FileName = string.Empty;
+        private ResourceLoader resource;
 
         public MainPage()
         {
             this.InitializeComponent();
 
-            textBlock_Response.Text = "App is started.";
+            resource = ResourceLoader.GetForCurrentView();
+
+            TextBlock_Response.Text = resource.GetString("TextBlock_Response/Start");
 
             ReadLocalSettings();
 
             storedInkFile = new StoredInkFile();
             oneDrive = new FileStorgeController.OneDrive();
+            inkDocument = new InkDocument();
 
             App.Current.Suspending += OnSuspending;
             App.Current.Resuming += OnResuming;
 
+            Pbtn_Login.Content = resource.GetString("TextBlock_Response/SignIn");
             Pbtn_GetDriveId.Visibility = Visibility.Collapsed;
             Pbtn_GetFileList.Content = "List Files";
             Pbtn_GetFileList.Visibility = Visibility.Collapsed;
@@ -74,15 +80,18 @@ namespace ClbHelperDemo
             textBox_Period.Text = period.ToString();
             textBox_Period.Visibility = Visibility.Collapsed;
             listBox_FileList.Visibility = Visibility.Collapsed;
+            Pbtn_ShowData.Content = "Show";
+            Pbtn_ShowData.Visibility = Visibility.Collapsed;
+            TextBox_Data.Visibility = Visibility.Collapsed;
         }
 
-        //Resumingイベントのイベントハンドラ
+        //Resuming event handler
         private void OnResuming(object sender, object e)
         {
             //ここにデータ復元の処理を書く
         }
 
-        //Suspendingイベントのイベントハンドラ
+        //Suspending event handler
         private void OnSuspending(object sender, Windows.ApplicationModel.SuspendingEventArgs e)
         {
             //ここにデータ保存の処理を書く
@@ -104,24 +113,24 @@ namespace ClbHelperDemo
             if (val != null && val is string)
             {
                 this.refreshToken = (string)val;
-                textBlock_Response.Text = (string)val;
+                listBox_LogMessages.Items.Add("refreshToken: " + (string)val); // for debug
             }
             else
             {
-                textBlock_Response.Text = "No settings";
+                TextBlock_Response.Text = resource.GetString("TextBlock_Response/NoSettings");
             }
         }
 
         private void Pbtn_Login_Click(object sender, RoutedEventArgs e)
         {
-            textBlock_Response.Text = "Login button is pressed.";
+            TextBlock_Response.Text = "Login button is pressed.";
 
             folderPath = textBox_FolderName.Text;
 
             if (oneDrive.OneDriveClientAuth == null)
             {
                 // Show in text box that we are connected.
-                textBlock_Response.Text = "We are now connected.";
+                TextBlock_Response.Text = "We are now connected.";
 
                 oneDrive.LoginByWebAuthentication();
                 //               LoginByAuthProvider();
@@ -138,10 +147,12 @@ namespace ClbHelperDemo
                 textBox_Period.Visibility = Visibility.Visible;
 
                 listBox_FileList.Visibility = Visibility.Visible;
+                Pbtn_ShowData.Visibility = Visibility.Visible;
+                TextBox_Data.Visibility = Visibility.Visible;
             }
             else
             {
-                textBlock_Response.Text = "No OneDriveClient objects.";
+                TextBlock_Response.Text = "No OneDriveClient objects.";
             }
         }
 
@@ -150,11 +161,11 @@ namespace ClbHelperDemo
             if (oneDrive.OneDriveClientAuth != null && oneDrive.OneDriveClientAuth.IsAuthenticated == true)
             {
                 var drive = await oneDrive.OneDriveClientAuth.Drive.Request().GetAsync();
-                textBlock_Response.Text = drive.Id.ToString();
+                TextBlock_Response.Text = drive.Id.ToString();
             }
             else
             {
-                textBlock_Response.Text = "We should never get here...";
+                TextBlock_Response.Text = "We should never get here...";
             }
 
         }
@@ -181,10 +192,33 @@ namespace ClbHelperDemo
                 }
                 else
                 {
-                    textBlock_Response.Text = "Unable to find a path: " + folderPath;
+                    TextBlock_Response.Text = "Unable to find a path: " + folderPath;
                 }
             }
 
+        }
+
+        private async void Pbtn_ShowData_Click(object sender, RoutedEventArgs e)
+        {
+//            string filename = string.Empty;
+
+            // ToDo: get the filename which selected in the ListView
+
+            if (FileName != string.Empty && storedInkFile != null)
+            {
+                int index = storedInkFile.FindFileName(FileName);
+                if (index >= 0)
+                {
+                    string text = await DownloadContentAsync(FileName,
+                        storedInkFile.properties[index].DirId);
+
+                    //                    string id = storedInkFile.properties[index].Id;
+                    //                    string time = storedInkFile.properties[index].CreatedDateTime.ToString();
+                    //                    string size = storedInkFile.properties[index].Size.ToString();
+
+                    TextBox_Data.Text = text;
+                }
+            }
         }
 
         private void StopPollingProc()
@@ -221,7 +255,7 @@ namespace ClbHelperDemo
         {
             count++;
 
-            textBlock_Response.Text = "Polling Count = " + count.ToString();
+            TextBlock_Response.Text = "Polling Count = " + count.ToString();
 
             await oneDrive.GetFileList(storedInkFile, this.dirId);
             if (storedInkFile.count > 0)
@@ -241,5 +275,35 @@ namespace ClbHelperDemo
                 }
             }
         }
+
+        public async Task<string> DownloadContentAsync(string FileName, string DirId)
+        {
+            string text = null;
+
+            using (var fileStream = await oneDrive.GetDownloadStreamAsync(FileName, DirId))
+            {
+                StreamReader sr = new StreamReader(fileStream);
+                text = inkDocument.ReadInkDocument(sr);
+            }
+
+            return text;
+        }
+
+        private void ListBox_FileList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                ListBox lb = (ListBox)sender;
+                if (lb == null) return;
+
+                FileName = lb.SelectedItem.ToString();
+                TextBlock_Response.Text = "   You selected " + FileName + "."; // for debug
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
     }
 }

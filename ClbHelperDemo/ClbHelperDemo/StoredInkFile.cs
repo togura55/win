@@ -17,6 +17,23 @@ namespace ClbHelperDemo
             count = 0;
         }
 
+        public int FindFileName(string FileName)
+        {
+            int index = -1;
+            int count = 0;
+
+            foreach (var item in properties)
+            {
+                if (item.Name == FileName)
+                {
+                    index = count;
+                    break;
+                }
+                count++;
+            }
+            return index;
+        }
+
         public bool IsExisted(Microsoft.OneDrive.Sdk.Item obj)
         {
             bool res = false;  // no
@@ -33,7 +50,7 @@ namespace ClbHelperDemo
             return res;
         }
 
-        public void Add(Microsoft.OneDrive.Sdk.Item obj)
+        public void Add(Microsoft.OneDrive.Sdk.Item obj, string dirId = null)
         {
             Property item = new Property
             {
@@ -42,7 +59,8 @@ namespace ClbHelperDemo
                 Size = (long)obj.Size,
                 CTag = obj.CTag,
                 ETag = obj.ETag,
-                CreatedDateTime = (DateTimeOffset)obj.CreatedDateTime
+                CreatedDateTime = (DateTimeOffset)obj.CreatedDateTime,
+                DirId = dirId
             };
 
             properties.Add(item);
@@ -58,6 +76,7 @@ namespace ClbHelperDemo
             public string CTag;
             public string ETag;
             public readonly System.DateTimeOffset ReadDateTime;
+            public string DirId;  // for OneDrive
 
             public Property()
             {
