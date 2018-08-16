@@ -7,5 +7,11 @@ xxx
 xxx  
 ## Environment
 UWP platforms  
-## ToDo/Known Issues
+## License
 xxx  
+## Author(s)
+* Tsuyoshi Ogura (togura55@gmail.com)  
+## ToDo/Known Issues
+* SocketClientクラスのメソッド分割  
+* 経過メッセージの表示  
+* パラメータの保存   
