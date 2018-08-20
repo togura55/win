@@ -88,6 +88,15 @@ namespace RebootPC.Properties {
         }
         
         /// <summary>
+        ///   Delay of Ext. App (sec):  に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string Label_Delay {
+            get {
+                return ResourceManager.GetString("Label_Delay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Launch External App:  に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string Label_ExtApp {

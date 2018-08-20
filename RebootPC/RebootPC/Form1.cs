@@ -12,6 +12,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Globalization;
+using System.Timers;
 
 namespace RebootPC
 {
@@ -50,6 +51,8 @@ namespace RebootPC
                 Pbtn_Reset.Text = Properties.Resources.Pbtn_Reset;
                 Label_ExtApp.Text = Properties.Resources.Label_ExtApp;
                 Pbtn_FilePath.Text = Properties.Resources.Pbtn_FilePath;
+                Label_Delay.Text = Properties.Resources.Label_Delay;
+
 
                 // Set UI state and values
 
@@ -78,17 +81,18 @@ namespace RebootPC
 
         private string GetAppVersion()
         {
-            Assembly asm =Assembly.GetExecutingAssembly();
+            Assembly asm = Assembly.GetExecutingAssembly();
             return asm.GetName().Version.ToString();
         }
 
         private void UpdateUi()
         {
             TextBox_Timeout.Text = rp.timeout.ToString();
-            TextBox_MaxCount.Text =rp. maxCount.ToString();
+            TextBox_MaxCount.Text = rp.maxCount.ToString();
             Label_CounterValue.Text = rp.counter.ToString();
             Pbtn_Start.Text = (rp.start) ? Properties.Resources.Pbtn_Stop : Properties.Resources.Pbtn_Start;
             TextBox_FilePath.Text = rp.filepath.ToString();
+            TextBox_Delay.Text = rp.extapp_delay.ToString();
             SetModeState();
         }
 
@@ -100,6 +104,7 @@ namespace RebootPC
             // start = 
             // counter = 
             rp.filepath = TextBox_FilePath.Text;
+            rp.extapp_delay = Int32.Parse(TextBox_Delay.Text);
         }
 
         private bool ExecLoopProcess()
@@ -122,24 +127,19 @@ namespace RebootPC
                     {
                         // 例外発生させる
                         result = false;
-                        throw new Exception(String.Format("No files are existed: {0}",rp.filepath));
+                        throw new Exception(String.Format("No files are existed: {0}", rp.filepath));
                     }
                     // 以外は正常実行
-                     else
+                    else
                     {
-                        // launch
-                        //Processオブジェクトを作成する
-                        Process p = new Process();
-                        p.StartInfo.FileName = rp.filepath;
-                        //起動する。プロセスが起動した時はTrueを返す。
-                        result = p.Start();
+                        result = DelayedStart(rp.extapp_delay);
+                        
                     }
 
                     if (result)
                     {
- //                       rp.WriteSettings();
                         XmlSerialize(configfile, rp);
-                        rp.Run(rp.mode, rp.timeout);
+ //                       rp.Run(rp.mode, rp.timeout);   // Go reboot/shutdown
                     }
                     else
                     {
@@ -151,7 +151,7 @@ namespace RebootPC
                     Label_Messages.Text = String.Format(Properties.Resources.Msg_LoopEnd, rp.maxCount);
                     Pbtn_Start.GetType().InvokeMember("OnClick",
                         BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance,
-                        null,Pbtn_Start, new object[] { EventArgs.Empty });
+                        null, Pbtn_Start, new object[] { EventArgs.Empty });
 
                     res = false;
                 }
@@ -162,6 +162,43 @@ namespace RebootPC
             }
 
             return res;
+        }
+
+        private bool DelayedStart(int sec)
+        {
+            try
+            {
+                using (System.Timers.Timer timer = new System.Timers.Timer())
+                {
+                    filepath = rp.filepath;
+
+                    //           var timer = new Timer();
+                    timer.Enabled = true;
+                    timer.AutoReset = true;
+                    timer.Interval = sec * 1000;    // msec
+                    timer.Elapsed += new ElapsedEventHandler(OnElapsed_TimersTimer);
+
+                    timer.Start();
+
+//                    timer.Stop();
+
+                    return true;
+                }
+            }
+            catch (ArgumentException aex)
+            {
+                return false;
+            }
+        }
+
+        static string filepath;
+
+        static void OnElapsed_TimersTimer(object sender, ElapsedEventArgs e)
+        {
+            // launch
+            Process p = new Process();
+            p.StartInfo.FileName = filepath;
+            bool result = p.Start();  // return true when success
         }
 
         private void SetModeState()
@@ -181,31 +218,6 @@ namespace RebootPC
                 rp.mode = RebootPc.MODE_SHUTDOWN;
             else { }
         }
-
-        //private void StartTimer(int mode, int timeout = 30)
-        //{
-        //    // set the form components
-        //    this.timer = new Timer(this.components);
-        //    this.timer.Interval = timeout * 1000;
-        //    this.timer.Start();
-
-        //    // Tick timer event 
-        //    this.timer.Tick += (semder, e) =>
-        //    {
-        //        reboot.Run(mode, timeout);
-
-        //        StopTimer();
-        //    };
-        //}
-
-        //private void StopTimer()
-        //{
-        //    // Stop timer
-        //    this.timer.Stop();
-
-        //    // releasing
-        //    using (this.timer) { }
-        //}
 
         private void XmlSerialize(string fileName, object obj)
         {
@@ -237,7 +249,7 @@ namespace RebootPC
             Pbtn_Start.Text = (rp.start) ? Properties.Resources.Pbtn_Stop : Properties.Resources.Pbtn_Start;
 
             if (!rp.start)
-                  XmlSerialize(configfile, rp);
+                XmlSerialize(configfile, rp);
             else
             {
                 UpdateParam();
@@ -295,9 +307,9 @@ namespace RebootPC
 
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
- //                   string path = string.Empty;
+                    //                   string path = string.Empty;
                     rp.filepath = ofd.FileName;    // full path + filename + extension
-                    TextBox_FilePath.Text = rp.filepath;                    
+                    TextBox_FilePath.Text = rp.filepath;
                 }
             }
             catch (Exception ex)

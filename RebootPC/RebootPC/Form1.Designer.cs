@@ -45,6 +45,8 @@
             this.Label_ExtApp = new System.Windows.Forms.Label();
             this.TextBox_FilePath = new System.Windows.Forms.TextBox();
             this.Pbtn_FilePath = new System.Windows.Forms.Button();
+            this.Label_Delay = new System.Windows.Forms.Label();
+            this.TextBox_Delay = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // Rbtn_Reboot
@@ -140,10 +142,22 @@
             this.Pbtn_FilePath.UseVisualStyleBackColor = true;
             this.Pbtn_FilePath.Click += new System.EventHandler(this.Pbtn_FilePath_Click);
             // 
+            // Label_Delay
+            // 
+            resources.ApplyResources(this.Label_Delay, "Label_Delay");
+            this.Label_Delay.Name = "Label_Delay";
+            // 
+            // TextBox_Delay
+            // 
+            resources.ApplyResources(this.TextBox_Delay, "TextBox_Delay");
+            this.TextBox_Delay.Name = "TextBox_Delay";
+            // 
             // Form1
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.Label_Delay);
+            this.Controls.Add(this.TextBox_Delay);
             this.Controls.Add(this.Pbtn_FilePath);
             this.Controls.Add(this.TextBox_FilePath);
             this.Controls.Add(this.Label_ExtApp);
@@ -184,6 +198,8 @@
         private System.Windows.Forms.Label Label_ExtApp;
         private System.Windows.Forms.TextBox TextBox_FilePath;
         private System.Windows.Forms.Button Pbtn_FilePath;
+        private System.Windows.Forms.Label Label_Delay;
+        private System.Windows.Forms.TextBox TextBox_Delay;
     }
 }
 

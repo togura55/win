@@ -5,6 +5,7 @@ using System.Text;
 
 using System.Diagnostics;
 using System.IO;
+//using System.Threading;
 
 namespace RebootPC
 {
@@ -18,6 +19,7 @@ namespace RebootPC
         private const int DEFAULT_COUNTER = 0;
         private const bool DEFAULT_START = false;  // stop
         private const string DEFAULT_FILEPATH = "";
+        private const int DEFAULT_DELAY = 1;
 
         public int timeout;
         public int maxCount;
@@ -25,11 +27,11 @@ namespace RebootPC
         public bool start;
         public int counter;
         public string filepath;
+        public int extapp_delay;
 
         public RebootPc()
         {
             ResetSettings();
-
         }
 
         public void ResetSettings()
@@ -40,8 +42,8 @@ namespace RebootPC
             start = DEFAULT_START;
             counter = DEFAULT_COUNTER;
             filepath = DEFAULT_FILEPATH;
+            extapp_delay = DEFAULT_DELAY;
         }
-
 
         public void Run(int mo, int timeout, bool nowarning = true)
         {

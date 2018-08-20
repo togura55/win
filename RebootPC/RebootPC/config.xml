@@ -6,4 +6,5 @@
   <start>false</start>
   <counter>0</counter>
   <filepath />
+  <extapp_delay>1</extapp_delay>
 </RebootPc>
