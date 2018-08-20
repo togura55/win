@@ -1,0 +1,20 @@
+﻿<Page
+    x:Class="Publisher.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Publisher"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="821.354" Height="724.289">
+
+    <Grid>
+        <ListBox x:Name="clientListBox" HorizontalAlignment="Center" Height="349" Margin="0,224,0,0" VerticalAlignment="Top" Width="575"/>
+        <Button x:Name="Pbtn_Exec" Content="Button" HorizontalAlignment="Left" Margin="124,142,0,0" VerticalAlignment="Top" Click="Pbtn_Exec_Click"/>
+        <TextBox x:Name="TextBox_HostName" HorizontalAlignment="Left" Margin="227,38,0,0" Text="TextBox" VerticalAlignment="Top" Width="139"/>
+        <TextBlock x:Name="TextBlock_IPAddr" HorizontalAlignment="Left" Margin="124,44,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <TextBox x:Name="TextBox_PortNumber" HorizontalAlignment="Left" Margin="227,84,0,0" Text="TextBox" VerticalAlignment="Top" Width="139"/>
+        <TextBlock x:Name="TextBlock_PortNumber" HorizontalAlignment="Left" Margin="124,90,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
+
+    </Grid>
+</Page>
