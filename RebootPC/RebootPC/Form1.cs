@@ -107,6 +107,37 @@ namespace RebootPC
             rp.extapp_delay = Int32.Parse(TextBox_Delay.Text);
         }
 
+        static System.Timers.Timer execloop_timer;
+
+        private bool ExecLoopProcessTimer(int sec)
+        {
+            try
+            {
+                execloop_timer = new System.Timers.Timer();
+                {
+                    execloop_timer.Enabled = true;
+                    execloop_timer.AutoReset = true;
+                    execloop_timer.Interval = sec * 1000;    // msec
+                    execloop_timer.Elapsed += new ElapsedEventHandler(OnElapsed_ExecLoopProcessTimer);
+
+                    execloop_timer.Start();
+
+                    return true;
+                }
+            }
+            catch (ArgumentException aex)
+            {
+                return false;
+            }
+        }
+
+        static void OnElapsed_ExecLoopProcessTimer(object sender, ElapsedEventArgs e)
+        {
+            execloop_timer.Stop();
+
+            ExecLoopProcess();
+        }
+
         private bool ExecLoopProcess()
         {
             bool res = true;
@@ -164,11 +195,14 @@ namespace RebootPC
             return res;
         }
 
+
+        static System.Timers.Timer timer; 
+
         private bool DelayedStart(int sec)
         {
             try
             {
-                using (System.Timers.Timer timer = new System.Timers.Timer())
+                timer = new System.Timers.Timer();
                 {
                     filepath = rp.filepath;
 
@@ -179,8 +213,6 @@ namespace RebootPC
                     timer.Elapsed += new ElapsedEventHandler(OnElapsed_TimersTimer);
 
                     timer.Start();
-
-//                    timer.Stop();
 
                     return true;
                 }
@@ -195,11 +227,15 @@ namespace RebootPC
 
         static void OnElapsed_TimersTimer(object sender, ElapsedEventArgs e)
         {
+            timer.Stop();
+
             // launch
             Process p = new Process();
             p.StartInfo.FileName = filepath;
             bool result = p.Start();  // return true when success
         }
+
+
 
         private void SetModeState()
         {

@@ -139,7 +139,7 @@
     <value />
   </data>
   <data name="Label_Timeout" xml:space="preserve">
-    <value>タイムアウト</value>
+    <value>タイムアウト(秒)</value>
   </data>
   <data name="Msg_LoopEnd" xml:space="preserve">
     <value>繰り返しは {0} 回に達しました。</value>
