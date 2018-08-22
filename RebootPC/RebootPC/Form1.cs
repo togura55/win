@@ -19,10 +19,9 @@ namespace RebootPC
 
     public partial class Form1 : Form
     {
-        string configfile = "config.xml";
+        static string configfile = "config.xml";
 
-        //       private Timer timer = null;
-        RebootPc rp = null;
+        static RebootPc rp = null;
 
         public Form1()
         {
@@ -55,21 +54,13 @@ namespace RebootPC
 
 
                 // Set UI state and values
-
                 UpdateUi();
 
                 if (rp.start)
                 {
                     ExecLoopProcess();
                 }
-
-
-                //           if (!start)
-                //               StartTimer(MODE_REBOOT, timeout);
             }
-            //           else
-            //               this.Close();
-
         }
 
         private string GetAppName()
@@ -138,7 +129,8 @@ namespace RebootPC
             ExecLoopProcess();
         }
 
-        private bool ExecLoopProcess()
+//        private bool ExecLoopProcess()
+        static bool ExecLoopProcess()
         {
             bool res = true;
 
@@ -179,6 +171,10 @@ namespace RebootPC
                 }
                 else
                 {
+                    // https://kitayamalab.wordpress.com/2016/10/06/wpf%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E4%BD%9C%E3%82%8B%E3%81%A8%E3%81%8D%E3%81%AB/
+                    // データバインディングで実現する 
+
+                   
                     Label_Messages.Text = String.Format(Properties.Resources.Msg_LoopEnd, rp.maxCount);
                     Pbtn_Start.GetType().InvokeMember("OnClick",
                         BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance,
@@ -189,7 +185,7 @@ namespace RebootPC
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, this.Text);
+                MessageBox.Show(ex.Message);
             }
 
             return res;
@@ -198,7 +194,7 @@ namespace RebootPC
 
         static System.Timers.Timer timer; 
 
-        private bool DelayedStart(int sec)
+        static bool DelayedStart(int sec)
         {
             try
             {
@@ -255,7 +251,7 @@ namespace RebootPC
             else { }
         }
 
-        private void XmlSerialize(string fileName, object obj)
+        static void XmlSerialize(string fileName, object obj)
         {
             System.Xml.Serialization.XmlSerializer serializer =
                 new System.Xml.Serialization.XmlSerializer(typeof(RebootPc));

@@ -123,14 +123,10 @@
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="Rbtn_Reboot.Location" type="System.Drawing.Point, System.Drawing">
-    <value>91, 68</value>
-  </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="Rbtn_Reboot.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 6, 6, 6</value>
+    <value>42, 34</value>
   </data>
   <data name="Rbtn_Reboot.Size" type="System.Drawing.Size, System.Drawing">
-    <value>168, 28</value>
+    <value>88, 16</value>
   </data>
   <data name="Rbtn_Reboot.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -154,13 +150,10 @@
     <value>True</value>
   </data>
   <data name="Rbtn_Shutdown.Location" type="System.Drawing.Point, System.Drawing">
-    <value>91, 114</value>
-  </data>
-  <data name="Rbtn_Shutdown.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 6, 6, 6</value>
+    <value>42, 57</value>
   </data>
   <data name="Rbtn_Shutdown.Size" type="System.Drawing.Size, System.Drawing">
-    <value>168, 28</value>
+    <value>88, 16</value>
   </data>
   <data name="Rbtn_Shutdown.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -181,13 +174,10 @@
     <value>15</value>
   </data>
   <data name="TextBox_Timeout.Location" type="System.Drawing.Point, System.Drawing">
-    <value>603, 58</value>
-  </data>
-  <data name="TextBox_Timeout.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 6, 6, 6</value>
+    <value>278, 29</value>
   </data>
   <data name="TextBox_Timeout.Size" type="System.Drawing.Size, System.Drawing">
-    <value>212, 31</value>
+    <value>100, 19</value>
   </data>
   <data name="TextBox_Timeout.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
@@ -205,13 +195,10 @@
     <value>14</value>
   </data>
   <data name="Label_Timeout.Location" type="System.Drawing.Point, System.Drawing">
-    <value>388, 54</value>
-  </data>
-  <data name="Label_Timeout.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 0, 6, 0</value>
+    <value>179, 27</value>
   </data>
   <data name="Label_Timeout.Size" type="System.Drawing.Size, System.Drawing">
-    <value>197, 32</value>
+    <value>91, 16</value>
   </data>
   <data name="Label_Timeout.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -238,13 +225,10 @@
     <value>True</value>
   </data>
   <data name="Label_Messages.Location" type="System.Drawing.Point, System.Drawing">
-    <value>86, 356</value>
-  </data>
-  <data name="Label_Messages.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 0, 6, 0</value>
+    <value>40, 178</value>
   </data>
   <data name="Label_Messages.Size" type="System.Drawing.Size, System.Drawing">
-    <value>67, 24</value>
+    <value>35, 12</value>
   </data>
   <data name="Label_Messages.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -265,13 +249,10 @@
     <value>12</value>
   </data>
   <data name="Label_MaxCount.Location" type="System.Drawing.Point, System.Drawing">
-    <value>388, 120</value>
-  </data>
-  <data name="Label_MaxCount.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 0, 6, 0</value>
+    <value>179, 60</value>
   </data>
   <data name="Label_MaxCount.Size" type="System.Drawing.Size, System.Drawing">
-    <value>197, 36</value>
+    <value>91, 18</value>
   </data>
   <data name="Label_MaxCount.TabIndex" type="System.Int32, mscorlib">
     <value>6</value>
@@ -295,13 +276,10 @@
     <value>10</value>
   </data>
   <data name="TextBox_MaxCount.Location" type="System.Drawing.Point, System.Drawing">
-    <value>603, 126</value>
-  </data>
-  <data name="TextBox_MaxCount.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 6, 6, 6</value>
+    <value>278, 63</value>
   </data>
   <data name="TextBox_MaxCount.Size" type="System.Drawing.Size, System.Drawing">
-    <value>212, 31</value>
+    <value>100, 19</value>
   </data>
   <data name="TextBox_MaxCount.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
@@ -318,17 +296,15 @@
   <data name="&gt;&gt;TextBox_MaxCount.ZOrder" xml:space="preserve">
     <value>11</value>
   </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="Pbtn_Start.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
   <data name="Pbtn_Start.Location" type="System.Drawing.Point, System.Drawing">
-    <value>91, 411</value>
-  </data>
-  <data name="Pbtn_Start.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 6, 6, 6</value>
+    <value>42, 206</value>
   </data>
   <data name="Pbtn_Start.Size" type="System.Drawing.Size, System.Drawing">
-    <value>162, 46</value>
+    <value>75, 23</value>
   </data>
   <data name="Pbtn_Start.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
@@ -352,13 +328,10 @@
     <value>NoControl</value>
   </data>
   <data name="Pbtn_Close.Location" type="System.Drawing.Point, System.Drawing">
-    <value>644, 411</value>
-  </data>
-  <data name="Pbtn_Close.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 6, 6, 6</value>
+    <value>297, 206</value>
   </data>
   <data name="Pbtn_Close.Size" type="System.Drawing.Size, System.Drawing">
-    <value>162, 46</value>
+    <value>75, 23</value>
   </data>
   <data name="Pbtn_Close.TabIndex" type="System.Int32, mscorlib">
     <value>8</value>
@@ -379,16 +352,10 @@
     <value>8</value>
   </data>
   <data name="GroupBox_Mode.Location" type="System.Drawing.Point, System.Drawing">
-    <value>63, 24</value>
-  </data>
-  <data name="GroupBox_Mode.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 6, 6, 6</value>
-  </data>
-  <data name="GroupBox_Mode.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 6, 6, 6</value>
+    <value>29, 12</value>
   </data>
   <data name="GroupBox_Mode.Size" type="System.Drawing.Size, System.Drawing">
-    <value>273, 158</value>
+    <value>126, 79</value>
   </data>
   <data name="GroupBox_Mode.TabIndex" type="System.Int32, mscorlib">
     <value>9</value>
@@ -412,13 +379,13 @@
     <value>True</value>
   </data>
   <data name="Label_Counter.Location" type="System.Drawing.Point, System.Drawing">
-    <value>416, 198</value>
+    <value>192, 99</value>
   </data>
   <data name="Label_Counter.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>5, 0, 5, 0</value>
+    <value>2, 0, 2, 0</value>
   </data>
   <data name="Label_Counter.Size" type="System.Drawing.Size, System.Drawing">
-    <value>67, 24</value>
+    <value>35, 12</value>
   </data>
   <data name="Label_Counter.TabIndex" type="System.Int32, mscorlib">
     <value>10</value>
@@ -442,13 +409,13 @@
     <value>True</value>
   </data>
   <data name="Label_CounterValue.Location" type="System.Drawing.Point, System.Drawing">
-    <value>526, 198</value>
+    <value>243, 99</value>
   </data>
   <data name="Label_CounterValue.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>5, 0, 5, 0</value>
+    <value>2, 0, 2, 0</value>
   </data>
   <data name="Label_CounterValue.Size" type="System.Drawing.Size, System.Drawing">
-    <value>67, 24</value>
+    <value>35, 12</value>
   </data>
   <data name="Label_CounterValue.TabIndex" type="System.Int32, mscorlib">
     <value>11</value>
@@ -472,13 +439,13 @@
     <value>NoControl</value>
   </data>
   <data name="Pbtn_Reset.Location" type="System.Drawing.Point, System.Drawing">
-    <value>377, 411</value>
+    <value>174, 206</value>
   </data>
   <data name="Pbtn_Reset.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>5, 4, 5, 4</value>
+    <value>2, 2, 2, 2</value>
   </data>
   <data name="Pbtn_Reset.Size" type="System.Drawing.Size, System.Drawing">
-    <value>154, 46</value>
+    <value>71, 23</value>
   </data>
   <data name="Pbtn_Reset.TabIndex" type="System.Int32, mscorlib">
     <value>12</value>
@@ -502,13 +469,10 @@
     <value>True</value>
   </data>
   <data name="Label_ExtApp.Location" type="System.Drawing.Point, System.Drawing">
-    <value>91, 230</value>
-  </data>
-  <data name="Label_ExtApp.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 0, 6, 0</value>
+    <value>42, 115</value>
   </data>
   <data name="Label_ExtApp.Size" type="System.Drawing.Size, System.Drawing">
-    <value>67, 24</value>
+    <value>35, 12</value>
   </data>
   <data name="Label_ExtApp.TabIndex" type="System.Int32, mscorlib">
     <value>13</value>
@@ -529,13 +493,10 @@
     <value>4</value>
   </data>
   <data name="TextBox_FilePath.Location" type="System.Drawing.Point, System.Drawing">
-    <value>96, 264</value>
-  </data>
-  <data name="TextBox_FilePath.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 6, 6, 6</value>
+    <value>44, 132</value>
   </data>
   <data name="TextBox_FilePath.Size" type="System.Drawing.Size, System.Drawing">
-    <value>529, 31</value>
+    <value>246, 19</value>
   </data>
   <data name="TextBox_FilePath.TabIndex" type="System.Int32, mscorlib">
     <value>14</value>
@@ -556,13 +517,10 @@
     <value>3</value>
   </data>
   <data name="Pbtn_FilePath.Location" type="System.Drawing.Point, System.Drawing">
-    <value>644, 254</value>
-  </data>
-  <data name="Pbtn_FilePath.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 6, 6, 6</value>
+    <value>297, 127</value>
   </data>
   <data name="Pbtn_FilePath.Size" type="System.Drawing.Size, System.Drawing">
-    <value>162, 48</value>
+    <value>75, 24</value>
   </data>
   <data name="Pbtn_FilePath.TabIndex" type="System.Int32, mscorlib">
     <value>15</value>
@@ -583,13 +541,10 @@
     <value>2</value>
   </data>
   <data name="TextBox_Delay.Location" type="System.Drawing.Point, System.Drawing">
-    <value>603, 326</value>
-  </data>
-  <data name="TextBox_Delay.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 6, 6, 6</value>
+    <value>278, 163</value>
   </data>
   <data name="TextBox_Delay.Size" type="System.Drawing.Size, System.Drawing">
-    <value>212, 31</value>
+    <value>100, 19</value>
   </data>
   <data name="TextBox_Delay.TabIndex" type="System.Int32, mscorlib">
     <value>16</value>
@@ -607,10 +562,13 @@
     <value>1</value>
   </data>
   <data name="Label_Delay.Location" type="System.Drawing.Point, System.Drawing">
-    <value>312, 327</value>
+    <value>144, 164</value>
+  </data>
+  <data name="Label_Delay.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>1, 0, 1, 0</value>
   </data>
   <data name="Label_Delay.Size" type="System.Drawing.Size, System.Drawing">
-    <value>273, 30</value>
+    <value>126, 15</value>
   </data>
   <data name="Label_Delay.TabIndex" type="System.Int32, mscorlib">
     <value>18</value>
@@ -637,13 +595,10 @@
     <value>True</value>
   </metadata>
   <data name="$this.AutoScaleDimensions" type="System.Drawing.SizeF, System.Drawing">
-    <value>13, 24</value>
+    <value>6, 12</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>882, 484</value>
-  </data>
-  <data name="$this.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>6, 6, 6, 6</value>
+    <value>407, 242</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>Form1</value>

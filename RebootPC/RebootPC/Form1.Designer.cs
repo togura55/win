@@ -186,7 +186,6 @@
         private System.Windows.Forms.RadioButton Rbtn_Shutdown;
         private System.Windows.Forms.TextBox TextBox_Timeout;
         private System.Windows.Forms.Label Label_Timeout;
-        private System.Windows.Forms.Label Label_Messages;
         private System.Windows.Forms.Label Label_MaxCount;
         private System.Windows.Forms.TextBox TextBox_MaxCount;
         private System.Windows.Forms.Button Pbtn_Start;
@@ -200,6 +199,7 @@
         private System.Windows.Forms.Button Pbtn_FilePath;
         private System.Windows.Forms.TextBox TextBox_Delay;
         private System.Windows.Forms.Label Label_Delay;
+        private System.Windows.Forms.Label Label_Messages;
     }
 }
 
