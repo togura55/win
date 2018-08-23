@@ -3,23 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 using System.IO;
 using Windows.Networking;
-using Windows.Networking.Connectivity;
+using Windows.Networking.Sockets;
 
 namespace Publisher
 {
     public class SocketClient
     {
         HostName hostName;
-        Windows.Networking.Sockets.StreamSocket streamSocket;
+        StreamSocket streamSocket;
 
         public SocketClient()
         {
 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="HostNameString"></param>
+        /// <param name="PortNumberString"></param>
         public async void Connect(string HostNameString, string PortNumberString)
         {
             try
@@ -28,35 +34,44 @@ namespace Publisher
                 hostName = new HostName(HostNameString);
 
                 // Create the StreamSocket and establish a connection to the echo server.
-                using (streamSocket = new Windows.Networking.Sockets.StreamSocket())
+                using (streamSocket = new StreamSocket())
                 {
-                    //   this.clientListBox.Items.Add("client is trying to connect...");
-
+                    Debug.WriteLine(string.Format("client is trying to connect..."));
                     await streamSocket.ConnectAsync(hostName, PortNumberString);
 
-                    //   this.clientListBox.Items.Add("client connected");
+                    Debug.WriteLine(string.Format("client connected"));
                 }
             }
             catch (Exception ex)
             {
-                Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                //                this.clientListBox.Items.Add(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
+                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+                Debug.WriteLine(string.Format("Connect(): Exception: {0}", 
+                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
 
-        public async void Disonnect()
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Disonnect()
         {
             try
             {
-                this.streamSocket?.Disconnect(false);
+                //    this.streamSocket?.Disconnect(false);
                 this.streamSocket?.Dispose();
             }
             catch (Exception ex)
             {
-                Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+                Debug.WriteLine(string.Format("Disconnect(): Exception: {0}",
+                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
         public async void Send(string request)
         {
             try
@@ -71,26 +86,37 @@ namespace Publisher
                         await streamWriter.FlushAsync();
                     }
                 }
-                //                    this.clientListBox.Items.Add(string.Format("client sent the request: \"{0}\"", request));
+                Debug.WriteLine(string.Format("Send: client sent the request: \"{0}\"", request));
             }
             catch (Exception ex)
             {
-                Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+                Debug.WriteLine(string.Format("Send(): Exception: {0}",
+                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
 
         public async void Receive()
         {
-            // Read data from the echo server.
-            string response;
-            using (Stream inputStream = streamSocket.InputStream.AsStreamForRead())
+            try
             {
-                using (StreamReader streamReader = new StreamReader(inputStream))
+                // Read data from the echo server.
+                string response;
+                using (Stream inputStream = streamSocket.InputStream.AsStreamForRead())
                 {
-                    response = await streamReader.ReadLineAsync();
+                    using (StreamReader streamReader = new StreamReader(inputStream))
+                    {
+                        response = await streamReader.ReadLineAsync();
+                    }
                 }
+                //                   this.clientListBox.Items.Add(string.Format("client received the response: \"{0}\" ", response));
             }
-            //                   this.clientListBox.Items.Add(string.Format("client received the response: \"{0}\" ", response));
+            catch (Exception ex)
+            {
+                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+                Debug.WriteLine(string.Format("Receive(): Exception: {0}",
+                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+            }
         }
 
         public async void StartClient(string HostNameString, string PortNumberString)
@@ -142,7 +168,7 @@ namespace Publisher
             }
             catch (Exception ex)
             {
-                Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
                 //                this.clientListBox.Items.Add(webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message);
             }
         }

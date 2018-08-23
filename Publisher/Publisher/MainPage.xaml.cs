@@ -53,8 +53,24 @@ namespace Publisher
         {
             GetUiState();
 
-            SocketClient socketClient = new SocketClient();
-            socketClient.StartClient(HostNameString, PortNumber);
+            try
+            {
+                SocketClient socketClient = new SocketClient();
+                //           socketClient.StartClient(HostNameString, PortNumber);
+
+                socketClient.Connect(HostNameString, PortNumber);
+
+                socketClient.Send("Hello World");
+
+ //               socketClient.Receive();
+
+                socketClient.Disonnect();
+
+            }
+            catch (Exception ex)
+            {
+                clientListBox.Items.Add(string.Format("{0}", ex.Message));
+            }
         }
 
   
