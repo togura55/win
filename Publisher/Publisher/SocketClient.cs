@@ -44,9 +44,13 @@ namespace Publisher
             }
             catch (Exception ex)
             {
-                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
-                Debug.WriteLine(string.Format("Connect(): Exception: {0}", 
-                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+                //SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+                //Debug.WriteLine(string.Format("Connect(): Exception: {0}", 
+                //    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+
+                TaskCanceledException argEx = new TaskCanceledException("Connect()", ex);
+                throw argEx;
+
             }
         }
 
