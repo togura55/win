@@ -5,7 +5,7 @@ using System.Text;
 
 using System.Diagnostics;
 using System.IO;
-//using System.Threading;
+
 
 namespace RebootPC
 {
@@ -63,7 +63,8 @@ namespace RebootPC
                 {
                     case MODE_REBOOT:
                     case MODE_SHUTDOWN:
-                        arguments = modes[mo] + " " + "-t" + " " + timeout.ToString();
+                        //                        arguments = modes[mo] + " " + "-t" + " " + timeout.ToString();
+                        arguments = modes[mo] + " " + f;  // immediately execute, delay is ensured by the caller process
                         break;
 
                     default:
@@ -80,6 +81,7 @@ namespace RebootPC
             catch (Exception ex)
             {
                 Trace.WriteLine(ex.Message);
+                throw;
             }
         }
     }

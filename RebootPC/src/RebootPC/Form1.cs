@@ -52,7 +52,6 @@ namespace RebootPC
                 Pbtn_FilePath.Text = Properties.Resources.Pbtn_FilePath;
                 Label_Delay.Text = Properties.Resources.Label_Delay;
 
-
                 // Set UI state and values
                 UpdateUi();
 
@@ -69,68 +68,14 @@ namespace RebootPC
                 (AssemblyTitleAttribute)Attribute.GetCustomAttribute(Assembly.GetExecutingAssembly(), typeof(AssemblyTitleAttribute));
             return asmttl.Title;
         }
-
         private string GetAppVersion()
         {
             Assembly asm = Assembly.GetExecutingAssembly();
             return asm.GetName().Version.ToString();
         }
 
-        private void UpdateUi()
-        {
-            TextBox_Timeout.Text = rp.timeout.ToString();
-            TextBox_MaxCount.Text = rp.maxCount.ToString();
-            Label_CounterValue.Text = rp.counter.ToString();
-            Pbtn_Start.Text = (rp.start) ? Properties.Resources.Pbtn_Stop : Properties.Resources.Pbtn_Start;
-            TextBox_FilePath.Text = rp.filepath.ToString();
-            TextBox_Delay.Text = rp.extapp_delay.ToString();
-            SetModeState();
-        }
-
-        private void UpdateParam()
-        {
-            rp.timeout = Int32.Parse(TextBox_Timeout.Text);
-            rp.maxCount = Int32.Parse(TextBox_MaxCount.Text);
-            GetModeState();
-            // start = 
-            // counter = 
-            rp.filepath = TextBox_FilePath.Text;
-            rp.extapp_delay = Int32.Parse(TextBox_Delay.Text);
-        }
-
-        static System.Timers.Timer execloop_timer;
-
-        private bool ExecLoopProcessTimer(int sec)
-        {
-            try
-            {
-                execloop_timer = new System.Timers.Timer();
-                {
-                    execloop_timer.Enabled = true;
-                    execloop_timer.AutoReset = true;
-                    execloop_timer.Interval = sec * 1000;    // msec
-                    execloop_timer.Elapsed += new ElapsedEventHandler(OnElapsed_ExecLoopProcessTimer);
-
-                    execloop_timer.Start();
-
-                    return true;
-                }
-            }
-            catch (ArgumentException aex)
-            {
-                return false;
-            }
-        }
-
-        static void OnElapsed_ExecLoopProcessTimer(object sender, ElapsedEventArgs e)
-        {
-            execloop_timer.Stop();
-
-            ExecLoopProcess();
-        }
-
-//        private bool ExecLoopProcess()
-        static bool ExecLoopProcess()
+        // Main procedure for the reboot loop
+        private bool ExecLoopProcess()
         {
             bool res = true;
 
@@ -155,14 +100,13 @@ namespace RebootPC
                     // 以外は正常実行
                     else
                     {
-                        result = DelayedStart(rp.extapp_delay);
-                        
+                        result = DelayedExtAppStart(rp.extapp_delay);
                     }
 
                     if (result)
                     {
                         XmlSerialize(configfile, rp);
- //                       rp.Run(rp.mode, rp.timeout);   // Go reboot/shutdown
+                        DelayedShutdownStart(rp.mode, rp.timeout); // Go reboot/shutdown
                     }
                     else
                     {
@@ -170,11 +114,7 @@ namespace RebootPC
                     }
                 }
                 else
-                {
-                    // https://kitayamalab.wordpress.com/2016/10/06/wpf%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E4%BD%9C%E3%82%8B%E3%81%A8%E3%81%8D%E3%81%AB/
-                    // データバインディングで実現する 
-
-                   
+                {  
                     Label_Messages.Text = String.Format(Properties.Resources.Msg_LoopEnd, rp.maxCount);
                     Pbtn_Start.GetType().InvokeMember("OnClick",
                         BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance,
@@ -185,30 +125,55 @@ namespace RebootPC
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message, "ExecLoopProcess");
             }
 
             return res;
         }
 
-
-        static System.Timers.Timer timer; 
-
-        static bool DelayedStart(int sec)
+        #region Delayed execution procedures
+        private System.Windows.Forms.Timer shutdown_timer;
+        private void DelayedShutdownStart(int mode, int sec)
         {
             try
             {
-                timer = new System.Timers.Timer();
+                this.shutdown_timer = new System.Windows.Forms.Timer();
+                this.shutdown_timer.Interval = sec * 1000;
+                this.shutdown_timer.Tick += new EventHandler(OnElapsed_ShutdownTimer);
+
+                this.shutdown_timer.Start();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "DelayedShutdownStart");
+            }
+
+        }
+        private void OnElapsed_ShutdownTimer(object sender, EventArgs e)
+        {
+            //// No use timer anymore
+            this.shutdown_timer.Stop();
+
+            rp.Run(rp.mode, 0);   // Go reboot/shutdown immediately
+        }
+
+        static System.Timers.Timer extapp_timer;
+        static string filepath;
+        static bool DelayedExtAppStart(int sec)
+        {
+            try
+            {
+                extapp_timer = new System.Timers.Timer();
                 {
                     filepath = rp.filepath;
 
                     //           var timer = new Timer();
-                    timer.Enabled = true;
-                    timer.AutoReset = true;
-                    timer.Interval = sec * 1000;    // msec
-                    timer.Elapsed += new ElapsedEventHandler(OnElapsed_TimersTimer);
+                    extapp_timer.Enabled = true;
+                    extapp_timer.AutoReset = true;
+                    extapp_timer.Interval = sec * 1000;    // msec
+                    extapp_timer.Elapsed += new ElapsedEventHandler(OnElapsed_ExtAppTimer);
 
-                    timer.Start();
+                    extapp_timer.Start();
 
                     return true;
                 }
@@ -218,40 +183,26 @@ namespace RebootPC
                 return false;
             }
         }
-
-        static string filepath;
-
-        static void OnElapsed_TimersTimer(object sender, ElapsedEventArgs e)
+        static void OnElapsed_ExtAppTimer(object sender, ElapsedEventArgs e)
         {
-            timer.Stop();
+            extapp_timer.Stop();
 
-            // launch
-            Process p = new Process();
-            p.StartInfo.FileName = filepath;
-            bool result = p.Start();  // return true when success
+            try
+            {
+                // launch external app
+                Process p = new Process();
+                p.StartInfo.FileName = filepath;
+                bool result = p.Start();  // return true when success
+            }
+            catch(Exception ex)
+            {
+                throw;
+            }
         }
+        #endregion
 
-
-
-        private void SetModeState()
-        {
-            if (rp.mode == RebootPc.MODE_REBOOT)
-                Rbtn_Reboot.Checked = true;
-            else if (rp.mode == RebootPc.MODE_SHUTDOWN)
-                Rbtn_Shutdown.Checked = true;
-            else { }
-        }
-
-        private void GetModeState()
-        {
-            if (Rbtn_Reboot.Checked == true)
-                rp.mode = RebootPc.MODE_REBOOT;
-            else if (Rbtn_Shutdown.Checked == true)
-                rp.mode = RebootPc.MODE_SHUTDOWN;
-            else { }
-        }
-
-        static void XmlSerialize(string fileName, object obj)
+        #region Serializers
+        private void XmlSerialize(string fileName, object obj)
         {
             System.Xml.Serialization.XmlSerializer serializer =
                 new System.Xml.Serialization.XmlSerializer(typeof(RebootPc));
@@ -260,7 +211,6 @@ namespace RebootPC
             serializer.Serialize(sw, obj);
             sw.Close();
         }
-
         private object XmlDeserialize(string fileName)
         {
             RebootPc obj;
@@ -274,7 +224,9 @@ namespace RebootPC
 
             return obj;
         }
+        #endregion
 
+        #region UI controles and handlers
         private void Pbtn_Start_Click(object sender, EventArgs e)
         {
             rp.start = !rp.start;
@@ -350,5 +302,45 @@ namespace RebootPC
             }
         }
 
+        private void SetModeState()
+        {
+            if (rp.mode == RebootPc.MODE_REBOOT)
+                Rbtn_Reboot.Checked = true;
+            else if (rp.mode == RebootPc.MODE_SHUTDOWN)
+                Rbtn_Shutdown.Checked = true;
+            else { }
+        }
+
+        private void GetModeState()
+        {
+            if (Rbtn_Reboot.Checked == true)
+                rp.mode = RebootPc.MODE_REBOOT;
+            else if (Rbtn_Shutdown.Checked == true)
+                rp.mode = RebootPc.MODE_SHUTDOWN;
+            else { }
+        }
+
+        private void UpdateUi()
+        {
+            TextBox_Timeout.Text = rp.timeout.ToString();
+            TextBox_MaxCount.Text = rp.maxCount.ToString();
+            Label_CounterValue.Text = rp.counter.ToString();
+            Pbtn_Start.Text = (rp.start) ? Properties.Resources.Pbtn_Stop : Properties.Resources.Pbtn_Start;
+            TextBox_FilePath.Text = rp.filepath.ToString();
+            TextBox_Delay.Text = rp.extapp_delay.ToString();
+            SetModeState();
+        }
+
+        private void UpdateParam()
+        {
+            rp.timeout = Int32.Parse(TextBox_Timeout.Text);
+            rp.maxCount = Int32.Parse(TextBox_MaxCount.Text);
+            GetModeState();
+            // start = 
+            // counter = 
+            rp.filepath = TextBox_FilePath.Text;
+            rp.extapp_delay = Int32.Parse(TextBox_Delay.Text);
+        }
+        #endregion
     }
 }

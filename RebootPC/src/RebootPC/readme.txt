@@ -7,18 +7,19 @@ RebootPC
 RebootPC.exeをダブルクリックして起動。設定値を入力して、Startボタンをクリックする。
 
 <機能>
-Timeout: 再起動するまでの秒数
-Max Count: 再起動する総回数
-Launch External App: 起動する外部アプリケーションファイルのフルパス
-Reset: 設定を規定値に戻す
+Timeout: 再起動・シャットダウンするまでの秒数
+Max Count: 再起動・シャットダウンする総回数
+Launch External App: 起動する外部アプリケーションのフルパス
+Reset: 設定を初期値に戻す
 Save&Close: 現在の設定を保存して終了
 Start/Stop: プログラムを実行、停止
-設定情報はconfig.xmlに保存される。
+設定情報はアプリフォルダのconfig.xmlに保存される。
 
 <実行環境>
 Windows 7 SP2以降 .NET Framework 4以上
 
 <履歴>
+1.0.0.12 - 起動する外部アプリの起動遅延時間を設定可能。
+　　　　　Timeoutの動作を、OSに再起動・シャットダウンのリクエストを発行するまでの時間に変更
 1.0.0.11 - 多言語表示対応。.NET Framework 4以上を要求に変更
-
 1.0.0.10 - 初版
