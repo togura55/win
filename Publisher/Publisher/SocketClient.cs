@@ -37,19 +37,26 @@ namespace Publisher
                 using (streamSocket = new StreamSocket())
                 {
                     Debug.WriteLine(string.Format("client is trying to connect..."));
-                    await streamSocket.ConnectAsync(hostName, PortNumberString);
+                    //                    await streamSocket.ConnectAsync(hostName, PortNumberString);
+ //                   await Task.Run(() => { streamSocket.ConnectAsync(hostName, PortNumberString); }).ConfigureAwait(false);
+
+                    await streamSocket.ConnectAsync(hostName, PortNumberString).AsTask().ConfigureAwait(false);
+
+                    //if (!streamSocket.ConnectAsync(hostName, PortNumberString).AsTask().Wait(2000))
+                    //{
+                    //    throw (new Exception("Connection Timeout."));
+                    //}
 
                     Debug.WriteLine(string.Format("client connected"));
                 }
             }
             catch (Exception ex)
             {
-                //SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
-                //Debug.WriteLine(string.Format("Connect(): Exception: {0}", 
-                //    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+                Debug.WriteLine(string.Format("Connect(): Exception: {0}",
+                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
 
-                TaskCanceledException argEx = new TaskCanceledException("Connect()", ex);
-                throw argEx;
+                throw;
 
             }
         }
