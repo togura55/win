@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using Windows.Networking;
 using Windows.Networking.Sockets;
+using System.Threading;
 
 namespace Publisher
 {
@@ -26,7 +27,9 @@ namespace Publisher
         /// </summary>
         /// <param name="HostNameString"></param>
         /// <param name="PortNumberString"></param>
-        public async void Connect(string HostNameString, string PortNumberString)
+        /// <param name="timeout"></param>
+        /// <returns></returns>
+        public async Task Connect(string HostNameString, string PortNumberString, int timeout = 10000)
         {
             try
             {
@@ -36,28 +39,25 @@ namespace Publisher
                 // Create the StreamSocket and establish a connection to the echo server.
                 using (streamSocket = new StreamSocket())
                 {
-                    Debug.WriteLine(string.Format("client is trying to connect..."));
-                    //                    await streamSocket.ConnectAsync(hostName, PortNumberString);
- //                   await Task.Run(() => { streamSocket.ConnectAsync(hostName, PortNumberString); }).ConfigureAwait(false);
+                    CancellationTokenSource cts = new CancellationTokenSource();
 
+                    cts.CancelAfter(timeout);
                     await streamSocket.ConnectAsync(hostName, PortNumberString).AsTask().ConfigureAwait(false);
-
-                    //if (!streamSocket.ConnectAsync(hostName, PortNumberString).AsTask().Wait(2000))
-                    //{
-                    //    throw (new Exception("Connection Timeout."));
-                    //}
-
-                    Debug.WriteLine(string.Format("client connected"));
                 }
+            }
+            catch (TaskCanceledException ex)
+            {
+                //clientSocket.Close();
+                //               clientSocket.Dispose();
+                // Debug.WriteLine("Operation was cancelled.");
+                throw new TaskCanceledException(string.Format("Connect(): TaskCanceledException: {0}",
+                     ex.Message));
             }
             catch (Exception ex)
             {
                 SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
-                Debug.WriteLine(string.Format("Connect(): Exception: {0}",
+                throw new Exception(string.Format("Connect(): Exception: {0}",
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
-
-                throw;
-
             }
         }
 
@@ -83,12 +83,12 @@ namespace Publisher
         /// 
         /// </summary>
         /// <param name="request"></param>
-        public async void Send(string request)
+        public async Task Send(string request)
         {
             try
             {
                 // Send a request to the echo server.
-                //            string request = "Hello, World!";
+
                 using (Stream outputStream = streamSocket.OutputStream.AsStreamForWrite())
                 {
                     using (var streamWriter = new StreamWriter(outputStream))
@@ -102,7 +102,7 @@ namespace Publisher
             catch (Exception ex)
             {
                 SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
-                Debug.WriteLine(string.Format("Send(): Exception: {0}",
+                throw new Exception(string.Format("Send(): Exception: {0}",
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }

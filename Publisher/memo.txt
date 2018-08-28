@@ -1,0 +1,11 @@
+Sendでテキストの送信-受診
+Sendでバイナリデータの送信-受診
+
+瞬断時の対応実装
+
+---------------------------
+
+Publisher <-> Broker -> Subscriber
+                         |         /
+                     Manager
+

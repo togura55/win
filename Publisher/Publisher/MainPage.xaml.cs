@@ -51,18 +51,18 @@ namespace Publisher
             PortNumber = this.TextBox_PortNumber.Text;
         }
 
-        private void Pbtn_Exec_Click(object sender, RoutedEventArgs e)
+        private async void Pbtn_Exec_Click(object sender, RoutedEventArgs e)
         {
             GetUiState();
+            SocketClient socketClient = new SocketClient();
 
             try
             {
-                SocketClient socketClient = new SocketClient();
-                //           socketClient.StartClient(HostNameString, PortNumber);
+                clientListBox.Items.Add(string.Format("{0}", "Start."));
 
-                socketClient.Connect(HostNameString, PortNumber);
+                await socketClient.Connect(HostNameString, PortNumber);
 
-                //socketClient.Send("Hello World");
+                await socketClient.Send("Hello World");
 
                 //socketClient.Receive();
 
@@ -72,55 +72,24 @@ namespace Publisher
             }
             catch (Exception ex)
             {
+                socketClient.Disonnect();
                 clientListBox.Items.Add(string.Format("{0}", ex.Message));
             }
+
         }
 
 
-
-        private async void Pbtn_Test_Click(object sender, RoutedEventArgs e)
-        {
-            clientListBox.Items.Add(string.Format("{0}", "Start Test"));
-            try
-            {
-                await Test();
-                //if (ret.Result)
-                //    msg = "true";
-                //else
-                //    msg = "false";
-                clientListBox.Items.Add(string.Format("{0}", "call Test() completed."));
-            }
-            catch (Exception ex)
-            {
-                clientListBox.Items.Add(string.Format("{0}", ex.Message));
-            }
-        }
-
-        private async Task Test()
-        {
-            try
-            {
-                await Task.Run(() => { throw (new Exception("Exception in Test().")); }).ConfigureAwait(false);
-            }
-
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
-
-        //private void Pbtn_Test_Click(object sender, RoutedEventArgs e)
+        //private async void Pbtn_Test_Click(object sender, RoutedEventArgs e)
         //{
         //    clientListBox.Items.Add(string.Format("{0}", "Start Test"));
-        //    string msg;
         //    try
         //    {
-        //        Task<bool> ret = Test();
-        //        if (ret.Result)
-        //            msg = "true";
-        //        else
-        //            msg = "false";
-        //        clientListBox.Items.Add(string.Format("{0}", msg));
+        //        await Test();
+        //        //if (ret.Result)
+        //        //    msg = "true";
+        //        //else
+        //        //    msg = "false";
+        //        clientListBox.Items.Add(string.Format("{0}", "call Test() completed."));
         //    }
         //    catch (Exception ex)
         //    {
@@ -128,22 +97,18 @@ namespace Publisher
         //    }
         //}
 
-        //private async Task<bool> Test()
+        //private async Task Test()
         //{
-        //    bool ret = false;
         //    try
         //    {
         //        await Task.Run(() => { throw (new Exception("Exception in Test().")); }).ConfigureAwait(false);
-        //        ret = true;
         //    }
 
         //    catch (Exception ex)
         //    {
-        //        ret = false;
         //        throw;
         //    }
-
-        //    return ret;
         //}
+
     }
 }
