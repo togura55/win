@@ -30,7 +30,7 @@ namespace Broker
         {
             try
             {
-                this.SocketServerMessage?.Invoke(this, "try to listen the port...");
+                this.SocketServerMessage?.Invoke(this, "Start(): try to listen the port...");
 
                 streamSocketListener = new Windows.Networking.Sockets.StreamSocketListener();
 
@@ -41,7 +41,7 @@ namespace Broker
                 ////                await streamSocketListener.BindServiceNameAsync(MainPage.PortNumber);
                 await streamSocketListener.BindEndpointAsync(ServerHostName, PortNumber).AsTask().ConfigureAwait(false);
 
-                this.SocketServerMessage?.Invoke(this, "now server is listening...");
+                this.SocketServerMessage?.Invoke(this, "Start(): now server is listening...");
             }
             catch (Exception ex)
             {
@@ -68,6 +68,7 @@ namespace Broker
 
             //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             //this.ListBox_Message.Items.Add(string.Format("server received the request: \"{0}\"", request)));
+            this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionReceived(): server received the request: \"{0}\"", request));
 
             // Echo the request back as the response.
             using (Stream outputStream = args.Socket.OutputStream.AsStreamForWrite())
@@ -80,10 +81,13 @@ namespace Broker
             }
 
             //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.ListBox_Message.Items.Add(string.Format("server sent back the response: \"{0}\"", request)));
+            this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionReceived(): server sent back the response: \"{0}\"", request));
 
             sender.Dispose();
 
             //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.ListBox_Message.Items.Add("server closed its socket"));
+            this.SocketServerMessage?.Invoke(this, "StreamSocketListener_ConnectionReceived(): server closed its socket");
+
         }
     }
 
