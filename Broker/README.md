@@ -12,6 +12,6 @@ xxx
 ## Author(s)
 * Tsuyoshi Ogura (togura55@gmail.com)  
 ## ToDo/Known Issues
-* XXX  
-* XXX  
-* XXX  
+* string data transmit  
+* binary data transmit  
+*   

@@ -15,6 +15,10 @@ namespace Broker
     {
         public HostName ServerHostName;
         private Windows.Networking.Sockets.StreamSocketListener streamSocketListener = null;
+        public delegate void MessageEventHandler(object sender, string message);
+
+        // Properties
+        public event MessageEventHandler SocketServerMessage;
 
         public SocketServer()
         {
@@ -26,6 +30,8 @@ namespace Broker
         {
             try
             {
+                this.SocketServerMessage?.Invoke(this, "try to listen the port...");
+
                 streamSocketListener = new Windows.Networking.Sockets.StreamSocketListener();
 
                 // The ConnectionReceived event is raised when connections are received.
@@ -35,7 +41,7 @@ namespace Broker
                 ////                await streamSocketListener.BindServiceNameAsync(MainPage.PortNumber);
                 await streamSocketListener.BindEndpointAsync(ServerHostName, PortNumber).AsTask().ConfigureAwait(false);
 
-//                this.ListBox_Message.Items.Add("server is listening...");
+                this.SocketServerMessage?.Invoke(this, "now server is listening...");
             }
             catch (Exception ex)
             {

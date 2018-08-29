@@ -28,9 +28,7 @@ namespace Broker
         static string HostNameString = "192.168.0.7";
         static bool fStart = true;
         SocketServer socketServer;
-
         ResourceLoader resourceLoader;
-
 
         public MainPage()
         {
@@ -43,9 +41,17 @@ namespace Broker
             this.TextBox_PortNumberValue.Text = PortNumber;
 
             socketServer = new SocketServer();
-            this.TextBlock_HostNameValue.Text = socketServer.ServerHostName.ToString();   // ToDo: Should get from the current system
+            this.TextBlock_HostNameValue.Text = socketServer.ServerHostName.ToString();
+
         }
 
+        // Message handler sent by SocketServer object
+        private void ReceiveSocketServerMessage(object sender, string message)
+        {
+            ListBox_Message.Items.Add(message);
+        }
+
+        // UI Control handlers 
         private async void Pbtn_Start_Click(object sender, RoutedEventArgs e)
         {
             ListBox_Message.Items.Add(
@@ -54,9 +60,16 @@ namespace Broker
             try
             {
                 if (fStart)
-                    await socketServer.Start(PortNumber) ;
+                {
+                    socketServer.SocketServerMessage += ReceiveSocketServerMessage;
+
+                    await socketServer.Start(PortNumber);
+                }
                 else
+                {
                     socketServer.Stop();
+                    socketServer.SocketServerMessage -= ReceiveSocketServerMessage;
+                }
 
                 fStart = fStart ? false : true;   // toggle if success
                 Pbtn_Start.Content = resourceLoader.GetString(fStart ? "IDC_Start" : "IDC_Stop");
