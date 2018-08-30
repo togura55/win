@@ -12,6 +12,6 @@ xxx
 ## Author(s)
 * Tsuyoshi Ogura (togura55@gmail.com)  
 ## ToDo/Known Issues
-* string data transmit  
-* binary data transmit  
-*   
+* binary data transmitting  
+* selectable if the server has plural IPs  
+* crush when toggle start and stop button
