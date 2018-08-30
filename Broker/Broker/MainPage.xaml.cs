@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 using Windows.ApplicationModel.Resources;
+using Windows.Storage;
 
 // 空白ページの項目テンプレートについては、https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x411 を参照してください
 
@@ -24,7 +25,7 @@ namespace Broker
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        static string PortNumber = "1337";
+        static string PortNumberString = "1337";
         static string HostNameString = "192.168.0.7";
         static bool fStart = true;
         SocketServer socketServer;
@@ -34,28 +35,46 @@ namespace Broker
         {
             this.InitializeComponent();
 
+            socketServer = new SocketServer();
+            RestoreSettings();
+
             resourceLoader = ResourceLoader.GetForCurrentView();
             this.TextBlock_HostName.Text = resourceLoader.GetString("IDC_HostName");
             this.TextBlock_PortNumber.Text = resourceLoader.GetString("IDC_PortNumber");
             this.Pbtn_Start.Content = resourceLoader.GetString(fStart ? "IDC_Start" : "IDC_Stop");
-            this.TextBox_PortNumberValue.Text = PortNumber;
+            this.TextBox_PortNumberValue.Text = PortNumberString;
+            this.Pbtn_Clearlog.Content = resourceLoader.GetString("IDC_Clearlog");
 
-            socketServer = new SocketServer();
             this.TextBlock_HostNameValue.Text = socketServer.ServerHostName.ToString();
+
+            Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
+
+            // for debug
+            this.TextBox_FixedHostNameValue.Text = HostNameString;
+        }
+
+        private void GetUiState()
+        {
+            PortNumberString = this.TextBox_PortNumberValue.Text;
+//            HostNameString = this.TextBlock_HostNameValue.Text;
+            HostNameString = this.TextBox_FixedHostNameValue.Text;    // for debug  
 
         }
 
-        // Message handler sent by SocketServer object
+        // Message event handler sent by SocketServer object
         private void ReceiveSocketServerMessage(object sender, string message)
         {
             ListBox_Message.Items.Add(message);
         }
 
-        // UI Control handlers 
+        #region UI Control handlers 
         private async void Pbtn_Start_Click(object sender, RoutedEventArgs e)
         {
             ListBox_Message.Items.Add(
                 string.Format("{0} button was clicked.", resourceLoader.GetString(fStart ? "IDC_Start" : "IDC_Stop")));
+
+            GetUiState();
+            socketServer.ServerHostName = new Windows.Networking.HostName(HostNameString); // for debug
 
             try
             {
@@ -63,7 +82,7 @@ namespace Broker
                 {
                     socketServer.SocketServerMessage += ReceiveSocketServerMessage;
 
-                    await socketServer.Start(PortNumber);
+                    await socketServer.Start(PortNumberString);
                 }
                 else
                 {
@@ -79,5 +98,39 @@ namespace Broker
                 ListBox_Message.Items.Add(ex.Message);
             }
         }
+
+        private void Pbtn_Clearlog_Click(object sender, RoutedEventArgs e)
+        {
+            ListBox_Message.Items.Clear();
+        }
+
+        // App exit procedure
+        void App_Suspending(Object sender, Windows.ApplicationModel.SuspendingEventArgs e)
+        {
+            GetUiState();
+
+            StoreSettings();
+        }
+        #endregion
+
+        #region Store/Restore the local data
+        private void StoreSettings()
+        {
+            ApplicationDataContainer container = ApplicationData.Current.LocalSettings;
+            container.Values["PortNumberString"] = PortNumberString;
+            container.Values["HostNameString"] = HostNameString;
+        }
+
+        private void RestoreSettings()
+        {
+            ApplicationDataContainer container = ApplicationData.Current.LocalSettings;
+            if (container.Values.ContainsKey("PortNumberString"))
+                PortNumberString = container.Values["PortNumberString"].ToString();
+            if (container.Values.ContainsKey("HostNameString"))
+                HostNameString = container.Values["HostNameString"].ToString();
+        }
+        #endregion
+
+
     }
 }

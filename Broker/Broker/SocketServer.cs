@@ -30,18 +30,20 @@ namespace Broker
         {
             try
             {
-                this.SocketServerMessage?.Invoke(this, "Start(): try to listen the port...");
+                this.SocketServerMessage?.Invoke(this,
+                    String.Format("Start(): try to listen the port {0}:{1}...", ServerHostName.ToString(), PortNumber));
 
                 streamSocketListener = new Windows.Networking.Sockets.StreamSocketListener();
 
                 // The ConnectionReceived event is raised when connections are received.
-                streamSocketListener.ConnectionReceived += this.StreamSocketListener_ConnectionReceived;
+                streamSocketListener.ConnectionReceived += StreamSocketListener_ConnectionReceived;
 
                 // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currently in use.
                 ////                await streamSocketListener.BindServiceNameAsync(MainPage.PortNumber);
                 await streamSocketListener.BindEndpointAsync(ServerHostName, PortNumber).AsTask().ConfigureAwait(false);
 
-                this.SocketServerMessage?.Invoke(this, "Start(): now server is listening...");
+                this.SocketServerMessage?.Invoke(this,
+                     String.Format("Start(): now server {0}:{1} is listening...", ServerHostName.ToString(), PortNumber));
             }
             catch (Exception ex)
             {
@@ -66,28 +68,38 @@ namespace Broker
                 request = await streamReader.ReadLineAsync();
             }
 
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+             {
+                // Your UI update code goes here!
+                this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionReceived(): server received the request: \"{0}\"", request));
+             });
+
             //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             //this.ListBox_Message.Items.Add(string.Format("server received the request: \"{0}\"", request)));
-            this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionReceived(): server received the request: \"{0}\"", request));
+            //            this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionReceived(): server received the request: \"{0}\"", request));
 
             // Echo the request back as the response.
-            using (Stream outputStream = args.Socket.OutputStream.AsStreamForWrite())
-            {
-                using (var streamWriter = new StreamWriter(outputStream))
-                {
-                    await streamWriter.WriteLineAsync(request);
-                    await streamWriter.FlushAsync();
-                }
-            }
+            //using (Stream outputStream = args.Socket.OutputStream.AsStreamForWrite())
+            //{s
+            //    using (var streamWriter = new StreamWriter(outputStream))
+            //    {
+            //        await streamWriter.WriteLineAsync(request);
+            //        await streamWriter.FlushAsync();
+            //    }
+            //}
 
-            //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.ListBox_Message.Items.Add(string.Format("server sent back the response: \"{0}\"", request)));
-            this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionReceived(): server sent back the response: \"{0}\"", request));
+            //await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            //{
+            //    this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionReceived(): server sent back the response: \"{0}\"", request));
+            //});
 
             sender.Dispose();
 
             //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.ListBox_Message.Items.Add("server closed its socket"));
-            this.SocketServerMessage?.Invoke(this, "StreamSocketListener_ConnectionReceived(): server closed its socket");
-
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                this.SocketServerMessage?.Invoke(this, "StreamSocketListener_ConnectionReceived(): server closed its socket");
+            });
         }
     }
 
