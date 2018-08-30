@@ -14,12 +14,33 @@ namespace Publisher
 {
     public class SocketClient
     {
+        public string HostNameString;
+        public string PortNumberString;
+
+        private const string DEFAULT_PORTNUMBER = "1337";
+        private const string DEFAULT_HOSTNAME = "192.168.0.7";
+
         HostName hostName;
         StreamSocket streamSocket;
 
+        public delegate void MessageEventHandler(object sender, string message);
+
+        // Properties
+        public event MessageEventHandler SocketClientMessage;
+
+
         public SocketClient()
         {
+            Reset();
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Reset()
+        {
+            HostNameString = DEFAULT_HOSTNAME;
+            PortNumberString = DEFAULT_PORTNUMBER;
         }
 
         /// <summary>
@@ -29,21 +50,26 @@ namespace Publisher
         /// <param name="PortNumberString"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public async Task Connect(string HostNameString, string PortNumberString, int timeout = 10000)
+        public async Task Connect(int timeout = 10000)
         {
+            //HostNameString = host;
+            //PortNumberString = port;
+
             try
             {
+                this.SocketClientMessage?.Invoke(this, 
+                    string.Format("Connect(): call ConnectAsync with timeout {0}", timeout.ToString()));
+
                 // The server hostname that we will be establishing a connection to. In this example, the server and client are in the same process.
                 hostName = new HostName(HostNameString);
 
                 // Create the StreamSocket and establish a connection to the echo server.
-                using (streamSocket = new StreamSocket())
-                {
-                    CancellationTokenSource cts = new CancellationTokenSource();
+                streamSocket = new StreamSocket();
 
-                    cts.CancelAfter(timeout);
-                    await streamSocket.ConnectAsync(hostName, PortNumberString).AsTask().ConfigureAwait(false);
-                }
+                CancellationTokenSource cts = new CancellationTokenSource();
+
+                cts.CancelAfter(timeout);
+                await streamSocket.ConnectAsync(hostName, PortNumberString).AsTask().ConfigureAwait(false);
             }
             catch (TaskCanceledException ex)
             {
