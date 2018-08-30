@@ -36,6 +36,7 @@ namespace Broker
             this.InitializeComponent();
 
             socketServer = new SocketServer();
+            socketServer.SocketServerMessage += ReceiveSocketServerMessage;
             RestoreSettings();
 
             resourceLoader = ResourceLoader.GetForCurrentView();
@@ -80,14 +81,11 @@ namespace Broker
             {
                 if (fStart)
                 {
-                    socketServer.SocketServerMessage += ReceiveSocketServerMessage;
-
                     await socketServer.Start(PortNumberString);
                 }
                 else
                 {
                     socketServer.Stop();
-                    socketServer.SocketServerMessage -= ReceiveSocketServerMessage;
                 }
 
                 fStart = fStart ? false : true;   // toggle if success
@@ -110,6 +108,8 @@ namespace Broker
             GetUiState();
 
             StoreSettings();
+
+            socketServer.SocketServerMessage -= ReceiveSocketServerMessage;
         }
         #endregion
 

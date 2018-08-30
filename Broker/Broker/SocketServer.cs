@@ -16,6 +16,7 @@ namespace Broker
         public HostName ServerHostName;
         private Windows.Networking.Sockets.StreamSocketListener streamSocketListener = null;
         public delegate void MessageEventHandler(object sender, string message);
+        public List<HostName> HostNames = new List<HostName>();
 
         // Properties
         public event MessageEventHandler SocketServerMessage;
@@ -24,6 +25,24 @@ namespace Broker
         {
             ServerHostName = NetworkInformation.GetHostNames().Where(q => q.Type == HostNameType.Ipv4).First();
 
+            RetrieveHostNames();
+        }
+
+        public void RetrieveHostNames()
+        {
+            foreach (HostName hostName in NetworkInformation.GetHostNames())
+            {
+                if (hostName.IPInformation != null)
+                {
+                    if (hostName.Type == HostNameType.Ipv4)
+                    {
+                        HostNames.Add(new HostName(hostName.ToString()));
+
+ //                       textblock.Text = hostName.ToString();
+ //                       break;
+                    }
+                }
+            }
         }
 
         public async Task Start(string PortNumber)
