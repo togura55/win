@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Navigation;
 
 using Windows.ApplicationModel.Resources;
 using Windows.Storage;
+using System.Collections.ObjectModel;
 
 // 空白ページの項目テンプレートについては、https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x411 を参照してください
 
@@ -31,6 +32,16 @@ namespace Broker
         SocketServer socketServer;
         ResourceLoader resourceLoader;
 
+        public class MainViewModel
+        {
+            public ObservableCollection<string> HostNameCollection { get; set; }
+
+            public MainViewModel()
+            {
+                HostNameCollection = new ObservableCollection<string>();
+            }
+        }
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -46,20 +57,36 @@ namespace Broker
             this.TextBox_PortNumberValue.Text = PortNumberString;
             this.Pbtn_Clearlog.Content = resourceLoader.GetString("IDC_Clearlog");
 
-            this.TextBlock_HostNameValue.Text = socketServer.ServerHostName.ToString();
+            //            this.TextBlock_HostNameValue.Text = socketServer.ServerHostName.ToString();
+            //            this.TextBox_FixedHostNameValue.Text = HostNameString;              // for debug
+            this.TextBox_FixedHostNameValue.Visibility = Visibility.Collapsed;
+            this.TextBlock_HostNameValue.Visibility = Visibility.Collapsed;
+
+            MainViewModel viewModel = new MainViewModel();
+            this.DataContext = viewModel;
+
+            {
+                //            viewModel = DataContext as MainViewModel;
+                int count = 0;
+                int index = 0;
+                foreach (Windows.Networking.HostName host in socketServer.HostNames)
+                {
+                    viewModel.HostNameCollection.Add(host.ToString());
+                    if (HostNameString == host.ToString())
+                        index = count;
+                    count++;
+                }
+                // update UI
+                this.Combo_HostNames.SelectedIndex = index;
+            }
 
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
-
-            // for debug
-            this.TextBox_FixedHostNameValue.Text = HostNameString;
         }
 
         private void GetUiState()
         {
             PortNumberString = this.TextBox_PortNumberValue.Text;
-//            HostNameString = this.TextBlock_HostNameValue.Text;
-            HostNameString = this.TextBox_FixedHostNameValue.Text;    // for debug  
-
+            HostNameString = (string)this.Combo_HostNames.SelectedValue;
         }
 
         // Message event handler sent by SocketServer object

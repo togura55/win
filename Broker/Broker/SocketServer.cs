@@ -55,14 +55,18 @@ namespace Broker
                 streamSocketListener = new Windows.Networking.Sockets.StreamSocketListener();
 
                 // The ConnectionReceived event is raised when connections are received.
-                streamSocketListener.ConnectionReceived += StreamSocketListener_ConnectionReceived;
+ //               streamSocketListener.ConnectionReceived += StreamSocketListener_ConnectionReceived;
+                streamSocketListener.ConnectionReceived += StreamSocketListener_ConnectionBinaryReceived;
 
                 // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currently in use.
                 ////                await streamSocketListener.BindServiceNameAsync(MainPage.PortNumber);
                 await streamSocketListener.BindEndpointAsync(ServerHostName, PortNumber).AsTask().ConfigureAwait(false);
 
-                this.SocketServerMessage?.Invoke(this,
+                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    this.SocketServerMessage?.Invoke(this,
                      String.Format("Start(): now server {0}:{1} is listening...", ServerHostName.ToString(), PortNumber));
+                });
             }
             catch (Exception ex)
             {
@@ -75,8 +79,42 @@ namespace Broker
         {
             if (streamSocketListener != null)
             {
+//                streamSocketListener.ConnectionReceived -= StreamSocketListener_ConnectionReceived;
+                streamSocketListener.ConnectionReceived -= StreamSocketListener_ConnectionBinaryReceived;
                 streamSocketListener.Dispose();
             }
+        }
+
+        public async void StreamSocketListener_ConnectionBinaryReceived(Windows.Networking.Sockets.StreamSocketListener sender, Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
+        {
+            //            string request;
+            //using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
+            //{
+            //    request = await streamReader.ReadLineAsync();
+            //}
+
+            byte[] data;
+            using (BinaryReader reader = new BinaryReader(args.Socket.InputStream.AsStreamForRead()))
+            {
+                // intの数値を読み込む
+
+                // 4バイト読み込む
+                data = reader.ReadBytes(4);
+
+            }
+                await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                // Your UI update code goes here!
+                this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionBinaryReceived(): server received data: \"{0}\"", data));
+            });
+
+            sender.Dispose();
+
+            //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.ListBox_Message.Items.Add("server closed its socket"));
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                this.SocketServerMessage?.Invoke(this, "StreamSocketListener_ConnectionBinaryReceived(): server closed its socket");
+            });
         }
 
         public async void StreamSocketListener_ConnectionReceived(Windows.Networking.Sockets.StreamSocketListener sender, Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)

@@ -29,12 +29,26 @@ namespace Publisher
     public sealed partial class MainPage : Page
     {
         static SocketClient socketClient = new SocketClient();  // suppose single instance
- //       static string configfile = "config.xml";
 
-        // Every protocol typically has a standard port number. For example, HTTP is typically 80, FTP is 20 and 21, etc.
-        // For this example, we'll choose an arbitrary port number.
-//        static string PortNumber = "1337";
-//        static string HostNameString = "192.168.0.7";
+        public class MyData
+        {
+            public float f; // Begin/End
+            public float x;
+            public float y;
+            public float z; 
+
+            public MyData()
+            {
+
+            }
+            public MyData(float f, float x, float y, float z)
+            {
+                this.f = f;
+                this.x = x;
+                this.y = y;
+                this.z = z;
+            }
+        }
 
         public MainPage()
         {
@@ -78,7 +92,11 @@ namespace Publisher
 
                 await socketClient.Connect();
 
-                await socketClient.Send("Hello World");
+                //                await socketClient.Send("Hello World");
+
+                MyData md = new MyData(1,1234,5678,0);
+                await socketClient.SendByte(md);
+
 
                 //socketClient.Receive();
 

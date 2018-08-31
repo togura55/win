@@ -13,5 +13,4 @@ xxx
 * Tsuyoshi Ogura (togura55@gmail.com)  
 ## ToDo/Known Issues
 * binary data transmitting  
-* selectable if the server has plural IPs  
-* crush when toggle start and stop button
+*   

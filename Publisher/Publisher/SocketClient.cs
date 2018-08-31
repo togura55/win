@@ -57,7 +57,7 @@ namespace Publisher
 
             try
             {
-                this.SocketClientMessage?.Invoke(this, 
+                this.SocketClientMessage?.Invoke(this,
                     string.Format("Connect(): call ConnectAsync with timeout {0}", timeout.ToString()));
 
                 // The server hostname that we will be establishing a connection to. In this example, the server and client are in the same process.
@@ -129,6 +129,42 @@ namespace Publisher
             {
                 SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
                 throw new Exception(string.Format("Send(): Exception: {0}",
+                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+            }
+        }
+
+        public async Task SendByte(MainPage.MyData md)
+        {
+            try
+            {
+                using (Stream outputStream = streamSocket.OutputStream.AsStreamForWrite())
+                {
+                    //                   using (var streamWriter = new StreamWriter(outputStream))
+                    using (var binaryWriter = new BinaryWriter(outputStream))
+                    {
+                        byte[] byteArray = BitConverter.GetBytes(md.f);
+                        //                        await streamWriter.WriteLineAsync(request);
+                        await Task.Run(new Action(() => binaryWriter.Write(byteArray, 0, byteArray.Length) ));
+                        await Task.Run(new Action(() => binaryWriter.Flush() ));
+
+                        byteArray = BitConverter.GetBytes(md.x);
+                        await Task.Run(new Action(() => binaryWriter.Write(byteArray, 0, byteArray.Length)));
+                        await Task.Run(new Action(() => binaryWriter.Flush()));
+
+                        byteArray = BitConverter.GetBytes(md.y);
+                        await Task.Run(new Action(() => binaryWriter.Write(byteArray, 0, byteArray.Length)));
+                        await Task.Run(new Action(() => binaryWriter.Flush()));
+
+                        byteArray = BitConverter.GetBytes(md.z);
+                        await Task.Run(new Action(() => binaryWriter.Write(byteArray, 0, byteArray.Length)));
+                        await Task.Run(new Action(() => binaryWriter.Flush()));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+                throw new Exception(string.Format("SendByte(): Exception: {0}",
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }

@@ -12,5 +12,5 @@ xxx
 ## Author(s)
 * Tsuyoshi Ogura (togura55@gmail.com)  
 ## ToDo/Known Issues
-* Display log messages  
-* Remember previous setting values   
+*   
+*    
