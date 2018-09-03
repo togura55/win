@@ -9,6 +9,8 @@ using System.IO;
 using Windows.Networking;
 using Windows.Networking.Sockets;
 using System.Threading;
+using Windows.Storage.Streams;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Publisher
 {
@@ -52,9 +54,6 @@ namespace Publisher
         /// <returns></returns>
         public async Task Connect(int timeout = 10000)
         {
-            //HostNameString = host;
-            //PortNumberString = port;
-
             try
             {
                 this.SocketClientMessage?.Invoke(this,
@@ -133,7 +132,9 @@ namespace Publisher
             }
         }
 
-        public async Task SendByte(MainPage.MyData md)
+//        public async Task SendByte(MainPage.MyData md)
+                    public async Task SendByte(float f)
+
         {
             try
             {
@@ -142,22 +143,10 @@ namespace Publisher
                     //                   using (var streamWriter = new StreamWriter(outputStream))
                     using (var binaryWriter = new BinaryWriter(outputStream))
                     {
-                        byte[] byteArray = BitConverter.GetBytes(md.f);
-                        //                        await streamWriter.WriteLineAsync(request);
-                        await Task.Run(new Action(() => binaryWriter.Write(byteArray, 0, byteArray.Length) ));
+                        byte[] byteArray = BitConverter.GetBytes(f);
+
+                        await Task.Run(new Action(() => binaryWriter.Write(byteArray, 0, byteArray.Length)));
                         await Task.Run(new Action(() => binaryWriter.Flush() ));
-
-                        byteArray = BitConverter.GetBytes(md.x);
-                        await Task.Run(new Action(() => binaryWriter.Write(byteArray, 0, byteArray.Length)));
-                        await Task.Run(new Action(() => binaryWriter.Flush()));
-
-                        byteArray = BitConverter.GetBytes(md.y);
-                        await Task.Run(new Action(() => binaryWriter.Write(byteArray, 0, byteArray.Length)));
-                        await Task.Run(new Action(() => binaryWriter.Flush()));
-
-                        byteArray = BitConverter.GetBytes(md.z);
-                        await Task.Run(new Action(() => binaryWriter.Write(byteArray, 0, byteArray.Length)));
-                        await Task.Run(new Action(() => binaryWriter.Flush()));
                     }
                 }
             }
@@ -168,6 +157,31 @@ namespace Publisher
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
+
+        // This implementation incurs kernel transition overhead for each packet written.
+        //public async void SendMultipleBuffersInefficiently(string message)
+        //{
+        //    var packetsToSend = new List<IBuffer>();
+        //    for (int count = 0; count < 5; ++count) { packetsToSend.Add(Windows.Security.Cryptography.CryptographicBuffer.ConvertStringToBinary(message, Windows.Security.Cryptography.BinaryStringEncoding.Utf8)); }
+
+        //    foreach (IBuffer packet in packetsToSend)
+        //    {
+        //        await streamSocket.OutputStream.WriteAsync(packet);
+        //    }
+        //}
+
+        public async void SendMultipleBuffersInefficiently(float f)
+        {
+            var packetsToSend = new List<IBuffer>();
+            byte[] byteArray = BitConverter.GetBytes(f);
+
+            for (int count = 0; count < 5; ++count) { packetsToSend.Add(byteArray.AsBuffer()); }
+            foreach (IBuffer packet in packetsToSend)
+            {
+                await streamSocket.OutputStream.WriteAsync(packet);
+            }
+        }
+
 
         public async void Receive()
         {
