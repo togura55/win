@@ -12,5 +12,4 @@ xxx
 ## Author(s)
 * Tsuyoshi Ogura (togura55@gmail.com)  
 ## ToDo/Known Issues
-* binary data transmitting  
-*   
+* consequently data transmitting    
