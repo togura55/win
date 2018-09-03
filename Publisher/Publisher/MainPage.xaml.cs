@@ -50,6 +50,9 @@ namespace Publisher
             }
         }
 
+        float[] DataArray = new float[] {1, 1234,5678, 910 };
+
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -94,9 +97,13 @@ namespace Publisher
 
                 //                await socketClient.Send("Hello World");
 
-                MyData md = new MyData(1,1234,5678,0);
-                await socketClient.SendByte(md);
+                //foreach(float f in DataArray)
+                //{
+                //    await socketClient.SendByte(f);
+                //}
 
+ //               socketClient.SendMultipleBuffersInefficiently("Hello world!");
+                socketClient.SendMultipleBuffersInefficiently(10);
 
                 //socketClient.Receive();
 
