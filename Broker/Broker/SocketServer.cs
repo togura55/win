@@ -8,6 +8,8 @@ using System.IO;
 using Windows.UI.Core;
 using Windows.Networking;
 using Windows.Networking.Connectivity;
+using Windows.Storage.Streams;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Broker
 {
@@ -56,7 +58,8 @@ namespace Broker
 
                 // The ConnectionReceived event is raised when connections are received.
                 //               streamSocketListener.ConnectionReceived += StreamSocketListener_ConnectionReceived;
-                streamSocketListener.ConnectionReceived += StreamSocketListener_ConnectionBinaryReceived;
+                //streamSocketListener.ConnectionReceived += StreamSocketListener_ConnectionBinaryReceived;
+                streamSocketListener.ConnectionReceived += StreamSocketListener_ConnectionDataReceived;
 
                 // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currently in use.
                 ////                await streamSocketListener.BindServiceNameAsync(MainPage.PortNumber);
@@ -88,35 +91,46 @@ namespace Broker
         public async void StreamSocketListener_ConnectionBinaryReceived(Windows.Networking.Sockets.StreamSocketListener sender,
             Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
         {
-            //            string request;
-            //using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
-            //{
-            //    request = await streamReader.ReadLineAsync();
-            //}
-
-            byte[] databyte;
-            float data;
-            using (BinaryReader reader = new BinaryReader(args.Socket.InputStream.AsStreamForRead()))
+            try
             {
-                // intの数値を読み込む
+                //            string request;
+                //using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
+                //{
+                //    request = await streamReader.ReadLineAsync();
+                //}
 
-                // 4バイト読み込む
-                databyte = reader.ReadBytes(4);
-                data = BitConverter.ToSingle(databyte, 0);
+                while (true)
+                {
+                    byte[] databyte;
+                    float data;
+                    //            using (BinaryReader reader = new BinaryReader(args.Socket.InputStream.AsStreamForRead()))
+                    BinaryReader reader = new BinaryReader(args.Socket.InputStream.AsStreamForRead());
+                    //           {
+                    // intの数値を読み込む
+
+                    // 4バイト読み込む
+                    databyte = reader.ReadBytes(4);
+                    data = BitConverter.ToSingle(databyte, 0);
+                    //            }
+
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionBinaryReceived(): server received data: \"{0}\"", data));
+                    });
+                }
+                sender.Dispose();
+
+                //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.ListBox_Message.Items.Add("server closed its socket"));
+                //await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                //{
+                //    this.SocketServerMessage?.Invoke(this, "StreamSocketListener_ConnectionBinaryReceived(): server closed its socket");
+                //});
             }
-            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            catch (Exception ex)
             {
-                // Your UI update code goes here!
-                this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionBinaryReceived(): server received data: \"{0}\"", data));
-            });
-
-            sender.Dispose();
-
-            //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.ListBox_Message.Items.Add("server closed its socket"));
-            //await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            //{
-            //    this.SocketServerMessage?.Invoke(this, "StreamSocketListener_ConnectionBinaryReceived(): server closed its socket");
-            //});
+                Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                throw new Exception(string.Format("StreamSocketListener_ConnectionBinaryReceived(): Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+            }
         }
 
         public async void StreamSocketListener_ConnectionReceived(Windows.Networking.Sockets.StreamSocketListener sender, Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
@@ -129,7 +143,6 @@ namespace Broker
 
             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
              {
-                 // Your UI update code goes here!
                  this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionReceived(): server received the request: \"{0}\"", request));
              });
 
@@ -160,8 +173,42 @@ namespace Broker
                 this.SocketServerMessage?.Invoke(this, "StreamSocketListener_ConnectionReceived(): server closed its socket");
             });
         }
+
+        private async void StreamSocketListener_ConnectionDataReceived(Windows.Networking.Sockets.StreamSocketListener sender, Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
+        {
+            try
+            {
+
+                using (var dataReader = new DataReader(args.Socket.InputStream))
+                {
+                    int index = 0;
+                    dataReader.InputStreamOptions = InputStreamOptions.Partial;
+                    while (true)
+                    {
+                        await dataReader.LoadAsync(256);
+                        if (dataReader.UnconsumedBufferLength == 0) break;
+                        IBuffer requestBuffer = dataReader.ReadBuffer(dataReader.UnconsumedBufferLength);
+                        //                        string request = Windows.Security.Cryptography.CryptographicBuffer.ConvertBinaryToString(Windows.Security.Cryptography.BinaryStringEncoding.Utf8, requestBuffer);
+                        Byte[] databyte = requestBuffer.ToArray();  //ReadBytes(4);
+                        float f = BitConverter.ToSingle(databyte, 0);
+                        
+                            Windows.Security.Cryptography.CryptographicBuffer.ConvertBinaryToString(Windows.Security.Cryptography.BinaryStringEncoding.Utf8, requestBuffer);
+                        await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                        {
+                            this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionDataReceived(): server received the request: \"{0}\"", f));
+                        });
+
+                        index += 4;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                throw new Exception(string.Format("StreamSocketListener_ConnectionDataReceived(): Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+
+            }
+        }
+
     }
-
-
-
 }
