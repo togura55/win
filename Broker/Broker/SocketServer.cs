@@ -83,7 +83,7 @@ namespace Broker
             if (streamSocketListener != null)
             {
                 //                streamSocketListener.ConnectionReceived -= StreamSocketListener_ConnectionReceived;
-                streamSocketListener.ConnectionReceived -= StreamSocketListener_ConnectionBinaryReceived;
+                streamSocketListener.ConnectionReceived -= StreamSocketListener_ConnectionDataReceived;
                 streamSocketListener.Dispose();
             }
         }
@@ -133,7 +133,8 @@ namespace Broker
             }
         }
 
-        public async void StreamSocketListener_ConnectionReceived(Windows.Networking.Sockets.StreamSocketListener sender, Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
+        public async void StreamSocketListener_ConnectionReceived(Windows.Networking.Sockets.StreamSocketListener sender, 
+            Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
         {
             string request;
             using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
@@ -174,11 +175,13 @@ namespace Broker
             });
         }
 
-        private async void StreamSocketListener_ConnectionDataReceived(Windows.Networking.Sockets.StreamSocketListener sender, Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
+        private async void StreamSocketListener_ConnectionDataReceived(Windows.Networking.Sockets.StreamSocketListener sender, 
+            Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
         {
+            const int num_bytes = 4;    // assuming float type of data
+
             try
             {
-
                 using (var dataReader = new DataReader(args.Socket.InputStream))
                 {
                     int index = 0;
@@ -188,17 +191,23 @@ namespace Broker
                         await dataReader.LoadAsync(256);
                         if (dataReader.UnconsumedBufferLength == 0) break;
                         IBuffer requestBuffer = dataReader.ReadBuffer(dataReader.UnconsumedBufferLength);
-                        //                        string request = Windows.Security.Cryptography.CryptographicBuffer.ConvertBinaryToString(Windows.Security.Cryptography.BinaryStringEncoding.Utf8, requestBuffer);
-                        Byte[] databyte = requestBuffer.ToArray();  //ReadBytes(4);
-                        float f = BitConverter.ToSingle(databyte, 0);
+                        Byte[] databyte = requestBuffer.ToArray();  //ReadBytes
                         
-                            Windows.Security.Cryptography.CryptographicBuffer.ConvertBinaryToString(Windows.Security.Cryptography.BinaryStringEncoding.Utf8, requestBuffer);
-                        await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                        // It's depend on each packets how many bytes are included.. 
+                        for (int i=0; i<databyte.Length/num_bytes; i++)
                         {
-                            this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionDataReceived(): server received the request: \"{0}\"", f));
-                        });
+                            float f = BitConverter.ToSingle(databyte, i*num_bytes);
 
-                        index += 4;
+                            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                            {
+                                this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionDataReceived(): server received the request[{0}]: \"{1}\"", index, f));
+                            });
+
+                            index++;
+                        }
+
+                        if (index == 5) break;  // for debug
+
                     }
                 }
             }
