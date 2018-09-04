@@ -132,8 +132,8 @@ namespace Publisher
             }
         }
 
-//        public async Task SendByte(MainPage.MyData md)
-                    public async Task SendByte(float f)
+        //        public async Task SendByte(MainPage.MyData md)
+        public async Task SendByte(float f)
 
         {
             try
@@ -146,7 +146,7 @@ namespace Publisher
                         byte[] byteArray = BitConverter.GetBytes(f);
 
                         await Task.Run(new Action(() => binaryWriter.Write(byteArray, 0, byteArray.Length)));
-                        await Task.Run(new Action(() => binaryWriter.Flush() ));
+                        await Task.Run(new Action(() => binaryWriter.Flush()));
                     }
                 }
             }
@@ -170,15 +170,31 @@ namespace Publisher
         //    }
         //}
 
-        public async void SendMultipleBuffersInefficiently(float f)
+        public async Task SendMultipleBuffersInefficiently(float f)
         {
-            var packetsToSend = new List<IBuffer>();
-            byte[] byteArray = BitConverter.GetBytes(f);
-
-            for (int count = 0; count < 5; ++count) { packetsToSend.Add(byteArray.AsBuffer()); }
-            foreach (IBuffer packet in packetsToSend)
+            try
             {
-                await streamSocket.OutputStream.WriteAsync(packet);
+                int index = 0;
+                var packetsToSend = new List<IBuffer>();
+                byte[] byteArray = BitConverter.GetBytes(f);
+
+                for (int count = 0; count < 5; ++count) { packetsToSend.Add(byteArray.AsBuffer()); }
+                foreach (IBuffer packet in packetsToSend)
+                {
+                    await streamSocket.OutputStream.WriteAsync(packet);
+
+                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                    {
+                        this.SocketClientMessage?.Invoke(this, string.Format("{0}", index));
+                    });
+                    index++;
+                }
+            }
+            catch (Exception ex)
+            {
+                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+                throw new Exception(string.Format("SendMultipleBuffersInefficiently(): Exception: {0}",
+                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
 

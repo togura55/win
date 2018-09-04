@@ -103,7 +103,7 @@ namespace Publisher
                 //}
 
  //               socketClient.SendMultipleBuffersInefficiently("Hello world!");
-                socketClient.SendMultipleBuffersInefficiently(10);
+                await socketClient.SendMultipleBuffersInefficiently(10);
 
                 //socketClient.Receive();
 
