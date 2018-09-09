@@ -15,6 +15,21 @@ namespace Broker
 {
     public class SocketServer
     {
+        class RawData
+        {
+            public float f;
+            public float x;
+            public float y;
+            public float z;
+            public RawData(float f = 0, float x = 0, float y = 0, float z = 0)
+            {
+                this.f = f;
+                this.x = x;
+                this.y = y;
+                this.z = z;
+            }
+        }
+
         public HostName ServerHostName;
         private Windows.Networking.Sockets.StreamSocketListener streamSocketListener = null;
         public delegate void MessageEventHandler(object sender, string message);
@@ -178,13 +193,15 @@ namespace Broker
         private async void StreamSocketListener_ConnectionDataReceived(Windows.Networking.Sockets.StreamSocketListener sender, 
             Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
         {
-            const int num_bytes = 4;    // assuming float type of data
+            const int num_bytes = sizeof(float);    // assuming float type of data
 
             try
             {
                 using (var dataReader = new DataReader(args.Socket.InputStream))
                 {
                     int index = 0;
+                    int count = 0;
+                    string label = string.Empty;
                     dataReader.InputStreamOptions = InputStreamOptions.Partial;
                     while (true)
                     {
@@ -198,15 +215,30 @@ namespace Broker
                         {
                             float f = BitConverter.ToSingle(databyte, i*num_bytes);
 
+                            if ((count % 4) == 0) count = 0;
+
+                            switch (count)
+                            {
+                                case 0:
+                                    label = "f"; break;
+                                case 1:
+                                    label = "x"; break;
+                                case 2:
+                                    label = "y"; break;
+                                case 3:
+                                    label = "z"; break;
+                            }
                             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                             {
-                                this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionDataReceived(): server received the request[{0}]: \"{1}\"", index, f));
+                                this.SocketServerMessage?.Invoke(this, 
+                                    string.Format("StreamSocketListener_ConnectionDataReceived(): server received the request[{0}]: {1}=\"{2}\"", index, label, f));
                             });
 
                             index++;
+                            count++;
                         }
 
-                        if (index == 5) break;  // for debug
+//                        if (index == 5) break;  // for debug
 
                     }
                 }
