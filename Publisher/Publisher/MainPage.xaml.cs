@@ -17,6 +17,8 @@ using Windows.Networking;
 using Windows.Networking.Connectivity;
 using System.Threading.Tasks;
 using Windows.Storage;
+using System.Collections;
+using Windows.Storage.Streams;
 
 
 // 空白ページの項目テンプレートについては、https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x411 を参照してください
@@ -29,19 +31,15 @@ namespace Publisher
     public sealed partial class MainPage : Page
     {
         static SocketClient socketClient = new SocketClient();  // suppose single instance
+        IBuffer buffer = null; // data buffer sent to the server
 
-        public class MyData
+        class RawData
         {
-            public float f; // Begin/End
+            public float f;
             public float x;
             public float y;
-            public float z; 
-
-            public MyData()
-            {
-
-            }
-            public MyData(float f, float x, float y, float z)
+            public float z;
+            public RawData(float f = 0, float x = 0, float y = 0, float z = 0)
             {
                 this.f = f;
                 this.x = x;
@@ -50,8 +48,45 @@ namespace Publisher
             }
         }
 
-        float[] DataArray = new float[] {1, 1234,5678, 910 };
+        private void RawDataToBuffer(ArrayList rawdatalist)
+        {
+            // convert to byte array and IBuffer
+            int num_bytes = sizeof(float);
+            byte[] ByteArray = new byte[rawdatalist.Count * num_bytes * 4];
+            int count = 0;
+            foreach (RawData rd in rawdatalist)
+            {
+                int offset = count * num_bytes * 4;
 
+                Array.Copy(BitConverter.GetBytes(rd.f), 0, ByteArray, offset, num_bytes);
+                Array.Copy(BitConverter.GetBytes(rd.x), 0, ByteArray, offset += num_bytes, num_bytes);
+                Array.Copy(BitConverter.GetBytes(rd.y), 0, ByteArray, offset += num_bytes, num_bytes);
+                Array.Copy(BitConverter.GetBytes(rd.z), 0, ByteArray, offset += num_bytes, num_bytes);
+                count++;
+            }
+            using (DataWriter writer = new DataWriter())
+            {
+                writer.WriteBytes(ByteArray);
+                buffer = writer.DetachBuffer();
+            }
+        }
+        //private void exercise()
+        //{
+        //    // decode
+        //    //IBuffer buffer =//なにかしらのIBufferデータ
+        //    //byte[] readBytes = new byte[buffer.Length];
+        //    //using (DataReader reader = DataReader.FromBuffer(buffer))
+        //    //{
+        //    //    reader.ReadBytes(readBytes);
+        //    //}
+        //    int num_bytes = sizeof(float);
+        //    int num_packets = ByteArray.Length / num_bytes;
+        //    byte[] tmpByte = new byte[num_bytes];
+        //    for (int i = 0; i < num_packets; i++)
+        //    {
+        //        float data = BitConverter.ToSingle(ByteArray, i * num_bytes);
+        //    }
+        //}
 
         public MainPage()
         {
@@ -69,6 +104,7 @@ namespace Publisher
 
             this.TextBox_HostName.Text = socketClient.HostNameString;
             this.TextBox_PortNumber.Text = socketClient.PortNumberString;
+
         }
 
         private void GetUiState()
@@ -87,6 +123,14 @@ namespace Publisher
         {
             GetUiState();
 
+            // for debug: Create raw data and stack on a buffer
+            ArrayList RawDataList = new ArrayList();
+            RawDataList.Add(new RawData(1, 100, 200, 3756));
+            RawDataList.Add(new RawData(0, 101, 223, 4675));
+            RawDataList.Add(new RawData(0, 102, 234, 323));
+            RawDataList.Add(new RawData(0, 105, 278, 32134));
+            RawDataToBuffer(RawDataList); // convert
+
             try
             {
                 clientListBox.Items.Add(string.Format("{0}", "Start."));
@@ -95,15 +139,9 @@ namespace Publisher
 
                 await socketClient.Connect();
 
-                //                await socketClient.Send("Hello World");
-
-                //foreach(float f in DataArray)
-                //{
-                //    await socketClient.SendByte(f);
-                //}
-
- //               socketClient.SendMultipleBuffersInefficiently("Hello world!");
-                await socketClient.SendMultipleBuffersInefficiently(10);
+                //               socketClient.SendMultipleBuffersInefficiently("Hello world!");
+//                await socketClient.SendMultipleBuffersInefficiently(10);
+                socketClient.BatchedSends(buffer);
 
                 //socketClient.Receive();
 
@@ -119,7 +157,7 @@ namespace Publisher
 
         }
 
-        void App_Suspending(Object sender,Windows.ApplicationModel.SuspendingEventArgs e)
+        void App_Suspending(Object sender, Windows.ApplicationModel.SuspendingEventArgs e)
         {
             GetUiState();
 
@@ -127,38 +165,6 @@ namespace Publisher
             //           XmlSerialize(configfile, socketClient);
             StoreSettings();
         }
-
-
-        //private async void Pbtn_Test_Click(object sender, RoutedEventArgs e)
-        //{
-        //    clientListBox.Items.Add(string.Format("{0}", "Start Test"));
-        //    try
-        //    {
-        //        await Test();
-        //        //if (ret.Result)
-        //        //    msg = "true";
-        //        //else
-        //        //    msg = "false";
-        //        clientListBox.Items.Add(string.Format("{0}", "call Test() completed."));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        clientListBox.Items.Add(string.Format("{0}", ex.Message));
-        //    }
-        //}
-
-        //private async Task Test()
-        //{
-        //    try
-        //    {
-        //        await Task.Run(() => { throw (new Exception("Exception in Test().")); }).ConfigureAwait(false);
-        //    }
-
-        //    catch (Exception ex)
-        //    {
-        //        throw;
-        //    }
-        //}
 
         #region Store/Restore local data
         private void StoreSettings()
@@ -178,37 +184,5 @@ namespace Publisher
         }
         #endregion
 
-        //#region Serializers
-        //private void XmlSerialize(string fileName, object obj)
-        //{
-        //    try
-        //    {
-        //        System.Xml.Serialization.XmlSerializer serializer =
-        //             new System.Xml.Serialization.XmlSerializer(typeof(SocketClient));
-        //        StreamWriter sw = new StreamWriter(
-        //            (System.IO.Stream)File.OpenWrite(fileName), System.Text.Encoding.UTF8, 512);
-
-        //        serializer.Serialize(sw, obj);
-        //        sw.Dispose();
-        //    }
-        //    catch(Exception ex)
-        //    {
-        //        throw;
-        //    }
-        //}
-        //private object XmlDeserialize(string fileName)
-        //{
-        //    SocketClient obj;
-
-        //    System.Xml.Serialization.XmlSerializer serializer =
-        //        new System.Xml.Serialization.XmlSerializer(typeof(SocketClient));
-        //    StreamReader sr = new StreamReader(
-        //        (System.IO.Stream)File.OpenRead(fileName), System.Text.Encoding.UTF8);
-        //    obj = (SocketClient)serializer.Deserialize(sr);
-        //    sr.Dispose();
-
-        //    return obj;
-        //}
-        //#endregion
     }
 }

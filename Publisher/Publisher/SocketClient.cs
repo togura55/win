@@ -132,7 +132,6 @@ namespace Publisher
             }
         }
 
-        //        public async Task SendByte(MainPage.MyData md)
         public async Task SendByte(float f)
 
         {
@@ -170,6 +169,34 @@ namespace Publisher
         //    }
         //}
 
+        // A C#-only technique for batched sends.
+        public void BatchedSends(IBuffer buffer)
+        {
+            try
+            {
+                var packetsToSend = new List<IBuffer>();
+                packetsToSend.Add(buffer);
+
+                var pendingTasks = new System.Threading.Tasks.Task[packetsToSend.Count];
+
+                for (int index = 0; index < packetsToSend.Count; ++index)
+                {
+                    // track all pending writes as tasks, but don't wait on one before beginning the next.
+                    pendingTasks[index] = streamSocket.OutputStream.WriteAsync(packetsToSend[index]).AsTask();
+                    // Don't modify any buffer's contents until the pending writes are complete.
+                }
+
+                // Wait for all of the pending writes to complete.
+                System.Threading.Tasks.Task.WaitAll(pendingTasks);
+            }
+            catch (Exception ex)
+            {
+                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+                throw new Exception(string.Format("SendMultipleBuffersInefficiently(): Exception: {0}",
+                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+            }
+        }
+
         public async Task SendMultipleBuffersInefficiently(float f)
         {
             try
@@ -197,7 +224,6 @@ namespace Publisher
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
-
 
         public async void Receive()
         {
