@@ -2,7 +2,7 @@
 ## Description
 Socket Server exercise  
 ## Build Instruction
-xxx  
+Load .sln by Visual Studio 2017 and build it. 
 ## Functions/Features
 xxx  
 ## Environment
@@ -12,4 +12,5 @@ xxx
 ## Author(s)
 * Tsuyoshi Ogura (togura55@gmail.com)  
 ## ToDo/Known Issues
-* consequently data transmitting    
+* Support multiple connection by Publishers  
+* Implement registering Subscribers     
