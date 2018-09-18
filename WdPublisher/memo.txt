@@ -1,0 +1,17 @@
+<全体構成>
+WdPublisher
+WdBroker
+WdSubscriber
+
+<WdPublisher>
+あんなUIは要らない=アプリとデバイスは1:1のシングルインスタンスで良い
+USB一択、常時接続
+3. 一通で動くように
+4. UIの設計
+5. GitHub化
+
+外部からのIP:Port指定はどうするか？
+外部からのStart/Stopコマンドはどうするか？
+BT接続での外部からのコントロールの実装
+BtControl
+BtClient
