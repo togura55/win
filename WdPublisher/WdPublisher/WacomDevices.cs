@@ -228,6 +228,7 @@ namespace WillDevicesSampleApp
 
             if (AppObjects.Instance.SocketClient != null)
             {
+//                IBuffer buffer = CreateBuffer(pathPart);
                 AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
             }
         }
@@ -294,6 +295,7 @@ namespace WillDevicesSampleApp
 
             if (AppObjects.Instance.SocketClient != null)
             {
+//                IBuffer buffer = CreateBuffer(pathPart);
                 AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
             }
         }
@@ -306,15 +308,8 @@ namespace WillDevicesSampleApp
 
         private IBuffer CreateBuffer(Wacom.Ink.Path pathPart)
         {
-            IBuffer buffer = null;
+            IBuffer buffer;
 
-            PathPartToBuffer(pathPart, buffer);
-
-            return buffer;
-        }
-
-        private void PathPartToBuffer(Wacom.Ink.Path pathPart, IBuffer buffer)
-        {
             var data = pathPart.Data.GetEnumerator();
 
             //Data is stored XYW
@@ -352,25 +347,7 @@ namespace WillDevicesSampleApp
                 buffer = writer.DetachBuffer();
             }
 
-            //// convert to byte array and IBuffer
-            //int num_bytes = sizeof(float);
-            //byte[] ByteArray = new byte[rawdatalist.Count * num_bytes * 4];
-            //int count = 0;
-            //foreach (RawData rd in pathPart)
-            //{
-            //    int offset = count * num_bytes * 4;
-
-            //    Array.Copy(BitConverter.GetBytes(rd.f), 0, ByteArray, offset, num_bytes);
-            //    Array.Copy(BitConverter.GetBytes(rd.x), 0, ByteArray, offset += num_bytes, num_bytes);
-            //    Array.Copy(BitConverter.GetBytes(rd.y), 0, ByteArray, offset += num_bytes, num_bytes);
-            //    Array.Copy(BitConverter.GetBytes(rd.z), 0, ByteArray, offset += num_bytes, num_bytes);
-            //    count++;
-            //}
-            //using (DataWriter writer = new DataWriter())
-            //{
-            //    writer.WriteBytes(ByteArray);
-            //    buffer = writer.DetachBuffer();
-            //}
+            return buffer;
         }
         #endregion
 

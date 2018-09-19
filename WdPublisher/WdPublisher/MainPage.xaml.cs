@@ -107,6 +107,8 @@ namespace WillDevicesSampleApp
             this.TextBox_PortNumber.Text = AppObjects.Instance.SocketClient.PortNumberString;
             // ----- end of ------
 
+            Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
+
         }
 
         private void GetUiState()
@@ -223,6 +225,8 @@ namespace WillDevicesSampleApp
 
         private void Pbtn_Exec_Click(object sender, RoutedEventArgs e)
         {
+            GetUiState();
+
             try
             {
                 // Set completion delegation 
@@ -253,10 +257,11 @@ namespace WillDevicesSampleApp
             }
         }
 
-        private void SocketClientConnect_Completed(object sender, bool result)
+        private async void SocketClientConnect_Completed(object sender, bool result)
         {
             clientListBox.Items.Add("SocketClientConnect_Completed: OK, start the RealTimeInk Transmission!");
-            // 
+            //
+            await wacomDevices.StartRealtimeInk();
         }
 
         private async void SocketProc_Completed(object sender, bool result)
@@ -307,6 +312,14 @@ namespace WillDevicesSampleApp
             }
         }
 
+        void App_Suspending(Object sender, Windows.ApplicationModel.SuspendingEventArgs s)
+        {
+            GetUiState();
+            StoreSettings();
+
+            wacomDevices.WacomDevicesMessage -= ReceivedMessage;
+            AppObjects.Instance.SocketClient.SocketClientMessage -= ReceivedMessage;
+        }
 
         #region Store/Restore local data
         private void StoreSettings()

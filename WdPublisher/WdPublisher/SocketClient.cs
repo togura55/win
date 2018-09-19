@@ -69,7 +69,7 @@ namespace WillDevicesSampleApp
         {
             try
             {
-                MessageEvent(string.Format("SocketClient.Connect(): call ConnectAsync with timeout {0}", timeout.ToString()));
+                MessageEvent(string.Format("SocketClient.Connect({0},{1}): call ConnectAsync with timeout {2}", HostNameString, PortNumberString, timeout.ToString()));
 
                 //this.SocketClientMessage?.Invoke(this,
                 //    string.Format("SocketClient.Connect(): call ConnectAsync with timeout {0}", timeout.ToString()));
