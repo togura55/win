@@ -33,54 +33,9 @@ namespace WillDevicesSampleApp
 
     public sealed partial class MainPage : Page
     {
-        static bool autopilot = true; // Auto pilot
-
         CancellationTokenSource m_cts = new CancellationTokenSource();
 
         static WacomDevices wacomDevices;
-
-        // ---- for sockets
- //       static SocketClient socketClient;  // suppose single instance
-        IBuffer buffer = null; // data buffer sent to the server
-
-        class RawData
-        {
-            public float f;
-            public float x;
-            public float y;
-            public float z;
-            public RawData(float f = 0, float x = 0, float y = 0, float z = 0)
-            {
-                this.f = f;
-                this.x = x;
-                this.y = y;
-                this.z = z;
-            }
-        }
-
-        private void RawDataToBuffer(ArrayList rawdatalist)
-        {
-            // convert to byte array and IBuffer
-            int num_bytes = sizeof(float);
-            byte[] ByteArray = new byte[rawdatalist.Count * num_bytes * 4];
-            int count = 0;
-            foreach (RawData rd in rawdatalist)
-            {
-                int offset = count * num_bytes * 4;
-
-                Array.Copy(BitConverter.GetBytes(rd.f), 0, ByteArray, offset, num_bytes);
-                Array.Copy(BitConverter.GetBytes(rd.x), 0, ByteArray, offset += num_bytes, num_bytes);
-                Array.Copy(BitConverter.GetBytes(rd.y), 0, ByteArray, offset += num_bytes, num_bytes);
-                Array.Copy(BitConverter.GetBytes(rd.z), 0, ByteArray, offset += num_bytes, num_bytes);
-                count++;
-            }
-            using (DataWriter writer = new DataWriter())
-            {
-                writer.WriteBytes(ByteArray);
-                buffer = writer.DetachBuffer();
-            }
-        }
-        // ------ end of ----------
 
         public MainPage()
         {
@@ -95,8 +50,6 @@ namespace WillDevicesSampleApp
             AppObjects.Instance.SocketClient.SocketClientMessage += ReceivedMessage; // 
 
             RestoreSettings();
-
-            //            Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
 
             var resourceLoader = Windows.ApplicationModel.Resources.ResourceLoader.GetForCurrentView();
             this.TextBlock_IPAddr.Text = resourceLoader.GetString("IDC_HostName");
@@ -119,7 +72,6 @@ namespace WillDevicesSampleApp
 
         private async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
-
             //if (AppObjects.Instance.DeviceInfo == null)
             //{
             //	AppObjects.Instance.DeviceInfo = await AppObjects.DeserializeDeviceInfoAsync();
@@ -127,7 +79,6 @@ namespace WillDevicesSampleApp
 
             if (AppObjects.Instance.DeviceInfo == null)
             {
-
                 //                Pbtn_Exec.RaiseClick();  // Auto pilot
                 return;
             }
@@ -149,13 +100,6 @@ namespace WillDevicesSampleApp
             {
                 clientListBox.Items.Add(string.Format("MainPage_Loaded: Exception: {0}", ex.Message));
                 return;
-            }
-
-            // Auto pilot
-            if (autopilot)
-            {
-                autopilot = !autopilot;
-                //               Pbtn_Exec.RaiseClick();  // ButtonScan_Click
             }
         }
 
@@ -279,31 +223,15 @@ namespace WillDevicesSampleApp
 
         private async Task SocketProc()
         {
-            // for debug: Create raw data and stack on a buffer
-            ArrayList RawDataList = new ArrayList
-            {
-                new RawData(1, 100, 200, 3756),
-                new RawData(0, 101, 223, 4675),
-                new RawData(0, 102, 234, 323),
-                new RawData(0, 105, 278, 32134)
-            };
-            RawDataToBuffer(RawDataList); // convert
-
             try
             {
                 clientListBox.Items.Add(string.Format("{0}", "Start. SocketProc()"));
 
                 await AppObjects.Instance.SocketClient.Connect();
 
- //               socketClient.BatchedSends(buffer);
-
-                //socketClient.Receive();
-
                 //socketClient.Disonnect();
 
                 clientListBox.Items.Add(string.Format("{0}", "Completed. SocketProc()"));
-
- //               SocketProc_Completed(this, true);
             }
             catch (Exception ex)
             {

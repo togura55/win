@@ -611,10 +611,6 @@ namespace WillDevicesSampleApp
             m_deviceInfos.Add(info);
 
             ConnectInkDevice();
-
- //           await StartRealtimeInk();
-
-            //         });
         }
 
         private void OnDeviceRemoved(object sender, InkDeviceInfo info)

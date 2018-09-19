@@ -61,8 +61,6 @@ namespace WillDevicesSampleApp
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="HostNameString"></param>
-        /// <param name="PortNumberString"></param>
         /// <param name="timeout"></param>
         /// <returns></returns>
         public async Task Connect(int timeout = 10000)
@@ -100,7 +98,6 @@ namespace WillDevicesSampleApp
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
 
-
             // Notify to caller
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
@@ -125,61 +122,11 @@ namespace WillDevicesSampleApp
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
-
+ 
         /// <summary>
-        /// 
+        /// A C#-only technique for batched sends.
         /// </summary>
-        /// <param name="request"></param>
-        public async Task Send(string request)
-        {
-            try
-            {
-                // Send a request to the echo server.
-
-                using (Stream outputStream = streamSocket.OutputStream.AsStreamForWrite())
-                {
-                    using (var streamWriter = new StreamWriter(outputStream))
-                    {
-                        await streamWriter.WriteLineAsync(request);
-                        await streamWriter.FlushAsync();
-                    }
-                }
-                Debug.WriteLine(string.Format("Send: client sent the request: \"{0}\"", request));
-            }
-            catch (Exception ex)
-            {
-                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("Send(): Exception: {0}",
-                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
-            }
-        }
-
-        public async Task SendByte(float f)
-
-        {
-            try
-            {
-                using (Stream outputStream = streamSocket.OutputStream.AsStreamForWrite())
-                {
-                    //                   using (var streamWriter = new StreamWriter(outputStream))
-                    using (var binaryWriter = new BinaryWriter(outputStream))
-                    {
-                        byte[] byteArray = BitConverter.GetBytes(f);
-
-                        await Task.Run(new Action(() => binaryWriter.Write(byteArray, 0, byteArray.Length)));
-                        await Task.Run(new Action(() => binaryWriter.Flush()));
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("SendByte(): Exception: {0}",
-                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
-            }
-        }
-
-        // A C#-only technique for batched sends.
+        /// <param name="buffer"></param>
         public void BatchedSends(IBuffer buffer)
         {
             try
@@ -200,34 +147,6 @@ namespace WillDevicesSampleApp
 
                 // Wait for all of the pending writes to complete.
                 System.Threading.Tasks.Task.WaitAll(pendingTasks);
-            }
-            catch (Exception ex)
-            {
-                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("SendMultipleBuffersInefficiently(): Exception: {0}",
-                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
-            }
-        }
-
-        public async Task SendMultipleBuffersInefficiently(float f)
-        {
-            try
-            {
-                int index = 0;
-                var packetsToSend = new List<IBuffer>();
-                byte[] byteArray = BitConverter.GetBytes(f);
-
-                for (int count = 0; count < 5; ++count) { packetsToSend.Add(byteArray.AsBuffer()); }
-                foreach (IBuffer packet in packetsToSend)
-                {
-                    await streamSocket.OutputStream.WriteAsync(packet);
-
-                    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                    {
-                        this.SocketClientMessage?.Invoke(this, string.Format("{0}", index));
-                    });
-                    index++;
-                }
             }
             catch (Exception ex)
             {
