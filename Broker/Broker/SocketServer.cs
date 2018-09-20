@@ -148,7 +148,7 @@ namespace Broker
             }
         }
 
-        public async void StreamSocketListener_ConnectionReceived(Windows.Networking.Sockets.StreamSocketListener sender, 
+        public async void StreamSocketListener_ConnectionReceived(Windows.Networking.Sockets.StreamSocketListener sender,
             Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
         {
             string request;
@@ -190,7 +190,7 @@ namespace Broker
             });
         }
 
-        private async void StreamSocketListener_ConnectionDataReceived(Windows.Networking.Sockets.StreamSocketListener sender, 
+        private async void StreamSocketListener_ConnectionDataReceived(Windows.Networking.Sockets.StreamSocketListener sender,
             Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
         {
             const int num_bytes = sizeof(float);    // assuming float type of data
@@ -209,11 +209,11 @@ namespace Broker
                         if (dataReader.UnconsumedBufferLength == 0) break;
                         IBuffer requestBuffer = dataReader.ReadBuffer(dataReader.UnconsumedBufferLength);
                         Byte[] databyte = requestBuffer.ToArray();  //ReadBytes
-                        
+
                         // It's depend on each packets how many bytes are included.. 
-                        for (int i=0; i<databyte.Length/num_bytes; i++)
+                        for (int i = 0; i < databyte.Length / num_bytes; i++)
                         {
-                            float f = BitConverter.ToSingle(databyte, i*num_bytes);
+                            float f = BitConverter.ToSingle(databyte, i * num_bytes);
 
                             if ((count % 4) == 0) count = 0;
 
@@ -228,17 +228,24 @@ namespace Broker
                                 case 3:
                                     label = "z"; break;
                             }
+                            string output = "StreamSocketListener_ConnectionDataReceived(): server received the request[{0}]: {1}=";
+                            if (label == "z")
+                                output += "\"{2:0.######}\"";
+                            else
+                                output += "\"{2}\"";
+
                             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                             {
-                                this.SocketServerMessage?.Invoke(this, 
-                                    string.Format("StreamSocketListener_ConnectionDataReceived(): server received the request[{0}]: {1}=\"{2}\"", index, label, f));
+                                //                                this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionDataReceived(): server received the request[{0}]: {1}=\"{2}\"", index, label, f);
+                                this.SocketServerMessage?.Invoke(this,
+                                    string.Format(output, index, label, f));
                             });
 
                             index++;
                             count++;
                         }
 
-//                        if (index == 5) break;  // for debug
+                        //                        if (index == 5) break;  // for debug
 
                     }
                 }
