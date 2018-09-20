@@ -14,6 +14,5 @@ xxx
 ## Author(s)
 * Tsuyoshi Ogura (togura55@gmail.com)  
 ## ToDo/Known Issues
-* debug of z=0  
 * UIは要らない=アプリとデバイスは1:1のシングルインスタンスで良い    
 * App congiguration utility through the Bluetooth connection   
