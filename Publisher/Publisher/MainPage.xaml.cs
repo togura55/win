@@ -119,18 +119,43 @@ namespace Publisher
             clientListBox.Items.Add(message);
         }
 
+        // f   [4][  4      ]|[4][4]
+        //     [ ][Begin/End]|[Id  ] 
+        // c.f. ESN = 7BQS0C1000131
+        const uint Mask_Reserve = 0xFF000000;
+        const uint Mask_PathOrder = 0x00FF0000;
+        const uint Mask_Id = 0x0000FFFF;
+        float FlagData(int id, int order)
+        {
+            float f = 0;
+            f = ((order << 16)) & Mask_PathOrder | (id & Mask_Id);
+            return f;
+        }
+
         private async void Pbtn_Exec_Click(object sender, RoutedEventArgs e)
         {
             GetUiState();
 
             // for debug: Create raw data and stack on a buffer
             ArrayList RawDataList = new ArrayList();
-            RawDataList.Add(new RawData(1, 100, 200, 3756));
-            RawDataList.Add(new RawData(0, 101, 223, 4675));
-            RawDataList.Add(new RawData(0, 102, 234, 323));
-            RawDataList.Add(new RawData(0, 105, 278, 32134));
+            RawDataList.Add(new RawData(FlagData(1,1), 100, 200, 3756));
+            RawDataList.Add(new RawData(FlagData(1,1), 101, 223, 4675));
+            RawDataList.Add(new RawData(FlagData(1,1), 102, 234, 323));
+            RawDataList.Add(new RawData(FlagData(1,1), 105, 278, 32134));
             RawDataToBuffer(RawDataList); // convert
+            socket_proc(buffer);
 
+            RawDataList = new ArrayList();
+            RawDataList.Add(new RawData(FlagData(0, 7), 123, 700, 2756));
+            RawDataList.Add(new RawData(FlagData(0, 7), 191, 823, 1675));
+            RawDataList.Add(new RawData(FlagData(0, 7), 122, 635, 6324));
+            RawDataToBuffer(RawDataList); // convert
+            socket_proc(buffer);
+
+        }
+
+        private async void socket_proc(IBuffer buff)
+        {
             try
             {
                 clientListBox.Items.Add(string.Format("{0}", "Start."));
@@ -140,8 +165,8 @@ namespace Publisher
                 await socketClient.Connect();
 
                 //               socketClient.SendMultipleBuffersInefficiently("Hello world!");
-//                await socketClient.SendMultipleBuffersInefficiently(10);
-                socketClient.BatchedSends(buffer);
+                //                await socketClient.SendMultipleBuffersInefficiently(10);
+                socketClient.BatchedSends(buff);
 
                 //socketClient.Receive();
 
@@ -154,7 +179,6 @@ namespace Publisher
                 socketClient.Disonnect();
                 clientListBox.Items.Add(string.Format("{0}", ex.Message));
             }
-
         }
 
         void App_Suspending(Object sender, Windows.ApplicationModel.SuspendingEventArgs e)

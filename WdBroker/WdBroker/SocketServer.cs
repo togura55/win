@@ -31,6 +31,8 @@ namespace WdBroker
             }
         }
 
+        List<Publisher> pubs = new List<Publisher>();
+
         public HostName ServerHostName;
         private StreamSocketListener streamSocketListener = null;
         public delegate void MessageEventHandler(object sender, string message);
@@ -108,6 +110,7 @@ namespace WdBroker
                 {
                     int index = 0;
                     int count = 0;
+                    float f = 0, x = 0, y = 0, z = 0;
                     string label = string.Empty;
                     dataReader.InputStreamOptions = InputStreamOptions.Partial;
                     while (true)
@@ -120,33 +123,74 @@ namespace WdBroker
                         // It's depend on each packets how many bytes are included.. 
                         for (int i = 0; i < databyte.Length / num_bytes; i++)
                         {
-                            float f = BitConverter.ToSingle(databyte, i * num_bytes);
+                            float data = BitConverter.ToSingle(databyte, i * num_bytes);
 
-                            if ((count % 4) == 0) count = 0;
+                            if ((count % 4) == 0)
+                            {
+                                count = 0;
+                                f = x = y = z = 0;
+                            }
 
                             switch (count)
                             {
                                 case 0:
-                                    label = "f"; break;
+                                    label = "f"; f = data; break;
                                 case 1:
-                                    label = "x"; break;
+                                    label = "x"; x = data; break;
                                 case 2:
-                                    label = "y"; break;
+                                    label = "y"; y = data; break;
                                 case 3:
-                                    label = "z"; break;
+                                    label = "z"; z = data; break;
                             }
                             string output = "StreamSocketListener_ConnectionDataReceived(): server received the request[{0}]: {1}=";
                             if (label == "z")
                                 output += "\"{2:0.######}\"";
                             else
                                 output += "\"{2}\"";
-
                             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                             {
-                                //                                this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionDataReceived(): server received the request[{0}]: {1}=\"{2}\"", index, label, f);
                                 this.SocketServerMessage?.Invoke(this,
-                                    string.Format(output, index, label, f));
+                                    string.Format(output, index, label, data));
                             });
+
+                            // ------------------------
+                            if (label == "z")  // all together
+                            {
+                                // f   [4][  4      ]|[4][4]
+                                //     [ ][Begin/End]|[Id  ] 
+                                // c.f. ESN = 7BQS0C1000131
+                                //const uint Mask_Reserve = 0xFF000000;
+                                const uint Mask_PathOrder = 0x00FF0000;
+                                const uint Mask_Id = 0x0000FFFF;
+
+                                uint pub_id = ((uint)f | Mask_Id);
+                                uint path_order = ((uint)f | Mask_PathOrder);
+
+                                if (pubs.Count == 0 || !pubs.Exists(pubs => pubs.Id == pub_id))
+                                {
+                                    pubs.Add(new Publisher());
+                                    pubs[pubs.Count].Id = pub_id;
+                                }
+                                else  // Publisher already existed
+                                {
+                                    // Search by Id, add data list and store raw data
+                                    int pi = pubs.FindIndex(n => n.Id == pub_id);
+
+                                    if (path_order == 1)  // begin storoke?
+                                    {
+                                        pubs[pi].Strokes.Add(new Stroke());
+                                    }
+                                    else if (path_order == 2)  // end stroke?
+                                    {
+
+                                    }
+                                    else  // intermediate
+                                    {
+                                        int s = pubs[pi].Strokes.Count;
+                                        pubs[pi].Strokes[s].DeviceRawDataList.Add(new DeviceRawData(x, y, z));
+                                    }
+                                }
+                            }
 
                             index++;
                             count++;
