@@ -21,6 +21,9 @@ namespace WillDevicesSampleApp
         public string HostNameString;
         public string PortNumberString;
 
+        public string CommandHostNameString;
+        public string CommandPortNumberString;
+
         private const string DEFAULT_PORTNUMBER = "1337";
         private const string DEFAULT_HOSTNAME = "192.168.0.7";
 
@@ -56,6 +59,9 @@ namespace WillDevicesSampleApp
         {
             HostNameString = DEFAULT_HOSTNAME;
             PortNumberString = DEFAULT_PORTNUMBER;
+
+            CommandHostNameString = HostNameString;
+            CommandPortNumberString = (int.Parse(PortNumberString) + 1).ToString();
         }
 
         /// <summary>
@@ -67,12 +73,11 @@ namespace WillDevicesSampleApp
         {
             try
             {
-                MessageEvent(string.Format("SocketClient.Connect({0},{1}): call ConnectAsync with timeout {2}", HostNameString, PortNumberString, timeout.ToString()));
+                MessageEvent(string.Format("SocketClient.Connect({0},{1}): call ConnectAsync with timeout {2}", 
+                    HostNameString, PortNumberString, timeout.ToString()));
 
-                //this.SocketClientMessage?.Invoke(this,
-                //    string.Format("SocketClient.Connect(): call ConnectAsync with timeout {0}", timeout.ToString()));
-
-                // The server hostname that we will be establishing a connection to. In this example, the server and client are in the same process.
+                // The server hostname that we will be establishing a connection to. In this example, 
+                //   the server and client are in the same process.
                 hostName = new HostName(HostNameString);
 
                 // Create the StreamSocket and establish a connection to the echo server.
