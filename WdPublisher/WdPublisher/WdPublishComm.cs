@@ -21,17 +21,24 @@ namespace WillDevicesSampleApp
 
         }
 
-        public void initialize()
+        public void Initialize()
         {
             try
             {
                 // make a command path
                 commandSocketClient = new SocketClient();
                 commandSocketClient.SocketClientConnectCompletedNotification += CommandSocketClientConnect_Completed;
+                commandSocketClient.SocketClientReceivedResponse += CommandSocketClient_Response;
+                commandSocketClient.CommandHostNameString = "";
+                commandSocketClient.CommandPortNumberString = "";
+                commandSocketClient.Connect();
 
                 // make a data path
                 dataSocketClient = new SocketClient();
                 dataSocketClient.SocketClientConnectCompletedNotification += DataSocketClientConnect_Completed;
+                dataSocketClient.HostNameString = "";
+                dataSocketClient.PortNumberString = "";
+                dataSocketClient.Connect();
             }
             catch (Exception ex)
             {
@@ -125,5 +132,39 @@ namespace WillDevicesSampleApp
 
             return buffer;
         }
+
+        #region Delegate Completion Handlers
+        private async void CommandSocketClientConnect_Completed(object sender, bool result)
+        {
+            if (result)
+            {
+                IBuffer buff_command = null;
+//              buff_command = CreateCommandPacket(COMMAND_REQUESTPUBLISHERCONNECTION);
+                commandSocketClient.BatchedSends(buff_command);
+            }
+            else
+            {
+
+            }
+        }
+
+        private async void CommandSocketClient_Response(object sender, bool result)
+        {
+
+        }
+
+        private async void DataSocketClientConnect_Completed(object sender, bool result)
+        {
+            if (result)
+            {
+
+            }
+            else
+            {
+
+            }
+        }
+
+        #endregion
     }
 }

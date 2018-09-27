@@ -32,9 +32,12 @@ namespace WillDevicesSampleApp
 
         public delegate void MessageEventHandler(object sender, string message);
         public delegate void SocketClientConnectCompletedNotificationHandler(object sender, bool result);
+        public delegate void SocketClientReceivedResponseNotificationHandler(object sender, bool result);
+
         // Properties
         public event MessageEventHandler WacomDevicesMessage;
         public event SocketClientConnectCompletedNotificationHandler SocketClientConnectCompletedNotification;
+        public event SocketClientReceivedResponseNotificationHandler SocketClientReceivedResponse;
 
         // Properties
         public event MessageEventHandler SocketClientMessage;
@@ -175,6 +178,14 @@ namespace WillDevicesSampleApp
                     }
                 }
                 //                   this.clientListBox.Items.Add(string.Format("client received the response: \"{0}\" ", response));
+                
+                // ToDo: update response in here
+
+                // Notify to caller
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    this.SocketClientReceivedResponse?.Invoke(this, true);
+                });
             }
             catch (Exception ex)
             {

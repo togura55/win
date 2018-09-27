@@ -99,7 +99,7 @@ namespace WillDevicesSampleApp
         }
 
         #region RealTimeInk
-        public async Task StartRealtimeInk()
+        public async Task StartRealTimeInk()
         {
             IDigitalInkDevice device = AppObjects.Instance.Device;
 
@@ -118,7 +118,7 @@ namespace WillDevicesSampleApp
 
             if (service == null)
             {
-                MessageEvent("StartRealtimeInk: The Real-time Ink service is not supported on this device");
+                MessageEvent("StartRealTimeInk: The Real-time Ink service is not supported on this device");
                 return;
             }
 
@@ -148,14 +148,22 @@ namespace WillDevicesSampleApp
                 //inkCanvas.GesturesManager = new GesturesManager();
                 //inkCanvas.StrokeDataProvider = service;
 
+                bool start_flag = false;
                 if (!service.IsStarted)
                 {
                     await service.StartAsync(false, m_cts.Token);
+                    start_flag = true;
                 }
+
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    this.StartRealTimeInkCompletedNotification?.Invoke(this, start_flag);
+                });
+
             }
             catch (Exception ex)
             {
-                MessageEvent(string.Format("StartRealtimeInk: Exception: {0}", ex.Message));
+                MessageEvent(string.Format("StartRealTimeInk: Exception: {0}", ex.Message));
             }
         }
 
