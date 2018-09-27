@@ -20,16 +20,6 @@ using Windows.Storage;
 
 namespace WillDevicesSampleApp
 {    
-    // Auto pilot
-    public static class ButtonExtension
-    {
-        public static void RaiseClick(this Button button)
-        {
-            var peer = new ButtonAutomationPeer(button);
-            var invokeProv = peer.GetPattern(PatternInterface.Invoke) as IInvokeProvider;
-            invokeProv.Invoke();
-        }
-    }
 
     public sealed partial class MainPage : Page
     {
@@ -37,6 +27,8 @@ namespace WillDevicesSampleApp
 
         static WacomDevices wacomDevices;
         static WdPublishComm wdPubComm;
+        string HostNameString;
+        string PortNumberString;
 
         public MainPage()
         {
@@ -65,8 +57,8 @@ namespace WillDevicesSampleApp
 
         private void GetUiState()
         {
-            AppObjects.Instance.SocketClient.HostNameString = this.TextBox_HostName.Text;
-            AppObjects.Instance.SocketClient.PortNumberString = this.TextBox_PortNumber.Text;
+            HostNameString = this.TextBox_HostName.Text;
+            PortNumberString = this.TextBox_PortNumber.Text;
         }
 
         /// <summary>
@@ -97,10 +89,10 @@ namespace WillDevicesSampleApp
 
             try
             {
-                // Set completion delegation 
+                // Set task completion delegation 
                 wacomDevices.ScanAndConnectCompletedNotification += ScanAndConnect_Completed;
+                wdPubComm.InitializationCompletedNotification += WdPubCommInitialization_Completed;
                 wacomDevices.StartRealTimeInkCompletedNotification += StartRealTimeInk_Completed;
-                AppObjects.Instance.SocketClient.SocketClientConnectCompletedNotification += SocketClientConnect_Completed;
 
                 wacomDevices.StartScanAndConnect();
             }
@@ -111,36 +103,13 @@ namespace WillDevicesSampleApp
         }
         #endregion
 
-        //private async Task SocketProc()
-        //{
-        //    try
-        //    {
-        //        clientListBox.Items.Add(string.Format("{0}", "Start. SocketProc()"));
-
-        //        await AppObjects.Instance.SocketClient.Connect();
-
-        //        //socketClient.Disonnect();
-
-        //        clientListBox.Items.Add(string.Format("{0}", "Completed. SocketProc()"));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        AppObjects.Instance.SocketClient.Disonnect();
-        //        clientListBox.Items.Add(string.Format("{0}", ex.Message));
-        //    }
-        //}
-       
         #region Delegate Completion Handlers
         private async void ScanAndConnect_Completed(object sender, bool result)
         {
             if (AppObjects.Instance.Device != null)
             {
                 clientListBox.Items.Add("ScanAndConnect_Completed: Go Socket initialization");
-                //               await SocketProc();
-                //await AppObjects.Instance.SocketClient.Connect();
-                wdPubComm.Initialize();
-
-                wdPubComm.Start();  // 
+                wdPubComm.Initialize(HostNameString, PortNumberString);
             }
             else
             {
@@ -148,19 +117,19 @@ namespace WillDevicesSampleApp
             }
         }
 
-        private async void SocketClientConnect_Completed(object sender, bool result)
+        private async void WdPubCommInitialization_Completed(object sender, bool result)
         {
-            clientListBox.Items.Add("SocketClientConnect_Completed: OK, start the RealTimeInk Transmission!");
-            //
-            await wacomDevices.StartRealTimeInk();
+            if (result)
+            {
+                await wacomDevices.StartRealTimeInk();
+            }
         }
 
-//        private async void SocketProc_Completed(object sender, bool result)
         private async void StartRealTimeInk_Completed(object sender, bool result)
         {
             if (result)  // socket was established
             {
-                clientListBox.Items.Add("StartRealTimeInk_Completed: All pre-process have done.");
+                clientListBox.Items.Add("StartRealTimeInk_Completed: All pre-process were done.");
 //                await wacomDevices.StartRealTimeInk();
             }
             else
@@ -182,9 +151,9 @@ namespace WillDevicesSampleApp
         {
             ApplicationDataContainer container = ApplicationData.Current.LocalSettings;
             if (container.Values.ContainsKey("HostNameString"))
-                AppObjects.Instance.SocketClient.HostNameString = container.Values["HostNameString"].ToString();
+                HostNameString = container.Values["HostNameString"].ToString();
             if (container.Values.ContainsKey("PortNumberString"))
-                AppObjects.Instance.SocketClient.PortNumberString = container.Values["PortNumberString"].ToString();
+                PortNumberString = container.Values["PortNumberString"].ToString();
         }
         #endregion
 

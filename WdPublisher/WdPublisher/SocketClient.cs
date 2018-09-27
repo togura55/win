@@ -18,21 +18,17 @@ namespace WillDevicesSampleApp
 {
     public class SocketClient
     {
-        public string HostNameString;
-        public string PortNumberString;
-
-        public string CommandHostNameString;
-        public string CommandPortNumberString;
-
         private const string DEFAULT_PORTNUMBER = "1337";
         private const string DEFAULT_HOSTNAME = "192.168.0.7";
+        public string HostNameString { get; private set; }
+        public string PortNumberString { get; private set; }
 
         HostName hostName;
         public StreamSocket streamSocket;
 
         public delegate void MessageEventHandler(object sender, string message);
         public delegate void SocketClientConnectCompletedNotificationHandler(object sender, bool result);
-        public delegate void SocketClientReceivedResponseNotificationHandler(object sender, bool result);
+        public delegate void SocketClientReceivedResponseNotificationHandler(object sender, float responce);
 
         // Properties
         public event MessageEventHandler WacomDevicesMessage;
@@ -62,9 +58,6 @@ namespace WillDevicesSampleApp
         {
             HostNameString = DEFAULT_HOSTNAME;
             PortNumberString = DEFAULT_PORTNUMBER;
-
-            CommandHostNameString = HostNameString;
-            CommandPortNumberString = (int.Parse(PortNumberString) + 1).ToString();
         }
 
         /// <summary>
@@ -72,16 +65,23 @@ namespace WillDevicesSampleApp
         /// </summary>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public async Task Connect(int timeout = 10000)
+        public async Task Connect(string hostNameString = DEFAULT_HOSTNAME, 
+            string portNumberString = DEFAULT_PORTNUMBER,
+            int timeout = 10000)
         {
             try
             {
-                MessageEvent(string.Format("SocketClient.Connect({0},{1}): call ConnectAsync with timeout {2}", 
-                    HostNameString, PortNumberString, timeout.ToString()));
-
                 // The server hostname that we will be establishing a connection to. In this example, 
                 //   the server and client are in the same process.
+                if (hostNameString != DEFAULT_HOSTNAME)
+                    HostNameString = hostNameString;
                 hostName = new HostName(HostNameString);
+
+                if (portNumberString != DEFAULT_PORTNUMBER)
+                    PortNumberString = portNumberString;
+
+                MessageEvent(string.Format("SocketClient.Connect({0},{1}): call ConnectAsync with timeout {2}",
+                            HostNameString, PortNumberString, timeout.ToString()));
 
                 // Create the StreamSocket and establish a connection to the echo server.
                 streamSocket = new StreamSocket();
@@ -159,7 +159,7 @@ namespace WillDevicesSampleApp
             catch (Exception ex)
             {
                 SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("SendMultipleBuffersInefficiently(): Exception: {0}",
+                throw new Exception(string.Format("BatchedSends(): Exception: {0}",
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
@@ -184,7 +184,7 @@ namespace WillDevicesSampleApp
                 // Notify to caller
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
-                    this.SocketClientReceivedResponse?.Invoke(this, true);
+                    this.SocketClientReceivedResponse?.Invoke(this, (float)response);
                 });
             }
             catch (Exception ex)
