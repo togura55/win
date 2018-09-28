@@ -16,6 +16,14 @@ namespace WdBroker
 {
     public class SocketServer
     {
+        // Command Packet Byte Definition and Command values
+        private const uint MASK_ID = 0x00FF;
+        private const uint MASK_STROKE = 0x0F00;
+        private const uint MASK_COMMAND = 0xF000;
+
+        private const float CMD_REQUESTPUBLISHERCONNECT = 1;
+
+
         class RawData
         {
             public float f;
@@ -153,11 +161,54 @@ namespace WdBroker
                                     string.Format(output, index, label, data));
                             });
 
-                            // ------------------------
+                            // --------------------------
+                            if (label == "f")
+                            {
+                                // command packet?
+                                float command = ((uint)f | MASK_COMMAND) >> 16;
+                                if (command != 0)
+                                {
+                                    switch (command)
+                                    {
+                                        case CMD_REQUESTPUBLISHERCONNECT:
+                                            // Do the publisher 1st contact process
+                                            // 1. Generate Publisher Id, smallest number of pubs
+                                            float id = 0;
+                                            for (int j=0; j < pubs.Count; j++)
+                                            {
+                                                if (pubs[j].Id > id)
+                                                    id = pubs[j].Id + 1;
+                                            }
+                                            // 2. Create Instance
+                                            pubs.Add(new Publisher());
+                                            pubs[pubs.Count].Id = id;
+
+                                            // 3. Respond to the publisher
+                                            // Echo the request back as the response.
+                                            using (Stream outputStream = args.Socket.OutputStream.AsStreamForWrite())
+                                            {
+                                                using (var binaryWriter = new BinaryWriter(outputStream))
+                                                {
+                                                    int num = sizeof(float);
+                                                    byte[] ByteArray = new byte[num_bytes * 1];
+                                                    int offset = 0;
+                                                    Array.Copy(BitConverter.GetBytes(id), 0, ByteArray, offset, num);
+                                                    binaryWriter.Write(ByteArray);
+                                                }
+                                            }
+                                            break;
+
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
+
+                            // --------------------------
                             if (label == "z")  // all together
                             {
-                                // f   [4][  4      ]|[4][4]
-                                //     [ ][Begin/End]|[Id  ] 
+                                // f   [ 8 ][4][2][2]|[    16    ]
+                                //     [cmd][stroke ]|[    Id    ] 
                                 // c.f. ESN = 7BQS0C1000131
                                 //const uint Mask_Reserve = 0xFF000000;
                                 const uint Mask_PathOrder = 0x00FF0000;
@@ -166,12 +217,13 @@ namespace WdBroker
                                 uint pub_id = ((uint)f | Mask_Id);
                                 uint path_order = ((uint)f | Mask_PathOrder);
 
-                                if (pubs.Count == 0 || !pubs.Exists(pubs => pubs.Id == pub_id))
+                                if (!pubs.Exists(pubs => pubs.Id == pub_id))
                                 {
-                                    pubs.Add(new Publisher());
-                                    pubs[pubs.Count].Id = pub_id;
+                                    // Error
+                                    throw new Exception(string.Format("StreamSocketListener_ConnectionDataReceived(): Exception: A publisher includes unknown Publisher ID: {0}",
+                                        pub_id.ToString()));
                                 }
-                                else  // Publisher already existed
+                                else  // Publisher existed
                                 {
                                     // Search by Id, add data list and store raw data
                                     int pi = pubs.FindIndex(n => n.Id == pub_id);
@@ -208,6 +260,52 @@ namespace WdBroker
 
             }
         }
+
+        private IBuffer CreateTransferBuffer(float cmd)
+        {
+            IBuffer buffer = null;
+
+            int num_bytes = sizeof(float);
+            byte[] ByteArray = new byte[num_bytes * 1];
+            int offset = 0;
+            Array.Copy(BitConverter.GetBytes(cmd), 0, ByteArray, offset, num_bytes);
+            using (DataWriter writer = new DataWriter())
+            {
+                writer.WriteBytes(ByteArray);
+                buffer = writer.DetachBuffer();
+            }
+
+            return buffer;
+        }
+
+        //public void BatchedSends(IBuffer buffer)
+        //{
+        //    try
+        //    {
+        //        var packetsToSend = new List<IBuffer>
+        //        {
+        //            buffer
+        //        };
+
+        //        var pendingTasks = new System.Threading.Tasks.Task[packetsToSend.Count];
+
+        //        for (int index = 0; index < packetsToSend.Count; ++index)
+        //        {
+        //            // track all pending writes as tasks, but don't wait on one before beginning the next.
+        //            pendingTasks[index] = streamSocketListener.OutputStream.WriteAsync(packetsToSend[index]).AsTask();
+        //            // Don't modify any buffer's contents until the pending writes are complete.
+        //        }
+
+        //        // Wait for all of the pending writes to complete.
+        //        System.Threading.Tasks.Task.WaitAll(pendingTasks);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+        //        throw new Exception(string.Format("BatchedSends(): Exception: {0}",
+        //            webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+        //    }
+        //}
 
     }
 }

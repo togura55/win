@@ -25,11 +25,12 @@ namespace WillDevicesSampleApp
         // Properties
         public event InitializationCompletedNotificationHandler InitializationCompletedNotification;
 
-
         public WdPublishComm()
         {
             CommandResponse = 0;
             PublisherId = 0;
+
+            commandSocketClient.SocketClientReceivedResponse += CommandSocketClient_Response; // set the response delegate
         }
 
         public async void Initialize(string HostName, string PortNumber)
@@ -39,12 +40,14 @@ namespace WillDevicesSampleApp
 
             try
             {
-                // make the command path
+                // establish the command path
                 commandSocketClient = new SocketClient();
+
+                commandSocketClient.CreateListener(HostName, PortNumber);  // create a listner, first
+
                 commandSocketClient.SocketClientConnectCompletedNotification += CommandSocketClientConnect_Completed;
                 commandSocketClient.SocketClientReceivedResponse += CommandSocketClient_Response;
-                await commandSocketClient.Connect(HostName, PortNumber);
-
+                await commandSocketClient.ConnectHost(HostName, PortNumber);
             }
             catch (Exception ex)
             {
@@ -114,7 +117,7 @@ namespace WillDevicesSampleApp
                     switch (command)
                     {
                         case CMD_REQUEST_PUBLISHER_CONNECTION:
-                            commandSocketClient.BatchedSends(CreateCommandBuffer(command));
+                            commandSocketClient.BatchedSends(CreateTransferBuffer(command));
                             break;
 
                         default:
@@ -134,7 +137,7 @@ namespace WillDevicesSampleApp
 
         }
 
-        private IBuffer CreateCommandBuffer(float cmd)
+        private IBuffer CreateTransferBuffer(float cmd)
         {
             IBuffer buffer = null;
 
@@ -165,20 +168,6 @@ namespace WillDevicesSampleApp
             }
         }
 
-        private async void CommandSocketClient_Response(object sender, float res)
-        {
-            if (CommandResponse == CMD_REQUEST_PUBLISHER_CONNECTION)
-            {
-                this.PublisherId = res;
-                this.CommandResponse = CMD_NEUTRAL;
-
-                // make the data path
-                dataSocketClient = new SocketClient();
-                dataSocketClient.SocketClientConnectCompletedNotification += DataSocketClientConnect_Completed;
-                await dataSocketClient.Connect(HostNameString, (int.Parse(PortNumberString) + 1).ToString());
-            }
-        }
-
         private async void DataSocketClientConnect_Completed(object sender, bool result)
         {
             if (result && this.PublisherId != 0)
@@ -194,7 +183,22 @@ namespace WillDevicesSampleApp
 
             }
         }
+        #endregion
 
+        #region Delegate Event Handlers
+        private async void CommandSocketClient_Response(object sender, float responce)
+        {
+            if (CommandResponse == CMD_REQUEST_PUBLISHER_CONNECTION)
+            {
+                this.PublisherId = responce;
+                this.CommandResponse = CMD_NEUTRAL;
+
+                // Establish the data path
+                dataSocketClient = new SocketClient();
+                dataSocketClient.SocketClientConnectCompletedNotification += DataSocketClientConnect_Completed;
+                await dataSocketClient.ConnectHost(HostNameString, (int.Parse(PortNumberString) + 1).ToString());
+            }
+        }
         #endregion
     }
 }
