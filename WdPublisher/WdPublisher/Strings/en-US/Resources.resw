@@ -121,7 +121,7 @@
     <value>Execute</value>
   </data>
   <data name="IDC_HostName" xml:space="preserve">
-    <value>IP Address</value>
+    <value>Host IP</value>
   </data>
   <data name="IDC_PortNumber" xml:space="preserve">
     <value>Port Number</value>

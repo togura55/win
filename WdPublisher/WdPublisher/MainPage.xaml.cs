@@ -49,8 +49,8 @@ namespace WillDevicesSampleApp
             this.TextBlock_PortNumber.Text = resourceLoader.GetString("IDC_PortNumber");
             this.Pbtn_Exec.Content = resourceLoader.GetString("IDC_Exec");
 
-            this.TextBox_HostName.Text = AppObjects.Instance.SocketClient.HostNameString;
-            this.TextBox_PortNumber.Text = AppObjects.Instance.SocketClient.PortNumberString;
+            this.TextBox_HostName.Text = HostNameString;
+            this.TextBox_PortNumber.Text = PortNumberString;
 
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
         }
@@ -106,14 +106,21 @@ namespace WillDevicesSampleApp
         #region Delegate Completion Handlers
         private async void ScanAndConnect_Completed(object sender, bool result)
         {
-            if (AppObjects.Instance.Device != null)
+            try
             {
-                clientListBox.Items.Add("ScanAndConnect_Completed: Go Socket initialization");
-                wdPubComm.Initialize(HostNameString, PortNumberString);
+                if (AppObjects.Instance.Device != null)
+                {
+                    clientListBox.Items.Add("ScanAndConnect_Completed: Go Socket initialization");
+                    wdPubComm.Initialize(HostNameString, PortNumberString);
+                }
+                else
+                {
+                    clientListBox.Items.Add("ScanAndConnect_Completed: Device is null");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                clientListBox.Items.Add("ScanAndConnect_Completed: Device is null");
+                clientListBox.Items.Add(string.Format("ScanAndConnect_Completed: {0}", ex.Message));
             }
         }
 
@@ -121,6 +128,7 @@ namespace WillDevicesSampleApp
         {
             if (result)
             {
+                clientListBox.Items.Add(" WdPubCommInitialization_Completed: Go to StartRealTimeInk");
                 await wacomDevices.StartRealTimeInk();
             }
         }
@@ -143,8 +151,8 @@ namespace WillDevicesSampleApp
         private void StoreSettings()
         {
             ApplicationDataContainer container = ApplicationData.Current.LocalSettings;
-            container.Values["HostNameString"] = AppObjects.Instance.SocketClient.HostNameString;
-            container.Values["PortNumberString"] = AppObjects.Instance.SocketClient.PortNumberString;
+            container.Values["HostNameString"] = HostNameString;
+            container.Values["PortNumberString"] = PortNumberString;
         }
 
         private void RestoreSettings()

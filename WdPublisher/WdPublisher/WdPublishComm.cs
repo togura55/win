@@ -29,8 +29,6 @@ namespace WillDevicesSampleApp
         {
             CommandResponse = 0;
             PublisherId = 0;
-
-            commandSocketClient.SocketClientReceivedResponse += CommandSocketClient_Response; // set the response delegate
         }
 
         public async void Initialize(string HostName, string PortNumber)
@@ -48,10 +46,12 @@ namespace WillDevicesSampleApp
                 commandSocketClient.SocketClientConnectCompletedNotification += CommandSocketClientConnect_Completed;
                 commandSocketClient.SocketClientReceivedResponse += CommandSocketClient_Response;
                 await commandSocketClient.ConnectHost(HostName, PortNumber);
+
+
             }
             catch (Exception ex)
             {
-
+                throw new Exception(string.Format("Initialize() Exception: {0}", ex.Message));
             }
         }
 
@@ -75,7 +75,7 @@ namespace WillDevicesSampleApp
             }
             catch (Exception ex)
             {
-
+                throw new Exception(string.Format("Close: Exception: {0}", ex.Message));
             }
         }
 

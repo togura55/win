@@ -223,6 +223,8 @@ namespace WillDevicesSampleApp
         private async void StreamSocketListener_ResponseReceived(StreamSocketListener sender,
             StreamSocketListenerConnectionReceivedEventArgs args)
         {
+            MessageEvent(string.Format("StreamSocketListener_ResponseReceived"));
+
             const int num_bytes = sizeof(float);    // assuming float type of data
 
             try
@@ -249,6 +251,7 @@ namespace WillDevicesSampleApp
                         }
 
                         this.SocketClientReceivedResponse?.Invoke(this, responce);
+                        break;
                     }
                 }
             }
