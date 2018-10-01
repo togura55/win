@@ -121,7 +121,7 @@
     <value>Clear Log</value>
   </data>
   <data name="IDC_HostName" xml:space="preserve">
-    <value>Host: </value>
+    <value>IP Address: </value>
   </data>
   <data name="IDC_PortNumber" xml:space="preserve">
     <value>Port Number: </value>

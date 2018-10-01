@@ -29,8 +29,6 @@ namespace WillDevicesSampleApp
         {
             CommandResponse = 0;
             PublisherId = 0;
-
-            commandSocketClient.SocketClientReceivedResponse += CommandSocketClient_Response; // set the response delegate
         }
 
         public async void Initialize(string HostName, string PortNumber)

@@ -23,7 +23,6 @@ namespace WdBroker
 
         private const float CMD_REQUESTPUBLISHERCONNECT = 1;
 
-
         class RawData
         {
             public float f;
@@ -88,7 +87,7 @@ namespace WdBroker
                 await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
                     this.SocketServerMessage?.Invoke(this,
-                     String.Format("Start(): now server {0}:{1} is listening...", ServerHostName.ToString(), PortNumber));
+                     String.Format("Start(): The server {0}:{1} is now listening...", ServerHostName.ToString(), PortNumber));
                 });
             }
             catch (Exception ex)
@@ -165,7 +164,11 @@ namespace WdBroker
                             if (label == "f")
                             {
                                 // command packet?
-                                float command = ((uint)f | MASK_COMMAND) >> 16;
+                                //f = 4097;
+                                //float tmp = (uint)f & MASK_COMMAND;
+                                //tmp = ((uint)f & MASK_COMMAND) >> 12;
+
+                                float command = ((uint)f & MASK_COMMAND ) >> 12;
                                 if (command != 0)
                                 {
                                     switch (command)
@@ -181,7 +184,7 @@ namespace WdBroker
                                             }
                                             // 2. Create Instance
                                             pubs.Add(new Publisher());
-                                            pubs[pubs.Count].Id = id;
+                                            pubs[pubs.Count-1].Id = id;
 
                                             // 3. Respond to the publisher
                                             // Echo the request back as the response.
@@ -256,8 +259,8 @@ namespace WdBroker
             catch (Exception ex)
             {
                 Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("StreamSocketListener_ConnectionDataReceived(): Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
-
+                throw new Exception(string.Format("StreamSocketListener_ConnectionDataReceived(): Exception: {0}", 
+                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
 

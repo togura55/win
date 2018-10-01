@@ -40,6 +40,9 @@ namespace WdBroker
             }
         }
 
+        private const uint MASK_COMMAND = 0xF000;
+
+
         public MainPage()
         {
             this.InitializeComponent();

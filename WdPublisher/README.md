@@ -14,5 +14,5 @@ xxx
 ## Author(s)
 * Tsuyoshi Ogura (togura55@gmail.com)  
 ## ToDo/Known Issues
-* UIは要らない=アプリとデバイスは1:1のシングルインスタンスで良い    
+* 起動時にデバイスの接続が無かった場合はエラー表示で終了。タイムアウトで良い。    
 * App congiguration utility through the Bluetooth connection   
