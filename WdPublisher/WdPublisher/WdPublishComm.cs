@@ -193,9 +193,11 @@ namespace WillDevicesSampleApp
                 this.CommandResponse = CMD_NEUTRAL;
 
                 // Establish the data path
+                string port = (int.Parse(PortNumberString) + 1).ToString();
                 dataSocketClient = new SocketClient();
+                dataSocketClient.CreateListener(HostNameString, port);  // create a listner, first
                 dataSocketClient.SocketClientConnectCompletedNotification += DataSocketClientConnect_Completed;
-                await dataSocketClient.ConnectHost(HostNameString, (int.Parse(PortNumberString) + 1).ToString());
+                await dataSocketClient.ConnectHost(HostNameString, port);
             }
         }
         #endregion
