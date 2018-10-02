@@ -228,6 +228,7 @@ namespace WillDevicesSampleApp
             try
             {
                 using (var dataReader = new DataReader(args.Socket.InputStream))
+//                using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
                 {
                     int count = 0;
                     float responce = 0;

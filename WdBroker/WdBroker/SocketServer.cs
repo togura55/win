@@ -197,6 +197,7 @@ namespace WdBroker
                                                     int offset = 0;
                                                     Array.Copy(BitConverter.GetBytes(id), 0, ByteArray, offset, num);
                                                     binaryWriter.Write(ByteArray);
+                                                    binaryWriter.Flush();
                                                 }
                                             }
                                             break;
