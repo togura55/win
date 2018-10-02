@@ -49,7 +49,7 @@ namespace WillDevicesSampleApp
             }
             catch (Exception ex)
             {
-
+                throw new Exception(string.Format("Initialize() Exception: {0}", ex.Message));
             }
         }
 
@@ -105,7 +105,7 @@ namespace WillDevicesSampleApp
         const float CMD_NEUTRAL = 0x0000;
         const float CMD_REQUEST_PUBLISHER_CONNECTION = 0x1000;
 
-        public void Send(float command)
+        public async Task Send(float command)
         {
             try
             {
@@ -116,6 +116,7 @@ namespace WillDevicesSampleApp
                     {
                         case CMD_REQUEST_PUBLISHER_CONNECTION:
                             commandSocketClient.BatchedSends(CreateTransferBuffer(command));
+                            await commandSocketClient.ResponseReceive();
                             break;
 
                         default:

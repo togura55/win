@@ -24,6 +24,8 @@
   </Applications>
   <Capabilities>
     <Capability Name="internetClient" />
+    <Capability Name="privateNetworkClientServer" />
+    <Capability Name="internetClientServer" />
     <DeviceCapability Name="bluetooth.genericAttributeProfile">
       <Device Id="any">
         <Function Type="serviceId:00001523-1212-efde-1523-785feabcd123" />
