@@ -190,12 +190,14 @@ namespace WillDevicesSampleApp
             if (CommandResponse == CMD_REQUEST_PUBLISHER_CONNECTION)
             {
                 this.PublisherId = responce;
+                
+
                 this.CommandResponse = CMD_NEUTRAL;
 
                 // Establish the data path
                 string port = (int.Parse(PortNumberString) + 1).ToString();
-                dataSocketClient = new SocketClient();
-                dataSocketClient.CreateListener(HostNameString, port);  // create a listner, first
+                //                dataSocketClient = new SocketClient();
+                dataSocketClient = AppObjects.Instance.SocketClient;    // share with WacomDevices
                 dataSocketClient.SocketClientConnectCompletedNotification += DataSocketClientConnect_Completed;
                 await dataSocketClient.ConnectHost(HostNameString, port);
             }

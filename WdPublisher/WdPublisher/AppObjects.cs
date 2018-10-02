@@ -161,5 +161,11 @@ namespace WillDevicesSampleApp
             get;
             set;
         }
+
+        public WacomDevices WacomDevice
+        {
+            get;
+            set;
+        }
 	}
 }

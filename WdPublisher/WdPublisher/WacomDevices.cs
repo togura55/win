@@ -40,7 +40,7 @@ namespace WillDevicesSampleApp
         public event ScanAndConnectCompletedNotificationHandler ScanAndConnectCompletedNotification;
         public event StartRealTimeInkCompletedNotificationHandler StartRealTimeInkCompletedNotification;
 
-        public SocketClient socketClientForDevice;
+        public float PublisherAttribute;
 
         #region Realtime Ink Raw Data Collection
         public ObservableCollection<StrokeRawData> StrokeRawDataInfos

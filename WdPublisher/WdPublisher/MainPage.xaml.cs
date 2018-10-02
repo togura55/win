@@ -121,6 +121,7 @@ namespace WillDevicesSampleApp
         {
             if (result)
             {
+                clientListBox.Items.Add("WdPubCommInitialization_Completed: Go to StartRealTimeInk.");
                 await wacomDevices.StartRealTimeInk();
             }
         }
