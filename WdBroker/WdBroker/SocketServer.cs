@@ -262,12 +262,16 @@ namespace WdBroker
                                 case 3:
                                     label = "z"; z = data; break;
                             }
-                            string output = "StreamSocketListener_DataReceived(): server received data [{0}]: {1}=";
-                            if (label == "z")
-                                output += "\"{2:0.######}\"";
+
+                            string output = "StreamSocketListener_DataReceived(): server received data [{0}]:[{1}]:[{2}] {3}=";
+                            if (label == "f")
+                                //                                output += "\"0x{3:X4}\"";
+                                output += "\"{4}\"";
+                            else if (label == "z")
+                                output += "\"{4:0.######}\"";
                             else
-                                output += "\"{2}\"";
-                            MessageEvent(string.Format(output, index, label, data));
+                                output += "\"{4}\"";
+                            MessageEvent(string.Format(output, index, ((uint)f & MASK_ID), ((uint)f & MASK_STROKE)>>8, label, data));
 
                             // --------------------------
                             if (label == "z")  // all together
@@ -288,16 +292,21 @@ namespace WdBroker
 
                                     if (path_order == 1)  // begin storoke?
                                     {
-                                        pubs[pi].Strokes.Add(new Stroke());
+                                        Stroke stroke = new Stroke();
+                                        stroke.DeviceRawDataList = new List<DeviceRawData>();
+                                        pubs[pi].Strokes.Add(stroke);
                                     }
                                     else if (path_order == 2)  // end stroke?
                                     {
-
+                                        int s = pubs[pi].Strokes.Count - 1;
+                                        DeviceRawData drd = new DeviceRawData(x, y, z);
+                                        pubs[pi].Strokes[s].DeviceRawDataList.Add(drd);
                                     }
                                     else  // intermediate
                                     {
-                                        int s = pubs[pi].Strokes.Count;
-                                        pubs[pi].Strokes[s].DeviceRawDataList.Add(new DeviceRawData(x, y, z));
+                                        int s = pubs[pi].Strokes.Count - 1;
+                                        DeviceRawData drd = new DeviceRawData(x, y, z);
+                                        pubs[pi].Strokes[s].DeviceRawDataList.Add(drd);
                                     }
                                 }
                             }
