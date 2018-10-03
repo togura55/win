@@ -20,15 +20,25 @@ namespace WillDevicesSampleApp
         string HostNameString;
         string PortNumberString;
 
+        public delegate void MessageEventHandler(object sender, string message);
         public delegate void InitializationCompletedNotificationHandler(object sender, bool result);
 
         // Properties
+        public event MessageEventHandler WdPublishCommMessage;
         public event InitializationCompletedNotificationHandler InitializationCompletedNotification;
 
         public WdPublishComm()
         {
             CommandResponse = 0;
             PublisherId = 0;
+        }
+
+        private async void MessageEvent(string message)
+        {
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                this.WdPublishCommMessage?.Invoke(this, message);
+            });
         }
 
         public async void Initialize(string HostName, string PortNumber)
@@ -156,6 +166,8 @@ namespace WillDevicesSampleApp
         #region Delegate Completion Handlers
         private void CommandSocketClientConnect_Completed(object sender, bool result)
         {
+            MessageEvent("CommandSocketClientConnect_Completed.");
+
             if (result)
             {
                 CommandResponse = CMD_REQUEST_PUBLISHER_CONNECTION;
@@ -169,6 +181,8 @@ namespace WillDevicesSampleApp
 
         private async void DataSocketClientConnect_Completed(object sender, bool result)
         {
+            MessageEvent("DataSocketClientConnect_Completed.");
+
             if (result && this.PublisherId != 0)
             {
                 // Get ready to do all
@@ -185,12 +199,15 @@ namespace WillDevicesSampleApp
         #endregion
 
         #region Delegate Event Handlers
-        private async void CommandSocketClient_Response(object sender, float responce)
+        private async void CommandSocketClient_Response(object sender, float response)
         {
             if (CommandResponse == CMD_REQUEST_PUBLISHER_CONNECTION)
             {
-                this.PublisherId = responce;
-                
+                this.PublisherId = response;
+                AppObjects.Instance.WacomDevice.PublisherAttribute 
+                    = (uint)AppObjects.Instance.WacomDevice.PublisherAttribute | (uint) response;
+                MessageEvent(string.Format("CommandSocketClient_Response: response = {0}, PublisherAttribute = {1}",
+                    response, AppObjects.Instance.WacomDevice.PublisherAttribute));
 
                 this.CommandResponse = CMD_NEUTRAL;
 

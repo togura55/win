@@ -25,7 +25,7 @@ namespace WillDevicesSampleApp
     {
         CancellationTokenSource m_cts = new CancellationTokenSource();
 
-        static WacomDevices wacomDevices;
+//        static WacomDevices wacomDevices;
         static WdPublishComm wdPubComm;
         string HostNameString;
         string PortNumberString;
@@ -35,9 +35,10 @@ namespace WillDevicesSampleApp
             this.InitializeComponent();
 
             wdPubComm = new WdPublishComm();  // single instance
+            wdPubComm.WdPublishCommMessage += ReceivedMessage; // set the message delegate
 
-            wacomDevices = new WacomDevices();
-            wacomDevices.WacomDevicesMessage += ReceivedMessage; // set the message delegate
+            AppObjects.Instance.WacomDevice = new WacomDevices();     // stored for using this app 
+            AppObjects.Instance.WacomDevice.WacomDevicesMessage += ReceivedMessage; // set the message delegate
 
             AppObjects.Instance.SocketClient = new SocketClient();
             AppObjects.Instance.SocketClient.SocketClientMessage += ReceivedMessage; // 
@@ -77,7 +78,7 @@ namespace WillDevicesSampleApp
             GetUiState();
             StoreSettings();
 
-            wacomDevices.WacomDevicesMessage -= ReceivedMessage;
+            AppObjects.Instance.WacomDevice.WacomDevicesMessage -= ReceivedMessage;
             AppObjects.Instance.SocketClient.SocketClientMessage -= ReceivedMessage;
 
             wdPubComm.Stop();
@@ -90,11 +91,11 @@ namespace WillDevicesSampleApp
             try
             {
                 // Set task completion delegation 
-                wacomDevices.ScanAndConnectCompletedNotification += ScanAndConnect_Completed;
+                AppObjects.Instance.WacomDevice.ScanAndConnectCompletedNotification += ScanAndConnect_Completed;
                 wdPubComm.InitializationCompletedNotification += WdPubCommInitialization_Completed;
-                wacomDevices.StartRealTimeInkCompletedNotification += StartRealTimeInk_Completed;
+                AppObjects.Instance.WacomDevice.StartRealTimeInkCompletedNotification += StartRealTimeInk_Completed;
 
-                wacomDevices.StartScanAndConnect();
+                AppObjects.Instance.WacomDevice.StartScanAndConnect();
             }
             catch (Exception ex)
             {
@@ -122,7 +123,7 @@ namespace WillDevicesSampleApp
             if (result)
             {
                 clientListBox.Items.Add("WdPubCommInitialization_Completed: Go to StartRealTimeInk.");
-                await wacomDevices.StartRealTimeInk();
+                await AppObjects.Instance.WacomDevice.StartRealTimeInk();
             }
         }
 

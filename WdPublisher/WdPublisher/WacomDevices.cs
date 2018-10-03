@@ -20,6 +20,10 @@ namespace WillDevicesSampleApp
 {
     public class WacomDevices
     {
+        private const uint MASK_ID      = 0x00FF;
+        private const uint MASK_STROKE  = 0x0F00;
+        private const uint MASK_COMMAND = 0xF000;
+
         private const float micrometerToDip = 96.0f / 25400.0f;
         private CancellationTokenSource m_cts = new CancellationTokenSource();
         //        private StrokeCollection _strokes = new StrokeCollection();
@@ -31,6 +35,7 @@ namespace WillDevicesSampleApp
         int PointCount;
         int StrokeCount;
         ////        public InkTransfer inkTransfer;
+        int m_StrokeOrder = 1; // 1: start, 0: intermediate, 2: end
 
         public delegate void MessageEventHandler(object sender, string message);
         public delegate void ScanAndConnectCompletedNotificationHandler(object sender, bool result);
@@ -188,6 +193,8 @@ namespace WillDevicesSampleApp
         #region Stroke event handlers
         private void Service_StrokeEnded(object sender, StrokeEndedEventArgs e)
         {
+            m_StrokeOrder = 2;
+
             //var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             //// Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
             //{
@@ -236,13 +243,14 @@ namespace WillDevicesSampleApp
 
             if (AppObjects.Instance.SocketClient != null)
             {
-//                IBuffer buffer = CreateBuffer(pathPart);
                 AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
             }
         }
 
         private void Service_StrokeUpdated(object sender, StrokeUpdatedEventArgs e)
         {
+            m_StrokeOrder = 0;
+
             var pathPart = e.PathPart;
             //var data = pathPart.Data.GetEnumerator();
 
@@ -267,20 +275,27 @@ namespace WillDevicesSampleApp
             //    w = Math.Max(0.0f, Math.Min(1.0f, (data.Current - 1.0f) * pFactor));
             //}
 
+
+            if (AppObjects.Instance.SocketClient != null)
+            {
+                AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
+            }
+            m_StrokeOrder = 0;
+
             //var point = new StylusPoint(x * m_scale, y * m_scale, w);
-            //if (m_addNewStrokeToModel)
-            //{
-            //    m_addNewStrokeToModel = false;
-            //    var points = new StylusPointCollection { point };
-            //    points.Add(point);
+            if (m_addNewStrokeToModel)
+            {
+                m_addNewStrokeToModel = false;
+                //    var points = new StylusPointCollection { point };
+                //    points.Add(point);
 
-            //    var stroke = new WinStroke(points) { DrawingAttributes = m_DrawingAttributes };
+                //    var stroke = new WinStroke(points) { DrawingAttributes = m_DrawingAttributes };
 
-            //    Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
-            //    {
-            //        _strokes.Add(stroke);
-            //    }));
-            //}
+                //    Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
+                //    {
+                //        _strokes.Add(stroke);
+                //    }));
+            }
             //else
             //{
             //    Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
@@ -301,17 +316,33 @@ namespace WillDevicesSampleApp
             // data transfer
             //            inkTransfer.Send(pathPart);
 
-            if (AppObjects.Instance.SocketClient != null)
-            {
-//                IBuffer buffer = CreateBuffer(pathPart);
-                AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
-            }
+
         }
 
         private void Service_StrokeStarted(object sender, StrokeStartedEventArgs e)
         {
+            m_StrokeOrder = 1;
+
             m_addNewStrokeToModel = true;
             StrokeCount++;
+
+            AppObjects.Instance.WacomDevice.PublisherAttribute =
+                ((uint)AppObjects.Instance.WacomDevice.PublisherAttribute & ~MASK_STROKE) | ((uint)m_StrokeOrder << 8);
+
+            float f = AppObjects.Instance.WacomDevice.PublisherAttribute;
+            int num_bytes = sizeof(float);
+            byte[] ByteArray = new byte[num_bytes * 4];
+            int offset = 0;
+            Array.Copy(BitConverter.GetBytes(f), 0, ByteArray, offset, num_bytes);
+            Array.Copy(BitConverter.GetBytes(0), 0, ByteArray, offset += num_bytes, num_bytes);
+            Array.Copy(BitConverter.GetBytes(0), 0, ByteArray, offset += num_bytes, num_bytes);
+            Array.Copy(BitConverter.GetBytes(0), 0, ByteArray, offset += num_bytes, num_bytes);
+            using (DataWriter writer = new DataWriter())
+            {
+                writer.WriteBytes(ByteArray);
+                AppObjects.Instance.SocketClient.BatchedSends(writer.DetachBuffer());
+            }
+
         }
 
         private IBuffer CreateBuffer(Wacom.Ink.Path pathPart)
@@ -320,8 +351,17 @@ namespace WillDevicesSampleApp
 
             var data = pathPart.Data.GetEnumerator();
 
+            // Stroke order info
+            //float path_order = 0;
+            //if (m_addNewStrokeToModel)
+            //    path_order = 1;
+            //else
+            //    path_order = 0;
+            AppObjects.Instance.WacomDevice.PublisherAttribute =
+                ((uint)AppObjects.Instance.WacomDevice.PublisherAttribute & ~MASK_STROKE) | ((uint)m_StrokeOrder << 8);
+
             //Data is stored XYW
-            float f = 0;
+            float f = AppObjects.Instance.WacomDevice.PublisherAttribute;
             float x = -1;
             float y = -1;
             float w = -1;

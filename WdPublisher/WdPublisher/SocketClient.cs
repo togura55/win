@@ -26,7 +26,7 @@ namespace WillDevicesSampleApp
         HostName hostName;
         public StreamSocket streamSocket;
         public StreamSocketListener streamSocketListener;
-    
+
         public delegate void MessageEventHandler(object sender, string message);
         public delegate void SocketClientConnectCompletedNotificationHandler(object sender, bool result);
         public delegate void SocketClientReceivedResponseNotificationHandler(object sender, float responce);
@@ -90,7 +90,7 @@ namespace WillDevicesSampleApp
         /// </summary>
         /// <param name="timeout"></param>
         /// <returns></returns>
-        public async Task ConnectHost(string hostNameString = DEFAULT_HOSTNAME, 
+        public async Task ConnectHost(string hostNameString = DEFAULT_HOSTNAME,
             string portNumberString = DEFAULT_PORTNUMBER,
             int timeout = 10000)
         {
@@ -155,7 +155,7 @@ namespace WillDevicesSampleApp
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
- 
+
         /// <summary>
         /// A C#-only technique for batched sends.
         /// </summary>
@@ -258,7 +258,7 @@ namespace WillDevicesSampleApp
                 throw new Exception(string.Format("ResponseReceive(): Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
 
             }
-    }
+        }
 
         private async void StreamSocketListener_ResponseReceived(StreamSocketListener sender,
             StreamSocketListenerConnectionReceivedEventArgs args)
@@ -268,10 +268,10 @@ namespace WillDevicesSampleApp
             try
             {
                 using (var dataReader = new DataReader(args.Socket.InputStream))
-//                using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
+                //                using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
                 {
                     int count = 0;
-                    float responce = 0;
+                    float response = 0;
 
                     dataReader.InputStreamOptions = InputStreamOptions.Partial;
                     while (true)
@@ -284,12 +284,12 @@ namespace WillDevicesSampleApp
                         // It's depend on each packets how many bytes are included.. 
                         for (int i = 0; i < databyte.Length / num_bytes; i++)
                         {
-                            responce = BitConverter.ToSingle(databyte, i * num_bytes);
+                            response = BitConverter.ToSingle(databyte, i * num_bytes);
 
                             count++;
                         }
 
-                        this.SocketClientReceivedResponse?.Invoke(this, responce);
+                        this.SocketClientReceivedResponse?.Invoke(this, response);
                     }
                 }
             }
