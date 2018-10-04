@@ -32,12 +32,14 @@ namespace WillDevicesSampleApp
         public delegate void SocketClientReceivedResponseNotificationHandler(object sender, float responce);
 
         // Properties
-        public event MessageEventHandler WacomDevicesMessage;
         public event SocketClientConnectCompletedNotificationHandler SocketClientConnectCompletedNotification;
         public event SocketClientReceivedResponseNotificationHandler SocketClientReceivedResponse;
-
-        // Properties
         public event MessageEventHandler SocketClientMessage;
+
+        public SocketClient()
+        {
+            Reset();
+        }
 
         private async void MessageEvent(string message)
         {
@@ -45,11 +47,6 @@ namespace WillDevicesSampleApp
             {
                 this.SocketClientMessage?.Invoke(this, message);
             });
-        }
-
-        public SocketClient()
-        {
-            Reset();
         }
 
         /// <summary>
@@ -222,8 +219,6 @@ namespace WillDevicesSampleApp
 
         public async Task ResponseReceive()
         {
-            MessageEvent(string.Format("StreamSocketListener_ResponseReceived"));
-
             const int num_bytes = sizeof(float);    // assuming float type of data
 
             try
@@ -251,7 +246,6 @@ namespace WillDevicesSampleApp
                         }
 
                         this.SocketClientReceivedResponse?.Invoke(this, responce);
-                        break;
                     }
                 }
             }
@@ -299,7 +293,7 @@ namespace WillDevicesSampleApp
             catch (Exception ex)
             {
                 Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("StreamSocketListener_ConnectionDataReceived(): Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+                throw new Exception(string.Format("StreamSocketListener_ResponseReceived: Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
 
             }
         }

@@ -20,14 +20,14 @@ namespace WillDevicesSampleApp
 {
     public class WacomDevices
     {
-        private const uint MASK_ID      = 0x00FF;
-        private const uint MASK_STROKE  = 0x0F00;
+        private const uint MASK_ID = 0x00FF;
+        private const uint MASK_STROKE = 0x0F00;
         private const uint MASK_COMMAND = 0xF000;
 
         private const float micrometerToDip = 96.0f / 25400.0f;
         private CancellationTokenSource m_cts = new CancellationTokenSource();
         //        private StrokeCollection _strokes = new StrokeCollection();
-        private double m_scale = 1.0;
+        //        private double m_scale = 1.0;
         //        private Size m_deviceSize;
         private bool m_addNewStrokeToModel = true;
         private static float maxP = 1.402218f;
@@ -194,93 +194,28 @@ namespace WillDevicesSampleApp
         private void Service_StrokeEnded(object sender, StrokeEndedEventArgs e)
         {
             m_StrokeOrder = 2;
-
-            //var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            //// Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
-            //{
-            var pathPart = e.PathPart;
-            //var data = pathPart.Data.GetEnumerator();
-
-            ////Data is stored XYW
-            //float x = -1;
-            //float y = -1;
-            //float w = -1;
-
-            //if (data.MoveNext())
-            //{
-            //    x = data.Current;
-            //}
-
-            //if (data.MoveNext())
-            //{
-            //    y = data.Current;
-            //}
-
-            //if (data.MoveNext())
-            //{
-            //    //Clamp to 0.0 -> 1.0
-            //    w = Math.Max(0.0f, Math.Min(1.0f, (data.Current - 1.0f) * pFactor));
-            //}
-
-            //               var point = new StylusPoint(x * m_scale, y * m_scale, w);
-            //               Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
-            //               {
-            //                   _strokes[_strokes.Count - 1].StylusPoints.Add(point);
-            //                  NotifyPropertyChanged("Strokes");
-            //               }));
+            AppObjects.Instance.WacomDevice.PublisherAttribute =
+                ((uint)AppObjects.Instance.WacomDevice.PublisherAttribute & ~MASK_STROKE) | ((uint)m_StrokeOrder << 8);
 
             m_addNewStrokeToModel = true;
 
-
-            // Add to List
-            //m_StrokeRawData.Add(new StrokeRawData(PointCount.ToString(), StrokeCount.ToString(), x.ToString(), y.ToString(), w.ToString()));
-
-            // Transfer to somewhere
-            //            inkTransfer.Send(pathPart);
-
-            //});
-
+            var pathPart = e.PathPart;
 
             if (AppObjects.Instance.SocketClient != null)
-            {
                 AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
-            }
         }
 
         private void Service_StrokeUpdated(object sender, StrokeUpdatedEventArgs e)
         {
             m_StrokeOrder = 0;
+            AppObjects.Instance.WacomDevice.PublisherAttribute =
+                ((uint)AppObjects.Instance.WacomDevice.PublisherAttribute & ~MASK_STROKE) | ((uint)m_StrokeOrder << 8);
 
             var pathPart = e.PathPart;
-            //var data = pathPart.Data.GetEnumerator();
-
-            ////Data is stored XYW
-            //float x = -1;
-            //float y = -1;
-            //float w = -1;
-
-            //if (data.MoveNext())
-            //{
-            //    x = data.Current;
-            //}
-
-            //if (data.MoveNext())
-            //{
-            //    y = data.Current;
-            //}
-
-            //if (data.MoveNext())
-            //{
-            //    //Clamp to 0.0 -> 1.0
-            //    w = Math.Max(0.0f, Math.Min(1.0f, (data.Current - 1.0f) * pFactor));
-            //}
-
 
             if (AppObjects.Instance.SocketClient != null)
-            {
                 AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
-            }
-            m_StrokeOrder = 0;
+           
 
             //var point = new StylusPoint(x * m_scale, y * m_scale, w);
             if (m_addNewStrokeToModel)
@@ -322,26 +257,14 @@ namespace WillDevicesSampleApp
         private void Service_StrokeStarted(object sender, StrokeStartedEventArgs e)
         {
             m_StrokeOrder = 1;
+            AppObjects.Instance.WacomDevice.PublisherAttribute =
+                ((uint)AppObjects.Instance.WacomDevice.PublisherAttribute & ~MASK_STROKE) | ((uint)m_StrokeOrder << 8);
 
             m_addNewStrokeToModel = true;
             StrokeCount++;
 
-            AppObjects.Instance.WacomDevice.PublisherAttribute =
-                ((uint)AppObjects.Instance.WacomDevice.PublisherAttribute & ~MASK_STROKE) | ((uint)m_StrokeOrder << 8);
-
-            float f = AppObjects.Instance.WacomDevice.PublisherAttribute;
-            int num_bytes = sizeof(float);
-            byte[] ByteArray = new byte[num_bytes * 4];
-            int offset = 0;
-            Array.Copy(BitConverter.GetBytes(f), 0, ByteArray, offset, num_bytes);
-            Array.Copy(BitConverter.GetBytes(0), 0, ByteArray, offset += num_bytes, num_bytes);
-            Array.Copy(BitConverter.GetBytes(0), 0, ByteArray, offset += num_bytes, num_bytes);
-            Array.Copy(BitConverter.GetBytes(0), 0, ByteArray, offset += num_bytes, num_bytes);
-            using (DataWriter writer = new DataWriter())
-            {
-                writer.WriteBytes(ByteArray);
-                AppObjects.Instance.SocketClient.BatchedSends(writer.DetachBuffer());
-            }
+            if (AppObjects.Instance.SocketClient != null)
+                AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(null));
 
         }
 
@@ -349,37 +272,36 @@ namespace WillDevicesSampleApp
         {
             IBuffer buffer;
 
-            var data = pathPart.Data.GetEnumerator();
-
-            // Stroke order info
-            //float path_order = 0;
-            //if (m_addNewStrokeToModel)
-            //    path_order = 1;
-            //else
-            //    path_order = 0;
-            AppObjects.Instance.WacomDevice.PublisherAttribute =
-                ((uint)AppObjects.Instance.WacomDevice.PublisherAttribute & ~MASK_STROKE) | ((uint)m_StrokeOrder << 8);
-
             //Data is stored XYW
             float f = AppObjects.Instance.WacomDevice.PublisherAttribute;
             float x = -1;
             float y = -1;
             float w = -1;
 
-            if (data.MoveNext())
+            if (pathPart == null)  // StartStroke
             {
-                x = data.Current;
+                x = y = w = 0;
             }
-
-            if (data.MoveNext())
+            else   // others
             {
-                y = data.Current;
-            }
 
-            if (data.MoveNext())
-            {
-                //Clamp to 0.0 -> 1.0
-                w = Math.Max(0.0f, Math.Min(1.0f, (data.Current - 1.0f) * pFactor));
+                var data = pathPart.Data.GetEnumerator();
+
+                if (data.MoveNext())
+                {
+                    x = data.Current;
+                }
+
+                if (data.MoveNext())
+                {
+                    y = data.Current;
+                }
+
+                if (data.MoveNext())
+                {
+                    //Clamp to 0.0 -> 1.0
+                    w = Math.Max(0.0f, Math.Min(1.0f, (data.Current - 1.0f) * pFactor));
+                }
             }
 
             int num_bytes = sizeof(float);
@@ -484,7 +406,7 @@ namespace WillDevicesSampleApp
         }
 
         //		private void ScanAndConnectPage_Loaded(object sender, RoutedEventArgs e)
-//        public void StartScanAndConnect(object sender, RoutedEventArgs e)
+        //        public void StartScanAndConnect(object sender, RoutedEventArgs e)
         public void StartScanAndConnect()
         {
             AppObjects.Instance.DeviceInfo = null;
@@ -554,7 +476,7 @@ namespace WillDevicesSampleApp
 
             //btnConnect.IsEnabled = false;
 
- //           StopScanning();
+            //           StopScanning();
 
             //SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
 
@@ -581,10 +503,10 @@ namespace WillDevicesSampleApp
             try
             {
                 device = InkDeviceFactory.Instance.CreateDeviceAsync(
-                    m_connectingDeviceInfo, 
-                    AppObjects.Instance.AppId, 
-                    true, 
-                    false, 
+                    m_connectingDeviceInfo,
+                    AppObjects.Instance.AppId,
+                    true,
+                    false,
                     OnDeviceStatusChanged_ScanAndConnect).Result;
 
             }
@@ -650,7 +572,7 @@ namespace WillDevicesSampleApp
             //});
         }
 
-        private void OnDeviceAdded(object sender, InkDeviceInfo info)
+        private async void OnDeviceAdded(object sender, InkDeviceInfo info)
         {
             MessageEvent("OnDeviceAdded: Device is added");
 
@@ -658,7 +580,7 @@ namespace WillDevicesSampleApp
             //{
             m_deviceInfos.Add(info);
 
-            ConnectInkDevice();
+            await ConnectInkDevice();
         }
 
         private void OnDeviceRemoved(object sender, InkDeviceInfo info)

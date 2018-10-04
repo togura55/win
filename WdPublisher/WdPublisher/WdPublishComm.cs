@@ -31,8 +31,6 @@ namespace WillDevicesSampleApp
         {
             CommandResponse = 0;
             PublisherId = 0;
-<<<<<<< HEAD
-=======
         }
 
         private async void MessageEvent(string message)
@@ -41,30 +39,28 @@ namespace WillDevicesSampleApp
             {
                 this.WdPublishCommMessage?.Invoke(this, message);
             });
->>>>>>> 0c9fe15511a6370944ce2f605d5ddb9f8fdc7d04
         }
 
-        public async void Initialize(string HostName, string PortNumber)
+        public async Task Initialize(string host, string port)
         {
-            HostNameString = HostName;
-            PortNumberString = PortNumber;
+            HostNameString = host;
+            PortNumberString = port;
 
             try
             {
                 // establish the command path
                 commandSocketClient = new SocketClient();
 
-                commandSocketClient.CreateListener(HostName, PortNumber);  // create a listner, first
+                commandSocketClient.CreateListener(HostNameString, PortNumberString);  // create a listner, first
 
                 commandSocketClient.SocketClientConnectCompletedNotification += CommandSocketClientConnect_Completed;
                 commandSocketClient.SocketClientReceivedResponse += CommandSocketClient_Response;
-                await commandSocketClient.ConnectHost(HostName, PortNumber);
-
-
+                await commandSocketClient.ConnectHost(HostNameString, PortNumberString);
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("Initialize() Exception: {0}", ex.Message));
+               MessageEvent(string.Format("Initialize() Exception: {0}", ex.Message));
+//               throw new Exception(string.Format("Initialize() Exception: {0}", ex.Message));
             }
         }
 
@@ -88,7 +84,7 @@ namespace WillDevicesSampleApp
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("Close: Exception: {0}", ex.Message));
+                throw new Exception(string.Format("Close() Exception: {0}", ex.Message));
             }
         }
 
@@ -141,7 +137,7 @@ namespace WillDevicesSampleApp
             }
             catch (Exception ex)
             {
-
+                throw new Exception(string.Format("Send() Exception: {0}", ex.Message));
             }
         }
 
@@ -169,14 +165,14 @@ namespace WillDevicesSampleApp
         }
 
         #region Delegate Completion Handlers
-        private void CommandSocketClientConnect_Completed(object sender, bool result)
+        private async void CommandSocketClientConnect_Completed(object sender, bool result)
         {
             MessageEvent("CommandSocketClientConnect_Completed.");
 
             if (result)
             {
                 CommandResponse = CMD_REQUEST_PUBLISHER_CONNECTION;
-                this.Send(CMD_REQUEST_PUBLISHER_CONNECTION);
+                await this.Send(CMD_REQUEST_PUBLISHER_CONNECTION);
             }
             else
             {

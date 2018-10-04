@@ -150,13 +150,6 @@
     <SDKReference Include="WILLInk, Version=2.1">
       <Name>WILL Ink 2.1</Name>
     </SDKReference>
-    <Reference Include="Microsoft.Graphics.Canvas">
-      <HintPath>References\$(Platform)\Microsoft.Graphics.Canvas.winmd</HintPath>
-    </Reference>
-    <Reference Include="Wacom.InkCanvas.UWP, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>References\$(Platform)\Wacom.InkCanvas.UWP.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

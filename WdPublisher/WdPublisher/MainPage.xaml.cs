@@ -26,15 +26,18 @@ namespace WillDevicesSampleApp
         CancellationTokenSource m_cts = new CancellationTokenSource();
 
         static WdPublishComm wdPubComm;
-        string HostNameString;
-        string PortNumberString;
+        string HostNameString = "192.168.0.7";
+        string PortNumberString = "1337";
 
         public MainPage()
         {
             this.InitializeComponent();
 
             wdPubComm = new WdPublishComm();  // single instance
+            wdPubComm.WdPublishCommMessage += ReceivedMessage; // set the message delegate
 
+            AppObjects.Instance.WacomDevice = new WacomDevices();     // stored for using this app 
+            AppObjects.Instance.WacomDevice.WacomDevicesMessage += ReceivedMessage; // set the message delegate
 
             AppObjects.Instance.SocketClient = new SocketClient();
             AppObjects.Instance.SocketClient.SocketClientMessage += ReceivedMessage; // 
@@ -74,6 +77,7 @@ namespace WillDevicesSampleApp
             GetUiState();
             StoreSettings();
 
+            AppObjects.Instance.WacomDevice.WacomDevicesMessage -= ReceivedMessage;
             AppObjects.Instance.SocketClient.SocketClientMessage -= ReceivedMessage;
 
             wdPubComm.Stop();
@@ -86,8 +90,11 @@ namespace WillDevicesSampleApp
             try
             {
                 // Set task completion delegation 
+                AppObjects.Instance.WacomDevice.ScanAndConnectCompletedNotification += ScanAndConnect_Completed;
                 wdPubComm.InitializationCompletedNotification += WdPubCommInitialization_Completed;
+                AppObjects.Instance.WacomDevice.StartRealTimeInkCompletedNotification += StartRealTimeInk_Completed;
 
+                AppObjects.Instance.WacomDevice.StartScanAndConnect();
             }
             catch (Exception ex)
             {
@@ -104,7 +111,7 @@ namespace WillDevicesSampleApp
                 if (AppObjects.Instance.Device != null)
                 {
                     clientListBox.Items.Add("ScanAndConnect_Completed: Go Socket initialization");
-                    wdPubComm.Initialize(HostNameString, PortNumberString);
+                    await wdPubComm.Initialize(HostNameString, PortNumberString);
                 }
                 else
                 {
@@ -113,35 +120,45 @@ namespace WillDevicesSampleApp
             }
             catch (Exception ex)
             {
-                clientListBox.Items.Add(string.Format("ScanAndConnect_Completed: {0}", ex.Message));
+                clientListBox.Items.Add(string.Format("ScanAndConnect_Completed: Exception: {0}", ex.Message));
             }
+
         }
 
         private async void WdPubCommInitialization_Completed(object sender, bool result)
         {
-            if (result)
+            try
             {
-<<<<<<< HEAD
-                clientListBox.Items.Add(" WdPubCommInitialization_Completed: Go to StartRealTimeInk");
-                await wacomDevices.StartRealTimeInk();
-=======
-                clientListBox.Items.Add("WdPubCommInitialization_Completed: Go to StartRealTimeInk.");
-                await AppObjects.Instance.WacomDevice.StartRealTimeInk();
->>>>>>> 0c9fe15511a6370944ce2f605d5ddb9f8fdc7d04
+                if (result)
+                {
+                    clientListBox.Items.Add("WdPubCommInitialization_Completed: Go to StartRealTimeInk.");
+                    await AppObjects.Instance.WacomDevice.StartRealTimeInk();
+                }
+            }
+            catch (Exception ex)
+            {
+                clientListBox.Items.Add(string.Format("WdPubCommInitialization_Completed: Exception: {0}", ex.Message));
             }
         }
 
-        private async void StartRealTimeInk_Completed(object sender, bool result)
+        private void StartRealTimeInk_Completed(object sender, bool result)
         {
-            if (result)  // socket was established
+            try
             {
-                clientListBox.Items.Add("StartRealTimeInk_Completed: All pre-process were done.");
-//                await wacomDevices.StartRealTimeInk();
+                if (result)  // socket was established
+                {
+                    clientListBox.Items.Add("StartRealTimeInk_Completed: All pre-process were done.");
+                }
+                else
+                {
+                    clientListBox.Items.Add("StartRealTime_Completed: got false.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                clientListBox.Items.Add("StartRealTime_Completed: got false.");
+                clientListBox.Items.Add(string.Format("StartRealTimeInk_Completed: Exception: {0}", ex.Message));
             }
+
         }
         #endregion
 
