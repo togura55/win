@@ -121,7 +121,7 @@
     <value>ログ消去</value>
   </data>
   <data name="IDC_HostName" xml:space="preserve">
-    <value>ホストIP: </value>
+    <value>IPアドレス: </value>
   </data>
   <data name="IDC_PortNumber" xml:space="preserve">
     <value>ポート番号:  </value>

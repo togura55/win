@@ -25,7 +25,6 @@ namespace WillDevicesSampleApp
     {
         CancellationTokenSource m_cts = new CancellationTokenSource();
 
-        static WacomDevices wacomDevices;
         static WdPublishComm wdPubComm;
         string HostNameString;
         string PortNumberString;
@@ -36,8 +35,6 @@ namespace WillDevicesSampleApp
 
             wdPubComm = new WdPublishComm();  // single instance
 
-            wacomDevices = new WacomDevices();
-            wacomDevices.WacomDevicesMessage += ReceivedMessage; // set the message delegate
 
             AppObjects.Instance.SocketClient = new SocketClient();
             AppObjects.Instance.SocketClient.SocketClientMessage += ReceivedMessage; // 
@@ -77,7 +74,6 @@ namespace WillDevicesSampleApp
             GetUiState();
             StoreSettings();
 
-            wacomDevices.WacomDevicesMessage -= ReceivedMessage;
             AppObjects.Instance.SocketClient.SocketClientMessage -= ReceivedMessage;
 
             wdPubComm.Stop();
@@ -90,11 +86,8 @@ namespace WillDevicesSampleApp
             try
             {
                 // Set task completion delegation 
-                wacomDevices.ScanAndConnectCompletedNotification += ScanAndConnect_Completed;
                 wdPubComm.InitializationCompletedNotification += WdPubCommInitialization_Completed;
-                wacomDevices.StartRealTimeInkCompletedNotification += StartRealTimeInk_Completed;
 
-                wacomDevices.StartScanAndConnect();
             }
             catch (Exception ex)
             {
@@ -128,8 +121,13 @@ namespace WillDevicesSampleApp
         {
             if (result)
             {
+<<<<<<< HEAD
                 clientListBox.Items.Add(" WdPubCommInitialization_Completed: Go to StartRealTimeInk");
                 await wacomDevices.StartRealTimeInk();
+=======
+                clientListBox.Items.Add("WdPubCommInitialization_Completed: Go to StartRealTimeInk.");
+                await AppObjects.Instance.WacomDevice.StartRealTimeInk();
+>>>>>>> 0c9fe15511a6370944ce2f605d5ddb9f8fdc7d04
             }
         }
 

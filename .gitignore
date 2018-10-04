@@ -243,3 +243,9 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+WdPublisher/WdPublisher/MainPage.xaml.cs
+WdPublisher/WdPublisher/MainPage.xaml.cs
+WdPublisher/WdPublisher/Package.appxmanifest
+WdPublisher/WdPublisher/Package.appxmanifest
+WdPublisher/WdPublisher/Package.appxmanifest
+WdPublisher/WdPublisher/Package.appxmanifest

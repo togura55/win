@@ -24,6 +24,7 @@
   </Applications>
   <Capabilities>
     <Capability Name="internetClient" />
+<<<<<<< HEAD
     <Capability Name="internetClientServer" />
     <Capability Name="privateNetworkClientServer" />
     <DeviceCapability Name="bluetooth.genericAttributeProfile">
