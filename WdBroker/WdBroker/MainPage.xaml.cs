@@ -90,6 +90,7 @@ namespace WdBroker
         private void ReceiveSocketServerMessage(object sender, string message)
         {
             ListBox_Message.Items.Add(message);
+            ListBox_Message.ScrollIntoView(message);    // scroll to bottom
         }
 
         #region UI Control handlers 
