@@ -94,6 +94,7 @@ namespace WillDevicesSampleApp
                 wdPubComm.InitializationCompletedNotification += WdPubCommInitialization_Completed;
                 AppObjects.Instance.WacomDevice.StartRealTimeInkCompletedNotification += StartRealTimeInk_Completed;
 
+                clientListBox.Items.Add("StartScanAndConnect.");
                 AppObjects.Instance.WacomDevice.StartScanAndConnect();
             }
             catch (Exception ex)
