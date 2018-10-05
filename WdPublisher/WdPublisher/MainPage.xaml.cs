@@ -109,14 +109,14 @@ namespace WillDevicesSampleApp
         {
             try
             {
-                if (AppObjects.Instance.Device != null)
+                if (result || AppObjects.Instance.Device != null)
                 {
                     clientListBox.Items.Add("ScanAndConnect_Completed: Go Socket initialization");
                     await wdPubComm.Initialize(HostNameString, PortNumberString);
                 }
                 else
                 {
-                    clientListBox.Items.Add("ScanAndConnect_Completed: Device is null");
+                    clientListBox.Items.Add("ScanAndConnect_Completed: Could not be detected devices.");
                 }
             }
             catch (Exception ex)

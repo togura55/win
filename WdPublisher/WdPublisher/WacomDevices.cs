@@ -88,6 +88,7 @@ namespace WillDevicesSampleApp
             m_watcherUSB.DeviceAdded += OnDeviceAdded;
             m_watcherUSB.DeviceRemoved += OnDeviceRemoved;
             m_watcherUSB.WatcherStopped += OnUsbWatcherStopped;
+            m_watcherUSB.EnumerationCompleted += OnUsbEnumerationCompleted;
 
             //Application.Current.Suspending += OnAppSuspending;
             //Application.Current.Resuming += OnAppResuming;
@@ -570,6 +571,18 @@ namespace WillDevicesSampleApp
             //{
             //	textBlock.Text = AppObjects.GetStringForDeviceStatus(e.Status);
             //});
+        }
+
+        private async void OnUsbEnumerationCompleted(object sender, object e)
+        {
+            if(m_deviceInfos.Count == 0)
+            {
+                MessageEvent("OnUsbEnumerationCompleted: No devices were enumarated.");
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    this.ScanAndConnectCompletedNotification?.Invoke(this, false);
+                });
+            }
         }
 
         private async void OnDeviceAdded(object sender, InkDeviceInfo info)
