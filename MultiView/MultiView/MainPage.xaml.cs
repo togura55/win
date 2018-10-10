@@ -38,7 +38,8 @@ namespace MultiView
             await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 Frame frame = new Frame();
-                frame.Navigate(typeof(SecondaryPage), null);
+//                frame.Navigate(typeof(SecondaryPage), null);
+                frame.Navigate(typeof(CanvasPage), null);
                 Window.Current.Content = frame;
                 // You have to activate the window in order to show it later.
                 Window.Current.Activate();
@@ -47,5 +48,12 @@ namespace MultiView
             });
             bool viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
         }
+
+        // 複数のウィンドウに同じデータを表示するには？
+        // http://www.atmarkit.co.jp/ait/articles/1404/24/news112.html
+
+        // 複数のウィンドウに情報を伝達するには？
+        // http://www.atmarkit.co.jp/ait/articles/1404/17/news072.html
+
     }
 }
