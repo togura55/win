@@ -33,20 +33,28 @@ namespace MultiView
         private async void Pbtn_Exec_Click(object sender, RoutedEventArgs e)
         {
 
-            CoreApplicationView newView = CoreApplication.CreateNewView();
-            int newViewId = 0;
-            await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                Frame frame = new Frame();
-//                frame.Navigate(typeof(SecondaryPage), null);
-                frame.Navigate(typeof(CanvasPage), null);
-                Window.Current.Content = frame;
-                // You have to activate the window in order to show it later.
-                Window.Current.Activate();
+            await App.CurrentApp.ShowSecondaryViewAsync(typeof(SecondaryPage), "2nd Window", "2");
 
-                newViewId = ApplicationView.GetForCurrentView().Id;
-            });
-            bool viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
+
+//            CoreApplicationView newView = CoreApplication.CreateNewView();
+//            int newViewId = 0;
+//            await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+//            {
+//                Frame frame = new Frame();
+////                frame.Navigate(typeof(SecondaryPage), null);
+//                frame.Navigate(typeof(CanvasPage), null);
+//                Window.Current.Content = frame;
+//                // You have to activate the window in order to show it later.
+//                Window.Current.Activate();
+
+//                newViewId = ApplicationView.GetForCurrentView().Id;
+//            });
+//            bool viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
+        }
+
+        private void Pbtn_Data_Click(object sender, RoutedEventArgs e)
+        {
+
         }
 
         // 複数のウィンドウに同じデータを表示するには？

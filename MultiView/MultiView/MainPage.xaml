@@ -9,7 +9,8 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Height="470" Width="899">
 
     <Grid Margin="0,0,9.8,10.2">
-        <Button x:Name="Pbtn_Exec" Content="Button" HorizontalAlignment="Left" Margin="153,110,0,0" VerticalAlignment="Top" Click="Pbtn_Exec_Click"/>
+        <Button x:Name="Pbtn_Exec" Content="Exec" HorizontalAlignment="Left" Margin="153,110,0,0" VerticalAlignment="Top" Click="Pbtn_Exec_Click" Width="83"/>
+        <Button x:Name="Pbtn_Data" Content="Data" HorizontalAlignment="Left" Height="32" Margin="285,110,0,0" VerticalAlignment="Top" Width="87" Click="Pbtn_Data_Click"/>
 
     </Grid>
 </Page>
