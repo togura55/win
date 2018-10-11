@@ -1,0 +1,24 @@
+﻿<Application
+    x:Class="BindSample.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BindSample"
+  >
+
+  <Application.Resources>
+    <x:String x:Key="AppName">WinRT/Metro TIPS #72 (C#)</x:String>
+    <SolidColorBrush x:Key="bwBackground">#00a2e8</SolidColorBrush>
+
+    <!-- TIPS #72: ここに定義したリソースは、ウィンドウごとにインスタンス化される -->
+    <local:Clock x:Key="AppResourceClock" />
+
+    <Style TargetType="TextBlock" x:Key="DisplayTextStyle">
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="VerticalAlignment" Value="Stretch" />
+      <Setter Property="TextAlignment" Value="Center" />
+      <Setter Property="FontFamily" Value="Segoe WP Black" />
+    </Style>
+    
+  </Application.Resources>
+  
+</Application>
