@@ -34,7 +34,16 @@ namespace MultiView
         // App クラスのインスタンス
         public static App CurrentApp { get { return Application.Current as App; } }
 
+//        public delegate void MessageEventHandler(object sender, string message);
+        public delegate void MessageEventHandler(object sender, Publisher pub);
+        public event MessageEventHandler PublisherEventMessage;
 
+//        public void PublisherEvent(object sender, string message)
+        public void PublisherEvent(object sender, Publisher pub)
+        {
+//            App.CurrentApp.PublisherEventMessage?.Invoke(sender, message);
+            App.CurrentApp.PublisherEventMessage?.Invoke(sender, pub);
+        }
 
         // TIPS #72
         // 唯一のインスタンスとして Clock のオブジェクトを保持
@@ -45,7 +54,6 @@ namespace MultiView
         {
             //            _clock = new Clock();
         }
-
 
 
         // MainPage のウィンドウ（アプリビュー）
@@ -71,58 +79,46 @@ namespace MultiView
 
         // SecondaryPage のアプリビューを保持しておくコレクション
         // ここではオブジェクトごと保持しているが、切り替えるだけならSecondaryPageのIdだけを保持しておけばよい
-        private Dictionary<string, Windows.UI.ViewManagement.ApplicationView> _viewDictionary
+        public Dictionary<string, Windows.UI.ViewManagement.ApplicationView> _viewDictionary
           = new Dictionary<string, Windows.UI.ViewManagement.ApplicationView>();
 
-        // SecondaryPage のウィンドウ（アプリビュー）を必要なら作成してから隣に表示する
+        // Publisher object that is unique in this app
+ //       public Dictionary<string, Publisher> pubs = new Dictionary<string, Publisher>();
+        public Dictionary<string, Publisher> Pubs { get; set; }
+
         public async Task ShowSecondaryViewAsync(Type page, string title, string param)
         {
             var viewKey = CreateKeyString(page, param);
             if (!_viewDictionary.ContainsKey(viewKey))
             {
-                // まだ存在しないウィンドウ（アプリビュー）なので、作成する。
-                // それにはまず、新しい CoreApplicationView を作り、そのスレッドで新しい Frame を作って、ApplicationView を取得する
+                // Create a Window (i.e. ApplicationView) because there are not exsisted yet.
+                // First of all, create a CoreApplicationView, and then creating a new Frame in that thread
+                //  and obtain a ApplicationView
 
-                // ------
-                CoreApplicationView newView = CoreApplication.CreateNewView();
-//                int newViewId = 0;
+                CoreApplicationView newView = CoreApplication.CreateNewView(); // generated Window and ApplicationView together
                 ApplicationView newAppView = null;
+                // Run into the CoreapplicationView we created
                 await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
                     Frame frame = new Frame();
-                    //                frame.Navigate(typeof(SecondaryPage), null);
-                    frame.Navigate(page, null);
+                    frame.Navigate(page, param);
                     Window.Current.Content = frame;
+
                     // You have to activate the window in order to show it later.
                     Window.Current.Activate();
+                    newAppView = ApplicationView.GetForCurrentView();  // get the ApplicationView
+                    newAppView.Title = title;
 
-                    newAppView = ApplicationView.GetForCurrentView();
+                    // Set the event handler for closing window by user
+                    newAppView.Consolidated += AppView_Consolidated;
                 });
- //               bool viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
-                // ------
 
-                //// 1. 新しい CoreApplicationView を作る (WindowとApplicationViewが一緒に生成される)
-                //var coreApplicationView = CoreApplication.CreateNewView();
-
-                //ApplicationView newAppView = null;
-                //await coreApplicationView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                //{
-                //            // 注意：2a.／2b.は、生成されたCoreApplicationViewのスレッドで行う必要がある
-
-                //            // 2a. 生成されたApplicationViewを取得する
-                //            newAppView = ApplicationView.GetForCurrentView();
-
-                //            // 2b. 生成されたWindowに画面をセットする
-                //            SetContent(newAppView, page, title, param);
-                // });
-
-                // 2c. 生成されたApplicationViewをメモリに保持しておく（後でウィンドウを切り替えたりするのに必要）
+                // Store the ApplicationView in the list (for the purpose of using swit window, etc.) 
                 _viewDictionary[viewKey] = newAppView;
             }
 
-            // 3. viewKey で特定されるウィンドウ（アプリビュー）を隣に表示する
+            // Display window which is specified by viewKey
             bool success = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(_viewDictionary[viewKey].Id);
-
             if (success)
             {
                 // イベントで情報を伝達
@@ -132,7 +128,7 @@ namespace MultiView
         }
 
         // Dictionary に格納するときのキー文字列を生成する
-        private string CreateKeyString(Type page, string param)
+        public string CreateKeyString(Type page, string param)
         {
             return page.Name + "-" + param;
         }

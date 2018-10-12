@@ -10,9 +10,9 @@ namespace MultiView
     {
         public class DeviceRawData
         {
-            float x;
-            float y;
-            float z;
+            public float x;
+            public float y;
+            public float z;
 
             public DeviceRawData(float x = 0, float y = 0, float z = 0)
             {
@@ -35,10 +35,14 @@ namespace MultiView
         public float Barcode;
         public List<Stroke> Strokes;
 
+        public Windows.UI.ViewManagement.ApplicationView AppView; // Subscriber
+
         public Publisher()
         {
             Strokes = new List<Stroke>();
         }
+
+
     }
 
 }

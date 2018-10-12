@@ -60,12 +60,19 @@ namespace BindSample
       App.CurrentApp.MessageEvent += App_MessageEvent;
 
 
-      // TIPS #72
-      // App クラスがスタティックに保持している Clock オブジェクトをバインドしてみる
-      //this.ClockText.DataContext = App.TheClock;
-      // MainPage だけでやるなら OK だが、これを SecondaryPage でも行うと例外が発生する!
-      // 型 'System.ComponentModel.PropertyChangedEventHandler' の COM オブジェクトをクラス型 'System.ComponentModel.PropertyChangedEventHandler' にキャストできません。COM コンポーネントを表す型のインターフェイスを COM コンポーネントを表さない型にキャストすることはできません。ただし、基になる COM コンポーネントがインターフェイスの IID の QueryInterface 呼び出しをサポートする場合は、インターフェイスにキャストすることができます。
-      // エラーメッセージ↑を見ただけでは何のことだか分からないが、これはバインディングソースの PropertyChanged イベントが MainPage の UI スレッドで発火し、バインディングによって SecondaryPage (MainPage とは異なる UI スレッドで動いている) のテキストを書き換えようとしたために発生した例外である。
+    // TIPS #72
+    // App クラスがスタティックに保持している Clock オブジェクトをバインドしてみる
+    //this.ClockText.DataContext = App.TheClock;
+    // MainPage だけでやるなら OK だが、これを SecondaryPage でも行うと例外が発生する!
+    // 型 'System.ComponentModel.PropertyChangedEventHandler' の COM オブジェクトをクラス型 
+    // 'System.ComponentModel.PropertyChangedEventHandler' にキャストできません。
+    // COM コンポーネントを表す型のインターフェイスを COM コンポーネントを表さない型に
+    // キャストすることはできません。ただし、基になる COM コンポーネントがインターフェイスの
+    // IID の QueryInterface 呼び出しをサポートする場合は、インターフェイスにキャストすることができます。
+    // エラーメッセージ↑を見ただけでは何のことだか分からないが、これはバインディングソースの 
+    // PropertyChanged イベントが MainPage の UI スレッドで発火し、バインディングによって 
+    // SecondaryPage (MainPage とは異なる UI スレッドで動いている) のテキストを書き換えようと
+    // したために発生した例外である。
 
       // そこで、それぞれの画面の UI スレッドで PropertyChanged イベントを発火するようなプロキシクラスを介すようにする
       this.ClockText.DataContext = new ClockProxy(App.TheClock);
@@ -131,8 +138,6 @@ namespace BindSample
       }
       catch { }
     }
-
-
 
     /// <summary>
     /// アプリケーションが中断される場合、またはページがナビゲーション キャッシュから破棄される場合、

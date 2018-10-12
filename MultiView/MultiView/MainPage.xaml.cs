@@ -25,37 +25,54 @@ namespace MultiView
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        int window_count;
+
         public MainPage()
         {
             this.InitializeComponent();
+            window_count = 0;
         }
 
         private async void Pbtn_Exec_Click(object sender, RoutedEventArgs e)
         {
+            // Suppose a publisher connection was made....
 
-            await App.CurrentApp.ShowSecondaryViewAsync(typeof(SecondaryPage), "2nd Window", "2");
 
-
-//            CoreApplicationView newView = CoreApplication.CreateNewView();
-//            int newViewId = 0;
-//            await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-//            {
-//                Frame frame = new Frame();
-////                frame.Navigate(typeof(SecondaryPage), null);
-//                frame.Navigate(typeof(CanvasPage), null);
-//                Window.Current.Content = frame;
-//                // You have to activate the window in order to show it later.
-//                Window.Current.Activate();
-
-//                newViewId = ApplicationView.GetForCurrentView().Id;
-//            });
-//            bool viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
+            await App.CurrentApp.ShowSecondaryViewAsync(typeof(CanvasPage), "2nd Window", window_count.ToString());
+            window_count++;
         }
 
         private void Pbtn_Data_Click(object sender, RoutedEventArgs e)
         {
+            int count = App.CurrentApp._viewDictionary.Count;
+//            Windows.UI.ViewManagement.ApplicationView appView = App.CurrentApp._viewDictionary["2nd Window" + "-" + "2"];
 
+            for (int i=0; i<count; i++)
+            {
+
+                Publisher pub = new Publisher();
+                pub.Id = 0;
+                pub.Strokes = new List<Publisher.Stroke>();
+                pub.Strokes.Add(new Publisher.Stroke());
+                pub.Strokes[pub.Strokes.Count - 1].DeviceRawDataList = new List<Publisher.DeviceRawData>();
+                pub.Strokes[pub.Strokes.Count - 1].DeviceRawDataList.Add(new Publisher.DeviceRawData(100*(i+1),100*(i+1),0));
+
+                MessageEvent("Data comes from Publisher", pub);
+            }
         }
+
+        private async void MessageEvent(string message, Publisher pub)
+        {
+ //           string key = App.CurrentApp.CreateKeyString(typeof(CanvasPage), id.ToString());
+
+            // ↓誰に対して?
+//            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+//            {
+                App.CurrentApp.PublisherEvent(this, pub);
+
+//            });
+        }
+
 
         // 複数のウィンドウに同じデータを表示するには？
         // http://www.atmarkit.co.jp/ait/articles/1404/24/news112.html

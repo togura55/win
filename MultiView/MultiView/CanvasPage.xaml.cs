@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -23,16 +25,21 @@ namespace MultiView
     /// </summary>
     public sealed partial class CanvasPage : Page
     {
+        private CoreDispatcher currentDispatcher;
+
         public CanvasPage()
         {
             this.InitializeComponent();
 
             Loaded += CanvasPage_Loaded;
 
+            App.CurrentApp.PublisherEventMessage += PublisherMessage; // インスタンス作成時にメッセージ受け先を登録しておく。
         }
 
         private void CanvasPage_Loaded(object sender, RoutedEventArgs e)
         {
+            currentDispatcher = Window.Current.Dispatcher;
+
             float x = 500;
             float y = 200;
 
@@ -43,6 +50,39 @@ namespace MultiView
             ellipse.Margin = new Thickness(x, y, 0, 0);
 
             canvas.Children.Add(ellipse);
+        }
+
+        //       private void PublisherMessage(object sender, string message)
+        private async void PublisherMessage(object sender, Publisher pub)
+        {
+            //            string msg = message;
+            // do something
+            Publisher p = pub;
+            float x = pub.Strokes[0].DeviceRawDataList[0].x;
+            float y = pub.Strokes[0].DeviceRawDataList[0].y;
+
+            var ellipse = new Ellipse();
+            ellipse.Fill = new SolidColorBrush(Windows.UI.Colors.Red);
+            ellipse.Width = 10;
+            ellipse.Height = 10;
+            ellipse.Margin = new Thickness(x, y, 0, 0);
+
+            //await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            //{
+            //    canvas.Children.Add(ellipse);
+
+            //});
+
+            try
+            {
+                await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    canvas.Children.Add(ellipse);
+                });
+            }
+            catch (Exception ex)
+            {
+            }
         }
     }
 }
