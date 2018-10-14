@@ -77,7 +77,7 @@ namespace MultiView
             {
                 await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
-                    canvas.Children.Add(ellipse);
+                    this.canvas.Children.Add(ellipse);
                 });
             }
             catch (Exception ex)

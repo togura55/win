@@ -61,7 +61,7 @@ namespace MultiView
             }
         }
 
-        private async void MessageEvent(string message, Publisher pub)
+        private void MessageEvent(string message, Publisher pub)
         {
  //           string key = App.CurrentApp.CreateKeyString(typeof(CanvasPage), id.ToString());
 
