@@ -22,6 +22,9 @@ namespace WdBroker
     /// </summary>
     sealed partial class App : Application
     {
+        // List of Publisher object to be managed in this app
+        public static List<Publisher> pubs;
+
         /// <summary>
         /// 単一アプリケーション オブジェクトを初期化します。これは、実行される作成したコードの
         ///最初の行であるため、main() または WinMain() と論理的に等価です。

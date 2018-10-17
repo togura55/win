@@ -29,17 +29,17 @@ namespace WdBroker
 
         private const float CMD_REQUESTPUBLISHERCONNECT = 1;
 
-        List<Publisher> pubs = new List<Publisher>();
-
         public HostName ServerHostName;
         private StreamSocketListener streamSocketListenerData = null;
         private StreamSocketListener streamSocketListenerCommand = null;
         public delegate void MessageEventHandler(object sender, string message);
+        public delegate void ConnectPublisherEventHandler(object sender, int index); // for drawing
         public delegate void DrawingEventHandler(object sender, DeviceRawData data, int index); // for drawing
         public List<HostName> HostNames = new List<HostName>();
 
         // Properties
         public event MessageEventHandler SocketServerMessage;
+        public event ConnectPublisherEventHandler SocketServerConnectPublisher; // for drawing
         public event DrawingEventHandler SocketServerDrawing; // for drawing
 
         public SocketServer()
@@ -48,6 +48,7 @@ namespace WdBroker
 
             RetrieveHostNames();
 
+            App.pubs = new List<Publisher>();
         }
 
         private async void MessageEvent(string message)
@@ -55,6 +56,15 @@ namespace WdBroker
             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 this.SocketServerMessage?.Invoke(this, message);
+            });
+        }
+
+        // for drawing
+        private async void ConnectPublisherEvent(int index)
+        {
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                this.SocketServerConnectPublisher?.Invoke(this, index);
             });
         }
 
@@ -183,14 +193,14 @@ namespace WdBroker
 
                                         // Do the publisher 1st contact process
                                         // 1. Create a new instance
-                                        pubs.Add(new Publisher());
+                                        App.pubs.Add(new Publisher());
 
                                         // 2. Generate Publisher Id, smallest number of pubs
                                         float id = 1; // set the base id number
                                         float id_new = id;
-                                        for (int j = 0; j < pubs.Count; j++)
+                                        for (int j = 0; j < App.pubs.Count; j++)
                                         {
-                                            if (pubs[j].Id != id)
+                                            if (App.pubs[j].Id != id)
                                             {
                                                 // ToDo: find if id is already stored into another pubs[].Id
                                                 id_new = id;
@@ -198,7 +208,7 @@ namespace WdBroker
                                             }
                                             id++;
                                         }
-                                        pubs[pubs.Count - 1].Id = id_new;
+                                        App.pubs[App.pubs.Count - 1].Id = id_new;
 
                                         // 3. Respond to the publisher
                                         // Echo the request back as the response.
@@ -294,7 +304,7 @@ namespace WdBroker
                                 uint pub_id = ((uint)f & MASK_ID);
                                 uint path_order = ((uint)f & MASK_STROKE) >> 8;
 
-                                if (!pubs.Exists(pubs => pubs.Id == pub_id))
+                                if (!App.pubs.Exists(pubs => pubs.Id == pub_id))
                                 {
                                     // Error
                                     throw new Exception(string.Format("StreamSocketListener_DataReceived(): Exception: A publisher includes unknown Publisher ID: {0}",
@@ -303,24 +313,24 @@ namespace WdBroker
                                 else  // Publisher existed
                                 {
                                     // Search by Id, add data list and store raw data
-                                    int pi = pubs.FindIndex(n => n.Id == pub_id);
+                                    int pi = App.pubs.FindIndex(n => n.Id == pub_id);
 
                                     DeviceRawData drd = new DeviceRawData(f, x, y, z);
                                     if (path_order == 1)  // begin storoke?
                                     {
                                         Stroke stroke = new Stroke();
                                         stroke.DeviceRawDataList = new List<DeviceRawData>();
-                                        pubs[pi].Strokes.Add(stroke);
+                                        App.pubs[pi].Strokes.Add(stroke);
                                     }
                                     else if (path_order == 2)  // end stroke?
                                     {
-                                        int s = pubs[pi].Strokes.Count - 1;
-                                        pubs[pi].Strokes[s].DeviceRawDataList.Add(drd);
+                                        int s = App.pubs[pi].Strokes.Count - 1;
+                                        App.pubs[pi].Strokes[s].DeviceRawDataList.Add(drd);
                                     }
                                     else  // intermediate
                                     {
-                                        int s = pubs[pi].Strokes.Count - 1;
-                                        pubs[pi].Strokes[s].DeviceRawDataList.Add(drd);
+                                        int s = App.pubs[pi].Strokes.Count - 1;
+                                        App.pubs[pi].Strokes[s].DeviceRawDataList.Add(drd);
                                     }
                                     DrawingEvent(drd, pi);  // for drawing
                                 }

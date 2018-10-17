@@ -49,6 +49,7 @@ namespace WdBroker
 
             socketServer = new SocketServer();
             socketServer.SocketServerMessage += ReceiveSocketServerMessage;
+            socketServer.SocketServerConnectPublisher += ReceiveSocketServerConnectPublisher;  // for drawing
             socketServer.SocketServerDrawing += ReceiveSocketServerDrawing;  // for drawing
 
             RestoreSettings();
@@ -82,8 +83,6 @@ namespace WdBroker
 
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
 
-            PrevRawData = new RawData();    // for drawing
-            SetCanvasScaling();             // for drawing
         }
 
         private void GetUiState()
@@ -122,7 +121,7 @@ namespace WdBroker
                 fStart = fStart ? false : true;   // toggle if success
                 Pbtn_Start.Content = resourceLoader.GetString(fStart ? "IDC_Start" : "IDC_Stop");
 
-                SetCanvasScaling(); // ToDo: とりあえずココに置く。
+
             }
             catch (Exception ex)
             {
@@ -133,6 +132,8 @@ namespace WdBroker
         private void Pbtn_Clearlog_Click(object sender, RoutedEventArgs e)
         {
             ListBox_Message.Items.Clear();
+ //           Canvas_Strokes.Children.Remove(ellipse);
+ //           Canvas_Strokes.Children.Remove(line1);
         }
 
         // App exit procedure
@@ -144,10 +145,15 @@ namespace WdBroker
 
             socketServer.SocketServerMessage -= ReceiveSocketServerMessage;
         }
-        #endregion
 
-        #region Store/Restore the local data
-        private void StoreSettings()
+        private void ReceiveSocketServerConnectPublisher(object sender, int index)
+        {
+            SetCanvasScaling(index);
+        }
+            #endregion
+
+            #region Store/Restore the local data
+            private void StoreSettings()
         {
             ApplicationDataContainer container = ApplicationData.Current.LocalSettings;
             container.Values["PortNumberString"] = PortNumberString;
@@ -165,25 +171,6 @@ namespace WdBroker
         #endregion
 
         #region Drawing
-        bool startFlag = false;
-        RawData PrevRawData;
-
-        class RawData
-        {
-            public float f;
-            public float x;
-            public float y;
-            public float index;
-
-            public RawData(float f = 0, float x = 0, float y = 0, float index = 0)
-            {
-                this.f = f;
-                this.x = x;
-                this.y = y;
-                this.index = index;
-            }
-        }
-
         // Raw data event handler sent by SocketServer object
         private void ReceiveSocketServerDrawing(object sender, DeviceRawData data, int index)
         {
@@ -193,15 +180,15 @@ namespace WdBroker
 
         private void DrawStroke(float f, float x, float y, int index)
         {
+            Publisher pub = App.pubs[index];
+
             if (f == 1)
             {
                 // start point, nothing to do
-                PrevRawData.f = f;
-                PrevRawData.x = x;
-                PrevRawData.y = y;
-                PrevRawData.index = index;
-
-                startFlag = true;
+                pub.PrevRawData.f = f;
+                pub.PrevRawData.x = x;
+                pub.PrevRawData.y = y;
+                pub.Start = true;
             }
             else
             {
@@ -214,48 +201,43 @@ namespace WdBroker
 
                 this.Canvas_Strokes.Children.Add(ellipse);
 
-                if (!startFlag)
+                if (!pub.Start)
                 {
                     //Draw line
                     var line1 = new Line();
                     SolidColorBrush brush = new SolidColorBrush(UIColors[index]);
                     line1.Stroke = brush;
-                    line1.X1 = (PrevRawData.x * m_scale) + ellipse.Width / 2;
+                    line1.X1 = (pub.PrevRawData.x * m_scale) + ellipse.Width / 2;
                     line1.X2 = (x * m_scale) + ellipse.Width / 2;
-                    line1.Y1 = (PrevRawData.y * m_scale) + ellipse.Height / 2;
+                    line1.Y1 = (pub.PrevRawData.y * m_scale) + ellipse.Height / 2;
                     line1.Y2 = (y * m_scale) + ellipse.Height / 2;
                     line1.StrokeThickness = 1;
                     this.Canvas_Strokes.Children.Add(line1);
                 }
 
-                PrevRawData.f = f;
-                PrevRawData.x = x;
-                PrevRawData.y = y;
-                PrevRawData.index = index;
-
-                startFlag = false;
+                pub.PrevRawData.f = f;
+                pub.PrevRawData.x = x;
+                pub.PrevRawData.y = y;
+                pub.Start = false;
             }
         }
 
         private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            SetCanvasScaling();
+//            SetCanvasScaling();
         }
 
         private double m_scale = 1.0;
         private Size m_deviceSize;
  //       Canvas_Strokes.DataContext = this;
-        private void SetCanvasScaling()
+        private void SetCanvasScaling(int index)
         {
-            //            IDigitalInkDevice device = AppObjects.Instance.Device;
+            Publisher pub = App.pubs[index];
 
-            m_deviceSize.Height = 29700;    // ToDo: get from Publishers
-            m_deviceSize.Width = 21600;
-
-//            if (device != null)
+            if (pub != null)
             {
-                double sx = Canvas_Strokes.ActualWidth / m_deviceSize.Width;
-                double sy = Canvas_Strokes.ActualHeight / m_deviceSize.Height;
+                double sx = Canvas_Strokes.ActualWidth / pub.DeviceSize.Width;
+                double sy = Canvas_Strokes.ActualHeight / pub.DeviceSize.Height;
                 m_scale = Math.Min(sx, sy);
             }
         }

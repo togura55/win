@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Windows.Foundation;
+
 namespace WdBroker
 {
     public class DeviceRawData
@@ -34,12 +36,19 @@ namespace WdBroker
         public string PortNumber;
         public string DeviceType;
         public string DeviceName;
+        public Size DeviceSize;
         public float Barcode;
         public List<Stroke> Strokes;
+        public DeviceRawData PrevRawData;
+        public bool Start;
 
         public Publisher()
         {
-            Strokes = new List<Stroke>();
+            this.Strokes = new List<Stroke>();
+            this.Start = true;
+
+            this.DeviceSize.Height = 29700;    // ToDo: get from Publishers
+            this.DeviceSize.Width = 21600;
         }
     }
 
