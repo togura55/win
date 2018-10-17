@@ -29,4 +29,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("1.1.0.4")]
 [assembly: ComVisible(false)]
 [assembly: NeutralResourcesLanguage("en-US")]
+//[assembly: AssemblyTitleAttribute("WdBroker")]
+//[assembly: AssemblyDescriptionAttribute("WdBroker")]
+//[assembly: AssemblyCompanyAttribute("WACOM, Co., Ltd.")]
+//[assembly: AssemblyVersionAttribute("1.1.4")]
+//[assembly: AssemblyFileVersionAttribute("1.1.4")]
+//[assembly: NeutralResourcesLanguageAttribute("en-US")]
 

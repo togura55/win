@@ -8,12 +8,14 @@ namespace WdBroker
 {
     public class DeviceRawData
     {
-        float x;
-        float y;
-        float z;
+        public float f;
+        public float x;
+        public float y;
+        public float z;
 
-        public DeviceRawData(float x = 0, float y = 0, float z = 0)
+        public DeviceRawData(float f = 0, float x = 0, float y = 0, float z = 0)
         {
+            this.f = f;
             this.x = x;
             this.y = y;
             this.z = z;

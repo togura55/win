@@ -14,3 +14,5 @@ xxx
 * Tsuyoshi Ogura (togura55@gmail.com)  
 ## ToDo/Known Issues
 * Implement registering Subscribers     
+## History
+* 1.0 - 1st release  

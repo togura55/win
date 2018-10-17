@@ -11,6 +11,9 @@ using Windows.Networking.Connectivity;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.UI.Xaml.Shapes;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml;
 
 namespace WdBroker
 {
@@ -32,16 +35,19 @@ namespace WdBroker
         private StreamSocketListener streamSocketListenerData = null;
         private StreamSocketListener streamSocketListenerCommand = null;
         public delegate void MessageEventHandler(object sender, string message);
+        public delegate void DrawingEventHandler(object sender, DeviceRawData data, int index); // for drawing
         public List<HostName> HostNames = new List<HostName>();
 
         // Properties
         public event MessageEventHandler SocketServerMessage;
+        public event DrawingEventHandler SocketServerDrawing; // for drawing
 
         public SocketServer()
         {
             ServerHostName = NetworkInformation.GetHostNames().Where(q => q.Type == HostNameType.Ipv4).First();
 
             RetrieveHostNames();
+
         }
 
         private async void MessageEvent(string message)
@@ -49,6 +55,15 @@ namespace WdBroker
             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 this.SocketServerMessage?.Invoke(this, message);
+            });
+        }
+
+        // for drawing
+        private async void DrawingEvent(DeviceRawData data, int index)
+        {
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                this.SocketServerDrawing?.Invoke(this, data, index);
             });
         }
 
@@ -263,7 +278,7 @@ namespace WdBroker
                                     label = "z"; z = data; break;
                             }
 
-                            string output = "StreamSocketListener_DataReceived(): server received data [{0}]:[{1}]:[{2}] {3}=";
+                            string output = "DataReceived(): Received data [{0}]:[{1}]:[{2}] {3}=";
                             if (label == "f")
                                 //                                output += "\"0x{3:X4}\"";
                                 output += "\"{4}\"";
@@ -271,7 +286,7 @@ namespace WdBroker
                                 output += "\"{4:0.######}\"";
                             else
                                 output += "\"{4}\"";
-                            MessageEvent(string.Format(output, index, ((uint)f & MASK_ID), ((uint)f & MASK_STROKE)>>8, label, data));
+                            MessageEvent(string.Format(output, index, ((uint)f & MASK_ID), ((uint)f & MASK_STROKE) >> 8, label, data));
 
                             // --------------------------
                             if (label == "z")  // all together
@@ -290,6 +305,7 @@ namespace WdBroker
                                     // Search by Id, add data list and store raw data
                                     int pi = pubs.FindIndex(n => n.Id == pub_id);
 
+                                    DeviceRawData drd = new DeviceRawData(f, x, y, z);
                                     if (path_order == 1)  // begin storoke?
                                     {
                                         Stroke stroke = new Stroke();
@@ -299,15 +315,14 @@ namespace WdBroker
                                     else if (path_order == 2)  // end stroke?
                                     {
                                         int s = pubs[pi].Strokes.Count - 1;
-                                        DeviceRawData drd = new DeviceRawData(x, y, z);
                                         pubs[pi].Strokes[s].DeviceRawDataList.Add(drd);
                                     }
                                     else  // intermediate
                                     {
                                         int s = pubs[pi].Strokes.Count - 1;
-                                        DeviceRawData drd = new DeviceRawData(x, y, z);
                                         pubs[pi].Strokes[s].DeviceRawDataList.Add(drd);
                                     }
+                                    DrawingEvent(drd, pi);  // for drawing
                                 }
                             }
 
@@ -328,158 +343,5 @@ namespace WdBroker
             }
         }
 
-        //private async void StreamSocketListener_ConnectionDataReceived(StreamSocketListener sender,
-        //    StreamSocketListenerConnectionReceivedEventArgs args)
-        //{
-        //    const int num_bytes = sizeof(float);    // assuming float type of data
-
-        //    try
-        //    {
-        //        using (var dataReader = new DataReader(args.Socket.InputStream))
-        //        {
-        //            int index = 0;
-        //            int count = 0;
-        //            float f = 0, x = 0, y = 0, z = 0;
-        //            string label = string.Empty;
-        //            dataReader.InputStreamOptions = InputStreamOptions.Partial;
-        //            while (true)
-        //            {
-        //                await dataReader.LoadAsync(256);
-        //                if (dataReader.UnconsumedBufferLength == 0) break;
-        //                IBuffer requestBuffer = dataReader.ReadBuffer(dataReader.UnconsumedBufferLength);
-        //                Byte[] databyte = requestBuffer.ToArray();  //ReadBytes
-
-        //                // It's depend on each packets how many bytes are included.. 
-        //                for (int i = 0; i < databyte.Length / num_bytes; i++)
-        //                {
-        //                    float data = BitConverter.ToSingle(databyte, i * num_bytes);
-
-        //                    if ((count % 4) == 0)
-        //                    {
-        //                        count = 0;
-        //                        f = x = y = z = 0;
-        //                    }
-
-        //                    switch (count)
-        //                    {
-        //                        case 0:
-        //                            label = "f"; f = data; break;
-        //                        case 1:
-        //                            label = "x"; x = data; break;
-        //                        case 2:
-        //                            label = "y"; y = data; break;
-        //                        case 3:
-        //                            label = "z"; z = data; break;
-        //                    }
-        //                    string output = "StreamSocketListener_ConnectionDataReceived(): server received the request[{0}]: {1}=";
-        //                    if (label == "z")
-        //                        output += "\"{2:0.######}\"";
-        //                    else
-        //                        output += "\"{2}\"";
-        //                    MessageEvent(string.Format(output, index, label, data));
-
-        //                    // --------------------------
-        //                    if (label == "f")
-        //                    {
-        //                        // command packet?
-        //                        float command = ((uint)f & MASK_COMMAND) >> 12;
-        //                        if (command != 0)
-        //                        {
-        //                            switch (command)
-        //                            {
-        //                                case CMD_REQUESTPUBLISHERCONNECT:
-        //                                    MessageEvent("Request Publisher Connect command is received.");
-
-        //                                    // Do the publisher 1st contact process
-        //                                    // 1. Create a new instance
-        //                                    pubs.Add(new Publisher());
-
-        //                                    // 2. Generate Publisher Id, smallest number of pubs
-        //                                    float id = 1; // set the base id number
-        //                                    float id_new = id;
-        //                                    for (int j = 0; j < pubs.Count; j++)
-        //                                    {
-        //                                        if (pubs[j].Id != id)
-        //                                        {
-        //                                            // ToDo: find if id is already stored into another pubs[].Id
-        //                                            id_new = id;
-        //                                            break;
-        //                                        }
-        //                                        id++;
-        //                                    }
-        //                                    pubs[pubs.Count - 1].Id = id_new;
-
-        //                                    // 3. Respond to the publisher
-        //                                    // Echo the request back as the response.
-        //                                    using (Stream outputStream = args.Socket.OutputStream.AsStreamForWrite())
-        //                                    {
-        //                                        using (var binaryWriter = new BinaryWriter(outputStream))
-        //                                        {
-        //                                            int num = sizeof(float);
-        //                                            byte[] ByteArray = new byte[num_bytes * 1];
-        //                                            int offset = 0;
-        //                                            Array.Copy(BitConverter.GetBytes(id_new), 0, ByteArray, offset, num);
-        //                                            binaryWriter.Write(ByteArray);
-        //                                            binaryWriter.Flush();
-        //                                            MessageEvent(string.Format("Assign and send Publisher ID: {0}", id_new.ToString()));
-        //                                        }
-        //                                    }
-        //                                    break;
-
-        //                                default:
-        //                                    break;
-        //                            }
-        //                        }
-        //                    }
-
-        //                    // --------------------------
-        //                    if (label == "z")  // all together
-        //                    {
-        //                        uint pub_id = ((uint)f & MASK_ID);
-        //                        uint path_order = ((uint)f & MASK_STROKE) >> 8;
-
-        //                        if (!pubs.Exists(pubs => pubs.Id == pub_id))
-        //                        {
-        //                            // Error
-        //                            throw new Exception(string.Format("StreamSocketListener_ConnectionDataReceived(): Exception: A publisher includes unknown Publisher ID: {0}",
-        //                                pub_id.ToString()));
-        //                        }
-        //                        else  // Publisher existed
-        //                        {
-        //                            // Search by Id, add data list and store raw data
-        //                            int pi = pubs.FindIndex(n => n.Id == pub_id);
-
-        //                            if (path_order == 1)  // begin storoke?
-        //                            {
-        //                                pubs[pi].Strokes.Add(new Stroke());
-        //                            }
-        //                            else if (path_order == 2)  // end stroke?
-        //                            {
-
-        //                            }
-        //                            else  // intermediate
-        //                            {
-        //                                int s = pubs[pi].Strokes.Count;
-        //                                pubs[pi].Strokes[s].DeviceRawDataList.Add(new DeviceRawData(x, y, z));
-        //                            }
-        //                        }
-        //                    }
-
-        //                    index++;
-        //                    count++;
-        //                }
-
-        //                //                        if (index == 5) break;  // for debug
-
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-        //        throw new Exception(string.Format("StreamSocketListener_ConnectionDataReceived(): Exception: {0}",
-        //            webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
-        //    }
-        //}
     }
 }
