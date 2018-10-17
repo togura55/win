@@ -82,7 +82,7 @@ namespace WdBroker
 
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
 
-            PrevRawDara = new RawData();    // for drawing
+            PrevRawData = new RawData();    // for drawing
             SetCanvasScaling();             // for drawing
         }
 
@@ -166,7 +166,7 @@ namespace WdBroker
 
         #region Drawing
         bool startFlag = false;
-        RawData PrevRawDara;
+        RawData PrevRawData;
 
         class RawData
         {
@@ -196,10 +196,10 @@ namespace WdBroker
             if (f == 1)
             {
                 // start point, nothing to do
-                PrevRawDara.f = f;
-                PrevRawDara.x = x;
-                PrevRawDara.y = y;
-                PrevRawDara.index = index;
+                PrevRawData.f = f;
+                PrevRawData.x = x;
+                PrevRawData.y = y;
+                PrevRawData.index = index;
 
                 startFlag = true;
             }
@@ -210,7 +210,7 @@ namespace WdBroker
                 ellipse.Fill = new SolidColorBrush(UIColors[index]);
                 ellipse.Width = 4;
                 ellipse.Height = 4;
-                ellipse.Margin = new Thickness(x, y, 0, 0);
+                ellipse.Margin = new Thickness((x * m_scale), (y * m_scale), 0, 0);
 
                 this.Canvas_Strokes.Children.Add(ellipse);
 
@@ -220,18 +220,18 @@ namespace WdBroker
                     var line1 = new Line();
                     SolidColorBrush brush = new SolidColorBrush(UIColors[index]);
                     line1.Stroke = brush;
-                    line1.X1 = PrevRawDara.x + ellipse.Width / 2;
-                    line1.X2 = x + ellipse.Width / 2;
-                    line1.Y1 = PrevRawDara.y + ellipse.Height / 2;
-                    line1.Y2 = y + ellipse.Height / 2;
+                    line1.X1 = (PrevRawData.x * m_scale) + ellipse.Width / 2;
+                    line1.X2 = (x * m_scale) + ellipse.Width / 2;
+                    line1.Y1 = (PrevRawData.y * m_scale) + ellipse.Height / 2;
+                    line1.Y2 = (y * m_scale) + ellipse.Height / 2;
                     line1.StrokeThickness = 1;
                     this.Canvas_Strokes.Children.Add(line1);
                 }
 
-                PrevRawDara.f = f;
-                PrevRawDara.x = x;
-                PrevRawDara.y = y;
-                PrevRawDara.index = index;
+                PrevRawData.f = f;
+                PrevRawData.x = x;
+                PrevRawData.y = y;
+                PrevRawData.index = index;
 
                 startFlag = false;
             }
