@@ -33,8 +33,6 @@ namespace BtClient
         public MainPage()
         {
             this.InitializeComponent();
-
-            Initialize();
         }
 
         Windows.Devices.Bluetooth.Rfcomm.RfcommDeviceService _service;
@@ -42,37 +40,48 @@ namespace BtClient
 
         async void Initialize()
         {
-            // Enumerate devices with the object push service
-            var services =
-                await Windows.Devices.Enumeration.DeviceInformation.FindAllAsync(
-                    RfcommDeviceService.GetDeviceSelector(
-                        RfcommServiceId.ObexObjectPush));
-
-            if (services.Count > 0)
+            try
             {
-                // Initialize the target Bluetooth BR device
-                var service = await RfcommDeviceService.FromIdAsync(services[0].Id);
+                // Enumerate devices with the object push service
+                var services =
+                    await Windows.Devices.Enumeration.DeviceInformation.FindAllAsync(
+                        RfcommDeviceService.GetDeviceSelector(
+                            RfcommServiceId.ObexObjectPush));
 
-                // Check that the service meets this App's minimum requirement
-                if (SupportsProtection(service) && await IsCompatibleVersionAsync(service))
+                if (services.Count > 0)
                 {
-                    _service = service;
+                    // Initialize the target Bluetooth BR device
+                    var service = await RfcommDeviceService.FromIdAsync(services[0].Id);
 
-                    // Create a socket and connect to the target
-                    _socket = new StreamSocket();
-                    await _socket.ConnectAsync(
-                        _service.ConnectionHostName,
-                        _service.ConnectionServiceName,
-                        SocketProtectionLevel
-                            .BluetoothEncryptionAllowNullAuthentication);
+                    // Check that the service meets this App's minimum requirement
+                    if (SupportsProtection(service) && await IsCompatibleVersionAsync(service))
+                    {
+                        _service = service;
 
-                    // The socket is connected. At this point the App can wait for
-                    // the user to take some action, e.g. click a button to send a
-                    // file to the device, which could invoke the Picker and then
-                    // send the picked file. The transfer itself would use the
-                    // Sockets API and not the Rfcomm API, and so is omitted here for
-                    // brevity.
+                        // Create a socket and connect to the target
+                        _socket = new StreamSocket();
+                        await _socket.ConnectAsync(
+                            _service.ConnectionHostName,
+                            _service.ConnectionServiceName,
+                            SocketProtectionLevel
+                                .BluetoothEncryptionAllowNullAuthentication);
+
+                        // The socket is connected. At this point the App can wait for
+                        // the user to take some action, e.g. click a button to send a
+                        // file to the device, which could invoke the Picker and then
+                        // send the picked file. The transfer itself would use the
+                        // Sockets API and not the Rfcomm API, and so is omitted here for
+                        // brevity.
+                    }
                 }
+                else
+                {
+                    ListBox_Messages.Items.Add(string.Format("RfcommDeviceService Count={0}",services.Count));
+                }
+            }
+            catch (Exception ex)
+            {
+                ListBox_Messages.Items.Add(ex.Message);
             }
         }
 
@@ -128,6 +137,12 @@ namespace BtClient
             }
 
             return false;
+        }
+
+        private void Pbtn_Start_Click(object sender, RoutedEventArgs e)
+        {
+            ListBox_Messages.Items.Add("Start Initialization");
+            Initialize();
         }
     }
 }

@@ -9,6 +9,8 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <Button x:Name="Pbtn_Start" Content="Button" HorizontalAlignment="Left" Margin="195,310,0,0" VerticalAlignment="Top" Height="52" Width="180" Click="Pbtn_Start_Click"/>
+        <ListBox x:Name="ListBox_Messages" HorizontalAlignment="Left" Height="275" Margin="195,425,0,0" VerticalAlignment="Top" Width="510"/>
 
     </Grid>
 </Page>
