@@ -91,7 +91,6 @@ namespace WdBroker
             }
         }
 
-
         public async Task Start(string PortNumber)
         {
             try

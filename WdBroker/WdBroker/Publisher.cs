@@ -41,16 +41,18 @@ namespace WdBroker
         public List<Stroke> Strokes;
         public DeviceRawData PrevRawData;
         public bool Start;
+        public double ViewScale;
 
         public Publisher()
         {
             this.Strokes = new List<Stroke>();
             this.Start = true;
+            this.ViewScale = 1.0;
 
             this.DeviceSize.Height = 29700;    // ToDo: get from Publishers
             this.DeviceSize.Width = 21600;
+
         }
     }
-
 
 }

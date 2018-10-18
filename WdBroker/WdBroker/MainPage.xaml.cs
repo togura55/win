@@ -82,7 +82,6 @@ namespace WdBroker
             }
 
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
-
         }
 
         private void GetUiState()
@@ -132,8 +131,8 @@ namespace WdBroker
         private void Pbtn_Clearlog_Click(object sender, RoutedEventArgs e)
         {
             ListBox_Message.Items.Clear();
- //           Canvas_Strokes.Children.Remove(ellipse);
- //           Canvas_Strokes.Children.Remove(line1);
+
+            CanvasClear(this.Canvas_Strokes);
         }
 
         // App exit procedure
@@ -150,10 +149,10 @@ namespace WdBroker
         {
             SetCanvasScaling(index);
         }
-            #endregion
+        #endregion
 
-            #region Store/Restore the local data
-            private void StoreSettings()
+        #region Store/Restore the local data
+        private void StoreSettings()
         {
             ApplicationDataContainer container = ApplicationData.Current.LocalSettings;
             container.Values["PortNumberString"] = PortNumberString;
@@ -171,6 +170,21 @@ namespace WdBroker
         #endregion
 
         #region Drawing
+        private void CanvasClear(Canvas canvas)
+        {
+            try
+            {
+                foreach (UIElement ui in canvas.Children)
+                {
+                    canvas.Children.Remove(ui);
+                }
+            }
+            catch (Exception ex)
+            {
+                ListBox_Message.Items.Add(ex.Message);
+            }
+        }
+
         // Raw data event handler sent by SocketServer object
         private void ReceiveSocketServerDrawing(object sender, DeviceRawData data, int index)
         {
@@ -180,65 +194,76 @@ namespace WdBroker
 
         private void DrawStroke(float f, float x, float y, int index)
         {
-            Publisher pub = App.pubs[index];
-
-            if (f == 1)
+            try
             {
-                // start point, nothing to do
-                pub.PrevRawData.f = f;
-                pub.PrevRawData.x = x;
-                pub.PrevRawData.y = y;
-                pub.Start = true;
-            }
-            else
-            {
-                // intermediates and end
-                var ellipse = new Ellipse();
-                ellipse.Fill = new SolidColorBrush(UIColors[index]);
-                ellipse.Width = 4;
-                ellipse.Height = 4;
-                ellipse.Margin = new Thickness((x * m_scale), (y * m_scale), 0, 0);
+                Publisher pub = App.pubs[index];
 
-                this.Canvas_Strokes.Children.Add(ellipse);
-
-                if (!pub.Start)
+                if (f == 1)
                 {
-                    //Draw line
-                    var line1 = new Line();
-                    SolidColorBrush brush = new SolidColorBrush(UIColors[index]);
-                    line1.Stroke = brush;
-                    line1.X1 = (pub.PrevRawData.x * m_scale) + ellipse.Width / 2;
-                    line1.X2 = (x * m_scale) + ellipse.Width / 2;
-                    line1.Y1 = (pub.PrevRawData.y * m_scale) + ellipse.Height / 2;
-                    line1.Y2 = (y * m_scale) + ellipse.Height / 2;
-                    line1.StrokeThickness = 1;
-                    this.Canvas_Strokes.Children.Add(line1);
+                    // start point, nothing to do
+                    pub.PrevRawData.f = f;
+                    pub.PrevRawData.x = x;
+                    pub.PrevRawData.y = y;
+                    pub.Start = true;
                 }
+                else
+                {
+                    // intermediates and end
+                    var ellipse = new Ellipse();
+                    ellipse.Fill = new SolidColorBrush(UIColors[index]);
+                    ellipse.Width = 4;
+                    ellipse.Height = 4;
+                    ellipse.Margin = new Thickness((x * pub.ViewScale), (y * pub.ViewScale), 0, 0);
+                    this.Canvas_Strokes.Children.Add(ellipse);
 
-                pub.PrevRawData.f = f;
-                pub.PrevRawData.x = x;
-                pub.PrevRawData.y = y;
-                pub.Start = false;
+                    if (!pub.Start)
+                    {
+                        //Draw line
+                        var line1 = new Line();
+                        SolidColorBrush brush = new SolidColorBrush(UIColors[index]);
+                        line1.Stroke = brush;
+                        line1.X1 = (pub.PrevRawData.x * pub.ViewScale) + ellipse.Width / 2;
+                        line1.X2 = (x * pub.ViewScale) + ellipse.Width / 2;
+                        line1.Y1 = (pub.PrevRawData.y * pub.ViewScale) + ellipse.Height / 2;
+                        line1.Y2 = (y * pub.ViewScale) + ellipse.Height / 2;
+                        line1.StrokeThickness = 1;
+                        this.Canvas_Strokes.Children.Add(line1);
+                    }
+
+                    pub.PrevRawData.f = f;
+                    pub.PrevRawData.x = x;
+                    pub.PrevRawData.y = y;
+                    pub.Start = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ListBox_Message.Items.Add(ex.Message);
             }
         }
 
-        private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-//            SetCanvasScaling();
-        }
+        //private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+        //{
+        //    //            SetCanvasScaling();
+        //}
 
-        private double m_scale = 1.0;
-        private Size m_deviceSize;
- //       Canvas_Strokes.DataContext = this;
+        //       Canvas_Strokes.DataContext = this;
         private void SetCanvasScaling(int index)
         {
-            Publisher pub = App.pubs[index];
-
-            if (pub != null)
+            try
             {
-                double sx = Canvas_Strokes.ActualWidth / pub.DeviceSize.Width;
-                double sy = Canvas_Strokes.ActualHeight / pub.DeviceSize.Height;
-                m_scale = Math.Min(sx, sy);
+                Publisher pub = App.pubs[index];
+
+                if (pub != null)
+                {
+                    double sx = Canvas_Strokes.ActualWidth / pub.DeviceSize.Width;
+                    double sy = Canvas_Strokes.ActualHeight / pub.DeviceSize.Height;
+                    pub.ViewScale = Math.Min(sx, sy);
+                }
+            }
+            catch (Exception ex)
+            {
+                ListBox_Message.Items.Add(ex.Message);
             }
         }
 
