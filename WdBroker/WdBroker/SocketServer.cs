@@ -208,6 +208,7 @@ namespace WdBroker
                                             id++;
                                         }
                                         App.pubs[App.pubs.Count - 1].Id = id_new;
+                                        ConnectPublisherEvent(App.pubs.Count - 1);  // Notify to caller 
 
                                         // 3. Respond to the publisher
                                         // Echo the request back as the response.

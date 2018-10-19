@@ -45,12 +45,13 @@ namespace WdBroker
 
         public Publisher()
         {
-            this.Strokes = new List<Stroke>();
-            this.Start = true;
-            this.ViewScale = 1.0;
-
             this.DeviceSize.Height = 29700;    // ToDo: get from Publishers
             this.DeviceSize.Width = 21600;
+
+            this.Strokes = new List<Stroke>();
+            this.PrevRawData = new DeviceRawData();
+            this.Start = true;
+            this.ViewScale = 1.0;
 
         }
     }
