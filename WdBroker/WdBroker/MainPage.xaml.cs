@@ -238,7 +238,7 @@ namespace WdBroker
             }
             catch (Exception ex)
             {
-                ListBox_Message.Items.Add(ex.Message);
+                ListBox_Message.Items.Add(string.Format("DrawStroke: {0}",ex.Message));
             }
         }
 
