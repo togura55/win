@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2000
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BtClient", "BtClient\BtClient.csproj", "{3953058E-0DD3-4C58-A4D9-378DA43CF31D}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BtServer", "BtServer\BtServer.csproj", "{6F6E95D7-95C3-4841-9B8D-9B4008A8A492}"
 EndProject
 Global
@@ -17,24 +15,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3953058E-0DD3-4C58-A4D9-378DA43CF31D}.Debug|ARM.ActiveCfg = Debug|ARM
-		{3953058E-0DD3-4C58-A4D9-378DA43CF31D}.Debug|ARM.Build.0 = Debug|ARM
-		{3953058E-0DD3-4C58-A4D9-378DA43CF31D}.Debug|ARM.Deploy.0 = Debug|ARM
-		{3953058E-0DD3-4C58-A4D9-378DA43CF31D}.Debug|x64.ActiveCfg = Debug|x64
-		{3953058E-0DD3-4C58-A4D9-378DA43CF31D}.Debug|x64.Build.0 = Debug|x64
-		{3953058E-0DD3-4C58-A4D9-378DA43CF31D}.Debug|x64.Deploy.0 = Debug|x64
-		{3953058E-0DD3-4C58-A4D9-378DA43CF31D}.Debug|x86.ActiveCfg = Debug|x86
-		{3953058E-0DD3-4C58-A4D9-378DA43CF31D}.Debug|x86.Build.0 = Debug|x86
-		{3953058E-0DD3-4C58-A4D9-378DA43CF31D}.Debug|x86.Deploy.0 = Debug|x86
-		{3953058E-0DD3-4C58-A4D9-378DA43CF31D}.Release|ARM.ActiveCfg = Release|ARM
-		{3953058E-0DD3-4C58-A4D9-378DA43CF31D}.Release|ARM.Build.0 = Release|ARM
-		{3953058E-0DD3-4C58-A4D9-378DA43CF31D}.Release|ARM.Deploy.0 = Release|ARM
-		{3953058E-0DD3-4C58-A4D9-378DA43CF31D}.Release|x64.ActiveCfg = Release|x64
-		{3953058E-0DD3-4C58-A4D9-378DA43CF31D}.Release|x64.Build.0 = Release|x64
-		{3953058E-0DD3-4C58-A4D9-378DA43CF31D}.Release|x64.Deploy.0 = Release|x64
-		{3953058E-0DD3-4C58-A4D9-378DA43CF31D}.Release|x86.ActiveCfg = Release|x86
-		{3953058E-0DD3-4C58-A4D9-378DA43CF31D}.Release|x86.Build.0 = Release|x86
-		{3953058E-0DD3-4C58-A4D9-378DA43CF31D}.Release|x86.Deploy.0 = Release|x86
 		{6F6E95D7-95C3-4841-9B8D-9B4008A8A492}.Debug|ARM.ActiveCfg = Debug|ARM
 		{6F6E95D7-95C3-4841-9B8D-9B4008A8A492}.Debug|ARM.Build.0 = Debug|ARM
 		{6F6E95D7-95C3-4841-9B8D-9B4008A8A492}.Debug|ARM.Deploy.0 = Debug|ARM
@@ -58,6 +38,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {C4B487E7-F8EC-45E9-A7E0-5B099FCF916E}
+		SolutionGuid = {0AA22B3B-1758-4754-BEE9-DE8DD3CE14BF}
 	EndGlobalSection
 EndGlobal

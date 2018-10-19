@@ -9,7 +9,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <Button x:Name="Pbtn_Start" Content="Button" HorizontalAlignment="Left" Margin="135,275,0,0" VerticalAlignment="Top" Height="47" Width="155" Click="Pbtn_Start_Click"/>
-        <ListBox x:Name="ListBox_Messages" HorizontalAlignment="Left" Height="200" Margin="135,0,0,0" VerticalAlignment="Center" Width="480"/>
+        <Button x:Name="Pbtn_Start" Content="Button" HorizontalAlignment="Left" Margin="135,146,0,0" VerticalAlignment="Top" Height="47" Width="155" Click="Pbtn_Start_Click"/>
+        <ListBox x:Name="ListBox_Messages" HorizontalAlignment="Left" Height="200" Margin="135,300,0,0" VerticalAlignment="Top" Width="480" ScrollViewer.HorizontalScrollBarVisibility="Visible"/>
     </Grid>
 </Page>
