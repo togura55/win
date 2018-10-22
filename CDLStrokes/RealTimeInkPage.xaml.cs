@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Windows.UI.Xaml.Navigation;
 using Wacom.UX.ViewModels;
 using Wacom.UX.Gestures;
+using Windows.Foundation;
 
 namespace WillDevicesSampleApp
 {
@@ -19,7 +20,11 @@ namespace WillDevicesSampleApp
 
         private CancellationTokenSource m_cts = new CancellationTokenSource();
 
-		public RealTimeInkPage()
+        private double m_scale = 1.0;
+        private Size m_deviceSize;
+        private bool m_addNewStrokeToModel = true;
+
+        public RealTimeInkPage()
 		{
 			this.InitializeComponent();
 
@@ -67,6 +72,7 @@ namespace WillDevicesSampleApp
 			Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested -= RealTimeInkPage_BackRequested;
 		}
 
+//        inkCanvas.DataContext = this;
 		private async void RealTimeInkPage_Loaded(object sender, RoutedEventArgs e)
 		{
 			IDigitalInkDevice device = AppObjects.Instance.Device;
@@ -113,7 +119,16 @@ namespace WillDevicesSampleApp
 				inkCanvas.GesturesManager = new GesturesManager();
 				inkCanvas.StrokeDataProvider = service;
 
-				if (!service.IsStarted)
+                // get raw data
+                m_deviceSize.Width = width;
+                m_deviceSize.Height = height;
+                SetCanvasScaling();
+                service.StrokeStarted += Service_StrokeStarted;
+                service.StrokeUpdated += Service_StrokeUpdated;
+                service.StrokeEnded += Service_StrokeEnded;
+                // -----
+
+                if (!service.IsStarted)
 				{
 					await service.StartAsync(false, m_cts.Token);
 				}
@@ -123,7 +138,119 @@ namespace WillDevicesSampleApp
 			}
 		}
 
-		private void OnHoverPointReceived(object sender, HoverPointReceivedEventArgs e)
+        private void SetCanvasScaling()
+        {
+            IDigitalInkDevice device = AppObjects.Instance.Device;
+
+            if (device != null)
+            {
+                double sx = inkCanvas.ActualWidth / m_deviceSize.Width;
+                double sy = inkCanvas.ActualHeight / m_deviceSize.Height;
+                m_scale = Math.Min(sx, sy);
+            }
+        }
+
+
+        private void Service_StrokeEnded(object sender, StrokeEndedEventArgs e)
+        {
+            Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
+            {
+                var pathPart = e.PathPart;
+                var data = pathPart.Data.GetEnumerator();
+
+
+                //Data is stored XYW
+                float x = -1;
+                float y = -1;
+                float w = -1;
+
+                if (data.MoveNext())
+                {
+                    x = data.Current;
+                }
+
+                if (data.MoveNext())
+                {
+                    y = data.Current;
+                }
+
+                if (data.MoveNext())
+                {
+                    //Clamp to 0.0 -> 1.0
+                    w = Math.Max(0.0f, Math.Min(1.0f, (data.Current - 1.0f) * pFactor));
+                }
+
+                var point = new System.Windows.Input.StylusPoint(x * m_scale, y * m_scale, w);
+                Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
+                {
+                    _strokes[_strokes.Count - 1].StylusPoints.Add(point);
+                    NotifyPropertyChanged("Strokes");
+                }));
+
+                m_addNewStrokeToModel = true;
+
+            }));
+
+
+        }
+
+        private void Service_StrokeUpdated(object sender, StrokeUpdatedEventArgs e)
+        {
+            var pathPart = e.PathPart;
+            var data = pathPart.Data.GetEnumerator();
+
+            //Data is stored XYW
+            float x = -1;
+            float y = -1;
+            float w = -1;
+
+            if (data.MoveNext())
+            {
+                x = data.Current;
+            }
+
+            if (data.MoveNext())
+            {
+                y = data.Current;
+            }
+
+            if (data.MoveNext())
+            {
+                //Clamp to 0.0 -> 1.0
+                w = Math.Max(0.0f, Math.Min(1.0f, (data.Current - 1.0f) * pFactor));
+            }
+
+            var point = new System.Windows.Input.StylusPoint(x * m_scale, y * m_scale, w);
+            if (m_addNewStrokeToModel)
+            {
+                m_addNewStrokeToModel = false;
+                var points = new System.Windows.Input.StylusPointCollection();
+                points.Add(point);
+
+                var stroke = new Stroke(points);
+                stroke.DrawingAttributes = m_DrawingAttributes;
+
+                Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
+                {
+                    _strokes.Add(stroke);
+                }));
+            }
+            else
+            {
+                Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
+                {
+                    _strokes[_strokes.Count - 1].StylusPoints.Add(point);
+                }));
+            }
+
+        }
+
+        private void Service_StrokeStarted(object sender, StrokeStartedEventArgs e)
+        {
+            m_addNewStrokeToModel = true;
+        }
+
+        private void OnHoverPointReceived(object sender, HoverPointReceivedEventArgs e)
 		{
 			string hoverPointCoords = string.Empty;
 

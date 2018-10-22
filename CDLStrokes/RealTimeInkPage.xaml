@@ -45,7 +45,7 @@
         <Border BorderBrush="Black" BorderThickness="1" Grid.Column="1" HorizontalAlignment="Left" 
                 Height="980" Margin="10,10,0,0" VerticalAlignment="Top" Width="740" Grid.RowSpan="2">
             <Controls:InkCanvas x:Name="inkCanvas"
-							Grid.Row="1"
+						 Grid.Row="1"
 							Grid.Column="1"
 							HorizontalAlignment="Stretch"
 							VerticalAlignment="Stretch"

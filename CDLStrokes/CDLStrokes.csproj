@@ -158,6 +158,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Wacom.InkCanvas.UWP">
+      <HintPath>References\x64\Wacom.InkCanvas.UWP.dll</HintPath>
+    </Reference>
     <SDKReference Include="WILLDevices, Version=1.0">
       <Name>WILL Devices 1.0</Name>
     </SDKReference>
@@ -169,10 +172,6 @@
     </SDKReference>
     <Reference Include="Microsoft.Graphics.Canvas">
       <HintPath>References\$(Platform)\Microsoft.Graphics.Canvas.winmd</HintPath>
-    </Reference>
-    <Reference Include="Wacom.InkCanvas.UWP, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>References\$(Platform)\Wacom.InkCanvas.UWP.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
   </ItemGroup>
   <ItemGroup>
