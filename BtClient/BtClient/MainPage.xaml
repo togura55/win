@@ -9,8 +9,13 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <Button x:Name="Pbtn_Start" Content="Button" HorizontalAlignment="Left" Margin="195,310,0,0" VerticalAlignment="Top" Height="52" Width="180" Click="Pbtn_Start_Click"/>
-        <ListBox x:Name="ListBox_Messages" HorizontalAlignment="Left" Height="275" Margin="195,425,0,0" VerticalAlignment="Top" Width="510"/>
+        <Button x:Name="Pbtn_Start" Content="Button" HorizontalAlignment="Left" Margin="170,221,0,0" VerticalAlignment="Top" Height="52" Width="180" Click="Pbtn_Start_Click"/>
+        <ListBox x:Name="ListBox_Messages" HorizontalAlignment="Left" Height="275" Margin="162,287,0,0" VerticalAlignment="Top" Width="510" RenderTransformOrigin="0.508,-0.321"/>
+        <Button x:Name="Pbtn_SetConfig" Content="Button" HorizontalAlignment="Left" Margin="401,103,0,0" VerticalAlignment="Top" Width="143"/>
+        <Button x:Name="Pbtn_GetConfig" Content="Button" HorizontalAlignment="Left" Margin="401,241,0,0" VerticalAlignment="Top" Width="143"/>
+        <TextBox x:Name="TextBox_IP" HorizontalAlignment="Left" Margin="573,103,0,0" Text="TextBox" VerticalAlignment="Top" Width="170"/>
+        <TextBox x:Name="TextBox_Port" HorizontalAlignment="Left" Margin="573,150,0,0" Text="TextBox" VerticalAlignment="Top" Width="170"/>
+        <Button x:Name="Pbtn_Activate" Content="Button" HorizontalAlignment="Left" Margin="573,241,0,0" VerticalAlignment="Top" Width="143"/>
 
     </Grid>
 </Page>

@@ -11,19 +11,24 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Windows.Devices.Radios;
 using System.Collections.Generic;
+using Windows.ApplicationModel.Resources;
 
 namespace WillDevicesSampleApp
 {
 	public sealed partial class MainPage : Page
 	{
-		CancellationTokenSource m_cts = new CancellationTokenSource();
+        private ResourceLoader resourceLoader;
+
+        CancellationTokenSource m_cts = new CancellationTokenSource();
 		ObservableCollection<DevicePropertyValuePair> m_propertiesCollection;
 		
 		public MainPage()
 		{
 			this.InitializeComponent();
 
-			Loaded += MainPage_Loaded;
+            resourceLoader = ResourceLoader.GetForCurrentView();
+
+            Loaded += MainPage_Loaded;
 
 			buttonFileTransfer.IsEnabled = false;
 			buttonRealTime.IsEnabled = false;
@@ -44,9 +49,9 @@ namespace WillDevicesSampleApp
 
 		private async void MainPage_Loaded(object sender, RoutedEventArgs e)
 		{
-            buttonScan.Content = App.resourceLoader.GetString("IDC_Scan");
-            buttonFileTransfer.Content = App.resourceLoader.GetString("IDC_FileTransfer");
-            buttonRealTime.Content = App.resourceLoader.GetString("IDC_RealTime");
+            buttonScan.Content = resourceLoader.GetString("IDC_Scan");
+            buttonFileTransfer.Content = resourceLoader.GetString("IDC_FileTransfer");
+            buttonRealTime.Content = resourceLoader.GetString("IDC_RealTime");
 
             buttonScan.IsEnabled = false;
 			buttonFileTransfer.IsEnabled = false;

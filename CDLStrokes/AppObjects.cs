@@ -80,11 +80,12 @@ namespace WillDevicesSampleApp
 			st.ScaleY = scaleFactor;
 
 			RotateTransform rt = new RotateTransform();
-			rt.Angle = 90;
+            //			rt.Angle = 90;
 
 			TranslateTransform tt = new TranslateTransform();
-			tt.X = deviceHeight * scaleFactor;
-			tt.Y = 0;
+//			tt.X = deviceHeight * scaleFactor;
+            tt.X = 0;
+            tt.Y = 0;
 
 			TransformGroup tg = new TransformGroup();
 			tg.Children.Add(st);

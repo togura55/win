@@ -66,12 +66,12 @@ namespace BtClient
                             SocketProtectionLevel
                                 .BluetoothEncryptionAllowNullAuthentication);
 
-                        // The socket is connected. At this point the App can wait for
-                        // the user to take some action, e.g. click a button to send a
-                        // file to the device, which could invoke the Picker and then
-                        // send the picked file. The transfer itself would use the
-                        // Sockets API and not the Rfcomm API, and so is omitted here for
-                        // brevity.
+                        // ソケットが接続されています。 この時点で、Appはユーザーが
+                        // デバイスにファイルを取得するのを待つことができます。これにより、
+                        //  Pickerが起動され、選択されたファイルが送信されます。 
+                        // 転送自体はRfcomm APIではなくSockets APIを使用するため、
+                        // ここでは簡潔にするために省略しています。
+
                     }
                 }
                 else
@@ -122,18 +122,25 @@ namespace BtClient
         const uint MINIMUM_SERVICE_VERSION = 200;
         async System.Threading.Tasks.Task<bool> IsCompatibleVersionAsync(RfcommDeviceService service)
         {
-            var attributes = await service.GetSdpRawAttributesAsync(
-                BluetoothCacheMode.Uncached);
-            var attribute = attributes[SERVICE_VERSION_ATTRIBUTE_ID];
-            var reader = DataReader.FromBuffer(attribute);
-
-            // The first byte contains the attribute's type
-            byte attributeType = reader.ReadByte();
-            if (attributeType == SERVICE_VERSION_ATTRIBUTE_TYPE)
+            try
             {
-                // The remainder is the data
-                uint version = reader.ReadUInt32();
-                return version >= MINIMUM_SERVICE_VERSION;
+                var attributes = await service.GetSdpRawAttributesAsync(
+    BluetoothCacheMode.Uncached);
+                var attribute = attributes[SERVICE_VERSION_ATTRIBUTE_ID];
+                var reader = DataReader.FromBuffer(attribute);
+
+                // The first byte contains the attribute's type
+                byte attributeType = reader.ReadByte();
+                if (attributeType == SERVICE_VERSION_ATTRIBUTE_TYPE)
+                {
+                    // The remainder is the data
+                    uint version = reader.ReadUInt32();
+                    return version >= MINIMUM_SERVICE_VERSION;
+                }
+            }
+            catch(Exception ex)
+            {
+                return true;
             }
 
             return false;

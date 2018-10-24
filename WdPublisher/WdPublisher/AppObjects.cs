@@ -18,6 +18,7 @@ namespace WillDevicesSampleApp
 		private AppObjects()
 		{
 			AppId = new SmartPadClientId(0xFA, 0xAB, 0xC1, 0xE0, 0xF1, 0x77);
+            Token = "0";
 		}
 
 		public IDigitalInkDevice Device
@@ -167,5 +168,12 @@ namespace WillDevicesSampleApp
             get;
             set;
         }
-	}
+
+        public string Token
+        {
+            get;
+            set;
+        }
+
+    }
 }

@@ -75,6 +75,36 @@ namespace WillDevicesSampleApp
         }
         #endregion
 
+        #region Device attribute definition and object sharing between Publisher and Broker
+        public class DeviceAttributes
+        {
+            public string Width;
+            public string Height;
+            public string PointSize;
+            public string Name;
+            public string ESN;
+            public string Battery;
+            public string DeviceType;
+            public string TransferMode;
+
+            public DeviceAttributes()
+            {
+
+            }
+
+            public string GenerateStrings()
+            {
+                string s = string.Empty;
+
+                s = Width + "," + Height + "," + PointSize + "," + Name + "," + 
+                    ESN + "," + Battery + "," + DeviceType + "," + TransferMode;
+
+                return s;
+            }
+        }
+        public DeviceAttributes Attribute;
+        #endregion
+
         public WacomDevices()
         {
             //this.InitializeComponent();
@@ -138,9 +168,17 @@ namespace WillDevicesSampleApp
 
             try
             {
-                //uint width = (uint)await device.GetPropertyAsync("Width", m_cts.Token);
-                //uint height = (uint)await device.GetPropertyAsync("Height", m_cts.Token);
-                //uint ptSize = (uint)await device.GetPropertyAsync("PointSize", m_cts.Token);
+//                uint width = (uint)await device.GetPropertyAsync("Width", m_cts.Token);
+//                uint height = (uint)await device.GetPropertyAsync("Height", m_cts.Token);
+//                uint ptSize = (uint)await device.GetPropertyAsync("PointSize", m_cts.Token);
+                Attribute.Width = ((uint)await device.GetPropertyAsync("Width", m_cts.Token)).ToString();
+                Attribute.Height = ((uint)await device.GetPropertyAsync("Height", m_cts.Token)).ToString();
+                Attribute.PointSize = ((uint)await device.GetPropertyAsync("PointSize", m_cts.Token)).ToString();
+                Attribute.Name = ((uint)await device.GetPropertyAsync(SmartPadProperties.DeviceName, m_cts.Token)).ToString();
+                Attribute.ESN = ((uint)await device.GetPropertyAsync(SmartPadProperties.SerialNumber, m_cts.Token)).ToString();
+                Attribute.Battery = ((uint)await device.GetPropertyAsync(SmartPadProperties.BatteryLevel, m_cts.Token)).ToString();
+                Attribute.TransferMode = "LiveMode";
+                Attribute.DeviceType = "PHU-111";
 
                 //service.Transform = AppObjects.CalculateTransform(width, height, ptSize);
 

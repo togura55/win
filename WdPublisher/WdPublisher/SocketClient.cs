@@ -153,6 +153,21 @@ namespace WillDevicesSampleApp
             }
         }
 
+        public void CommandSends(string message)
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+                throw new Exception(string.Format("CommandSends(): Exception: {0}",
+                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+
+            }
+        }
+
         /// <summary>
         /// A C#-only technique for batched sends.
         /// </summary>
