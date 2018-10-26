@@ -27,7 +27,8 @@ namespace WdBroker
         private const uint MASK_STROKE = 0x0F00;
         private const uint MASK_COMMAND = 0xF000;
 
-        private const float CMD_REQUESTPUBLISHERCONNECT = 1;
+        private const float CMD_REQUESTPUBLISHERCONNECT = 1;  // for binarry transmittion
+
 
         public HostName ServerHostName;
         private StreamSocketListener streamSocketListenerData = null;
@@ -153,6 +154,29 @@ namespace WdBroker
                 throw new Exception(string.Format("Stop(): Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
+
+ 
+        public async void StreamSocketListener_CommandReceived2(Windows.Networking.Sockets.StreamSocketListener sender,
+    Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
+        {
+            string request;
+            using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
+            {
+                request = await streamReader.ReadLineAsync();
+            }
+            MessageEvent(string.Format("StreamSocketListener_ConnectionReceived2(): Command: \"{0}\"", request));
+
+            App.PublisherCommandHandler(request);
+
+            sender.Dispose();
+
+            //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => this.ListBox_Message.Items.Add("server closed its socket"));
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                this.SocketServerMessage?.Invoke(this, "StreamSocketListener_ConnectionReceived(): server closed its socket");
+            });
+        }
+
 
         private async void StreamSocketListener_CommandReceived(StreamSocketListener sender,
      StreamSocketListenerConnectionReceivedEventArgs args)

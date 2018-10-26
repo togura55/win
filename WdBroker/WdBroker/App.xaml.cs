@@ -7,6 +7,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -33,6 +34,146 @@ namespace WdBroker
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+        }
+
+        // Delegate Handlers
+        public delegate void MessageEventHandler(object sender, string message);
+        // Properties
+        public static event MessageEventHandler AppMessage;
+
+        private async void MessageEvent(string message)
+        {
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                this.AppMessage?.Invoke(this, message);
+            });
+        }
+
+        private const float CMD_REQUEST_PUBLISHER_CONNECTION = 1;
+        private const float CMD_SET_ATTRIBUTES = 2;
+        private const float CMD_START_PUBLISHER = 3;
+        private const float CMD_STOP_PUBLISHER = 4;
+        private const float CMD_DISPOSE_PUBLISHER = 5;
+        static List<string> CommandList = new List<string> { "1", "2", "3", "4", "5" };  // Command word sent by Publisher
+
+        public void PublisherCommandHandler(string request)
+        {
+            try
+            {
+                char sp = ','; // separater
+                string[] arr = request.Split(',');
+                var list = new List<string>();
+                list.AddRange(arr);
+
+                // decode
+                if (list.Count < 2)
+                {
+                    // error, resend?
+                }
+                string id = list[0];
+                string command = list[1];
+                if (list.Count >= 2)
+                {
+                    string data = list[2];
+;                }
+
+                float command = CommandList.IndexOf(request) + 1;
+                if (command > 0)
+                {
+                    switch (command)
+                    {
+                        case CMD_REQUEST_PUBLISHER_CONNECTION:
+                            this.MessageEvent("Request Publisher Connect command is received.");
+
+                            // Do the publisher 1st contact process
+                            // 1. Create a new instance
+                            App.pubs.Add(new Publisher());
+
+                            // 2. Generate Publisher Id, smallest number of pubs
+                            float id = 1; // set the base id number
+                            float id_new = id;
+                            for (int j = 0; j < App.pubs.Count; j++)
+                            {
+                                if (App.pubs[j].Id != id)
+                                {
+                                    // ToDo: find if id is already stored into another pubs[].Id
+                                    id_new = id;
+                                    break;
+                                }
+                                id++;
+                            }
+                            App.pubs[App.pubs.Count - 1].Id = id_new;
+                            ConnectPublisherEvent(App.pubs.Count - 1);  // Notify to caller 
+
+                            // 3. Respond to the publisher
+                            // Echo the request back as the response.
+                            using (Stream outputStream = args.Socket.OutputStream.AsStreamForWrite())
+                            {
+                                using (var binaryWriter = new BinaryWriter(outputStream))
+                                {
+                                    int num = sizeof(float);
+                                    byte[] ByteArray = new byte[num_bytes * 1];
+                                    int offset = 0;
+                                    Array.Copy(BitConverter.GetBytes(id_new), 0, ByteArray, offset, num);
+                                    binaryWriter.Write(ByteArray);
+                                    binaryWriter.Flush();
+                                    MessageEvent(string.Format("Assigned and sent Publisher ID: {0}", id_new.ToString()));
+                                }
+                            }
+                            break;
+
+                        case CMD_SET_ATTRIBUTES:
+                            commandString = string.Format("{0},{1},{2}", PublisherId, 2,
+                                AppObjects.Instance.WacomDevice.Attribute.GenerateStrings()); ;
+                            break;
+
+                        case CMD_START_PUBLISHER:
+                            commandString = string.Format("{0},{1}", PublisherId, 3);
+                            break;
+
+                        case CMD_STOP_PUBLISHER:
+                            commandString = string.Format("{0},{1}", PublisherId, 4);
+                            break;
+
+                        case CMD_DISPOSE_PUBLISHER:
+                            commandString = string.Format("{0},{1}", PublisherId, 5);
+                            break;
+
+                        //default:
+                        //    commandString = string.Empty;
+
+                        default:
+                            break;
+                    }
+                    //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    //this.ListBox_Message.Items.Add(string.Format("server received the request: \"{0}\"", request)));
+                    //            this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionReceived(): server received the request: \"{0}\"", request));
+
+                    // Echo the request back as the response.
+                    //using (Stream outputStream = args.Socket.OutputStream.AsStreamForWrite())
+                    //{s
+                    //    using (var streamWriter = new StreamWriter(outputStream))
+                    //    {
+                    //        await streamWriter.WriteLineAsync(request);
+                    //        await streamWriter.FlushAsync();
+                    //    }
+                    //}
+
+                    //await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    //{
+                    //    this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionReceived(): server sent back the response: \"{0}\"", request));
+                    //});
+                }
+                else
+                {
+                    // invalid command word
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+
         }
 
         /// <summary>

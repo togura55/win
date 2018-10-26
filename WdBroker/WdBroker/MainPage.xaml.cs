@@ -51,6 +51,7 @@ namespace WdBroker
             socketServer.SocketServerMessage += ReceiveSocketServerMessage;
             socketServer.SocketServerConnectPublisher += ReceiveSocketServerConnectPublisher;  // for drawing
             socketServer.SocketServerDrawing += ReceiveSocketServerDrawing;  // for drawing
+            App.AppMessage += ReceiveSocketServerMessage;
 
             RestoreSettings();
 
