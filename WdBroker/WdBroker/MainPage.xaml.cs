@@ -28,7 +28,6 @@ namespace WdBroker
         static string PortNumberString = "1337";
         static string HostNameString = "192.168.0.7";
         static bool fStart = true;
-        SocketServer socketServer;
         ResourceLoader resourceLoader;
 
         public class MainViewModel
@@ -47,6 +46,7 @@ namespace WdBroker
         {
             this.InitializeComponent();
 
+            SocketServer socketServer = App.TheSocketServer; 
             socketServer = new SocketServer();
             socketServer.SocketServerMessage += ReceiveSocketServerMessage;
             socketServer.SocketServerConnectPublisher += ReceiveSocketServerConnectPublisher;  // for drawing
@@ -105,17 +105,17 @@ namespace WdBroker
                 string.Format("{0} button was clicked.", resourceLoader.GetString(fStart ? "IDC_Start" : "IDC_Stop")));
 
             GetUiState();
-            socketServer.ServerHostName = new Windows.Networking.HostName(HostNameString); // for debug
+            App.TheSocketServer.ServerHostName = new Windows.Networking.HostName(HostNameString); // for debug
 
             try
             {
                 if (fStart)
                 {
-                    await socketServer.Start(PortNumberString);
+                    await App.TheSocketServer.Start(PortNumberString);
                 }
                 else
                 {
-                    socketServer.Stop();
+                    App.TheSocketServer.Stop();
                 }
 
                 fStart = fStart ? false : true;   // toggle if success
@@ -143,7 +143,7 @@ namespace WdBroker
 
             StoreSettings();
 
-            socketServer.SocketServerMessage -= ReceiveSocketServerMessage;
+            App.TheSocketServer.SocketServerMessage -= ReceiveSocketServerMessage;
         }
 
         private void ReceiveSocketServerConnectPublisher(object sender, int index)
@@ -205,7 +205,7 @@ namespace WdBroker
                     pub.PrevRawData.f = f;
                     pub.PrevRawData.x = x;
                     pub.PrevRawData.y = y;
-                    pub.Start = true;
+                    pub.StartState = true;
                 }
                 else
                 {
@@ -217,7 +217,7 @@ namespace WdBroker
                     ellipse.Margin = new Thickness((x * pub.ViewScale), (y * pub.ViewScale), 0, 0);
                     this.Canvas_Strokes.Children.Add(ellipse);
 
-                    if (!pub.Start)
+                    if (!pub.StartState)
                     {
                         //Draw line
                         var line1 = new Line();
@@ -234,7 +234,7 @@ namespace WdBroker
                     pub.PrevRawData.f = f;
                     pub.PrevRawData.x = x;
                     pub.PrevRawData.y = y;
-                    pub.Start = false;
+                    pub.StartState = false;
                 }
             }
             catch (Exception ex)

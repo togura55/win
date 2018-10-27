@@ -23,6 +23,9 @@ namespace WdBroker
     /// </summary>
     sealed partial class App : Application
     {
+        // Single instance of SocketServer using this app
+        public static SocketServer TheSocketServer;
+
         // List of Publisher object to be managed in this app
         public static List<Publisher> pubs;
 
@@ -34,6 +37,7 @@ namespace WdBroker
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+            TheSocketServer = new SocketServer();
         }
 
         // Delegate Handlers
@@ -49,11 +53,13 @@ namespace WdBroker
             });
         }
 
-        private const float CMD_REQUEST_PUBLISHER_CONNECTION = 1;
-        private const float CMD_SET_ATTRIBUTES = 2;
-        private const float CMD_START_PUBLISHER = 3;
-        private const float CMD_STOP_PUBLISHER = 4;
-        private const float CMD_DISPOSE_PUBLISHER = 5;
+        private const int CMD_REQUEST_PUBLISHER_CONNECTION = 1;
+        private const int CMD_SET_ATTRIBUTES = 2;
+        private const int CMD_START_PUBLISHER = 3;
+        private const int CMD_STOP_PUBLISHER = 4;
+        private const int CMD_DISPOSE_PUBLISHER = 5;
+        private const string RES_ACK = "ack";
+        private const string RES_NAK = "nak";
         static List<string> CommandList = new List<string> { "1", "2", "3", "4", "5" };  // Command word sent by Publisher
 
         public void PublisherCommandHandler(string request)
@@ -61,7 +67,7 @@ namespace WdBroker
             try
             {
                 char sp = ','; // separater
-                string[] arr = request.Split(',');
+                string[] arr = request.Split(sp);
                 var list = new List<string>();
                 list.AddRange(arr);
 
@@ -70,26 +76,27 @@ namespace WdBroker
                 {
                     // error, resend?
                 }
-                string id = list[0];
+                string publisher_id = list[0];
                 string command = list[1];
+                string data = string.Empty;
                 if (list.Count >= 2)
                 {
-                    string data = list[2];
-;                }
+                    data = list[2];
+                }
 
-                float command = CommandList.IndexOf(request) + 1;
-                if (command > 0)
+                int command_index = CommandList.IndexOf(request) + 1;
+                if (command_index > 0)
                 {
-                    switch (command)
+                    switch (command_index)
                     {
                         case CMD_REQUEST_PUBLISHER_CONNECTION:
                             this.MessageEvent("Request Publisher Connect command is received.");
 
-                            // Do the publisher 1st contact process
-                            // 1. Create a new instance
+                            //// Do the publisher 1st contact process
+                            //// 1. Create a new instance
                             App.pubs.Add(new Publisher());
 
-                            // 2. Generate Publisher Id, smallest number of pubs
+                            //// 2. Generate Publisher Id, smallest number of pubs
                             float id = 1; // set the base id number
                             float id_new = id;
                             for (int j = 0; j < App.pubs.Count; j++)
@@ -105,38 +112,38 @@ namespace WdBroker
                             App.pubs[App.pubs.Count - 1].Id = id_new;
                             ConnectPublisherEvent(App.pubs.Count - 1);  // Notify to caller 
 
-                            // 3. Respond to the publisher
-                            // Echo the request back as the response.
-                            using (Stream outputStream = args.Socket.OutputStream.AsStreamForWrite())
-                            {
-                                using (var binaryWriter = new BinaryWriter(outputStream))
-                                {
-                                    int num = sizeof(float);
-                                    byte[] ByteArray = new byte[num_bytes * 1];
-                                    int offset = 0;
-                                    Array.Copy(BitConverter.GetBytes(id_new), 0, ByteArray, offset, num);
-                                    binaryWriter.Write(ByteArray);
-                                    binaryWriter.Flush();
-                                    MessageEvent(string.Format("Assigned and sent Publisher ID: {0}", id_new.ToString()));
-                                }
-                            }
+                            //// 3. Respond to the publisher
+                            //// Echo the request back as the response.
+                            App.TheSocketServer.StreamSocketListener_CommandResponse(id_new.ToString());
+                            MessageEvent(string.Format("Assigned and sent Publisher ID: {0}", id_new.ToString()));
+
                             break;
 
                         case CMD_SET_ATTRIBUTES:
-                            commandString = string.Format("{0},{1},{2}", PublisherId, 2,
-                                AppObjects.Instance.WacomDevice.Attribute.GenerateStrings()); ;
+                            var list_data = new List<string>();
+                            list_data.AddRange(data.Split(sp));
+
+                            Publisher pub = App.pubs[int.Parse(publisher_id)];
+                            pub.DeviceSize.Width = double.Parse(list_data[0]);
+                            pub.DeviceSize.Height = double.Parse(list_data[1]);
+                            pub.PointSize = float.Parse(list_data[2]);
+                            pub.DeviceName = list_data[3];
+                            pub.SerialNumber = list_data[4];
+                            pub.Battery = float.Parse(list_data[5]);
+                            pub.DeviceType = list_data[6];
+                            pub.TransferMode = list_data[7];
                             break;
 
                         case CMD_START_PUBLISHER:
-                            commandString = string.Format("{0},{1}", PublisherId, 3);
+                            App.pubs[int.Parse(publisher_id)].Start();
                             break;
 
                         case CMD_STOP_PUBLISHER:
-                            commandString = string.Format("{0},{1}", PublisherId, 4);
+                            App.pubs[int.Parse(publisher_id)].Stop();
                             break;
 
                         case CMD_DISPOSE_PUBLISHER:
-                            commandString = string.Format("{0},{1}", PublisherId, 5);
+                            App.pubs[int.Parse(publisher_id)].Dispose();
                             break;
 
                         //default:

@@ -156,6 +156,31 @@ namespace WdBroker
         }
 
  
+        public async void  StreamSocketListener_CommandResponse(string response)
+        {
+            try
+            {
+                // ToDo: rewrite to sending string value to Publisher
+                using (Stream outputStream = args.Socket.OutputStream.AsStreamForWrite())
+                {
+                    using (var binaryWriter = new BinaryWriter(outputStream))
+                    {
+                        int num = sizeof(float);
+                        byte[] ByteArray = new byte[num_bytes * 1];
+                        int offset = 0;
+                        Array.Copy(BitConverter.GetBytes(id_new), 0, ByteArray, offset, num);
+                        binaryWriter.Write(ByteArray);
+                        binaryWriter.Flush();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+        }
+
         public async void StreamSocketListener_CommandReceived2(Windows.Networking.Sockets.StreamSocketListener sender,
     Windows.Networking.Sockets.StreamSocketListenerConnectionReceivedEventArgs args)
         {

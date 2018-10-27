@@ -36,11 +36,15 @@ namespace WdBroker
         public string PortNumber;
         public string DeviceType;
         public string DeviceName;
-        public Size DeviceSize;
+        public Size DeviceSize; // Width,Height
+        public float PointSize;
+        public string SerialNumber;
+        public string TransferMode;
+        public float Battery;
         public float Barcode;
         public List<Stroke> Strokes;
         public DeviceRawData PrevRawData;
-        public bool Start;
+        public bool StartState;
         public double ViewScale;
 
         public Publisher()
@@ -50,10 +54,26 @@ namespace WdBroker
 
             this.Strokes = new List<Stroke>();
             this.PrevRawData = new DeviceRawData();
-            this.Start = true;
+            this.StartState = true;
             this.ViewScale = 1.0;
 
         }
+
+        public void Start()
+        {
+
+        }
+
+        public void Stop()
+        {
+
+        }
+
+        public void Dispose()
+        {
+
+        }
+
     }
 
 }
