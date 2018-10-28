@@ -120,8 +120,6 @@ namespace WdBroker
 
                 fStart = fStart ? false : true;   // toggle if success
                 Pbtn_Start.Content = resourceLoader.GetString(fStart ? "IDC_Start" : "IDC_Stop");
-
-
             }
             catch (Exception ex)
             {

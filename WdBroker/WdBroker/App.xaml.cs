@@ -23,11 +23,17 @@ namespace WdBroker
     /// </summary>
     sealed partial class App : Application
     {
-        // Single instance of SocketServer using this app
-        public static SocketServer TheSocketServer;
 
-        // List of Publisher object to be managed in this app
-        public static List<Publisher> pubs;
+        public static SocketServer Socket; // Single instance of SocketServer using this app
+        public static List<Publisher> Pubs; // List of Publisher object to be managed in this app
+
+        // Delegeat handlers
+        public delegate void ConnectPublisherEventHandler(object sender, int index); // for drawing
+        public delegate void MessageEventHandler(object sender, string message);
+
+        // Properties
+        public event ConnectPublisherEventHandler SocketServerConnectPublisher; // for drawing
+        public static event MessageEventHandler AppMessage;
 
         /// <summary>
         /// 単一アプリケーション オブジェクトを初期化します。これは、実行される作成したコードの
@@ -37,21 +43,18 @@ namespace WdBroker
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
-            TheSocketServer = new SocketServer();
+            Socket = new SocketServer();
         }
 
-        // Delegate Handlers
-        public delegate void MessageEventHandler(object sender, string message);
-        // Properties
-        public static event MessageEventHandler AppMessage;
-
+        #region Event handler
         private async void MessageEvent(string message)
         {
             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                this.AppMessage?.Invoke(this, message);
+                AppMessage?.Invoke(this, message);
             });
         }
+        #endregion
 
         private const int CMD_REQUEST_PUBLISHER_CONNECTION = 1;
         private const int CMD_SET_ATTRIBUTES = 2;
@@ -61,6 +64,15 @@ namespace WdBroker
         private const string RES_ACK = "ack";
         private const string RES_NAK = "nak";
         static List<string> CommandList = new List<string> { "1", "2", "3", "4", "5" };  // Command word sent by Publisher
+
+        // for drawing
+        private async void ConnectPublisherEvent(int index)
+        {
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                this.SocketServerConnectPublisher?.Invoke(this, index);
+            });
+        }
 
         public void PublisherCommandHandler(string request)
         {

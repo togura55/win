@@ -49,7 +49,7 @@ namespace WdBroker
 
             RetrieveHostNames();
 
-            App.pubs = new List<Publisher>();
+//            App.pubs = new List<Publisher>();
         }
 
         private async void MessageEvent(string message)
@@ -178,7 +178,6 @@ namespace WdBroker
             {
 
             }
-
         }
 
         public async void StreamSocketListener_CommandReceived2(Windows.Networking.Sockets.StreamSocketListener sender,
