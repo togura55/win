@@ -16,6 +16,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
+using Windows.Networking.Sockets;   //
+
 namespace WdBroker
 {
     /// <summary>
@@ -23,38 +25,23 @@ namespace WdBroker
     /// </summary>
     sealed partial class App : Application
     {
-
         public static SocketServer Socket; // Single instance of SocketServer using this app
         public static List<Publisher> Pubs; // List of Publisher object to be managed in this app
 
         // Delegeat handlers
-        public delegate void ConnectPublisherEventHandler(object sender, int index); // for drawing
         public delegate void MessageEventHandler(object sender, string message);
+        public delegate void ConnectPublisherEventHandler(object sender, int index);
+        public delegate void DrawingEventHandler(object sender, DeviceRawData data, int index); // for drawing
 
         // Properties
-        public event ConnectPublisherEventHandler SocketServerConnectPublisher; // for drawing
         public static event MessageEventHandler AppMessage;
+        public static event ConnectPublisherEventHandler AppConnectPublisher;
+        public static event DrawingEventHandler AppDrawing; // for drawing
 
-        /// <summary>
-        /// 単一アプリケーション オブジェクトを初期化します。これは、実行される作成したコードの
-        ///最初の行であるため、main() または WinMain() と論理的に等価です。
-        /// </summary>
-        public App()
-        {
-            this.InitializeComponent();
-            this.Suspending += OnSuspending;
-            Socket = new SocketServer();
-        }
-
-        #region Event handler
-        private async void MessageEvent(string message)
-        {
-            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                AppMessage?.Invoke(this, message);
-            });
-        }
-        #endregion
+        // Definition of constants
+        private const uint MASK_ID = 0x00FF;
+        private const uint MASK_STROKE = 0x0F00;
+        private const uint MASK_COMMAND = 0xF000;
 
         private const int CMD_REQUEST_PUBLISHER_CONNECTION = 1;
         private const int CMD_SET_ATTRIBUTES = 2;
@@ -65,16 +52,61 @@ namespace WdBroker
         private const string RES_NAK = "nak";
         static List<string> CommandList = new List<string> { "1", "2", "3", "4", "5" };  // Command word sent by Publisher
 
-        // for drawing
+
+        /// <summary>
+        /// 単一アプリケーション オブジェクトを初期化します。これは、実行される作成したコードの
+        ///最初の行であるため、main() または WinMain() と論理的に等価です。
+        /// </summary>
+        public App()
+        {
+            this.InitializeComponent();
+            this.Suspending += OnSuspending;
+
+            AppInitialize();
+        }
+        private void AppInitialize()
+        {
+            Socket = new SocketServer();
+
+            Socket.CommandEvent += OnCommandPublisherEvent;
+            Socket.DataEvent += OnDataPublisherEvent;
+        }
+        private void AppDispose()
+        {
+            Socket.CommandEvent -= OnCommandPublisherEvent;
+            Socket.DataEvent -= OnDataPublisherEvent;
+
+            Socket.Stop();
+            Socket = null;
+        }
+
+        #region Event handlers
+        private async void MessageEvent(string message)
+        {
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                AppMessage?.Invoke(this, message);
+            });
+        }
+
+        //// for drawing
+        private async void DrawingEvent(DeviceRawData data, int index)
+        {
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                AppDrawing?.Invoke(this, data, index);
+            });
+        }
+
         private async void ConnectPublisherEvent(int index)
         {
             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                this.SocketServerConnectPublisher?.Invoke(this, index);
+                AppConnectPublisher?.Invoke(this, index);
             });
         }
 
-        public void PublisherCommandHandler(string request)
+        private void OnCommandPublisherEvent(StreamSocketListenerConnectionReceivedEventArgs args, string request)
         {
             try
             {
@@ -106,14 +138,14 @@ namespace WdBroker
 
                             //// Do the publisher 1st contact process
                             //// 1. Create a new instance
-                            App.pubs.Add(new Publisher());
+                            App.Pubs.Add(new Publisher());
 
                             //// 2. Generate Publisher Id, smallest number of pubs
                             float id = 1; // set the base id number
                             float id_new = id;
-                            for (int j = 0; j < App.pubs.Count; j++)
+                            for (int j = 0; j < App.Pubs.Count; j++)
                             {
-                                if (App.pubs[j].Id != id)
+                                if (App.Pubs[j].Id != id)
                                 {
                                     // ToDo: find if id is already stored into another pubs[].Id
                                     id_new = id;
@@ -121,21 +153,22 @@ namespace WdBroker
                                 }
                                 id++;
                             }
-                            App.pubs[App.pubs.Count - 1].Id = id_new;
-                            ConnectPublisherEvent(App.pubs.Count - 1);  // Notify to caller 
+                            App.Pubs[App.Pubs.Count - 1].Id = id_new;
+ //                           ConnectPublisherEvent(App.Pubs.Count - 1);  // Notify to caller 
 
                             //// 3. Respond to the publisher
-                            //// Echo the request back as the response.
-                            App.TheSocketServer.StreamSocketListener_CommandResponse(id_new.ToString());
+                            //// response back.
+                            App.Socket.SendCommandResponse(args, id_new.ToString());
                             MessageEvent(string.Format("Assigned and sent Publisher ID: {0}", id_new.ToString()));
 
                             break;
 
+                            // Suppose getting this request only one time at the Publisher connection...
                         case CMD_SET_ATTRIBUTES:
                             var list_data = new List<string>();
                             list_data.AddRange(data.Split(sp));
 
-                            Publisher pub = App.pubs[int.Parse(publisher_id)];
+                            Publisher pub = App.Pubs[int.Parse(publisher_id)];
                             pub.DeviceSize.Width = double.Parse(list_data[0]);
                             pub.DeviceSize.Height = double.Parse(list_data[1]);
                             pub.PointSize = float.Parse(list_data[2]);
@@ -144,18 +177,35 @@ namespace WdBroker
                             pub.Battery = float.Parse(list_data[5]);
                             pub.DeviceType = list_data[6];
                             pub.TransferMode = list_data[7];
+
+                            App.Socket.SendCommandResponse(args, RES_ACK);
+                            MessageEvent(string.Format("Response to Publisher: {0}", RES_ACK));
+
+                            // ToDo: What shoud we do when the Publisher request to change the attribute?
+                            ConnectPublisherEvent(App.Pubs.Count - 1);  // Notify to caller 
+                            MessageEvent("Notify Publisher is connect");
+
                             break;
 
                         case CMD_START_PUBLISHER:
-                            App.pubs[int.Parse(publisher_id)].Start();
+                            App.Pubs[int.Parse(publisher_id)].Start();
+
+                            App.Socket.SendCommandResponse(args, RES_ACK);
+                            MessageEvent(string.Format("Response to Publisher: {0}", RES_ACK));
                             break;
 
                         case CMD_STOP_PUBLISHER:
-                            App.pubs[int.Parse(publisher_id)].Stop();
+                            App.Pubs[int.Parse(publisher_id)].Stop();
+
+                            App.Socket.SendCommandResponse(args, RES_ACK);
+                            MessageEvent(string.Format("Response to Publisher: {0}", RES_ACK));
                             break;
 
                         case CMD_DISPOSE_PUBLISHER:
-                            App.pubs[int.Parse(publisher_id)].Dispose();
+                            App.Pubs[int.Parse(publisher_id)].Dispose();
+
+                            App.Socket.SendCommandResponse(args, RES_ACK);
+                            MessageEvent(string.Format("Response to Publisher: {0}", RES_ACK));
                             break;
 
                         //default:
@@ -164,36 +214,115 @@ namespace WdBroker
                         default:
                             break;
                     }
-                    //await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                    //this.ListBox_Message.Items.Add(string.Format("server received the request: \"{0}\"", request)));
-                    //            this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionReceived(): server received the request: \"{0}\"", request));
 
-                    // Echo the request back as the response.
-                    //using (Stream outputStream = args.Socket.OutputStream.AsStreamForWrite())
-                    //{s
-                    //    using (var streamWriter = new StreamWriter(outputStream))
-                    //    {
-                    //        await streamWriter.WriteLineAsync(request);
-                    //        await streamWriter.FlushAsync();
-                    //    }
-                    //}
-
-                    //await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                    //{
-                    //    this.SocketServerMessage?.Invoke(this, string.Format("StreamSocketListener_ConnectionReceived(): server sent back the response: \"{0}\"", request));
-                    //});
                 }
                 else
                 {
                     // invalid command word
+                    App.Socket.SendCommandResponse(args, RES_NAK);
+                    MessageEvent(string.Format("Response to Publisher: {0}", RES_NAK));
                 }
             }
             catch (Exception ex)
             {
-
+                MessageEvent(string.Format("OnCommandPublisherEvent: Exception: {0}", ex.Message));
             }
-
         }
+
+        private void OnDataPublisherEvent(Byte[] databyte)
+        {
+            const int num_bytes = sizeof(float);
+            int index = 0;
+            int count = 0;
+            float f = 0, x = 0, y = 0, z = 0;
+            string label = string.Empty;
+
+            try
+            {
+                // It's depend on each packets how many bytes are included.. 
+                for (int i = 0; i < databyte.Length / num_bytes; i++)
+                {
+                    float data = BitConverter.ToSingle(databyte, i * num_bytes);
+
+                    if ((count % 4) == 0)
+                    {
+                        count = 0;
+                        f = x = y = z = 0;
+                    }
+
+                    switch (count)
+                    {
+                        case 0:
+                            label = "f"; f = data; break;
+                        case 1:
+                            label = "x"; x = data; break;
+                        case 2:
+                            label = "y"; y = data; break;
+                        case 3:
+                            label = "z"; z = data; break;
+                    }
+
+                    string output = "OnDataPublisherEvent(): Received data [{0}]:[{1}]:[{2}] {3}=";
+                    if (label == "f")
+                        //                                output += "\"0x{3:X4}\"";
+                        output += "\"{4}\"";
+                    else if (label == "z")
+                        output += "\"{4:0.######}\"";
+                    else
+                        output += "\"{4}\"";
+                    MessageEvent(string.Format(output, index, ((uint)f & MASK_ID), ((uint)f & MASK_STROKE) >> 8, label, data));
+
+                    // --------------------------
+                    if (label == "z")  // all together
+                    {
+                        uint pub_id = ((uint)f & MASK_ID);
+                        uint path_order = ((uint)f & MASK_STROKE) >> 8;
+
+                        if (!App.Pubs.Exists(pubs => pubs.Id == pub_id))
+                        {
+                            // Error
+                            throw new Exception(string.Format("OnDataPublisherEvent(): Exception: A publisher includes unknown Publisher ID: {0}",
+                                pub_id.ToString()));
+                        }
+                        else  // Publisher existed
+                        {
+                            // Search by Id, add data list and store raw data
+                            int pi = App.Pubs.FindIndex(n => n.Id == pub_id);
+
+                            DeviceRawData drd = new DeviceRawData(f, x, y, z);
+                            if (path_order == 1)  // begin storoke?
+                            {
+                                Stroke stroke = new Stroke
+                                {
+                                    DeviceRawDataList = new List<DeviceRawData>()
+                                };
+                                App.Pubs[pi].Strokes.Add(stroke);
+                            }
+                            else if (path_order == 2)  // end stroke?
+                            {
+                                int s = App.Pubs[pi].Strokes.Count - 1;
+                                App.Pubs[pi].Strokes[s].DeviceRawDataList.Add(drd);
+                            }
+                            else  // intermediate
+                            {
+                                int s = App.Pubs[pi].Strokes.Count - 1;
+                                App.Pubs[pi].Strokes[s].DeviceRawDataList.Add(drd);
+                            }
+                            DrawingEvent(drd, pi);  // for drawing
+                        }
+                    }
+                    index++;
+                    count++;
+                }
+
+                //                        if (index == 5) break;  // for debug
+            }
+            catch(Exception ex)
+            {
+                MessageEvent(string.Format("OnDataPublisherEvent: Exception: {0}", ex.Message));
+            }
+        }
+        #endregion
 
         /// <summary>
         /// アプリケーションがエンド ユーザーによって正常に起動されたときに呼び出されます。他のエントリ ポイントは、
@@ -202,11 +331,9 @@ namespace WdBroker
         /// <param name="e">起動の要求とプロセスの詳細を表示します。</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            Frame rootFrame = Window.Current.Content as Frame;
-
             // ウィンドウに既にコンテンツが表示されている場合は、アプリケーションの初期化を繰り返さずに、
             // ウィンドウがアクティブであることだけを確認してください
-            if (rootFrame == null)
+            if (!(Window.Current.Content is Frame rootFrame))
             {
                 // ナビゲーション コンテキストとして動作するフレームを作成し、最初のページに移動します
                 rootFrame = new Frame();
@@ -255,6 +382,8 @@ namespace WdBroker
         /// <param name="e">中断要求の詳細。</param>
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
+            AppDispose();
+
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: アプリケーションの状態を保存してバックグラウンドの動作があれば停止します
             deferral.Complete();

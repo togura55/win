@@ -46,12 +46,10 @@ namespace WdBroker
         {
             this.InitializeComponent();
 
-            SocketServer socketServer = App.TheSocketServer; 
-            socketServer = new SocketServer();
-            socketServer.SocketServerMessage += ReceiveSocketServerMessage;
-            socketServer.SocketServerConnectPublisher += ReceiveSocketServerConnectPublisher;  // for drawing
-            socketServer.SocketServerDrawing += ReceiveSocketServerDrawing;  // for drawing
-            App.AppMessage += ReceiveSocketServerMessage;
+            App.Socket.SocketServerMessage += ReceiveMessage;
+            App.AppConnectPublisher += ReceiveAppConnectPublisher;
+            App.AppMessage += ReceiveMessage;
+            App.AppDrawing += ReceiveDrawing;  // for drawing
 
             RestoreSettings();
 
@@ -71,7 +69,7 @@ namespace WdBroker
             {
                 int count = 0;
                 int index = 0;
-                foreach (Windows.Networking.HostName host in socketServer.HostNames)
+                foreach (Windows.Networking.HostName host in App.Socket.HostNames)
                 {
                     viewModel.HostNameCollection.Add(host.ToString());
                     if (HostNameString == host.ToString())
@@ -92,7 +90,7 @@ namespace WdBroker
         }
 
         // Message event handler sent by SocketServer object
-        private void ReceiveSocketServerMessage(object sender, string message)
+        private void ReceiveMessage(object sender, string message)
         {
             ListBox_Message.Items.Add(message);
             ListBox_Message.ScrollIntoView(message);    // scroll to bottom
@@ -105,17 +103,17 @@ namespace WdBroker
                 string.Format("{0} button was clicked.", resourceLoader.GetString(fStart ? "IDC_Start" : "IDC_Stop")));
 
             GetUiState();
-            App.TheSocketServer.ServerHostName = new Windows.Networking.HostName(HostNameString); // for debug
+            App.Socket.ServerHostName = new Windows.Networking.HostName(HostNameString); // for debug
 
             try
             {
                 if (fStart)
                 {
-                    await App.TheSocketServer.Start(PortNumberString);
+                    await App.Socket.Start(PortNumberString);
                 }
                 else
                 {
-                    App.TheSocketServer.Stop();
+                    App.Socket.Stop();
                 }
 
                 fStart = fStart ? false : true;   // toggle if success
@@ -141,10 +139,13 @@ namespace WdBroker
 
             StoreSettings();
 
-            App.TheSocketServer.SocketServerMessage -= ReceiveSocketServerMessage;
+            App.Socket.SocketServerMessage -= ReceiveMessage;
+            App.AppConnectPublisher -= ReceiveAppConnectPublisher;
+            App.AppMessage -= ReceiveMessage;
+            App.AppDrawing -= ReceiveDrawing;  // for drawing
         }
 
-        private void ReceiveSocketServerConnectPublisher(object sender, int index)
+        private void ReceiveAppConnectPublisher(object sender, int index)
         {
             SetCanvasScaling(index);
         }
@@ -185,7 +186,7 @@ namespace WdBroker
         }
 
         // Raw data event handler sent by SocketServer object
-        private void ReceiveSocketServerDrawing(object sender, DeviceRawData data, int index)
+        private void ReceiveDrawing(object sender, DeviceRawData data, int index)
         {
             uint path_order = ((uint)data.f & 0x0F00) >> 8;
             DrawStroke((float)path_order, data.x, data.y, index);
@@ -195,7 +196,7 @@ namespace WdBroker
         {
             try
             {
-                Publisher pub = App.pubs[index];
+                Publisher pub = App.Pubs[index];
 
                 if (f == 1)
                 {
@@ -208,11 +209,13 @@ namespace WdBroker
                 else
                 {
                     // intermediates and end
-                    var ellipse = new Ellipse();
-                    ellipse.Fill = new SolidColorBrush(UIColors[index]);
-                    ellipse.Width = 4;
-                    ellipse.Height = 4;
-                    ellipse.Margin = new Thickness((x * pub.ViewScale), (y * pub.ViewScale), 0, 0);
+                    var ellipse = new Ellipse
+                    {
+                        Fill = new SolidColorBrush(UIColors[index]),
+                        Width = 4,
+                        Height = 4,
+                        Margin = new Thickness((x * pub.ViewScale), (y * pub.ViewScale), 0, 0)
+                    };
                     this.Canvas_Strokes.Children.Add(ellipse);
 
                     if (!pub.StartState)
@@ -251,7 +254,7 @@ namespace WdBroker
         {
             try
             {
-                Publisher pub = App.pubs[index];
+                Publisher pub = App.Pubs[index];
 
                 if (pub != null)
                 {
