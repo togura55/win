@@ -20,6 +20,7 @@ namespace WillDevicesSampleApp
         string HostNameString;
         string PortNumberString;
 
+        // Delegate handlers
         public delegate void MessageEventHandler(object sender, string message);
         public delegate void InitializationCompletedNotificationHandler(object sender, bool result);
 
@@ -148,7 +149,7 @@ namespace WillDevicesSampleApp
 
                         case CMD_SET_ATTRIBUTES:
                             commandString = string.Format("{0},{1},{2}", PublisherId, 2,
-                                AppObjects.Instance.WacomDevice.Attribute.GenerateStrings()); ;
+                                AppObjects.Instance.WacomDevice.Attribute.GenerateStrings());
                             break;
 
                         case CMD_START_PUBLISHER:
@@ -169,7 +170,8 @@ namespace WillDevicesSampleApp
                     }
 
                     CommandResponseState = command;
-                    commandSocketClient.CommandSends(commandString);
+                    commandSocketClient.SendCommand(commandString);
+
                     await commandSocketClient.ResponseReceive();
                 }
                 else
@@ -183,30 +185,31 @@ namespace WillDevicesSampleApp
             }
         }
 
-        public async Task Send(float command)
-        {
-            try
-            {
-                // send command packets
-                if (commandSocketClient != null)
-                {
-                    switch (command)
-                    {
-                        case CMD_REQUEST_PUBLISHER_CONNECTION:
-                            commandSocketClient.BatchedSends(CreateTransferBuffer(command));
-                            await commandSocketClient.ResponseReceive();
-                            break;
+//        public async Task Send(float command)
+//        {
+//            try
+//            {
+//                // send command packets
+//                if (commandSocketClient != null)
+//                {
+//                    switch (command)
+//                    {
+//                        case CMD_REQUEST_PUBLISHER_CONNECTION:
+////                            commandSocketClient.BatchedSends(CreateTransferBuffer(command));
 
-                        default:
-                            break;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(string.Format("Send() Exception: {0}", ex.Message));
-            }
-        }
+//                            await commandSocketClient.ResponseReceive();
+//                            break;
+
+//                        default:
+//                            break;
+//                    }
+//                }
+//            }
+//            catch (Exception ex)
+//            {
+//                throw new Exception(string.Format("Send() Exception: {0}", ex.Message));
+//            }
+//        }
 
         public void Receive()
         {
@@ -239,7 +242,7 @@ namespace WillDevicesSampleApp
             if (result)
             {
                 CommandResponseState = CMD_REQUEST_PUBLISHER_CONNECTION;
-                await this.Send(CMD_REQUEST_PUBLISHER_CONNECTION);
+                await this.SendCommand(CMD_REQUEST_PUBLISHER_CONNECTION);
             }
             else
             {
@@ -282,7 +285,8 @@ namespace WillDevicesSampleApp
                                 response, AppObjects.Instance.WacomDevice.PublisherAttribute));
 
                             this.CommandResponseState = CMD_REQUEST_PUBLISHER_CONNECTION;
-                            await this.Send(CMD_REQUEST_PUBLISHER_CONNECTION);
+                            AppObjects.Instance.SocketClient.SendCommand(RES_ACK);
+                            MessageEvent("Send ACK");
                         }
                         break;
 

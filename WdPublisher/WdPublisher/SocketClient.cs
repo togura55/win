@@ -27,14 +27,17 @@ namespace WillDevicesSampleApp
         public StreamSocket streamSocket;
         public StreamSocketListener streamSocketListener;
 
+        // Delegate handlers
         public delegate void MessageEventHandler(object sender, string message);
         public delegate void SocketClientConnectCompletedNotificationHandler(object sender, bool result);
         public delegate void SocketClientReceivedResponseNotificationHandler(object sender, float responce);
+        public delegate void CommandResponseEventHandler(StreamSocketListenerConnectionReceivedEventArgs args, string message);
 
         // Properties
+        public event MessageEventHandler SocketClientMessage;
         public event SocketClientConnectCompletedNotificationHandler SocketClientConnectCompletedNotification;
         public event SocketClientReceivedResponseNotificationHandler SocketClientReceivedResponse;
-        public event MessageEventHandler SocketClientMessage;
+        public event CommandResponseEventHandler CommandResponseEvent;
 
         public SocketClient()
         {
@@ -68,7 +71,8 @@ namespace WillDevicesSampleApp
                 streamSocketListener = new StreamSocketListener();
 
                 // The ConnectionReceived event is raised when connections are received.
-                streamSocketListener.ConnectionReceived += StreamSocketListener_ResponseReceived;
+//                streamSocketListener.ConnectionReceived += StreamSocketListener_ResponseReceived;
+                streamSocketListener.ConnectionReceived += StreamSocketListener_StringReceive;
 
                 // Start listening for incoming TCP connections on the specified port. 
                 // You can specify any port that's not currently in use.
@@ -153,26 +157,215 @@ namespace WillDevicesSampleApp
             }
         }
 
-        public void CommandSends(string message)
-        {
-            try
-            {
-
-            }
-            catch (Exception ex)
-            {
-                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("CommandSends(): Exception: {0}",
-                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
-
-            }
-        }
-
         /// <summary>
         /// A C#-only technique for batched sends.
         /// </summary>
         /// <param name="buffer"></param>
-        public void BatchedSends(IBuffer buffer)
+        //public void BatchedSends(IBuffer buffer)
+        //{
+        //    try
+        //    {
+        //        var packetsToSend = new List<IBuffer>
+        //        {
+        //            buffer
+        //        };
+
+        //        var pendingTasks = new System.Threading.Tasks.Task[packetsToSend.Count];
+
+        //        for (int index = 0; index < packetsToSend.Count; ++index)
+        //        {
+        //            // track all pending writes as tasks, but don't wait on one before beginning the next.
+        //            pendingTasks[index] = streamSocket.OutputStream.WriteAsync(packetsToSend[index]).AsTask();
+        //            // Don't modify any buffer's contents until the pending writes are complete.
+        //        }
+
+        //        // Wait for all of the pending writes to complete.
+        //        System.Threading.Tasks.Task.WaitAll(pendingTasks);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+        //        throw new Exception(string.Format("BatchedSends(): Exception: {0}",
+        //            webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+        //    }
+        //}
+
+        //public async Task Receive()
+        //{
+        //    try
+        //    {
+        //        // Read data from the echo server.
+        //        string response;
+        //        using (Stream inputStream = streamSocket.InputStream.AsStreamForRead())
+        //        {
+        //            using (StreamReader streamReader = new StreamReader(inputStream))
+        //            {
+        //                response = await streamReader.ReadLineAsync();
+        //            }
+        //        }
+        //        //                   this.clientListBox.Items.Add(string.Format("client received the response: \"{0}\" ", response));
+
+        //        // ToDo: update response in here
+
+        //        // Notify to caller
+        //        //await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+        //        //{
+        //        //    this.SocketClientReceivedResponse?.Invoke(this, (float)response);
+        //        //});
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+        //        Debug.WriteLine(string.Format("Receive(): Exception: {0}",
+        //            webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+        //    }
+        //}
+
+        //public async Task ResponseReceive()
+        //{
+        //    const int num_bytes = sizeof(float);    // assuming float type of data
+
+        //    try
+        //    {
+        //        using (var dataReader = new DataReader(streamSocket.InputStream))
+        //        //                using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
+        //        {
+        //            int count = 0;
+        //            float responce = 0;
+
+        //            dataReader.InputStreamOptions = InputStreamOptions.Partial;
+        //            while (true)
+        //            {
+        //                await dataReader.LoadAsync(256);
+        //                if (dataReader.UnconsumedBufferLength == 0) break;
+        //                IBuffer requestBuffer = dataReader.ReadBuffer(dataReader.UnconsumedBufferLength);
+        //                Byte[] databyte = requestBuffer.ToArray();  //ReadBytes
+
+        //                // It's depend on each packets how many bytes are included.. 
+        //                for (int i = 0; i < databyte.Length / num_bytes; i++)
+        //                {
+        //                    responce = BitConverter.ToSingle(databyte, i * num_bytes);
+
+        //                    count++;
+        //                }
+
+        //                this.SocketClientReceivedResponse?.Invoke(this, responce);
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+        //        throw new Exception(string.Format("ResponseReceive(): Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+
+        //    }
+        //}
+
+        //private async void StreamSocketListener_ResponseReceived(StreamSocketListener sender,
+        //    StreamSocketListenerConnectionReceivedEventArgs args)
+        //{
+        //    const int num_bytes = sizeof(float);    // assuming float type of data
+
+        //    try
+        //    {
+        //        using (var dataReader = new DataReader(args.Socket.InputStream))
+        //        //                using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
+        //        {
+        //            int count = 0;
+        //            float response = 0;
+
+        //            dataReader.InputStreamOptions = InputStreamOptions.Partial;
+        //            while (true)
+        //            {
+        //                await dataReader.LoadAsync(256);
+        //                if (dataReader.UnconsumedBufferLength == 0) break;
+        //                IBuffer requestBuffer = dataReader.ReadBuffer(dataReader.UnconsumedBufferLength);
+        //                Byte[] databyte = requestBuffer.ToArray();  //ReadBytes
+
+        //                // It's depend on each packets how many bytes are included.. 
+        //                for (int i = 0; i < databyte.Length / num_bytes; i++)
+        //                {
+        //                    response = BitConverter.ToSingle(databyte, i * num_bytes);
+
+        //                    count++;
+        //                }
+
+        //                this.SocketClientReceivedResponse?.Invoke(this, response);
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+        //        throw new Exception(string.Format("StreamSocketListener_ResponseReceived: Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+
+        //    }
+        //}
+
+        #region SocketClient services
+        public async void SendCommand(string response)
+        {
+            await StreamSocketListener_StringSend(streamSocket, response);
+        }
+        public async void SendData(IBuffer buffer)
+        {
+            await StreamSocketListener_BinarySend(streamSocket, buffer);
+        }
+        #endregion
+
+        #region Socket I/O
+        private async Task StreamSocketListener_StringSend(
+            StreamSocket socket, string message)
+        {
+            try
+            {
+                //                Send the response back to Publisher as string
+                using (Stream outputStream = socket.OutputStream.AsStreamForWrite())
+                {
+                    using (var streamWriter = new StreamWriter(outputStream))
+                    {
+                        await streamWriter.WriteLineAsync(message);
+                        await streamWriter.FlushAsync();
+                    }
+
+                    this.SocketClientMessage?.Invoke(this, String.Format("StreamSocketListener_StringSend: Sent: {0}", message));
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                throw new Exception(string.Format("StreamSocketListener_DataReceived(): Exception: {0}",
+                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+            }
+        }
+
+        private async void StreamSocketListener_StringReceive(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
+        {
+            try
+            {
+                string request;
+                using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
+                {
+                    request = await streamReader.ReadLineAsync();
+                }
+                MessageEvent(string.Format("StreamSocketListener_StringReceive(): Command: \"{0}\"", request));
+
+                //                App.PublisherCommandHandler(args, request);
+                this.CommandResponseEvent?.Invoke(args, request);
+
+                sender.Dispose();
+                MessageEvent(string.Format("StreamSocketListener_StringReceive(): server closed its socket"));
+            }
+            catch (Exception ex)
+            {
+                Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                throw new Exception(string.Format("StreamSocketListener_StringReceive(): Exception: {0}",
+                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+            }
+        }
+
+        private async Task StreamSocketListener_BinarySend(StreamSocket socket, IBuffer buffer)
         {
             try
             {
@@ -186,7 +379,7 @@ namespace WillDevicesSampleApp
                 for (int index = 0; index < packetsToSend.Count; ++index)
                 {
                     // track all pending writes as tasks, but don't wait on one before beginning the next.
-                    pendingTasks[index] = streamSocket.OutputStream.WriteAsync(packetsToSend[index]).AsTask();
+                    pendingTasks[index] = socket.OutputStream.WriteAsync(packetsToSend[index]).AsTask();
                     // Don't modify any buffer's contents until the pending writes are complete.
                 }
 
@@ -196,122 +389,10 @@ namespace WillDevicesSampleApp
             catch (Exception ex)
             {
                 SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("BatchedSends(): Exception: {0}",
+                throw new Exception(string.Format("StreamSocketListener_BinarySend: Exception: {0}",
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
-
-        public async Task Receive()
-        {
-            try
-            {
-                // Read data from the echo server.
-                string response;
-                using (Stream inputStream = streamSocket.InputStream.AsStreamForRead())
-                {
-                    using (StreamReader streamReader = new StreamReader(inputStream))
-                    {
-                        response = await streamReader.ReadLineAsync();
-                    }
-                }
-                //                   this.clientListBox.Items.Add(string.Format("client received the response: \"{0}\" ", response));
-
-                // ToDo: update response in here
-
-                // Notify to caller
-                //await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                //{
-                //    this.SocketClientReceivedResponse?.Invoke(this, (float)response);
-                //});
-            }
-            catch (Exception ex)
-            {
-                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
-                Debug.WriteLine(string.Format("Receive(): Exception: {0}",
-                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
-            }
-        }
-
-        public async Task ResponseReceive()
-        {
-            const int num_bytes = sizeof(float);    // assuming float type of data
-
-            try
-            {
-                using (var dataReader = new DataReader(streamSocket.InputStream))
-                //                using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
-                {
-                    int count = 0;
-                    float responce = 0;
-
-                    dataReader.InputStreamOptions = InputStreamOptions.Partial;
-                    while (true)
-                    {
-                        await dataReader.LoadAsync(256);
-                        if (dataReader.UnconsumedBufferLength == 0) break;
-                        IBuffer requestBuffer = dataReader.ReadBuffer(dataReader.UnconsumedBufferLength);
-                        Byte[] databyte = requestBuffer.ToArray();  //ReadBytes
-
-                        // It's depend on each packets how many bytes are included.. 
-                        for (int i = 0; i < databyte.Length / num_bytes; i++)
-                        {
-                            responce = BitConverter.ToSingle(databyte, i * num_bytes);
-
-                            count++;
-                        }
-
-                        this.SocketClientReceivedResponse?.Invoke(this, responce);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("ResponseReceive(): Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
-
-            }
-        }
-
-        private async void StreamSocketListener_ResponseReceived(StreamSocketListener sender,
-            StreamSocketListenerConnectionReceivedEventArgs args)
-        {
-            const int num_bytes = sizeof(float);    // assuming float type of data
-
-            try
-            {
-                using (var dataReader = new DataReader(args.Socket.InputStream))
-                //                using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
-                {
-                    int count = 0;
-                    float response = 0;
-
-                    dataReader.InputStreamOptions = InputStreamOptions.Partial;
-                    while (true)
-                    {
-                        await dataReader.LoadAsync(256);
-                        if (dataReader.UnconsumedBufferLength == 0) break;
-                        IBuffer requestBuffer = dataReader.ReadBuffer(dataReader.UnconsumedBufferLength);
-                        Byte[] databyte = requestBuffer.ToArray();  //ReadBytes
-
-                        // It's depend on each packets how many bytes are included.. 
-                        for (int i = 0; i < databyte.Length / num_bytes; i++)
-                        {
-                            response = BitConverter.ToSingle(databyte, i * num_bytes);
-
-                            count++;
-                        }
-
-                        this.SocketClientReceivedResponse?.Invoke(this, response);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("StreamSocketListener_ResponseReceived: Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
-
-            }
-        }
-
+        #endregion
     }
 }

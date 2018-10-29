@@ -241,7 +241,9 @@ namespace WillDevicesSampleApp
             var pathPart = e.PathPart;
 
             if (AppObjects.Instance.SocketClient != null)
-                AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
+ //               AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
+            AppObjects.Instance.SocketClient.SendData(CreateBuffer(pathPart));
+
         }
 
         private void Service_StrokeUpdated(object sender, StrokeUpdatedEventArgs e)
@@ -253,8 +255,9 @@ namespace WillDevicesSampleApp
             var pathPart = e.PathPart;
 
             if (AppObjects.Instance.SocketClient != null)
-                AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
-           
+                //               AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
+                AppObjects.Instance.SocketClient.SendData(CreateBuffer(pathPart));
+
 
             //var point = new StylusPoint(x * m_scale, y * m_scale, w);
             if (m_addNewStrokeToModel)
@@ -303,8 +306,8 @@ namespace WillDevicesSampleApp
             StrokeCount++;
 
             if (AppObjects.Instance.SocketClient != null)
-                AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(null));
-
+                //               AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
+                AppObjects.Instance.SocketClient.SendData(CreateBuffer(null));
         }
 
         private IBuffer CreateBuffer(Wacom.Ink.Path pathPart)
@@ -323,7 +326,6 @@ namespace WillDevicesSampleApp
             }
             else   // others
             {
-
                 var data = pathPart.Data.GetEnumerator();
 
                 if (data.MoveNext())
