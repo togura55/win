@@ -26,7 +26,7 @@ namespace WdBroker
     sealed partial class App : Application
     {
         public static SocketServer Socket; // Single instance of SocketServer using this app
-        public static List<Publisher> Pubs; // List of Publisher object to be managed in this app
+        public static List<Publisher> Pubs = new List<Publisher>(); // List of Publisher object to be managed in this app
 
         // Delegeat handlers
         public delegate void MessageEventHandler(object sender, string message);
@@ -128,7 +128,7 @@ namespace WdBroker
                     data = list[2];
                 }
 
-                int command_index = CommandList.IndexOf(request) + 1;
+                int command_index = CommandList.IndexOf(command) + 1;
                 if (command_index > 0)
                 {
                     switch (command_index)
@@ -138,6 +138,7 @@ namespace WdBroker
 
                             //// Do the publisher 1st contact process
                             //// 1. Create a new instance
+  //                          Publisher publisher = new Publisher();
                             App.Pubs.Add(new Publisher());
 
                             //// 2. Generate Publisher Id, smallest number of pubs
@@ -158,7 +159,7 @@ namespace WdBroker
 
                             //// 3. Respond to the publisher
                             //// response back.
-                            App.Socket.SendCommandResponse(args, id_new.ToString());
+                            App.Socket.SendCommandResponseAsync(args, id_new.ToString());
                             MessageEvent(string.Format("Assigned and sent Publisher ID: {0}", id_new.ToString()));
 
                             break;
@@ -178,7 +179,7 @@ namespace WdBroker
                             pub.DeviceType = list_data[6];
                             pub.TransferMode = list_data[7];
 
-                            App.Socket.SendCommandResponse(args, RES_ACK);
+                            App.Socket.SendCommandResponseAsync(args, RES_ACK);
                             MessageEvent(string.Format("Response to Publisher: {0}", RES_ACK));
 
                             // ToDo: What shoud we do when the Publisher request to change the attribute?
@@ -190,21 +191,21 @@ namespace WdBroker
                         case CMD_START_PUBLISHER:
                             App.Pubs[int.Parse(publisher_id)].Start();
 
-                            App.Socket.SendCommandResponse(args, RES_ACK);
+                            App.Socket.SendCommandResponseAsync(args, RES_ACK);
                             MessageEvent(string.Format("Response to Publisher: {0}", RES_ACK));
                             break;
 
                         case CMD_STOP_PUBLISHER:
                             App.Pubs[int.Parse(publisher_id)].Stop();
 
-                            App.Socket.SendCommandResponse(args, RES_ACK);
+                            App.Socket.SendCommandResponseAsync(args, RES_ACK);
                             MessageEvent(string.Format("Response to Publisher: {0}", RES_ACK));
                             break;
 
                         case CMD_DISPOSE_PUBLISHER:
                             App.Pubs[int.Parse(publisher_id)].Dispose();
 
-                            App.Socket.SendCommandResponse(args, RES_ACK);
+                            App.Socket.SendCommandResponseAsync(args, RES_ACK);
                             MessageEvent(string.Format("Response to Publisher: {0}", RES_ACK));
                             break;
 
@@ -219,7 +220,7 @@ namespace WdBroker
                 else
                 {
                     // invalid command word
-                    App.Socket.SendCommandResponse(args, RES_NAK);
+                    App.Socket.SendCommandResponseAsync(args, RES_NAK);
                     MessageEvent(string.Format("Response to Publisher: {0}", RES_NAK));
                 }
             }

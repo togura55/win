@@ -62,7 +62,7 @@ namespace WdBroker
                 }
             }
         }
-   
+
         #region SocketServer services
         public async Task Start(string PortNumber)
         {
@@ -129,14 +129,19 @@ namespace WdBroker
             }
         }
 
-        public async void SendCommandResponse(StreamSocketListenerConnectionReceivedEventArgs args, string response)
+        public async Task SendCommandResponseAsync(StreamSocketListenerConnectionReceivedEventArgs args, string response)
         {
-            await StreamSocket_SendString(args, response);
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            () =>
+            {
+                StreamSocket_SendString(args, response);
+            }
+);
         }
         #endregion
 
         #region Socket I/O
-        private async Task StreamSocket_SendString(
+        private async void StreamSocket_SendString(
             StreamSocketListenerConnectionReceivedEventArgs args, string message)
         {
             try
@@ -160,7 +165,7 @@ namespace WdBroker
             }
         }
 
-        private async void StreamSocketListener_ReceiveString(StreamSocketListener sender, 
+        private async void StreamSocketListener_ReceiveString(StreamSocketListener sender,
             StreamSocketListenerConnectionReceivedEventArgs args)
         {
             try
@@ -172,11 +177,11 @@ namespace WdBroker
                 }
                 MessageEvent(string.Format("StreamSocketListener_ReceiveString: Command: \"{0}\"", request));
 
-//                App.PublisherCommandHandler(args, request);
+                //                App.PublisherCommandHandler(args, request);
                 this.CommandEvent?.Invoke(args, request);
 
-                sender.Dispose();
-                MessageEvent(string.Format("StreamSocketListener_ReceiveString: server closed its socket"));
+//                sender.Dispose();
+//                MessageEvent(string.Format("StreamSocketListener_ReceiveString: server closed its socket"));
             }
             catch (Exception ex)
             {
