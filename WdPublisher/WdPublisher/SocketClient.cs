@@ -71,8 +71,7 @@ namespace WillDevicesSampleApp
                 streamSocketListener = new StreamSocketListener();
 
                 // The ConnectionReceived event is raised when connections are received.
-//                streamSocketListener.ConnectionReceived += StreamSocketListener_ResponseReceived;
-                streamSocketListener.ConnectionReceived += StreamSocketListener_StringReceive;
+                streamSocketListener.ConnectionReceived += StreamSocketListener_ReceiveString;
 
                 // Start listening for incoming TCP connections on the specified port. 
                 // You can specify any port that's not currently in use.
@@ -303,19 +302,18 @@ namespace WillDevicesSampleApp
         //}
 
         #region SocketClient services
-        public async void SendCommand(string response)
+        public async Task SendCommand(string response)
         {
-            await StreamSocketListener_StringSend(streamSocket, response);
+            await StreamSocket_SendString(streamSocket, response);
         }
         public async void SendData(IBuffer buffer)
         {
-            await StreamSocketListener_BinarySend(streamSocket, buffer);
+            await StreamSocket_SendBinary(streamSocket, buffer);
         }
         #endregion
 
         #region Socket I/O
-        private async Task StreamSocketListener_StringSend(
-            StreamSocket socket, string message)
+        private async Task StreamSocket_SendString(StreamSocket socket, string message)
         {
             try
             {
@@ -328,19 +326,19 @@ namespace WillDevicesSampleApp
                         await streamWriter.FlushAsync();
                     }
 
-                    this.SocketClientMessage?.Invoke(this, String.Format("StreamSocketListener_StringSend: Sent: {0}", message));
+                    this.SocketClientMessage?.Invoke(this, String.Format("StreamSocket_SendString: Sent: {0}", message));
                 }
 
             }
             catch (Exception ex)
             {
                 Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("StreamSocketListener_DataReceived(): Exception: {0}",
+                throw new Exception(string.Format("StreamSocket_SendString: Exception: {0}",
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
 
-        private async void StreamSocketListener_StringReceive(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
+        private async void StreamSocketListener_ReceiveString(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
         {
             try
             {
@@ -349,13 +347,13 @@ namespace WillDevicesSampleApp
                 {
                     request = await streamReader.ReadLineAsync();
                 }
-                MessageEvent(string.Format("StreamSocketListener_StringReceive(): Command: \"{0}\"", request));
+                MessageEvent(string.Format("StreamSocketListener_ReceiveString: Command: \"{0}\"", request));
 
                 //                App.PublisherCommandHandler(args, request);
                 this.CommandResponseEvent?.Invoke(args, request);
 
                 sender.Dispose();
-                MessageEvent(string.Format("StreamSocketListener_StringReceive(): server closed its socket"));
+                MessageEvent(string.Format("StreamSocketListener_ReceiveString: server closed its socket"));
             }
             catch (Exception ex)
             {
@@ -365,7 +363,7 @@ namespace WillDevicesSampleApp
             }
         }
 
-        private async Task StreamSocketListener_BinarySend(StreamSocket socket, IBuffer buffer)
+        private async Task StreamSocket_SendBinary(StreamSocket socket, IBuffer buffer)
         {
             try
             {
@@ -389,7 +387,7 @@ namespace WillDevicesSampleApp
             catch (Exception ex)
             {
                 SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("StreamSocketListener_BinarySend: Exception: {0}",
+                throw new Exception(string.Format("StreamSocket_SendBinary: Exception: {0}",
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }

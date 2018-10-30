@@ -30,8 +30,8 @@ namespace WillDevicesSampleApp
         //        private double m_scale = 1.0;
         //        private Size m_deviceSize;
         private bool m_addNewStrokeToModel = true;
-        private static float maxP = 1.402218f;
-        private static float pFactor = 1.0f / (maxP - 1.0f);
+        private static readonly float maxP = 1.402218f;
+        private static readonly float pFactor = 1.0f / (maxP - 1.0f);
         int PointCount;
         int StrokeCount;
         ////        public InkTransfer inkTransfer;
@@ -585,9 +585,7 @@ namespace WillDevicesSampleApp
 
         private void OnDeviceStatusChanged_ScanAndConnect(object sender, DeviceStatusChangedEventArgs e)
         {
-            IDigitalInkDevice device = sender as IDigitalInkDevice;
-
-            if (device == null)
+            if (!(sender is IDigitalInkDevice device))
                 return;
 
             //TextBlock textBlock = null;

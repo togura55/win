@@ -62,7 +62,8 @@ namespace WdBroker
                 }
             }
         }
-
+   
+        #region SocketServer services
         public async Task Start(string PortNumber)
         {
             try
@@ -74,7 +75,7 @@ namespace WdBroker
                 streamSocketListenerCommand = new StreamSocketListener();
 
                 // The ConnectionReceived event is raised when connections are received.
-                streamSocketListenerCommand.ConnectionReceived += StreamSocketListener_StringReceive;
+                streamSocketListenerCommand.ConnectionReceived += StreamSocketListener_ReceiveString;
 
                 // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currently in use.
                 await streamSocketListenerCommand.BindEndpointAsync(ServerHostName, PortNumber).AsTask().ConfigureAwait(false);
@@ -90,7 +91,7 @@ namespace WdBroker
                 streamSocketListenerData = new StreamSocketListener();
 
                 // The ConnectionReceived event is raised when connections are received.
-                streamSocketListenerData.ConnectionReceived += StreamSocketListener_BinaryReceive;
+                streamSocketListenerData.ConnectionReceived += StreamSocketListener_ReceiveBinary;
 
                 // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currently in use.
                 await streamSocketListenerData.BindEndpointAsync(ServerHostName, port).AsTask().ConfigureAwait(false);
@@ -111,12 +112,12 @@ namespace WdBroker
             {
                 if (streamSocketListenerCommand != null)
                 {
-                    streamSocketListenerCommand.ConnectionReceived -= StreamSocketListener_StringReceive;
+                    streamSocketListenerCommand.ConnectionReceived -= StreamSocketListener_ReceiveString;
                     streamSocketListenerCommand.Dispose();
                 }
                 if (streamSocketListenerData != null)
                 {
-                    streamSocketListenerData.ConnectionReceived -= StreamSocketListener_BinaryReceive;
+                    streamSocketListenerData.ConnectionReceived -= StreamSocketListener_ReceiveBinary;
                     streamSocketListenerData.Dispose();
                 }
                 this.SocketServerMessage?.Invoke(this, "Stop(): Socket services were stop and disposed.");
@@ -128,20 +129,19 @@ namespace WdBroker
             }
         }
 
-        #region SocketServer services
         public async void SendCommandResponse(StreamSocketListenerConnectionReceivedEventArgs args, string response)
         {
-            await StreamSocketListener_StringSend(args, response);
+            await StreamSocket_SendString(args, response);
         }
         #endregion
 
         #region Socket I/O
-        private async Task StreamSocketListener_StringSend(
+        private async Task StreamSocket_SendString(
             StreamSocketListenerConnectionReceivedEventArgs args, string message)
         {
             try
             {
-                //                Send the response back to Publisher as string
+                //  Send the response back to Publisher as string
                 using (Stream outputStream = args.Socket.OutputStream.AsStreamForWrite())
                 {
                     using (var streamWriter = new StreamWriter(outputStream))
@@ -149,20 +149,18 @@ namespace WdBroker
                         await streamWriter.WriteLineAsync(message);
                         await streamWriter.FlushAsync();
                     }
-
-                    this.SocketServerMessage?.Invoke(this, String.Format("StreamSocketListener_StringSend: Sent: {0}", message));
+                    this.SocketServerMessage?.Invoke(this, String.Format("StreamSocket_SendString: Sent: {0}", message));
                 }
-
             }
             catch (Exception ex)
             {
-                Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("StreamSocketListener_DataReceived(): Exception: {0}",
+                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+                throw new Exception(string.Format("StreamSocket_SendString: Exception: {0}",
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
 
-        private async void StreamSocketListener_StringReceive(StreamSocketListener sender, 
+        private async void StreamSocketListener_ReceiveString(StreamSocketListener sender, 
             StreamSocketListenerConnectionReceivedEventArgs args)
         {
             try
@@ -172,23 +170,23 @@ namespace WdBroker
                 {
                     request = await streamReader.ReadLineAsync();
                 }
-                MessageEvent(string.Format("StreamSocketListener_StringReceive(): Command: \"{0}\"", request));
+                MessageEvent(string.Format("StreamSocketListener_ReceiveString: Command: \"{0}\"", request));
 
 //                App.PublisherCommandHandler(args, request);
                 this.CommandEvent?.Invoke(args, request);
 
                 sender.Dispose();
-                MessageEvent(string.Format("StreamSocketListener_StringReceive(): server closed its socket"));
+                MessageEvent(string.Format("StreamSocketListener_ReceiveString: server closed its socket"));
             }
             catch (Exception ex)
             {
-                Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("StreamSocketListener_StringReceive(): Exception: {0}",
+                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+                throw new Exception(string.Format("StreamSocketListener_ReceiveString: Exception: {0}",
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
 
-        private async void StreamSocketListener_BinaryReceive(StreamSocketListener sender,
+        private async void StreamSocketListener_ReceiveBinary(StreamSocketListener sender,
             StreamSocketListenerConnectionReceivedEventArgs args)
         {
             try
@@ -210,8 +208,8 @@ namespace WdBroker
             }
             catch (Exception ex)
             {
-                Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("StreamSocketListener_DataReceived(): Exception: {0}",
+                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+                throw new Exception(string.Format("StreamSocketListener_ReceiveBinary: Exception: {0}",
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
