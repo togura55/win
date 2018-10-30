@@ -132,11 +132,9 @@ namespace WdBroker
         public async Task SendCommandResponseAsync(StreamSocketListenerConnectionReceivedEventArgs args, string response)
         {
             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-            () =>
-            {
+            () =>{
                 StreamSocket_SendString(args, response);
-            }
-);
+            });
         }
         #endregion
 
@@ -180,8 +178,8 @@ namespace WdBroker
                 //                App.PublisherCommandHandler(args, request);
                 this.CommandEvent?.Invoke(args, request);
 
-//                sender.Dispose();
-//                MessageEvent(string.Format("StreamSocketListener_ReceiveString: server closed its socket"));
+                //                sender.Dispose();
+                //                MessageEvent(string.Format("StreamSocketListener_ReceiveString: server closed its socket"));
             }
             catch (Exception ex)
             {
