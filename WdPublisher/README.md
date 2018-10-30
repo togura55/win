@@ -16,3 +16,4 @@ xxx
 ## ToDo/Known Issues
 * 起動時にデバイスの接続が無かった場合はエラー表示で終了。タイムアウトで良い。    
 * App configuration utility through the Bluetooth connection   
+* Do the GetAttribute from device before StartRealtimeInk  

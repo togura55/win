@@ -174,7 +174,7 @@ namespace WillDevicesSampleApp
                     await commandSocketClient.SendCommand(commandString);
 
                     // Then, waiting for response string at CommandSocketClient_Response
-
+                    await commandSocketClient.ResponseReceive();
                 }
                 else
                 {
@@ -272,7 +272,7 @@ namespace WillDevicesSampleApp
         #endregion
 
         #region Delegate Event Handlers
-        private async void CommandSocketClient_Response(object sender, string response)
+        private async void CommandSocketClient_Response(string response)
         {
             try
             {
@@ -287,8 +287,10 @@ namespace WillDevicesSampleApp
                                 response, AppObjects.Instance.WacomDevice.PublisherAttribute));
 
                             this.CommandResponseState = CMD_REQUEST_PUBLISHER_CONNECTION;
-                            await AppObjects.Instance.SocketClient.SendCommand(RES_ACK);
-                            MessageEvent("Send ACK");
+                            //await commandSocketClient.SendCommand(RES_ACK);
+                            //MessageEvent("Send ACK");
+
+                            await this.SendCommand(CMD_SET_ATTRIBUTES);
                         }
                         break;
 

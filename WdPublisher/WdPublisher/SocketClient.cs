@@ -30,8 +30,8 @@ namespace WillDevicesSampleApp
         // Delegate handlers
         public delegate void MessageEventHandler(object sender, string message);
         public delegate void SocketClientConnectCompletedNotificationHandler(object sender, bool result);
-        public delegate void SocketClientReceivedResponseNotificationHandler(object sender, float responce);
-        public delegate void CommandResponseEventHandler(StreamSocketListenerConnectionReceivedEventArgs args, string message);
+        public delegate void SocketClientReceivedResponseNotificationHandler(object sender, string responce);
+        public delegate void CommandResponseEventHandler(string response);
 
         // Properties
         public event MessageEventHandler SocketClientMessage;
@@ -189,36 +189,38 @@ namespace WillDevicesSampleApp
         //    }
         //}
 
-        //public async Task Receive()
-        //{
-        //    try
-        //    {
-        //        // Read data from the echo server.
-        //        string response;
-        //        using (Stream inputStream = streamSocket.InputStream.AsStreamForRead())
-        //        {
-        //            using (StreamReader streamReader = new StreamReader(inputStream))
-        //            {
-        //                response = await streamReader.ReadLineAsync();
-        //            }
-        //        }
-        //        //                   this.clientListBox.Items.Add(string.Format("client received the response: \"{0}\" ", response));
-
-        //        // ToDo: update response in here
-
-        //        // Notify to caller
-        //        //await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-        //        //{
-        //        //    this.SocketClientReceivedResponse?.Invoke(this, (float)response);
-        //        //});
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
-        //        Debug.WriteLine(string.Format("Receive(): Exception: {0}",
-        //            webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
-        //    }
-        //}
+        public async Task ResponseReceive()
+        {
+            try
+            {
+                // Read data from the echo server.
+                string response = string.Empty;
+                using (Stream inputStream = streamSocket.InputStream.AsStreamForRead())
+                {
+                    using (StreamReader streamReader = new StreamReader(inputStream))
+                    {
+                        while(true)
+                        {
+                            response = await streamReader.ReadLineAsync();
+                            if (response != string.Empty)
+                            {
+                                // bingo
+                                string res = response;
+                                break;
+                            }
+                        }
+                        streamReader.Dispose();
+                        this.CommandResponseEvent?.Invoke(response);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+                Debug.WriteLine(string.Format("ResponseReceive(): Exception: {0}",
+                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+            }
+        }
 
         //public async Task ResponseReceive()
         //{
@@ -325,19 +327,18 @@ namespace WillDevicesSampleApp
                         await streamWriter.WriteLineAsync(message);
                         await streamWriter.FlushAsync();
                     }
-
-                    this.SocketClientMessage?.Invoke(this, String.Format("StreamSocket_SendString: Sent: {0}", message));
                 }
-
+                this.SocketClientMessage?.Invoke(this, String.Format("StreamSocket_SendString: Sent: {0}", message));
             }
             catch (Exception ex)
             {
-                Windows.Networking.Sockets.SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
                 throw new Exception(string.Format("StreamSocket_SendString: Exception: {0}",
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
 
+        // Not in use
         private async void StreamSocketListener_ReceiveString(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
         {
             try
@@ -350,10 +351,10 @@ namespace WillDevicesSampleApp
                 MessageEvent(string.Format("StreamSocketListener_ReceiveString: Command: \"{0}\"", request));
 
                 //                App.PublisherCommandHandler(args, request);
-                this.CommandResponseEvent?.Invoke(args, request);
+                this.CommandResponseEvent?.Invoke(request);
 
-                sender.Dispose();
-                MessageEvent(string.Format("StreamSocketListener_ReceiveString: server closed its socket"));
+                //                sender.Dispose();
+                //                MessageEvent(string.Format("StreamSocketListener_ReceiveString: server closed its socket"));
             }
             catch (Exception ex)
             {

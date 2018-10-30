@@ -102,7 +102,7 @@ namespace WillDevicesSampleApp
                 return s;
             }
         }
-        public DeviceAttributes Attribute;
+        public DeviceAttributes Attribute = new DeviceAttributes();
         #endregion
 
         public WacomDevices()
