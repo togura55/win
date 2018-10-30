@@ -112,6 +112,7 @@ namespace WillDevicesSampleApp
                 if (result || AppObjects.Instance.Device != null)
                 {
                     clientListBox.Items.Add("ScanAndConnect_Completed: Go Socket initialization");
+
                     await wdPubComm.Initialize(HostNameString, PortNumberString);
                 }
                 else

@@ -171,14 +171,14 @@ namespace WillDevicesSampleApp
 //                uint width = (uint)await device.GetPropertyAsync("Width", m_cts.Token);
 //                uint height = (uint)await device.GetPropertyAsync("Height", m_cts.Token);
 //                uint ptSize = (uint)await device.GetPropertyAsync("PointSize", m_cts.Token);
-                Attribute.Width = ((uint)await device.GetPropertyAsync("Width", m_cts.Token)).ToString();
-                Attribute.Height = ((uint)await device.GetPropertyAsync("Height", m_cts.Token)).ToString();
-                Attribute.PointSize = ((uint)await device.GetPropertyAsync("PointSize", m_cts.Token)).ToString();
-                Attribute.Name = ((uint)await device.GetPropertyAsync(SmartPadProperties.DeviceName, m_cts.Token)).ToString();
-                Attribute.ESN = ((uint)await device.GetPropertyAsync(SmartPadProperties.SerialNumber, m_cts.Token)).ToString();
-                Attribute.Battery = ((uint)await device.GetPropertyAsync(SmartPadProperties.BatteryLevel, m_cts.Token)).ToString();
-                Attribute.TransferMode = "LiveMode";
-                Attribute.DeviceType = "PHU-111";
+                //Attribute.Width = ((uint)await device.GetPropertyAsync("Width", m_cts.Token)).ToString();
+                //Attribute.Height = ((uint)await device.GetPropertyAsync("Height", m_cts.Token)).ToString();
+                //Attribute.PointSize = ((uint)await device.GetPropertyAsync("PointSize", m_cts.Token)).ToString();
+                //Attribute.Name = ((uint)await device.GetPropertyAsync(SmartPadProperties.DeviceName, m_cts.Token)).ToString();
+                //Attribute.ESN = ((uint)await device.GetPropertyAsync(SmartPadProperties.SerialNumber, m_cts.Token)).ToString();
+                //Attribute.Battery = ((uint)await device.GetPropertyAsync(SmartPadProperties.BatteryLevel, m_cts.Token)).ToString();
+                //Attribute.TransferMode = "LiveMode";
+                //Attribute.DeviceType = "PHU-111";
 
                 //service.Transform = AppObjects.CalculateTransform(width, height, ptSize);
 
@@ -573,6 +573,7 @@ namespace WillDevicesSampleApp
             AppObjects.Instance.DeviceInfo = m_connectingDeviceInfo;
             AppObjects.Instance.Device = device;
             m_connectingDeviceInfo = null;
+            GetDeviceAttributesAsync(device);  // Get device attributes from connected device
 
             await AppObjects.SerializeDeviceInfoAsync(AppObjects.Instance.DeviceInfo);
 
@@ -581,6 +582,18 @@ namespace WillDevicesSampleApp
                 this.ScanAndConnectCompletedNotification?.Invoke(this, true);
             });
 
+        }
+
+        async void GetDeviceAttributesAsync(IDigitalInkDevice device)
+        {
+            Attribute.Width = ((uint)await device.GetPropertyAsync("Width", m_cts.Token)).ToString();
+            Attribute.Height = ((uint)await device.GetPropertyAsync("Height", m_cts.Token)).ToString();
+            Attribute.PointSize = ((uint)await device.GetPropertyAsync("PointSize", m_cts.Token)).ToString();
+            Attribute.Name = ((uint)await device.GetPropertyAsync(SmartPadProperties.DeviceName, m_cts.Token)).ToString();
+            Attribute.ESN = ((uint)await device.GetPropertyAsync(SmartPadProperties.SerialNumber, m_cts.Token)).ToString();
+            Attribute.Battery = ((uint)await device.GetPropertyAsync(SmartPadProperties.BatteryLevel, m_cts.Token)).ToString();
+            Attribute.TransferMode = "LiveMode";
+            Attribute.DeviceType = "PHU-111";
         }
 
         private void OnDeviceStatusChanged_ScanAndConnect(object sender, DeviceStatusChangedEventArgs e)

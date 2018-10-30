@@ -171,7 +171,7 @@ namespace WillDevicesSampleApp
                     }
 
                     CommandResponseState = command;
-                    await commandSocketClient.SendCommand(commandString);
+                    commandSocketClient.SendCommand(commandString);
 
                     // Then, waiting for response string at CommandSocketClient_Response
                     await commandSocketClient.ResponseReceive();

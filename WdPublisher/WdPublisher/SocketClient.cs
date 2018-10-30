@@ -30,13 +30,13 @@ namespace WillDevicesSampleApp
         // Delegate handlers
         public delegate void MessageEventHandler(object sender, string message);
         public delegate void SocketClientConnectCompletedNotificationHandler(object sender, bool result);
-        public delegate void SocketClientReceivedResponseNotificationHandler(object sender, string responce);
+//        public delegate void SocketClientReceivedResponseNotificationHandler(object sender, string responce);
         public delegate void CommandResponseEventHandler(string response);
 
         // Properties
         public event MessageEventHandler SocketClientMessage;
         public event SocketClientConnectCompletedNotificationHandler SocketClientConnectCompletedNotification;
-        public event SocketClientReceivedResponseNotificationHandler SocketClientReceivedResponse;
+//        public event SocketClientReceivedResponseNotificationHandler SocketClientReceivedResponse;
         public event CommandResponseEventHandler CommandResponseEvent;
 
         public SocketClient()
@@ -304,28 +304,31 @@ namespace WillDevicesSampleApp
         //}
 
         #region SocketClient services
-        public async Task SendCommand(string response)
+        public void SendCommand(string response)
         {
-            await StreamSocket_SendString(streamSocket, response);
+            StreamSocket_SendString(streamSocket, response);
         }
-        public async void SendData(IBuffer buffer)
+        public void SendData(IBuffer buffer)
         {
-            await StreamSocket_SendBinary(streamSocket, buffer);
+            StreamSocket_SendBinary(streamSocket, buffer);
         }
         #endregion
 
         #region Socket I/O
-        private async Task StreamSocket_SendString(StreamSocket socket, string message)
+        private void StreamSocket_SendString(StreamSocket socket, string message)
         {
             try
             {
-                //                Send the response back to Publisher as string
+                // Send the response back to Publisher as string
                 using (Stream outputStream = socket.OutputStream.AsStreamForWrite())
                 {
                     using (var streamWriter = new StreamWriter(outputStream))
                     {
-                        await streamWriter.WriteLineAsync(message);
-                        await streamWriter.FlushAsync();
+                        streamWriter.WriteLine(message);
+                        streamWriter.Flush();
+
+                        //await streamWriter.WriteLineAsync(message);
+                        //await streamWriter.FlushAsync();
                     }
                 }
                 this.SocketClientMessage?.Invoke(this, String.Format("StreamSocket_SendString: Sent: {0}", message));
@@ -364,7 +367,7 @@ namespace WillDevicesSampleApp
             }
         }
 
-        private async Task StreamSocket_SendBinary(StreamSocket socket, IBuffer buffer)
+        private void StreamSocket_SendBinary(StreamSocket socket, IBuffer buffer)
         {
             try
             {
