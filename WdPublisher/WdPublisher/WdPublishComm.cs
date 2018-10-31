@@ -174,7 +174,8 @@ namespace WillDevicesSampleApp
                     commandSocketClient.SendCommand(commandString);
 
                     // Then, waiting for response string at CommandSocketClient_Response
-                    await commandSocketClient.ResponseReceive();
+//                    await commandSocketClient.ResponseReceiveAsync();
+                    commandSocketClient.ResponseReceive();
                 }
                 else
                 {

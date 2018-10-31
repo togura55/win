@@ -68,14 +68,14 @@ namespace WillDevicesSampleApp
             {
                 hostName = new HostName(hostNameString);
 
-                streamSocketListener = new StreamSocketListener();
+                this.streamSocketListener = new StreamSocketListener();
 
                 // The ConnectionReceived event is raised when connections are received.
-                streamSocketListener.ConnectionReceived += StreamSocketListener_ReceiveString;
+                this.streamSocketListener.ConnectionReceived += StreamSocketListener_ReceiveString;
 
                 // Start listening for incoming TCP connections on the specified port. 
                 // You can specify any port that's not currently in use.
-                streamSocketListener.BindEndpointAsync(hostName, PortNumberString).AsTask().ConfigureAwait(false);
+                this.streamSocketListener.BindEndpointAsync(hostName, PortNumberString).AsTask().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -109,12 +109,12 @@ namespace WillDevicesSampleApp
                             HostNameString, PortNumberString, timeout.ToString()));
 
                 // Create the StreamSocket and establish a connection to the echo server.
-                streamSocket = new StreamSocket();
+                this.streamSocket = new StreamSocket();
 
                 CancellationTokenSource cts = new CancellationTokenSource();
 
                 cts.CancelAfter(timeout);
-                await streamSocket.ConnectAsync(hostName, PortNumberString).AsTask().ConfigureAwait(false);
+                await this.streamSocket.ConnectAsync(hostName, PortNumberString).AsTask().ConfigureAwait(false);
             }
             catch (TaskCanceledException ex)
             {
@@ -189,30 +189,42 @@ namespace WillDevicesSampleApp
         //    }
         //}
 
-        public async Task ResponseReceive()
+ //       public async Task ResponseReceiveAsync()
+        public void ResponseReceive()
         {
             try
             {
                 // Read data from the echo server.
                 string response = string.Empty;
-                using (Stream inputStream = streamSocket.InputStream.AsStreamForRead())
+                using (Stream inputStream = this.streamSocket.InputStream.AsStreamForRead())
                 {
                     using (StreamReader streamReader = new StreamReader(inputStream))
                     {
-                        while(true)
+                        //while (true)
+                        //{
+                        //    response = await streamReader.ReadLineAsync();
+                        //    if (response != string.Empty)
+                        //    {
+                        //        // bingo
+                        //        string res = response;
+                        //        break;
+                        //    }
+                        //}
+                        while ((response = streamReader.ReadLine()) != string.Empty)
                         {
-                            response = await streamReader.ReadLineAsync();
-                            if (response != string.Empty)
-                            {
-                                // bingo
-                                string res = response;
-                                break;
-                            }
+                            break;
                         }
-                        streamReader.Dispose();
-                        this.CommandResponseEvent?.Invoke(response);
+ //                       inputStream.Flush();
                     }
+
                 }
+
+                // for debug
+                using (Stream outputStream = this.streamSocket.OutputStream.AsStreamForWrite())
+                {
+                    int i = 0;
+                }
+                    this.CommandResponseEvent?.Invoke(response);
             }
             catch (Exception ex)
             {
@@ -306,11 +318,12 @@ namespace WillDevicesSampleApp
         #region SocketClient services
         public void SendCommand(string response)
         {
-            StreamSocket_SendString(streamSocket, response);
+            StreamSocket_SendString(this.streamSocket, response);
         }
+
         public void SendData(IBuffer buffer)
         {
-            StreamSocket_SendBinary(streamSocket, buffer);
+            StreamSocket_SendBinary(this.streamSocket, buffer);
         }
         #endregion
 

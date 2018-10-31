@@ -96,7 +96,7 @@ namespace WillDevicesSampleApp
             {
                 string s = string.Empty;
 
-                s = Width + "," + Height + "," + PointSize + "," + Name + "," + 
+                s = Width + "," + Height + "," + PointSize + "," + Name + "," +
                     ESN + "," + Battery + "," + DeviceType + "," + TransferMode;
 
                 return s;
@@ -168,9 +168,9 @@ namespace WillDevicesSampleApp
 
             try
             {
-//                uint width = (uint)await device.GetPropertyAsync("Width", m_cts.Token);
-//                uint height = (uint)await device.GetPropertyAsync("Height", m_cts.Token);
-//                uint ptSize = (uint)await device.GetPropertyAsync("PointSize", m_cts.Token);
+                //                uint width = (uint)await device.GetPropertyAsync("Width", m_cts.Token);
+                //                uint height = (uint)await device.GetPropertyAsync("Height", m_cts.Token);
+                //                uint ptSize = (uint)await device.GetPropertyAsync("PointSize", m_cts.Token);
                 //Attribute.Width = ((uint)await device.GetPropertyAsync("Width", m_cts.Token)).ToString();
                 //Attribute.Height = ((uint)await device.GetPropertyAsync("Height", m_cts.Token)).ToString();
                 //Attribute.PointSize = ((uint)await device.GetPropertyAsync("PointSize", m_cts.Token)).ToString();
@@ -241,8 +241,8 @@ namespace WillDevicesSampleApp
             var pathPart = e.PathPart;
 
             if (AppObjects.Instance.SocketClient != null)
- //               AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
-            AppObjects.Instance.SocketClient.SendData(CreateBuffer(pathPart));
+                //               AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
+                AppObjects.Instance.SocketClient.SendData(CreateBuffer(pathPart));
 
         }
 
@@ -573,14 +573,24 @@ namespace WillDevicesSampleApp
             AppObjects.Instance.DeviceInfo = m_connectingDeviceInfo;
             AppObjects.Instance.Device = device;
             m_connectingDeviceInfo = null;
-            GetDeviceAttributesAsync(device);  // Get device attributes from connected device
 
-            await AppObjects.SerializeDeviceInfoAsync(AppObjects.Instance.DeviceInfo);
-
-            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            try
             {
-                this.ScanAndConnectCompletedNotification?.Invoke(this, true);
-            });
+                GetDeviceAttributesAsync(device);  // Get device attributes from connected device
+
+                await AppObjects.SerializeDeviceInfoAsync(AppObjects.Instance.DeviceInfo);
+
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    this.ScanAndConnectCompletedNotification?.Invoke(this, true);
+                });
+            }
+            catch (Exception ex)
+            {
+                string message = string.Format($"ConnectInkDevice: The final process got an error: {0}", ex.Message);
+                MessageEvent(message);
+                throw new Exception(message);
+            }
 
         }
 
@@ -589,9 +599,9 @@ namespace WillDevicesSampleApp
             Attribute.Width = ((uint)await device.GetPropertyAsync("Width", m_cts.Token)).ToString();
             Attribute.Height = ((uint)await device.GetPropertyAsync("Height", m_cts.Token)).ToString();
             Attribute.PointSize = ((uint)await device.GetPropertyAsync("PointSize", m_cts.Token)).ToString();
-            Attribute.Name = ((uint)await device.GetPropertyAsync(SmartPadProperties.DeviceName, m_cts.Token)).ToString();
-            Attribute.ESN = ((uint)await device.GetPropertyAsync(SmartPadProperties.SerialNumber, m_cts.Token)).ToString();
-            Attribute.Battery = ((uint)await device.GetPropertyAsync(SmartPadProperties.BatteryLevel, m_cts.Token)).ToString();
+            Attribute.Name = (string)await device.GetPropertyAsync(SmartPadProperties.DeviceName, m_cts.Token);
+            Attribute.ESN = (string)await device.GetPropertyAsync(SmartPadProperties.SerialNumber, m_cts.Token);
+            Attribute.Battery = ((int)await device.GetPropertyAsync(SmartPadProperties.BatteryLevel, m_cts.Token)).ToString();
             Attribute.TransferMode = "LiveMode";
             Attribute.DeviceType = "PHU-111";
         }
@@ -626,7 +636,7 @@ namespace WillDevicesSampleApp
 
         private async void OnUsbEnumerationCompleted(object sender, object e)
         {
-            if(m_deviceInfos.Count == 0)
+            if (m_deviceInfos.Count == 0)
             {
                 MessageEvent("OnUsbEnumerationCompleted: No devices were enumarated.");
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
