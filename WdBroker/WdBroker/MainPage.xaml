@@ -14,7 +14,8 @@
             <RowDefinition Height="323*"/>
             <RowDefinition Height="177*"/>
         </Grid.RowDefinitions>
-        <ListBox x:Name="ListBox_Message" HorizontalAlignment="Left" Height="373" Margin="64,319,0,0" VerticalAlignment="Top" Width="467" Grid.RowSpan="2" ScrollViewer.HorizontalScrollMode="Enabled"/>
+        <ListBox x:Name="ListBox_Message" HorizontalAlignment="Left" Height="373" Margin="64,319,0,0" VerticalAlignment="Top" Width="467" Grid.RowSpan="2" 
+                 ScrollViewer.HorizontalScrollMode="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto"/>
         <Button x:Name="Pbtn_Start" Content="Button" HorizontalAlignment="Left" Margin="64,201,0,0" VerticalAlignment="Top" Click="Pbtn_Start_Click"/>
         <TextBlock x:Name="TextBlock_HostName" HorizontalAlignment="Left" Margin="64,46,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <TextBlock x:Name="TextBlock_PortNumber" HorizontalAlignment="Left" Margin="64,90,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>

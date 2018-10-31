@@ -139,7 +139,31 @@ namespace WdBroker
         #endregion
 
         #region Socket I/O
-        private async void StreamSocket_SendString(
+        private void StreamSocket_SendString(
+    StreamSocketListenerConnectionReceivedEventArgs args, string message)
+        {
+            try
+            {
+                //  Send the response back to Publisher as string
+                using (Stream outputStream = args.Socket.OutputStream.AsStreamForWrite())
+                {
+                    using (var streamWriter = new StreamWriter(outputStream))
+                    {
+                        streamWriter.WriteLine(message);
+                        streamWriter.Flush();
+                    }
+                }
+                this.SocketServerMessage?.Invoke(this, String.Format("StreamSocket_SendString: Sent: {0}", message));
+            }
+            catch (Exception ex)
+            {
+                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+                throw new Exception(string.Format("StreamSocket_SendString: Exception: {0}",
+                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+            }
+        }
+
+        private async void StreamSocket_SendStringAsync(
             StreamSocketListenerConnectionReceivedEventArgs args, string message)
         {
             try
@@ -152,8 +176,8 @@ namespace WdBroker
                         await streamWriter.WriteLineAsync(message);
                         await streamWriter.FlushAsync();
                     }
-                    this.SocketServerMessage?.Invoke(this, String.Format("StreamSocket_SendString: Sent: {0}", message));
                 }
+                this.SocketServerMessage?.Invoke(this, String.Format("StreamSocket_SendString: Sent: {0}", message));
             }
             catch (Exception ex)
             {
@@ -163,8 +187,34 @@ namespace WdBroker
             }
         }
 
-        private async void StreamSocketListener_ReceiveString(StreamSocketListener sender,
+        private void StreamSocketListener_ReceiveString(StreamSocketListener sender,
             StreamSocketListenerConnectionReceivedEventArgs args)
+        {
+            try
+            {
+                string request;
+                using (var streamReader = new StreamReader(args.Socket.InputStream.AsStreamForRead()))
+                {
+                    request = streamReader.ReadLine();
+                }
+                MessageEvent(string.Format("StreamSocketListener_ReceiveString: Command: \"{0}\"", request));
+
+                sender.Dispose();
+                //                MessageEvent(string.Format("StreamSocketListener_ReceiveString: server closed its socket"));
+
+                this.CommandEvent?.Invoke(args, request);
+
+             }
+            catch (Exception ex)
+            {
+                SocketErrorStatus webErrorStatus = SocketError.GetStatus(ex.GetBaseException().HResult);
+                throw new Exception(string.Format("StreamSocketListener_ReceiveString: Exception: {0}",
+                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+            }
+        }
+
+        private async void StreamSocketListener_ReceiveStringAsync(StreamSocketListener sender,
+     StreamSocketListenerConnectionReceivedEventArgs args)
         {
             try
             {
@@ -175,11 +225,12 @@ namespace WdBroker
                 }
                 MessageEvent(string.Format("StreamSocketListener_ReceiveString: Command: \"{0}\"", request));
 
-                //                App.PublisherCommandHandler(args, request);
+                //                MessageEvent(string.Format("StreamSocketListener_ReceiveString: server closed its socket"));
+
                 this.CommandEvent?.Invoke(args, request);
 
-                //                sender.Dispose();
-                //                MessageEvent(string.Format("StreamSocketListener_ReceiveString: server closed its socket"));
+                sender.Dispose();
+
             }
             catch (Exception ex)
             {
