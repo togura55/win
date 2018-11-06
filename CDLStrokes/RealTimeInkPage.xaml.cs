@@ -91,6 +91,12 @@ namespace WillDevicesSampleApp
 //        inkCanvas.DataContext = this;
         private async void RealTimeInkPage_Loaded(object sender, RoutedEventArgs e)
         {
+            Pbtn_Save.Content = "Save";
+
+            //
+            inkCanvas.Width = 432;
+            inkCanvas.Height = 594;
+
             IDigitalInkDevice device = AppObjects.Instance.Device;
 
             //           this.TextBlock_IPAddr.Text = resourceLoader.GetString("IDC_HostName");
@@ -119,17 +125,20 @@ namespace WillDevicesSampleApp
 
             try
             {
-                uint width = (uint)await device.GetPropertyAsync("Width", m_cts.Token);
-                uint height = (uint)await device.GetPropertyAsync("Height", m_cts.Token);
+                uint deviceWidth = (uint)await device.GetPropertyAsync("Width", m_cts.Token);
+                uint deviceHeight = (uint)await device.GetPropertyAsync("Height", m_cts.Token);
                 uint ptSize = (uint)await device.GetPropertyAsync("PointSize", m_cts.Token);
-
-                service.Transform = AppObjects.CalculateTransform(width, height, ptSize);
 
                 float scaleFactor = ptSize * AppObjects.micrometerToDip;
 
+                float scale = (float)inkCanvas.Width / (deviceWidth); // 0.02
+
+                service.Transform = AppObjects.CalculateTransform((uint)(deviceWidth * scale), (uint)(deviceHeight * scale), ptSize, 0.5f);
+
+
                 InkCanvasDocument document = new InkCanvasDocument();
 //                document.Size = new Windows.Foundation.Size(height * scaleFactor, width * scaleFactor);
-                document.Size = new Windows.Foundation.Size(width * scaleFactor, height * scaleFactor);
+                document.Size = new Windows.Foundation.Size(deviceWidth * scaleFactor, deviceHeight * scaleFactor);
                 document.InkCanvasLayers.Add(new InkCanvasLayer());
 
                 inkCanvas.InkCanvasDocument = document;
@@ -137,8 +146,8 @@ namespace WillDevicesSampleApp
                 inkCanvas.StrokeDataProvider = service;
 
                 // get raw data
-                m_deviceSize.Width = width;
-                m_deviceSize.Height = height;
+                m_deviceSize.Width = deviceWidth;
+                m_deviceSize.Height = deviceHeight;
                 SetCanvasScaling();
                 service.StrokeStarted += Service_StrokeStarted;
                 service.StrokeUpdated += Service_StrokeUpdated;
@@ -371,8 +380,24 @@ namespace WillDevicesSampleApp
             });
         }
 
-        private void Pbtn_Save_Click(object sender, RoutedEventArgs e)
+        private async void Pbtn_Save_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                // Create a data stored file; replace if exists.
+                Windows.Storage.StorageFolder storageFolder =
+                    Windows.Storage.ApplicationData.Current.LocalFolder;
+                Windows.Storage.StorageFile dataFile =
+                    await storageFolder.CreateFileAsync("data.txt",
+                        Windows.Storage.CreationCollisionOption.ReplaceExisting);
+
+
+                await Windows.Storage.FileIO.WriteTextAsync(dataFile, "Swift as a shadow");
+            }
+            catch (Exception ex)
+            {
+
+            }
 
         }
     }

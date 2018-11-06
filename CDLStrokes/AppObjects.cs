@@ -71,26 +71,28 @@ namespace WillDevicesSampleApp
 			return null;
 		}
 
-		public static Matrix CalculateTransform(uint deviceWidth, uint deviceHeight, uint ptSizeInMicrometers)
+		public static Matrix CalculateTransform(uint deviceWidth, uint deviceHeight, uint ptSizeInMicrometers, float scale)
 		{
-			float scaleFactor = ptSizeInMicrometers * micrometerToDip;
+			float scaleFactor = ptSizeInMicrometers * micrometerToDip * scale;
 
 			ScaleTransform st = new ScaleTransform();
 			st.ScaleX = scaleFactor;
 			st.ScaleY = scaleFactor;
 
-			RotateTransform rt = new RotateTransform();
+//			RotateTransform rt = new RotateTransform();
             //			rt.Angle = 90;
 
 			TranslateTransform tt = new TranslateTransform();
 //			tt.X = deviceHeight * scaleFactor;
-            tt.X = 0;
-            tt.Y = 0;
+            //tt.X = 0;
+            //tt.Y = 0;
+            tt.X = deviceWidth * scaleFactor;
+            tt.Y = deviceHeight * scaleFactor;
 
-			TransformGroup tg = new TransformGroup();
+            TransformGroup tg = new TransformGroup();
 			tg.Children.Add(st);
-			tg.Children.Add(rt);
-			tg.Children.Add(tt);
+//			tg.Children.Add(rt);
+//			tg.Children.Add(tt);
 
 			return tg.Value;
 		}

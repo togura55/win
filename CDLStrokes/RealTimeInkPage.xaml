@@ -44,8 +44,8 @@
         <ListBox x:Name="ListBox_Messages" Grid.Column="1" HorizontalAlignment="Left" Height="375" Margin="738,179,0,0" Grid.Row="1" VerticalAlignment="Top" RenderTransformOrigin="-0.893,0.485" Width="335"
                  ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible"
                  Background="LightBlue"/>
-        <Controls:InkCanvas x:Name="inkCanvas" HorizontalAlignment="Left" Height="669" Margin="0,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="639" Grid.Column="1"/>
         <Button x:Name="Pbtn_Save" Content="Button" Grid.Column="1" HorizontalAlignment="Left" Height="50" Margin="745,66,0,0" Grid.Row="1" VerticalAlignment="Top" Width="156" Click="Pbtn_Save_Click"/>
+        <Controls:InkCanvas x:Name="inkCanvas" HorizontalAlignment="Left" Height="669" Margin="0,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="639" Grid.Column="1" BorderThickness="10" RequestedTheme="Dark" Opacity="0.5"/>
 
     </Grid>
 </Page>

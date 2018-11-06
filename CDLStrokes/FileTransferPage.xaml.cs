@@ -104,7 +104,7 @@ namespace WillDevicesSampleApp
 				uint height = (uint)await device.GetPropertyAsync("Height", m_cts.Token);
 				uint ptSize = (uint)await device.GetPropertyAsync("PointSize", m_cts.Token);
 
-				service.Transform = AppObjects.CalculateTransform(width, height, ptSize);
+//				service.Transform = AppObjects.CalculateTransform(width, height, ptSize, scale);
 
 				if (!service.IsStarted)
 				{
