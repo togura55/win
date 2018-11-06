@@ -384,21 +384,41 @@ namespace WillDevicesSampleApp
         {
             try
             {
+                var folderPicker = new Windows.Storage.Pickers.FolderPicker();
+                folderPicker.FileTypeFilter.Add("*");
+                Windows.Storage.StorageFolder folder =
+                    await folderPicker.PickSingleFolderAsync();
+
+                if (folder == null)
+                {
+                    return;
+                }
+
+                string path = folder.Path.ToString();
+                string filename = "data.txt";
+
                 // Create a data stored file; replace if exists.
                 Windows.Storage.StorageFolder storageFolder =
                     Windows.Storage.ApplicationData.Current.LocalFolder;
                 Windows.Storage.StorageFile dataFile =
-                    await storageFolder.CreateFileAsync("data.txt",
+                    await storageFolder.CreateFileAsync(string.Format("{0}\\{1}",path,filename),
                         Windows.Storage.CreationCollisionOption.ReplaceExisting);
 
+                string dataString = string.Empty;
+                foreach (String item in ListBox_Messages.Items)
+                {
+                    dataString += item + System.Environment.NewLine;
+                }
 
-                await Windows.Storage.FileIO.WriteTextAsync(dataFile, "Swift as a shadow");
+                if (dataFile != null)
+                {
+                    await Windows.Storage.FileIO.WriteTextAsync(dataFile, dataString);
+                }
             }
             catch (Exception ex)
             {
 
             }
-
         }
     }
 }
