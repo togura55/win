@@ -88,7 +88,7 @@ namespace WillDevicesSampleApp
             Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested -= RealTimeInkPage_BackRequested;
         }
 
-//        inkCanvas.DataContext = this;
+        //        inkCanvas.DataContext = this;
         private async void RealTimeInkPage_Loaded(object sender, RoutedEventArgs e)
         {
             Pbtn_Save.Content = "Save";
@@ -133,11 +133,10 @@ namespace WillDevicesSampleApp
 
                 float scale = (float)inkCanvas.Width / (deviceWidth); // 0.02
 
-                service.Transform = AppObjects.CalculateTransform((uint)(deviceWidth * scale), (uint)(deviceHeight * scale), ptSize, 0.5f);
-
+//                service.Transform = AppObjects.CalculateTransform((uint)(deviceWidth * scale), (uint)(deviceHeight * scale), ptSize, 0.5f);
 
                 InkCanvasDocument document = new InkCanvasDocument();
-//                document.Size = new Windows.Foundation.Size(height * scaleFactor, width * scaleFactor);
+                //                document.Size = new Windows.Foundation.Size(height * scaleFactor, width * scaleFactor);
                 document.Size = new Windows.Foundation.Size(deviceWidth * scaleFactor, deviceHeight * scaleFactor);
                 document.InkCanvasLayers.Add(new InkCanvasLayer());
 
@@ -271,10 +270,10 @@ namespace WillDevicesSampleApp
             //       }));
             //   }
 
-            await EventMessage(sender, string.Format("Stroke Middle: {0} : {1} : {2}", x,y,z));
+            await EventMessage(sender, string.Format("Stroke Middle: {0} : {1} : {2}", x, y, z));
         }
 
-        private async void  Service_StrokeStarted(object sender, StrokeStartedEventArgs e)
+        private async void Service_StrokeStarted(object sender, StrokeStartedEventArgs e)
         {
             m_addNewStrokeToModel = true;
             await EventMessage(sender, "Stroke Started");
@@ -385,6 +384,7 @@ namespace WillDevicesSampleApp
             try
             {
                 var folderPicker = new Windows.Storage.Pickers.FolderPicker();
+
                 folderPicker.FileTypeFilter.Add("*");
                 Windows.Storage.StorageFolder folder =
                     await folderPicker.PickSingleFolderAsync();
@@ -398,10 +398,8 @@ namespace WillDevicesSampleApp
                 string filename = "data.txt";
 
                 // Create a data stored file; replace if exists.
-                Windows.Storage.StorageFolder storageFolder =
-                    Windows.Storage.ApplicationData.Current.LocalFolder;
                 Windows.Storage.StorageFile dataFile =
-                    await storageFolder.CreateFileAsync(string.Format("{0}\\{1}",path,filename),
+                    await folder.CreateFileAsync(filename,
                         Windows.Storage.CreationCollisionOption.ReplaceExisting);
 
                 string dataString = string.Empty;
