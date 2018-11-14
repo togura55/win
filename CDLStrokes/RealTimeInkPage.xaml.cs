@@ -13,6 +13,7 @@ using Wacom.UX.Gestures;
 using Windows.Foundation;
 using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.Resources;
+using Windows.UI.Input.Inking;
 
 namespace WillDevicesSampleApp
 {
@@ -24,9 +25,11 @@ namespace WillDevicesSampleApp
         private static float maxP = 1.402218f;
         private static float pFactor = 1.0f / (maxP - 1.0f);
 
+        private InkStrokeBuilder m_inkStrokeBuilder = new InkStrokeBuilder();
+        private double mScale = 1;
+
         private CancellationTokenSource m_cts = new CancellationTokenSource();
 
-        private double m_scale = 1.0;
         private Size m_deviceSize;
         private bool m_addNewStrokeToModel = true;
 
@@ -37,6 +40,12 @@ namespace WillDevicesSampleApp
             resourceLoader = ResourceLoader.GetForCurrentView();
 
             Loaded += RealTimeInkPage_Loaded;
+
+            // Default settings of Stroke
+            InkDrawingAttributes attributes = new InkDrawingAttributes();
+            attributes.Color = Windows.UI.Colors.Black;
+            attributes.Size = new Windows.Foundation.Size(1, 1);
+            m_inkStrokeBuilder.SetDefaultDrawingAttributes(attributes);
 
             Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested += RealTimeInkPage_BackRequested;
         }
@@ -91,7 +100,7 @@ namespace WillDevicesSampleApp
         //        inkCanvas.DataContext = this;
         private async void RealTimeInkPage_Loaded(object sender, RoutedEventArgs e)
         {
-            Pbtn_Save.Content = "Save";
+            Pbtn_Save.Content = resourceLoader.GetString("IDS_Save");
 
             //
             inkCanvas.Width = 432;
@@ -99,11 +108,10 @@ namespace WillDevicesSampleApp
 
             IDigitalInkDevice device = AppObjects.Instance.Device;
 
-            //           this.TextBlock_IPAddr.Text = resourceLoader.GetString("IDC_HostName");
-
             if (device == null)
             {
-                textBlockPrompt.Text = "Device not connected";
+                textBlockPrompt.Text =
+                    resourceLoader.GetString("IDS_DeviceNotConnected2");
                 return;
             }
 
@@ -117,7 +125,8 @@ namespace WillDevicesSampleApp
 
             if (service == null)
             {
-                textBlockPrompt.Text = "The Real-time Ink service is not supported on this device";
+                textBlockPrompt.Text =
+                    resourceLoader.GetString("IDS_RealtimeinkNotSupported");
                 return;
             }
 
@@ -129,56 +138,73 @@ namespace WillDevicesSampleApp
                 uint deviceHeight = (uint)await device.GetPropertyAsync("Height", m_cts.Token);
                 uint ptSize = (uint)await device.GetPropertyAsync("PointSize", m_cts.Token);
 
-                float scaleFactor = ptSize * AppObjects.micrometerToDip;
-
-                float scale = (float)inkCanvas.Width / (deviceWidth); // 0.02
-
-//                service.Transform = AppObjects.CalculateTransform((uint)(deviceWidth * scale), (uint)(deviceHeight * scale), ptSize, 0.5f);
-
-                InkCanvasDocument document = new InkCanvasDocument();
-                //                document.Size = new Windows.Foundation.Size(height * scaleFactor, width * scaleFactor);
-                document.Size = new Windows.Foundation.Size(deviceWidth * scaleFactor, deviceHeight * scaleFactor);
-                document.InkCanvasLayers.Add(new InkCanvasLayer());
-
-                inkCanvas.InkCanvasDocument = document;
-                inkCanvas.GesturesManager = new GesturesManager();
-                inkCanvas.StrokeDataProvider = service;
-
-                // get raw data
+                // preparing for getting stroke raw data
                 m_deviceSize.Width = deviceWidth;
                 m_deviceSize.Height = deviceHeight;
-                SetCanvasScaling();
                 service.StrokeStarted += Service_StrokeStarted;
                 service.StrokeUpdated += Service_StrokeUpdated;
                 service.StrokeEnded += Service_StrokeEnded;
-                // -----
+
+                // Calc coordination scale
+                double sx = inkCanvas.Width / deviceWidth;
+                double sy = inkCanvas.Height / deviceHeight;
+
+                mScale = sx < sy ? sx : sy;
+
+                int cw = (int)(deviceWidth * mScale);
+                int ch = (int)(deviceHeight * mScale);
+
+                // InkCanvas size settings for displaying
+                inkCanvas.Width = cw;
+                inkCanvas.Height = ch;
+                inkContainer.Width = cw;
+                inkContainer.Height = ch;
 
                 if (!service.IsStarted)
                 {
                     await service.StartAsync(false, m_cts.Token);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                throw new Exception(string.Format("RealTimeInkPage_Loaded: Exception: {0}", ex));
             }
         }
 
-        private void SetCanvasScaling()
+        private async void DrawStrokes(StrokeUpdatedEventArgs e)
         {
-            IDigitalInkDevice device = AppObjects.Instance.Device;
-
-            if (device != null)
+            if (e.PathPart.DataStride == 3)
             {
-                double sx = inkCanvas.ActualWidth / m_deviceSize.Width;
-                double sy = inkCanvas.ActualHeight / m_deviceSize.Height;
-                m_scale = Math.Min(sx, sy);
+                int stride = 3;
+                int count = e.PathPart.Data.Count / stride;
+                int index = 0;
+
+                InkPoint[] points = new InkPoint[count];
+
+                for (int i = 0; i < count; i++)
+                {
+                    float x = e.PathPart.Data[index];
+                    float y = e.PathPart.Data[index + 1];
+                    float p = e.PathPart.Data[index + 2] / maxP;
+
+                    points[i] = new InkPoint(new Windows.Foundation.Point(x * mScale, y * mScale), p);
+
+                    index += stride;
+                }
+
+                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    // Make a stroke by array of point
+                    InkStroke s = m_inkStrokeBuilder.CreateStrokeFromInkPoints(
+                        points, System.Numerics.Matrix3x2.Identity
+                        );
+                    inkCanvas.InkPresenter.StrokeContainer.AddStroke(s);
+                });
             }
         }
 
         private async void Service_StrokeEnded(object sender, StrokeEndedEventArgs e)
         {
-            //Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
-            //{
             var pathPart = e.PathPart;
             var data = pathPart.Data.GetEnumerator();
 
@@ -204,23 +230,17 @@ namespace WillDevicesSampleApp
                 //Clamp to 0.0 -> 1.0
                 w = Math.Max(0.0f, Math.Min(1.0f, (data.Current - 1.0f) * pFactor));
             }
-
-            //var point = new System.Windows.Input.StylusPoint(x * m_scale, y * m_scale, w);
-            //Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
-            //{
-            //    _strokes[_strokes.Count - 1].StylusPoints.Add(point);
-            //    NotifyPropertyChanged("Strokes");
-            //}));
 
             m_addNewStrokeToModel = true;
 
             await EventMessage(sender, string.Format("Stroke End: {0} : {1} : {2}", x, y, z));
 
-            //}));
         }
 
         private async void Service_StrokeUpdated(object sender, StrokeUpdatedEventArgs e)
         {
+            DrawStrokes(e);
+
             var pathPart = e.PathPart;
             var data = pathPart.Data.GetEnumerator();
 
@@ -246,29 +266,6 @@ namespace WillDevicesSampleApp
                 //Clamp to 0.0 -> 1.0
                 w = Math.Max(0.0f, Math.Min(1.0f, (data.Current - 1.0f) * pFactor));
             }
-
-            //   var point = new System.Windows.Input.StylusPoint(x * m_scale, y * m_scale, w);
-            //   if (m_addNewStrokeToModel)
-            //   {
-            //       m_addNewStrokeToModel = false;
-            //       var points = new System.Windows.Input.StylusPointCollection();
-            //       points.Add(point);
-
-            //       var stroke = new Stroke(points);
-            //       stroke.DrawingAttributes = m_DrawingAttributes;
-
-            //Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
-            //       {
-            //           _strokes.Add(stroke);
-            //       }));
-            //   }
-            //   else
-            //   {
-            //       Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
-            //       {
-            //           _strokes[_strokes.Count - 1].StylusPoints.Add(point);
-            //       }));
-            //   }
 
             await EventMessage(sender, string.Format("Stroke Middle: {0} : {1} : {2}", x, y, z));
         }
@@ -373,7 +370,8 @@ namespace WillDevicesSampleApp
 
             var ignore = this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             {
-                await new MessageDialog($"The device {AppObjects.Instance.DeviceInfo.DeviceName} was disconnected.").ShowAsync();
+                await new MessageDialog(
+                    string.Format(resourceLoader.GetString("IDS_DeviceDisconnected"), AppObjects.Instance.DeviceInfo.DeviceName)).ShowAsync();
 
                 Frame.Navigate(typeof(ScanAndConnectPage));
             });
@@ -418,5 +416,6 @@ namespace WillDevicesSampleApp
 
             }
         }
+
     }
 }

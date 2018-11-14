@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Wacom;
 using Wacom.Devices;
 using Wacom.SmartPadCommunication;
+using Windows.ApplicationModel.Resources;
 using Windows.Devices.Bluetooth;
 using Windows.UI.Core;
 using Windows.UI.Popups;
@@ -15,7 +16,9 @@ namespace WillDevicesSampleApp
 {
 	public sealed partial class ScanAndConnectPage : Page
 	{
-		InkDeviceWatcherBLE m_watcherBLE;
+        private ResourceLoader resourceLoader;
+
+        InkDeviceWatcherBLE m_watcherBLE;
 		InkDeviceWatcherUSB m_watcherUSB;
 		InkDeviceWatcherBTC m_watcherBTC;
 		InkDeviceInfo m_connectingDeviceInfo;
@@ -28,7 +31,9 @@ namespace WillDevicesSampleApp
 
 			this.DataContext = this;
 
-			m_watcherBLE = new InkDeviceWatcherBLE();
+            resourceLoader = ResourceLoader.GetForCurrentView();
+
+            m_watcherBLE = new InkDeviceWatcherBLE();
 			m_watcherBLE.DeviceAdded += OnDeviceAdded;
 			m_watcherBLE.DeviceRemoved += OnDeviceRemoved;
 			m_watcherBLE.WatcherStopped += OnBleWatcherStopped;
@@ -189,7 +194,7 @@ namespace WillDevicesSampleApp
 
 			if (m_connectingDeviceInfo != null)
 			{
-				string msg = $"Initializing connection with device: \"{m_connectingDeviceInfo.DeviceName}\"";
+                string msg = string.Format(resourceLoader.GetString("IDS_InitializingConnection"), m_connectingDeviceInfo.DeviceName);
 
 				switch (m_connectingDeviceInfo.TransportProtocol)
 				{
@@ -213,7 +218,7 @@ namespace WillDevicesSampleApp
 			}
 			catch (Exception ex)
 			{
-				string message = $"Device creation failed: {ex.Message}";
+                string message = string.Format(resourceLoader.GetString("IDS_DeviceCreationFailed"), ex.Message);
 
 				await new MessageDialog(message).ShowAsync();
 			}
@@ -334,44 +339,44 @@ namespace WillDevicesSampleApp
 							return;
 						}
 
-						message = "Not scanning";
+                        message = resourceLoader.GetString("IDS_NotScanning");
 						break;
 
 					case BluetoothError.RadioNotAvailable:
-						message = "Bluetooth is turned off, please turn it on.";
+                        message = resourceLoader.GetString("IDS_BluetoothTurnedOff");
 						SetScanAndEnabled(btnBleScan);
 						break;
 
 					case BluetoothError.ResourceInUse:
-						message = "Not scanning: Resource In Use";
+                        message = resourceLoader.GetString("IDS_ResourceInUse");
 						break;
 
 					case BluetoothError.DeviceNotConnected:
-						message = "Not scanning: Device Not Connected";
+						message = resourceLoader.GetString("IDS_DeviceNotConnected");
 						break;
 
 					case BluetoothError.OtherError:
-						message = "Not scanning: Unexpected Error";
+						message = resourceLoader.GetString("IDS_UnexpectedError");
 						break;
 
 					case BluetoothError.DisabledByPolicy:
-						message = "Not scanning: Disabled By Policy";
+						message = resourceLoader.GetString("IDS_DisabledByPolicy");
 						break;
 
 					case BluetoothError.NotSupported:
-						message = "Not scanning: Not Supported";
+						message = resourceLoader.GetString("IDS_NotSupported");
 						break;
 
 					case BluetoothError.DisabledByUser:
-						message = "Not scanning: Disabled By User";
+						message = resourceLoader.GetString("IDS_DisabledByUser");
 						break;
 
 					case BluetoothError.ConsentRequired:
-						message = "Not scanning: Consent Required";
+						message = resourceLoader.GetString("IDS_ConsentRequired");
 						break;
 
 					default:
-						throw new Exception("Unknown Bluetooth error!");
+                        throw new Exception(resourceLoader.GetString("IDS_UnknownBluetoothError"));
 				}
 
 				tbBle.Text = message;
@@ -385,7 +390,7 @@ namespace WillDevicesSampleApp
 				if ((m_connectingDeviceInfo != null) && (m_connectingDeviceInfo.TransportProtocol == TransportProtocol.USB))
 					return;
 
-				tbUsb.Text = "Not scanning";
+				tbUsb.Text = resourceLoader.GetString("IDS_NotScanning");
 			});
 		}
 
@@ -396,8 +401,8 @@ namespace WillDevicesSampleApp
 				if ((m_connectingDeviceInfo != null) && (m_connectingDeviceInfo.TransportProtocol == TransportProtocol.BTC))
 					return;
 
-				tbBtc.Text = "Not scanning";
-			});
+				tbBtc.Text = resourceLoader.GetString("IDS_NotScanning");
+            });
 		}
 
 		private void OnAppSuspending(object sender, Windows.ApplicationModel.SuspendingEventArgs e)
@@ -436,39 +441,41 @@ namespace WillDevicesSampleApp
 
 		private void SetScanningAndDisabled(Button btn)
 		{
-			btn.Content = "Scanning";
+			btn.Content = resourceLoader.GetString("IDS_Scanning"); ;
 			btn.IsEnabled = false;
 		}
 
 		private void SetScanAndEnabled(Button btn)
 		{
-			btn.Content = "Scan";
-			btn.IsEnabled = true;
+			btn.Content = resourceLoader.GetString("IDS_Scan");
+            btn.IsEnabled = true;
 		}
 
 		private void SetScanAndDisabled(Button btn)
 		{
-			btn.Content = "Scan";
+			btn.Content = resourceLoader.GetString("IDS_Scan");
 			btn.IsEnabled = false;
 		}
 
 		private void TextBoxBleSetText()
 		{
 			tbBle.Text =
-				"Press and hold the device's Central Button and wait until the blue LED starts to blink. " +
-				"When the device appears in the list, select it and press the Connect button.";
-		}
+                resourceLoader.GetString("IDS_PressAndHoldButton") +
+                resourceLoader.GetString("IDS_WhenDeviceAppears");
+ 		}
 
 		private void TextBoxUsbSetText()
 		{
-			tbUsb.Text = "Connect the device to a USB port and turn it on.";
-		}
+            tbUsb.Text =
+                resourceLoader.GetString("IDS_ConnectUsbPort");
+
+        }
 
 		private void TextBoxBtcSetText()
 		{
 			tbBtc.Text =
-				"Press and hold the device's Central Button and wait until the blue LED starts to blink. " +
-				"When the device appears in the list, select it and press the Connect button.";
+                resourceLoader.GetString("IDS_PressAndHoldButton") +
+                resourceLoader.GetString("IDS_WhenDeviceAppears");
 		}
 
 		#endregion

@@ -45,7 +45,17 @@
                  ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible"
                  Background="LightBlue"/>
         <Button x:Name="Pbtn_Save" Content="Button" Grid.Column="1" HorizontalAlignment="Left" Height="50" Margin="745,66,0,0" Grid.Row="1" VerticalAlignment="Top" Width="156" Click="Pbtn_Save_Click"/>
-        <Controls:InkCanvas x:Name="inkCanvas" HorizontalAlignment="Left" Height="669" Margin="0,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="639" Grid.Column="1" BorderThickness="10" RequestedTheme="Dark" Opacity="0.5"/>
+        <Border x:Name="inkContainer" Grid.Column="1" Grid.Row="1" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="125,47,557,46" 
+                Height="594" Width="432" 
+                >
+            <InkCanvas x:Name="inkCanvas" Height="594" Width="432"/>
+        </Border>
+        <!--<InkCanvas x:Name="inkCanvas" DataContext="{Binding ElementName=inkStrokes}"
+                   RequestedTheme="Dark" Opacity="0.5" Grid.Column="1" HorizontalAlignment="Left" Height="375" Margin="132,179,0,0" Grid.Row="1" VerticalAlignment="Top" Width="353"/>-->
+
+        <!--<Controls:InkCanvas x:Name="inkCanvas" HorizontalAlignment="Left" Height="669" Margin="0,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="639" Grid.Column="1" BorderThickness="10" RequestedTheme="Dark" Opacity="0.5"/>-->
+
+
 
     </Grid>
 </Page>

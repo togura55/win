@@ -49,9 +49,9 @@ namespace WillDevicesSampleApp
 
 		private async void MainPage_Loaded(object sender, RoutedEventArgs e)
 		{
-            buttonScan.Content = resourceLoader.GetString("IDC_Scan");
-            buttonFileTransfer.Content = resourceLoader.GetString("IDC_FileTransfer");
-            buttonRealTime.Content = resourceLoader.GetString("IDC_RealTime");
+            buttonScan.Content = resourceLoader.GetString("IDS_ScanDevices");
+            buttonFileTransfer.Content = resourceLoader.GetString("IDS_FileTransfer");
+            buttonRealTime.Content = resourceLoader.GetString("IDS_RealTime");
 
             buttonScan.IsEnabled = false;
 			buttonFileTransfer.IsEnabled = false;
@@ -64,13 +64,15 @@ namespace WillDevicesSampleApp
 
 			if (AppObjects.Instance.DeviceInfo == null)
 			{
-				textBlockDeviceName.Text = "Not connected to a device, click the \"Scan for Devices\" button and follow the instructions.";
-				buttonScan.IsEnabled = true;
+                textBlockDeviceName.Text = resourceLoader.GetString("IDS_NotConnectedDevice");
+                buttonScan.IsEnabled = true;
 				return;
 			}
 
 			InkDeviceInfo inkDeviceInfo = AppObjects.Instance.DeviceInfo;
-			textBlockDeviceName.Text = $"Reconnecting to device {inkDeviceInfo.DeviceName} ({inkDeviceInfo.TransportProtocol}) ...";
+            textBlockDeviceName.Text = 
+                string.Format(resourceLoader.GetString("IDS_ReconnectDevice"), 
+                inkDeviceInfo.DeviceName, inkDeviceInfo.TransportProtocol);
 
 			try
 			{
@@ -85,12 +87,15 @@ namespace WillDevicesSampleApp
 			}
 			catch (Exception ex)
 			{
-				textBlockDeviceName.Text = $"Cannot init device: {inkDeviceInfo.DeviceName} [{ex.Message}]";
+                textBlockDeviceName.Text =
+                    string.Format(resourceLoader.GetString("IDS_CannotInitDevice"), inkDeviceInfo.DeviceName, ex.Message);
 				buttonScan.IsEnabled = true;
 				return;
 			}
 
-			textBlockDeviceName.Text = $"Current device: {inkDeviceInfo.DeviceName}";
+			textBlockDeviceName.Text =
+                string.Format(resourceLoader.GetString("IDS_CurrentDevice"), inkDeviceInfo.DeviceName);
+
 			buttonFileTransfer.IsEnabled = true;
 			buttonRealTime.IsEnabled = true;
 			buttonScan.IsEnabled = true;
@@ -214,9 +219,9 @@ namespace WillDevicesSampleApp
 
 			var ignore = this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
 			{
-				await new MessageDialog($"The device {AppObjects.Instance.DeviceInfo.DeviceName} was disconnected.").ShowAsync();
-
-				Frame.Navigate(typeof(ScanAndConnectPage));
+				await new MessageDialog(
+                    string.Format(resourceLoader.GetString("IDS_DeviceDisconnected"), AppObjects.Instance.DeviceInfo.DeviceName)).ShowAsync();
+                Frame.Navigate(typeof(ScanAndConnectPage));
 			});
 		}
 	}

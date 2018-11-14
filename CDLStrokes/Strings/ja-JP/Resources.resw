@@ -118,123 +118,123 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="IDS_AuthorizationFailed" xml:space="preserve">
-    <value>The device authorization failed.</value>
+    <value>デバイスの承認に失敗しました。</value>
   </data>
   <data name="IDS_BluetoothTurnedOff" xml:space="preserve">
-    <value>Bluetooth is turned off, please turn it on.</value>
+    <value>ブルートゥースがオフです。オンにしてください。</value>
   </data>
   <data name="IDS_CannotInitDevice" xml:space="preserve">
-    <value>Cannot init device: {0} [{1}]</value>
+    <value>デバイスを初期化できません：{0} [{1}]</value>
   </data>
   <data name="IDS_Connecting" xml:space="preserve">
-    <value>Connecting...</value>
+    <value>接続しています…</value>
   </data>
   <data name="IDS_ConnectUsbPort" xml:space="preserve">
-    <value>Connect the device to a USB port and turn it on.</value>
+    <value>デバイスをUSBポートに接続してオンにします。</value>
   </data>
   <data name="IDS_ConsentRequired" xml:space="preserve">
-    <value>Not scanning: Consent Required</value>
+    <value>スキャンできません：同意が必要です。</value>
   </data>
   <data name="IDS_CurrentDevice" xml:space="preserve">
-    <value>Current device: {0}</value>
+    <value>現在のデバイス：{0}</value>
   </data>
   <data name="IDS_DeviceCreationFailed" xml:space="preserve">
-    <value>Device creation failed: {0}</value>
+    <value>デバイスの作成に失敗しました：{0}</value>
   </data>
   <data name="IDS_DeviceDisconnected" xml:space="preserve">
-    <value>The device {0} was disconnected.</value>
+    <value>デバイス {0} が切断されました。</value>
   </data>
   <data name="IDS_DeviceNotConnected" xml:space="preserve">
-    <value>Not scanning: Device Not Connected</value>
+    <value>スキャンできません：デバイスが接続されていません。</value>
   </data>
   <data name="IDS_DeviceNotConnected2" xml:space="preserve">
-    <value>Device not connected</value>
+    <value>デバイスが接続されていません</value>
   </data>
   <data name="IDS_DevicePairingMode" xml:space="preserve">
-    <value>The device {0} is in pairing mode. How do you want proceed?</value>
+    <value>デバイス {0} はペアリングモードです。どのように進めますか？</value>
   </data>
   <data name="IDS_DeviceUseAnother" xml:space="preserve">
-    <value>The device is in use by another host.</value>
+    <value>デバイスは他のホストで使用中です。</value>
   </data>
   <data name="IDS_DisabledByPolicy" xml:space="preserve">
-    <value>Not scanning: Disabled By Policy</value>
+    <value>スキャンできません：ポリシーにより使用停止されました。</value>
   </data>
   <data name="IDS_DisabledByUser" xml:space="preserve">
-    <value>Not scanning: Disabled By User</value>
+    <value>スキャンできません：ユーザーにより使用停止されました。</value>
   </data>
   <data name="IDS_FileTransfer" xml:space="preserve">
-    <value>File Transfer</value>
+    <value>ファイル転送</value>
   </data>
   <data name="IDS_ForgetDevice" xml:space="preserve">
-    <value>Forget the device</value>
+    <value>デバイスを失いました</value>
   </data>
   <data name="IDS_InitializingConnection" xml:space="preserve">
-    <value>Initializing connection with device: {0}</value>
+    <value>デバイス {0} の接続の初期化中</value>
   </data>
   <data name="IDS_KeepUsingDevice" xml:space="preserve">
-    <value>Keep using the device</value>
+    <value>デバイスの使用継続</value>
   </data>
   <data name="IDS_NotConnectedDevice" xml:space="preserve">
-    <value>Not connected to a device, click the \"Scan for Devices\" button and follow the instructions.</value>
+    <value>デバイスに接続していません。\"デバイスのスキャン\" ボタンをクリックして説明に従ってください.</value>
   </data>
   <data name="IDS_NotScanning" xml:space="preserve">
-    <value>Not scanning</value>
+    <value>スキャンできません</value>
   </data>
   <data name="IDS_NotSupported" xml:space="preserve">
-    <value>Not scanning: Not Supported</value>
+    <value>スキャンできません：サポートされていません</value>
   </data>
   <data name="IDS_PeriodExpired" xml:space="preserve">
-    <value>The connection confirmation period expired.</value>
+    <value>接続確定までの時間が経過しました。</value>
   </data>
   <data name="IDS_PressAndHoldButton" xml:space="preserve">
-    <value>Press and hold the device's Central Button and wait until the blue LED starts to blink.</value>
+    <value>天面のボタンを押し続けて、青色LEDが点滅し始めるまで待ってください。</value>
   </data>
   <data name="IDS_PressAndHoldUserConfirm" xml:space="preserve">
-    <value>Press and hold the Central Button to enter user confirmation mode.</value>
+    <value>天面のボタンを押し続けて、ユーザーによる確定モードに移行してください。</value>
   </data>
   <data name="IDS_RealTime" xml:space="preserve">
-    <value>Real Time Ink</value>
+    <value>リアルタイム インク</value>
   </data>
   <data name="IDS_RealtimeInkEnabled" xml:space="preserve">
-    <value>Real time ink mode enabled.</value>
+    <value>リアルタイム インク モードが有効</value>
   </data>
   <data name="IDS_RealtimeinkNotSupported" xml:space="preserve">
-    <value>The Real-time Ink service is not supported on this device</value>
+    <value>このデバイスではリアルタイム インク モードはサポートされていません。</value>
   </data>
   <data name="IDS_ReconnectDevice" xml:space="preserve">
-    <value>Reconnecting to device {0} ({1}) ...</value>
+    <value>デバイスに再接続中 {0} ({1}) ...</value>
   </data>
   <data name="IDS_ResourceInUse" xml:space="preserve">
-    <value>Not scanning: Resource In Use</value>
+    <value>スキャンできません：リソースが使用中です。</value>
   </data>
   <data name="IDS_Save" xml:space="preserve">
-    <value>Save</value>
+    <value>保存</value>
   </data>
   <data name="IDS_Scan" xml:space="preserve">
-    <value>Scan</value>
+    <value>スキャン</value>
   </data>
   <data name="IDS_ScanDevices" xml:space="preserve">
-    <value>Scan for Devices</value>
+    <value>デバイスのスキャン</value>
   </data>
   <data name="IDS_Scanning" xml:space="preserve">
-    <value>Scanning</value>
+    <value>スキャン中…</value>
   </data>
   <data name="IDS_Syncing" xml:space="preserve">
-    <value>Syncing...</value>
+    <value>同期中…</value>
   </data>
   <data name="IDS_TabButtonRestore" xml:space="preserve">
-    <value>Tap the Central Button to restore the connection.</value>
+    <value>天面のボタンを押して接続を回復させてください。</value>
   </data>
   <data name="IDS_TapButtonConfirm" xml:space="preserve">
-    <value>Tap the Central Button to confirm the connection.</value>
+    <value>天面のボタンを押して接続を確定させてください。</value>
   </data>
   <data name="IDS_UnexpectedError" xml:space="preserve">
-    <value>Not scanning: Unexpected Error</value>
+    <value>スキャンできません：予期せぬエラー</value>
   </data>
   <data name="IDS_UnknownBluetoothError" xml:space="preserve">
-    <value>Unknown Bluetooth error!</value>
+    <value>既知のブルートゥース エラー！</value>
   </data>
   <data name="IDS_WhenDeviceAppears" xml:space="preserve">
-    <value>When the device appears in the list, select it and press the Connect button.</value>
+    <value>デバイスがリスト中に表示されたら、選択して接続ボタンを押してください。</value>
   </data>
 </root>

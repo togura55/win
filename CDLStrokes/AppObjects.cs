@@ -7,17 +7,22 @@ using Wacom.SmartPadCommunication;
 using Windows.Storage;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Popups;
+using Windows.ApplicationModel.Resources;
 
 namespace WillDevicesSampleApp
 {
 	public class AppObjects
 	{
-		public static readonly AppObjects Instance = new AppObjects();
+        private static ResourceLoader resourceLoader;
+
+        public static readonly AppObjects Instance = new AppObjects();
 		private static readonly string SaveFileName = "SavedData";
 
 		private AppObjects()
 		{
-			AppId = new SmartPadClientId(0xFA, 0xAB, 0xC1, 0xE0, 0xF1, 0x77);
+            resourceLoader = ResourceLoader.GetForCurrentView();
+
+            AppId = new SmartPadClientId(0xFA, 0xAB, 0xC1, 0xE0, 0xF1, 0x77);
 		}
 
 		public IDigitalInkDevice Device
@@ -107,39 +112,48 @@ namespace WillDevicesSampleApp
 					break;
 
 				case DeviceStatus.Reconnecting:
-					text = "Connecting...";
+                    text =
+                        resourceLoader.GetString("IDS_Connecting");
 					break;
 
 				case DeviceStatus.Syncing:
-					text = "Syncing...";
+					text =
+                         resourceLoader.GetString("IDS_Syncing");
 					break;
 
 				case DeviceStatus.CapturingRealTimeInk:
-					text = "Real time ink mode enabled.";
+					text =
+                         resourceLoader.GetString("IDS_RealtimeInkEnabled");
 					break;
 
 				case DeviceStatus.ExpectingConnectionConfirmation:
-					text = "Tap the Central Button to confirm the connection.";
+					text =
+                          resourceLoader.GetString("IDS_TapButtonConfirm");
 					break;
 
 				case DeviceStatus.ExpectingReconnect:
-					text = "Tap the Central Button to restore the connection.";
+					text =
+                           resourceLoader.GetString("IDS_TabButtonRestore");
 					break;
 
 				case DeviceStatus.ExpectingUserConfirmationMode:
-					text = "Press and hold the Central Button to enter user confirmation mode.";
+					text =
+                           resourceLoader.GetString("IDS_PressAndHoldUserConfirm");
 					break;
 
 				case DeviceStatus.NotAuthorizedConnectionNotConfirmed:
-					text = "The connection confirmation period expired.";
+					text =
+                           resourceLoader.GetString("IDS_PeriodExpired");
 					break;
 
 				case DeviceStatus.NotAuthorizedDeviceInUseByAnotherHost:
-					text = "The device is in use by another host.";
+					text =
+                           resourceLoader.GetString("IDS_DeviceUseAnother");
 					break;
 
 				case DeviceStatus.NotAuthorizedGeneralError:
-					text = "The device authorization failed.";
+					text =
+                           resourceLoader.GetString("IDS_AuthorizationFailed");
 					break;
 			}
 
@@ -148,11 +162,11 @@ namespace WillDevicesSampleApp
 
 		public async Task<bool> ShowPairingModeEnabledDialogAsync()
 		{
-			var dialog = new MessageDialog($"The device {DeviceInfo.DeviceName} is in pairing mode. How do you want proceed?");
-			dialog.Commands.Add(new UICommand("Keep using the device") { Id = 0 });
-			dialog.Commands.Add(new UICommand("Forget the device") { Id = 1 });
-
-			var dialogResult = await dialog.ShowAsync();
+            var dialog = new MessageDialog(string.Format(resourceLoader.GetString("IDS_DevicePairingMode"), DeviceInfo.DeviceName));
+            dialog.Commands.Add(new UICommand(resourceLoader.GetString("IDS_KeepUsingDevice")) { Id = 0 });
+			dialog.Commands.Add(new UICommand(resourceLoader.GetString("IDS_ForgetDevice")) { Id = 1 });
+            
+            var dialogResult = await dialog.ShowAsync();
 
 			return ((int)dialogResult.Id == 0);
 		}
