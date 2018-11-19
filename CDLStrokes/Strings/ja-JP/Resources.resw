@@ -175,7 +175,7 @@
     <value>デバイスの使用継続</value>
   </data>
   <data name="IDS_NotConnectedDevice" xml:space="preserve">
-    <value>デバイスに接続していません。\"デバイスのスキャン\" ボタンをクリックして説明に従ってください.</value>
+    <value>デバイスに接続していません。"デバイスのスキャン" ボタンをクリックして説明に従ってください。</value>
   </data>
   <data name="IDS_NotScanning" xml:space="preserve">
     <value>スキャンできません</value>
@@ -236,5 +236,8 @@
   </data>
   <data name="IDS_WhenDeviceAppears" xml:space="preserve">
     <value>デバイスがリスト中に表示されたら、選択して接続ボタンを押してください。</value>
+  </data>
+  <data name="IDS_Connect" xml:space="preserve">
+    <value>接続</value>
   </data>
 </root>

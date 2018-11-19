@@ -68,21 +68,7 @@ namespace WdBroker
         {
             try
             {
-                // ------- For Commands -------------
-                this.SocketServerMessage?.Invoke(this,
-                    String.Format("Start(): try to listen the port for command {0}:{1}...", ServerHostName.ToString(), PortNumber));
-
-                streamSocketListenerCommand = new StreamSocketListener();
-
-                // The ConnectionReceived event is raised when connections are received.
-                streamSocketListenerCommand.ConnectionReceived += StreamSocketListener_ReceiveString;
-
-                // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currently in use.
-                await streamSocketListenerCommand.BindEndpointAsync(ServerHostName, PortNumber).AsTask().ConfigureAwait(false);
-
-                this.SocketServerMessage?.Invoke(this,
-                 String.Format("Start(): The server for command {0}:{1} is now listening...", ServerHostName.ToString(), PortNumber));
-
+ 
                 // --------- For Data -------------
                 string port = (int.Parse(PortNumber) + 1).ToString();
                 this.SocketServerMessage?.Invoke(this,

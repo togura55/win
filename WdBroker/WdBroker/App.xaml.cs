@@ -25,7 +25,8 @@ namespace WdBroker
     /// </summary>
     sealed partial class App : Application
     {
-        public static SocketServer Socket; // Single instance of SocketServer using this app
+        public static Broker Broker = null;
+        public static SocketServer Socket = null; // Single instance of SocketServer using this app
         public static List<Publisher> Pubs = new List<Publisher>(); // List of Publisher object to be managed in this app
 
         // Delegeat handlers
@@ -66,6 +67,7 @@ namespace WdBroker
         }
         private void AppInitialize()
         {
+            Broker = new Broker();
             Socket = new SocketServer();
 
             Socket.CommandEvent += OnCommandPublisherEvent;

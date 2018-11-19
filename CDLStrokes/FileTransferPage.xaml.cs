@@ -9,7 +9,6 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Navigation;
 using Wacom.SmartPadCommunication;
-using Wacom.UX.ViewModels;
 using Windows.Foundation;
 
 namespace WillDevicesSampleApp
@@ -161,7 +160,7 @@ namespace WillDevicesSampleApp
 
 			if (item != null)
 			{
-				inkCanvas.InkCanvasDocument = InkCanvasDocument.FromInkDocument(item.Document);
+//				inkCanvas.InkCanvasDocument = InkCanvasDocument.FromInkDocument(item.Document);
 			}
 		}
 

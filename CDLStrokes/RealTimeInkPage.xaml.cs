@@ -8,8 +8,6 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Navigation;
-using Wacom.UX.ViewModels;
-using Wacom.UX.Gestures;
 using Windows.Foundation;
 using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.Resources;

@@ -175,5 +175,11 @@ namespace WillDevicesSampleApp
             set;
         }
 
+        public SocketServices SocketService
+        {
+            get;
+            set;
+        }
+
     }
 }

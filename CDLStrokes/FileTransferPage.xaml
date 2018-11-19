@@ -42,12 +42,12 @@
 				   Text=""
 				   VerticalAlignment="Top"/>
 
-		<Controls:InkCanvas x:Name="inkCanvas"
+		<!--<Controls:InkCanvas x:Name="inkCanvas"
 							Grid.Row="1"
 							Grid.Column="1"
 							HorizontalAlignment="Stretch"
 							VerticalAlignment="Stretch"
-							Margin="10, 10, 10, 10" />
+							Margin="10, 10, 10, 10" />-->
 
 
 	</Grid>

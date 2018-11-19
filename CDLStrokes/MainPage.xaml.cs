@@ -30,7 +30,8 @@ namespace WillDevicesSampleApp
 
             Loaded += MainPage_Loaded;
 
-			buttonFileTransfer.IsEnabled = false;
+            buttonFileTransfer.Visibility = Visibility.Collapsed;
+            buttonFileTransfer.IsEnabled = false;
 			buttonRealTime.IsEnabled = false;
 			buttonScan.IsEnabled = false;
 
@@ -96,8 +97,9 @@ namespace WillDevicesSampleApp
 			textBlockDeviceName.Text =
                 string.Format(resourceLoader.GetString("IDS_CurrentDevice"), inkDeviceInfo.DeviceName);
 
-			buttonFileTransfer.IsEnabled = true;
-			buttonRealTime.IsEnabled = true;
+            buttonFileTransfer.Visibility = Visibility.Collapsed;
+            //			buttonFileTransfer.IsEnabled = true;
+            buttonRealTime.IsEnabled = true;
 			buttonScan.IsEnabled = true;
 
 			textBlockStatus.Text = AppObjects.GetStringForDeviceStatus(AppObjects.Instance.Device.DeviceStatus);
@@ -169,7 +171,7 @@ namespace WillDevicesSampleApp
 				{
 					case DeviceStatus.Idle:
 						textBlockStatus.Text = AppObjects.GetStringForDeviceStatus(e.Status);
-						buttonFileTransfer.IsEnabled = true;
+//						buttonFileTransfer.IsEnabled = true;
 						buttonRealTime.IsEnabled = true;
 						break;
 

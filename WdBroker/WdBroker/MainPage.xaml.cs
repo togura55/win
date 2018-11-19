@@ -109,7 +109,8 @@ namespace WdBroker
             {
                 if (fStart)
                 {
-                    await App.Socket.Start(PortNumberString);
+//                    await App.Socket.Start(PortNumberString);
+                    await App.Broker.Start(HostNameString, PortNumberString);
                 }
                 else
                 {

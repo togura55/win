@@ -108,7 +108,9 @@ namespace WillDevicesSampleApp
 				AppObjects.Instance.Device = null;
 			}
 
-			StartScanning();
+            this.btnConnect.Content = resourceLoader.GetString("IDS_Connect"); 
+
+            StartScanning();
 		}
 
 		private void ScanAndConnectPage_Unloaded(object sender, RoutedEventArgs e)

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
@@ -12,7 +14,9 @@ namespace WillDevicesSampleApp
 {
     public class WdPublishComm
     {
-        public SocketClient commandSocketClient = null;
+        public Socket mSocket = null;
+        
+ //       public SocketClient commandSocketClient = null;
         public SocketClient dataSocketClient = null;
 
         float CommandResponseState;
@@ -44,26 +48,37 @@ namespace WillDevicesSampleApp
 
         public async Task Initialize(string host, string port)
         {
-            HostNameString = host;
-            PortNumberString = port;
+            AppObjects.Instance.SocketService = new SocketServices();
+            SocketServices socketService = AppObjects.Instance.SocketService;
 
-            try
-            {
-                // establish the command path
-                commandSocketClient = new SocketClient();
+            // Socket client delegate settings
+            socketService.ConnectComplete += CommandSocketClientConnect_Completed; // Client_ConnectComplete;
+            socketService.ReceivePacketComplete += CommandSocketClient_Response; //  Client_ReceivePacketComplete;
+            socketService.SendPacketComplete += Client_SendPacketComplete;
 
-                commandSocketClient.CreateListener(HostNameString, PortNumberString);  // create a listner, first
+            socketService.Connect(System.Net.IPAddress.Parse(host), int.Parse(port));
 
-                commandSocketClient.SocketClientConnectCompletedNotification += CommandSocketClientConnect_Completed;
-                commandSocketClient.CommandResponseEvent += CommandSocketClient_Response;
 
-                await commandSocketClient.ConnectHost(HostNameString, PortNumberString);
-            }
-            catch (Exception ex)
-            {
-                MessageEvent(string.Format("Initialize() Exception: {0}", ex.Message));
-                //               throw new Exception(string.Format("Initialize() Exception: {0}", ex.Message));
-            }
+            //HostNameString = host;
+            //PortNumberString = port;
+
+            //try
+            //{
+            //    // establish the command path
+            //    commandSocketClient = new SocketClient();
+
+            //    commandSocketClient.CreateListener(HostNameString, PortNumberString);  // create a listner, first
+
+            //    commandSocketClient.SocketClientConnectCompletedNotification += CommandSocketClientConnect_Completed;
+            //    commandSocketClient.CommandResponseEvent += CommandSocketClient_Response;
+
+            //    await commandSocketClient.ConnectHost(HostNameString, PortNumberString);
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageEvent(string.Format("Initialize() Exception: {0}", ex.Message));
+            //    //               throw new Exception(string.Format("Initialize() Exception: {0}", ex.Message));
+            //}
         }
 
         public async Task Close()
@@ -73,11 +88,19 @@ namespace WillDevicesSampleApp
                 CommandResponseState = CMD_DISPOSE_PUBLISHER;
                 await this.SendCommand(CMD_DISPOSE_PUBLISHER);
 
-                if (commandSocketClient != null)
+                //if (commandSocketClient != null)
+                //{
+                //    commandSocketClient.Disonnect();
+                //    // commandSocketClient.SocketClientConnectCompletedNotification -= CommandSocketClientConnect_Completed;
+
+                //    commandSocketClient = null;
+                //}
+                if (AppObjects.Instance.SocketService != null)
                 {
-                    commandSocketClient.Disonnect();
-                    commandSocketClient.SocketClientConnectCompletedNotification -= CommandSocketClientConnect_Completed;
-                    commandSocketClient = null;
+                    SocketServices socketService = AppObjects.Instance.SocketService;
+                    socketService.ConnectComplete -= CommandSocketClientConnect_Completed; // Client_ConnectComplete;
+                    socketService.ReceivePacketComplete -= CommandSocketClient_Response; //  Client_ReceivePacketComplete;
+                    socketService.SendPacketComplete -= Client_SendPacketComplete;
                 }
 
                 if (dataSocketClient != null)
@@ -93,25 +116,25 @@ namespace WillDevicesSampleApp
             }
         }
 
-        public void Start()
-        {
-            // let WacomDevices post data packets
-            try
-            {
-                if (commandSocketClient == null || dataSocketClient == null)
-                {
-                    throw new Exception("SocketClient object is null.");
-                }
-                else
-                {
+        //public void Start()
+        //{
+        //    // let WacomDevices post data packets
+        //    try
+        //    {
+        //        if (commandSocketClient == null || dataSocketClient == null)
+        //        {
+        //            throw new Exception("SocketClient object is null.");
+        //        }
+        //        else
+        //        {
 
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(string.Format("Start() Exception: {0}", ex.Message));
-            }
-        }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(string.Format("Start() Exception: {0}", ex.Message));
+        //    }
+        //}
 
         public async void Stop()
         {
@@ -136,9 +159,12 @@ namespace WillDevicesSampleApp
         {
             try
             {
+                SocketServices socketService = AppObjects.Instance.SocketService;
+
                 // send command packets
-                if (commandSocketClient != null)
-                {
+                //                if (commandSocketClient != null)
+                if (socketService != null)
+                    {
                     string commandString;
 
                     switch (command)
@@ -171,11 +197,12 @@ namespace WillDevicesSampleApp
                     }
 
                     CommandResponseState = command;
-                    commandSocketClient.SendCommand(commandString);
+ //                   commandSocketClient.SendCommand(commandString);
+                    socketService.SendToServer(System.Text.Encoding.UTF8.GetBytes(commandString));
 
                     // Then, waiting for response string at CommandSocketClient_Response
-//                    await commandSocketClient.ResponseReceiveAsync();
-                    commandSocketClient.ResponseReceive();
+                    //                    await commandSocketClient.ResponseReceiveAsync();
+ //                   commandSocketClient.ResponseReceive();
                 }
                 else
                 {
@@ -238,18 +265,20 @@ namespace WillDevicesSampleApp
         }
 
         #region Delegate Completion Handlers
-        private async void CommandSocketClientConnect_Completed(object sender, bool result)
+//        private async void CommandSocketClientConnect_Completed(object sender, bool result)
+        private async void CommandSocketClientConnect_Completed(object sender, SocketErrorEventArgs e)
         {
             MessageEvent("CommandSocketClientConnect_Completed.");
 
-            if (result)
+            if (e.Error != System.Net.Sockets.SocketError.Success)
             {
-                CommandResponseState = CMD_REQUEST_PUBLISHER_CONNECTION;
-                await this.SendCommand(CMD_REQUEST_PUBLISHER_CONNECTION);
+                MessageEvent(string.Format("Command connection error: {0}", e.Error));
+                return;
             }
             else
             {
-
+                CommandResponseState = CMD_REQUEST_PUBLISHER_CONNECTION;
+                await this.SendCommand(CMD_REQUEST_PUBLISHER_CONNECTION);
             }
         }
 
@@ -273,10 +302,22 @@ namespace WillDevicesSampleApp
         #endregion
 
         #region Delegate Event Handlers
-        private async void CommandSocketClient_Response(string response)
+ //       private async void CommandSocketClient_Response(string response)
+        private async void CommandSocketClient_Response (object sender, ReceivePacketEventArgs e)
         {
             try
             {
+                if (e.Error != System.Net.Sockets.SocketError.Success)
+                {
+                    // 受信に失敗
+                    MessageEvent(string.Format("packet receive error: {0}", e.Error));
+                    return;
+                }
+
+                // 受信したデータをテキストに変換
+                string response = System.Text.Encoding.UTF8.GetString(e.Data);
+                MessageEvent(string.Format("packet received : {0}", response));
+
                 switch (CommandResponseState)
                 {
                     case CMD_REQUEST_PUBLISHER_CONNECTION:
@@ -380,6 +421,11 @@ namespace WillDevicesSampleApp
             {
                 throw new Exception(string.Format("CommandSocketClient_Response: Exception: {0}", ex.Message));
             }
+        }
+
+        private async void Client_SendPacketComplete(object sender, SocketErrorEventArgs e)
+        {
+
         }
 
         //private async void CommandSocketClient_Response(object sender, float response)
