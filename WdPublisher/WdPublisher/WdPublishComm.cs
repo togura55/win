@@ -15,14 +15,13 @@ namespace WillDevicesSampleApp
     public class WdPublishComm
     {
         public Socket mSocket = null;
-        
- //       public SocketClient commandSocketClient = null;
+
         public SocketClient dataSocketClient = null;
 
         float CommandResponseState;
         float PublisherId;
-        string HostNameString;
-        string PortNumberString;
+        string HostNameString = string.Empty;
+        string PortNumberString = string.Empty;
 
         // Delegate handlers
         public delegate void MessageEventHandler(object sender, string message);
@@ -48,37 +47,24 @@ namespace WillDevicesSampleApp
 
         public async Task Initialize(string host, string port)
         {
+            HostNameString = host;
+            PortNumberString = port;
             AppObjects.Instance.SocketService = new SocketServices();
             SocketServices socketService = AppObjects.Instance.SocketService;
 
-            // Socket client delegate settings
-            socketService.ConnectComplete += CommandSocketClientConnect_Completed; // Client_ConnectComplete;
-            socketService.ReceivePacketComplete += CommandSocketClient_Response; //  Client_ReceivePacketComplete;
-            socketService.SendPacketComplete += Client_SendPacketComplete;
+            try
+            {
+                // Socket client delegate settings
+                socketService.ConnectComplete += CommandSocketClientConnect_Completed; // Client_ConnectComplete;
+                socketService.ReceivePacketComplete += CommandSocketClient_Response; //  Client_ReceivePacketComplete;
+                socketService.SendPacketComplete += Client_SendPacketComplete;
 
-            socketService.Connect(System.Net.IPAddress.Parse(host), int.Parse(port));
-
-
-            //HostNameString = host;
-            //PortNumberString = port;
-
-            //try
-            //{
-            //    // establish the command path
-            //    commandSocketClient = new SocketClient();
-
-            //    commandSocketClient.CreateListener(HostNameString, PortNumberString);  // create a listner, first
-
-            //    commandSocketClient.SocketClientConnectCompletedNotification += CommandSocketClientConnect_Completed;
-            //    commandSocketClient.CommandResponseEvent += CommandSocketClient_Response;
-
-            //    await commandSocketClient.ConnectHost(HostNameString, PortNumberString);
-            //}
-            //catch (Exception ex)
-            //{
-            //    MessageEvent(string.Format("Initialize() Exception: {0}", ex.Message));
-            //    //               throw new Exception(string.Format("Initialize() Exception: {0}", ex.Message));
-            //}
+                socketService.Connect(System.Net.IPAddress.Parse(host), int.Parse(port));
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("Initialize() Exception: {0}", ex.Message));
+            }
         }
 
         public async Task Close()
@@ -88,13 +74,6 @@ namespace WillDevicesSampleApp
                 CommandResponseState = CMD_DISPOSE_PUBLISHER;
                 await this.SendCommand(CMD_DISPOSE_PUBLISHER);
 
-                //if (commandSocketClient != null)
-                //{
-                //    commandSocketClient.Disonnect();
-                //    // commandSocketClient.SocketClientConnectCompletedNotification -= CommandSocketClientConnect_Completed;
-
-                //    commandSocketClient = null;
-                //}
                 if (AppObjects.Instance.SocketService != null)
                 {
                     SocketServices socketService = AppObjects.Instance.SocketService;
@@ -152,8 +131,8 @@ namespace WillDevicesSampleApp
         const float CMD_START_PUBLISHER = 0x3000;
         const float CMD_STOP_PUBLISHER = 0x4000;
         const float CMD_DISPOSE_PUBLISHER = 0x5000;
-        const string RES_ACK = "0";
-        const string RES_NAK = "1";
+        const string RES_ACK = "ack";
+        const string RES_NAK = "nak";
 
         public async Task SendCommand(float command)
         {
@@ -162,9 +141,8 @@ namespace WillDevicesSampleApp
                 SocketServices socketService = AppObjects.Instance.SocketService;
 
                 // send command packets
-                //                if (commandSocketClient != null)
                 if (socketService != null)
-                    {
+                {
                     string commandString;
 
                     switch (command)
@@ -197,12 +175,11 @@ namespace WillDevicesSampleApp
                     }
 
                     CommandResponseState = command;
- //                   commandSocketClient.SendCommand(commandString);
                     socketService.SendToServer(System.Text.Encoding.UTF8.GetBytes(commandString));
 
                     // Then, waiting for response string at CommandSocketClient_Response
                     //                    await commandSocketClient.ResponseReceiveAsync();
- //                   commandSocketClient.ResponseReceive();
+                    //                   commandSocketClient.ResponseReceive();
                 }
                 else
                 {
@@ -214,38 +191,6 @@ namespace WillDevicesSampleApp
                 throw new Exception(string.Format("SendCommand Exception: {0}", ex.Message));
             }
         }
-
-//        public async Task Send(float command)
-//        {
-//            try
-//            {
-//                // send command packets
-//                if (commandSocketClient != null)
-//                {
-//                    switch (command)
-//                    {
-//                        case CMD_REQUEST_PUBLISHER_CONNECTION:
-////                            commandSocketClient.BatchedSends(CreateTransferBuffer(command));
-
-//                            await commandSocketClient.ResponseReceive();
-//                            break;
-
-//                        default:
-//                            break;
-//                    }
-//                }
-//            }
-//            catch (Exception ex)
-//            {
-//                throw new Exception(string.Format("Send() Exception: {0}", ex.Message));
-//            }
-//        }
-
-        //public void Receive()
-        //{
-        //    // receive a command packets
-
-        //}
 
         private IBuffer CreateTransferBuffer(float cmd)
         {
@@ -265,7 +210,6 @@ namespace WillDevicesSampleApp
         }
 
         #region Delegate Completion Handlers
-//        private async void CommandSocketClientConnect_Completed(object sender, bool result)
         private async void CommandSocketClientConnect_Completed(object sender, SocketErrorEventArgs e)
         {
             MessageEvent("CommandSocketClientConnect_Completed.");
@@ -302,8 +246,7 @@ namespace WillDevicesSampleApp
         #endregion
 
         #region Delegate Event Handlers
- //       private async void CommandSocketClient_Response(string response)
-        private async void CommandSocketClient_Response (object sender, ReceivePacketEventArgs e)
+        private async void CommandSocketClient_Response(object sender, ReceivePacketEventArgs e)
         {
             try
             {
@@ -341,21 +284,18 @@ namespace WillDevicesSampleApp
                         switch (response)
                         {
                             case RES_ACK:
-                                if (dataSocketClient != null)
-                                {
-                                    // Establish the data path
-                                    string port = (int.Parse(PortNumberString) + 1).ToString();
-                                    dataSocketClient = AppObjects.Instance.SocketClient;    // share with WacomDevices
-                                    dataSocketClient.SocketClientConnectCompletedNotification += DataSocketClientConnect_Completed;
-                                    await dataSocketClient.ConnectHost(HostNameString, port);
-                                }
+                                // Establish the data path
+                                string port = (int.Parse(PortNumberString) + 1).ToString();
+                                dataSocketClient = AppObjects.Instance.SocketClient;    // share with WacomDevices
+                                dataSocketClient.SocketClientConnectCompletedNotification += DataSocketClientConnect_Completed;
+                                await dataSocketClient.ConnectHost(HostNameString, port);
                                 this.CommandResponseState = CMD_NEUTRAL;
 
                                 break;
 
                             case RES_NAK:
                                 throw new Exception("CMD_SET_ATTRIBUTES returns NAK");
-//                                break;
+                            //                                break;
 
                             default:
                                 break;
@@ -372,7 +312,7 @@ namespace WillDevicesSampleApp
 
                             case RES_NAK:
                                 throw new Exception("CMD_START_PUBLISHER returns NAK");
-//                                break;
+                            //                                break;
 
                             default:
                                 break;
@@ -389,7 +329,7 @@ namespace WillDevicesSampleApp
 
                             case RES_NAK:
                                 throw new Exception("CMD_STOP_PUBLISHER returns NAK");
- //                               break;
+                            //                               break;
 
                             default:
                                 break;
@@ -406,7 +346,7 @@ namespace WillDevicesSampleApp
 
                             case RES_NAK:
                                 throw new Exception("CMD_DISPOSE_PUBLISHER returns NAK");
- //                               break;
+                            //                               break;
 
                             default:
                                 break;
@@ -428,33 +368,6 @@ namespace WillDevicesSampleApp
 
         }
 
-        //private async void CommandSocketClient_Response(object sender, float response)
-        //{
-        //    switch (CommandResponseState)
-        //    {
-        //        case CMD_REQUEST_PUBLISHER_CONNECTION:
-        //            {
-        //                this.PublisherId = response;
-        //                AppObjects.Instance.WacomDevice.PublisherAttribute
-        //                    = (uint)AppObjects.Instance.WacomDevice.PublisherAttribute | (uint)response;
-        //                MessageEvent(string.Format("CommandSocketClient_Response: response = {0}, PublisherAttribute = {1}",
-        //                    response, AppObjects.Instance.WacomDevice.PublisherAttribute));
-
-        //                this.CommandResponseState = CMD_NEUTRAL;
-
-        //                // Establish the data path
-        //                string port = (int.Parse(PortNumberString) + 1).ToString();
-        //                //                dataSocketClient = new SocketClient();
-        //                dataSocketClient = AppObjects.Instance.SocketClient;    // share with WacomDevices
-        //                dataSocketClient.SocketClientConnectCompletedNotification += DataSocketClientConnect_Completed;
-        //                await dataSocketClient.ConnectHost(HostNameString, port);
-        //            }
-        //            break;
-
-        //        default:
-        //            break;
-        //    }
-        //}
         #endregion
     }
 }
