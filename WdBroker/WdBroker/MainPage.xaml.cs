@@ -48,7 +48,8 @@ namespace WdBroker
 
             App.Socket.SocketServerMessage += ReceiveMessage;
             App.Broker.AppConnectPublisher += ReceiveAppConnectPublisher;
-//            App.AppConnectPublisher += ReceiveAppConnectPublisher;
+            App.Broker.BrokerMessage += ReceiveMessage;
+            //            App.AppConnectPublisher += ReceiveAppConnectPublisher;
             App.AppMessage += ReceiveMessage;
             App.AppDrawing += ReceiveDrawing;  // for drawing
 

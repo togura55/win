@@ -199,18 +199,18 @@ namespace WdBroker
 
                         // Suppose getting this request only one time at the Publisher connection...
                         case CMD_SET_ATTRIBUTES:
-                            var list_data = new List<string>();
-                            list_data.AddRange(data.Split(sp));
+                            //var list_data = new List<string>();
+                            //list_data.AddRange(data.Split(sp));
 
                             Publisher pub = App.Pubs[int.Parse(publisher_id)];
-                            pub.DeviceSize.Width = double.Parse(list_data[0]);
-                            pub.DeviceSize.Height = double.Parse(list_data[1]);
-                            pub.PointSize = float.Parse(list_data[2]);
-                            pub.DeviceName = list_data[3];
-                            pub.SerialNumber = list_data[4];
-                            pub.Battery = float.Parse(list_data[5]);
-                            pub.DeviceType = list_data[6];
-                            pub.TransferMode = list_data[7];
+                            pub.DeviceSize.Width = double.Parse(list[0]);
+                            pub.DeviceSize.Height = double.Parse(list[1]);
+                            pub.PointSize = float.Parse(list[2]);
+                            pub.DeviceName = list[3];
+                            pub.SerialNumber = list[4];
+                            pub.Battery = float.Parse(list[5]);
+                            pub.DeviceType = list[6];
+                            pub.TransferMode = list[7];
 
                             //                           App.Socket.SendCommandResponseAsync(args, RES_ACK);
                             res = RES_ACK;
