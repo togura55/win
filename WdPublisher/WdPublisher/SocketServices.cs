@@ -7,6 +7,12 @@ using System.IO;
 
 using System.Net.Sockets;
 using System.Net;
+using Windows.Networking.Sockets;
+using Windows.Networking;
+using Windows.ApplicationModel.Core;
+using Windows.UI.Core;
+using System.Threading;
+using Windows.Storage.Streams;
 
 namespace WillDevicesSampleApp
 {
@@ -20,7 +26,7 @@ namespace WillDevicesSampleApp
             get;
         }
 
-        public ReceivePacketEventArgs(SocketError err, byte[] recvData) : base(err)
+        public ReceivePacketEventArgs(System.Net.Sockets.SocketError err, byte[] recvData) : base(err)
         {
             this.Data = recvData;
         }
@@ -30,12 +36,12 @@ namespace WillDevicesSampleApp
     /// </summary>
     public class SocketErrorEventArgs : EventArgs
     {
-        public SocketError Error
+        public System.Net.Sockets.SocketError Error
         {
             get;
         }
 
-        public SocketErrorEventArgs(SocketError err) : base()
+        public SocketErrorEventArgs(System.Net.Sockets.SocketError err) : base()
         {
             this.Error = err;
         }
@@ -98,6 +104,14 @@ namespace WillDevicesSampleApp
         } = 2048;
 
         #endregion
+
+        private async void MessageEvent(string message)
+        {
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                this.SocketClientMessage?.Invoke(this, message);
+            });
+        }
 
         /// <summary>
         /// ソケットのクローズ
@@ -242,7 +256,7 @@ namespace WillDevicesSampleApp
         /// <param name="e"></param>
         private void AcceptAsync_Completed(object sender, SocketAsyncEventArgs e)
         {
-            if (e.SocketError == SocketError.Success)
+            if (e.SocketError == System.Net.Sockets.SocketError.Success)
             {
                 // クライアントのソケット設定
                 mClientSocket = e.AcceptSocket;
@@ -263,7 +277,7 @@ namespace WillDevicesSampleApp
         /// <param name="e"></param>
         private void Connect_Completed(object sender, SocketAsyncEventArgs e)
         {
-            if (e.SocketError != SocketError.Success)
+            if (e.SocketError != System.Net.Sockets.SocketError.Success)
             {
                 // 接続失敗
                 this.Close();
@@ -296,7 +310,7 @@ namespace WillDevicesSampleApp
             {
                 SocketUserToken token = (SocketUserToken)e.UserToken;
 
-                if (e.SocketError != SocketError.Success)
+                if (e.SocketError != System.Net.Sockets.SocketError.Success)
                 {
                     // 受信に失敗
                     this.ReceivePacketComplete?.Invoke(this,
@@ -325,7 +339,7 @@ namespace WillDevicesSampleApp
                         // 受信完了イベント
                         byte[] data = new byte[packetSize];
                         Array.Copy(e.Buffer, 4, data, 0, packetSize);
-                        this.ReceivePacketComplete?.Invoke(this, new ReceivePacketEventArgs(SocketError.Success, data));
+                        this.ReceivePacketComplete?.Invoke(this, new ReceivePacketEventArgs(System.Net.Sockets.SocketError.Success, data));
                     }
                 }
                 else
@@ -339,7 +353,7 @@ namespace WillDevicesSampleApp
                         
                         // 受信完了イベント
                         this.ReceivePacketComplete?.Invoke(this, 
-                            new ReceivePacketEventArgs(SocketError.Success, token.PacketBuffer.ToArray()));
+                            new ReceivePacketEventArgs(System.Net.Sockets.SocketError.Success, token.PacketBuffer.ToArray()));
 
                         // 受信用バッファのクリア
                         token.PacketSize = 0;
@@ -397,6 +411,125 @@ namespace WillDevicesSampleApp
             // TODO: 上のファイナライザーがオーバーライドされる場合は、次の行のコメントを解除してください。
             // GC.SuppressFinalize(this);
         }
+        #endregion
+
+        #region StreamSocket
+        private const string DEFAULT_PORTNUMBER = "1337";
+        private const string DEFAULT_HOSTNAME = "192.168.0.7";
+        public string HostNameString { get; private set; }
+        public string PortNumberString { get; private set; }
+
+        HostName hostName;
+        public StreamSocket streamSocket;
+//        public StreamSocketListener streamSocketListener;
+
+        // Delegate handlers
+        public delegate void MessageEventHandler(object sender, string message);
+        public delegate void SocketClientConnectCompletedNotificationHandler(object sender, bool result);
+
+        // Properties
+        public event MessageEventHandler SocketClientMessage;
+        public event SocketClientConnectCompletedNotificationHandler SocketClientConnectCompletedNotification;
+
+        public async Task StreamSocket_Connect(string hostNameString = DEFAULT_HOSTNAME,
+    string portNumberString = DEFAULT_PORTNUMBER,
+    int timeout = 10000)
+        {
+            try
+            {
+                // The server hostname that we will be establishing a connection to. In this example, 
+                //   the server and client are in the same process.
+                if (hostNameString != DEFAULT_HOSTNAME)
+                    HostNameString = hostNameString;
+                hostName = new HostName(HostNameString);
+
+                if (portNumberString != DEFAULT_PORTNUMBER)
+                    PortNumberString = portNumberString;
+
+                MessageEvent(string.Format("SocketClient.Connect({0},{1}): call ConnectAsync with timeout {2}",
+                            HostNameString, PortNumberString, timeout.ToString()));
+
+                // Create the StreamSocket and establish a connection to the echo server.
+                this.streamSocket = new StreamSocket();
+
+                CancellationTokenSource cts = new CancellationTokenSource();
+
+                cts.CancelAfter(timeout);
+                await this.streamSocket.ConnectAsync(hostName, PortNumberString).AsTask().ConfigureAwait(false);
+            }
+            catch (TaskCanceledException ex)
+            {
+                throw new TaskCanceledException(string.Format("SocketClient.Connect(): TaskCanceledException: {0}",
+                     ex.Message));
+            }
+            catch (Exception ex)
+            {
+                SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                throw new Exception(string.Format("SocketClient.Connect(): Exception: {0}",
+                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+            }
+
+            // Notify to caller
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                this.SocketClientConnectCompletedNotification?.Invoke(this, true);
+            });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void StreamSocket_Disonnect()
+        {
+            try
+            {
+                this.streamSocket?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                //Debug.WriteLine(string.Format("Disconnect(): Exception: {0}",
+                //    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+            }
+        }
+
+        #region SocketClient services
+        public void StreamSocket_SendData(IBuffer buffer)
+        {
+            StreamSocket_SendBinary(this.streamSocket, buffer);
+        }
+        #endregion
+
+        #region Socket I/O
+        private void StreamSocket_SendBinary(StreamSocket socket, IBuffer buffer)
+        {
+            try
+            {
+                var packetsToSend = new List<IBuffer>
+                {
+                    buffer
+                };
+
+                var pendingTasks = new System.Threading.Tasks.Task[packetsToSend.Count];
+
+                for (int index = 0; index < packetsToSend.Count; ++index)
+                {
+                    // track all pending writes as tasks, but don't wait on one before beginning the next.
+                    pendingTasks[index] = socket.OutputStream.WriteAsync(packetsToSend[index]).AsTask();
+                    // Don't modify any buffer's contents until the pending writes are complete.
+                }
+
+                // Wait for all of the pending writes to complete.
+                System.Threading.Tasks.Task.WaitAll(pendingTasks);
+            }
+            catch (Exception ex)
+            {
+                SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                throw new Exception(string.Format("StreamSocket_SendBinary: Exception: {0}",
+                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+            }
+        }
+        #endregion
         #endregion
     }
 }
