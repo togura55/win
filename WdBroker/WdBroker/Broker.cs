@@ -120,7 +120,7 @@ namespace WdBroker
             //msg += " From Server";
             //mServerSock.SendToClient(System.Text.Encoding.UTF8.GetBytes(msg));
             CommandPublisher(msg);
-            MessageEvent(string.Format("return message: {0}", msg));
+       //     MessageEvent(string.Format("return message: {0}", msg));
         }
 
         /// <summary>
@@ -201,16 +201,16 @@ namespace WdBroker
                         case CMD_SET_ATTRIBUTES:
                             //var list_data = new List<string>();
                             //list_data.AddRange(data.Split(sp));
-
-                            Publisher pub = App.Pubs[int.Parse(publisher_id)];
-                            pub.DeviceSize.Width = double.Parse(list[0]);
-                            pub.DeviceSize.Height = double.Parse(list[1]);
-                            pub.PointSize = float.Parse(list[2]);
-                            pub.DeviceName = list[3];
-                            pub.SerialNumber = list[4];
-                            pub.Battery = float.Parse(list[5]);
-                            pub.DeviceType = list[6];
-                            pub.TransferMode = list[7];
+                            int i = 1;
+                            Publisher pub = App.Pubs[int.Parse(publisher_id)-1];
+                            pub.DeviceSize.Width = double.Parse(list[++i]);
+                            pub.DeviceSize.Height = double.Parse(list[++i]);
+                            pub.PointSize = float.Parse(list[++i]);
+                            pub.DeviceName = list[++i];
+                            pub.SerialNumber = list[++i];
+                            pub.Battery = float.Parse(list[++i]);
+                            pub.DeviceType = list[++i];
+                            pub.TransferMode = list[++i];
 
                             //                           App.Socket.SendCommandResponseAsync(args, RES_ACK);
                             res = RES_ACK;
