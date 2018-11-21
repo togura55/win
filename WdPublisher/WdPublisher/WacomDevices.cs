@@ -26,9 +26,6 @@ namespace WillDevicesSampleApp
 
         private const float micrometerToDip = 96.0f / 25400.0f;
         private CancellationTokenSource m_cts = new CancellationTokenSource();
-        //        private StrokeCollection _strokes = new StrokeCollection();
-        //        private double m_scale = 1.0;
-        //        private Size m_deviceSize;
         private bool m_addNewStrokeToModel = true;
         private static readonly float maxP = 1.402218f;
         private static readonly float pFactor = 1.0f / (maxP - 1.0f);
@@ -240,9 +237,9 @@ namespace WillDevicesSampleApp
 
             var pathPart = e.PathPart;
 
-            if (AppObjects.Instance.SocketClient != null)
+            if (AppObjects.Instance.SocketService != null)
                 //               AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
-                AppObjects.Instance.SocketClient.SendData(CreateBuffer(pathPart));
+                AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(pathPart));
 
         }
 
@@ -254,9 +251,9 @@ namespace WillDevicesSampleApp
 
             var pathPart = e.PathPart;
 
-            if (AppObjects.Instance.SocketClient != null)
+            if (AppObjects.Instance.SocketService != null)
                 //               AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
-                AppObjects.Instance.SocketClient.SendData(CreateBuffer(pathPart));
+                AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(pathPart));
 
 
             //var point = new StylusPoint(x * m_scale, y * m_scale, w);
@@ -305,9 +302,8 @@ namespace WillDevicesSampleApp
             m_addNewStrokeToModel = true;
             StrokeCount++;
 
-            if (AppObjects.Instance.SocketClient != null)
-                //               AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
-                AppObjects.Instance.SocketClient.SendData(CreateBuffer(null));
+            if (AppObjects.Instance.SocketService != null)
+                AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(null));
         }
 
         private IBuffer CreateBuffer(Wacom.Ink.Path pathPart)

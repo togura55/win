@@ -16,7 +16,7 @@ namespace WillDevicesSampleApp
     {
         public Socket mSocket = null;
 
-        public SocketClient dataSocketClient = null;
+        public SocketServices dataSocketClient = null;
 
         float CommandResponseState;
         float PublisherId;
@@ -286,9 +286,9 @@ namespace WillDevicesSampleApp
                             case RES_ACK:
                                 // Establish the data path
                                 string port = (int.Parse(PortNumberString) + 1).ToString();
-                                dataSocketClient = AppObjects.Instance.SocketClient;    // share with WacomDevices
+                                dataSocketClient = AppObjects.Instance.SocketService;    // share with WacomDevices
                                 dataSocketClient.SocketClientConnectCompletedNotification += DataSocketClientConnect_Completed;
-                                await dataSocketClient.ConnectHost(HostNameString, port);
+                                await dataSocketClient.StreamSocket_Connect(HostNameString, port);
                                 this.CommandResponseState = CMD_NEUTRAL;
 
                                 break;

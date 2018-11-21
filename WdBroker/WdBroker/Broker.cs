@@ -5,13 +5,14 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Networking;
 using Windows.UI.Core;
 
 namespace WdBroker
 {
     public class Broker
     {
-        SocketServices mServerSock = null;
+        SocketServices mServerSocket = null;
 
         // Delegate event handlers
         public delegate void BrokerEventHandler(object sender, string message);
@@ -38,7 +39,7 @@ namespace WdBroker
 
         public Broker()
         {
-            mServerSock = new SocketServices();
+            mServerSocket = new SocketServices();
         }
 
         private async void MessageEvent(string message)
@@ -58,16 +59,16 @@ namespace WdBroker
         }
 
 
-        public async Task Start(string hostName, string portNumber)
+        public async Task Start(HostName hostName, string portNumber)
         {
             // ------- For Commands -------------
             // サーバーのイベント設定
-            mServerSock.AcceptComplete += Server_AcceptComplete;
-            mServerSock.ReceivePacketComplete += Server_ReceivePacketComplete;
-            mServerSock.SendPacketComplete += Server_SendPacketComplete;
+            mServerSocket.AcceptComplete += Server_AcceptComplete;
+            mServerSocket.ReceivePacketComplete += Server_ReceivePacketComplete;
+            mServerSocket.SendPacketComplete += Server_SendPacketComplete;
 
-            // サーバーのリッスン開始
-            mServerSock.Listen(IPAddress.Parse(hostName), int.Parse(portNumber));
+            // Start server listen for command
+            mServerSocket.Listen(IPAddress.Parse(hostName.ToString()), int.Parse(portNumber));
 
             //this.SocketServerMessage?.Invoke(this,
             //    String.Format("Start(): try to listen the port for command {0}:{1}...", ServerHostName.ToString(), PortNumber));
@@ -84,7 +85,7 @@ namespace WdBroker
             // String.Format("Start(): The server for command {0}:{1} is now listening...", ServerHostName.ToString(), PortNumber));
 
             // -------- For Data -----------------
-            await App.Socket.Start(portNumber);
+            await App.Socket.StreamSocket_Start(hostName, portNumber);
         }
 
         public void Stop()
@@ -192,7 +193,7 @@ namespace WdBroker
                             //// response back.
                             //                            App.Socket.SendCommandResponseAsync(args, id_new.ToString());
                             res = id_new.ToString();
-                            mServerSock.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
+                            mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
                             MessageEvent(string.Format("Assigned and sent Publisher ID: {0}", res));
 
                             break;
@@ -214,7 +215,7 @@ namespace WdBroker
 
                             //                           App.Socket.SendCommandResponseAsync(args, RES_ACK);
                             res = RES_ACK;
-                            mServerSock.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
+                            mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
                             MessageEvent(string.Format("Response to Publisher: {0}", res));
 
                             // ToDo: What shoud we do when the Publisher request to change the attribute?
@@ -228,7 +229,7 @@ namespace WdBroker
 
                             //                            App.Socket.SendCommandResponseAsync(args, RES_ACK);
                             res = RES_ACK;
-                            mServerSock.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
+                            mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
                             MessageEvent(string.Format("Response to Publisher: {0}", res));
                             break;
 
@@ -237,7 +238,7 @@ namespace WdBroker
 
                             //                            App.Socket.SendCommandResponseAsync(args, RES_ACK);
                             res = RES_ACK;
-                            mServerSock.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
+                            mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
                             MessageEvent(string.Format("Response to Publisher: {0}", res));
                             break;
 
@@ -246,7 +247,7 @@ namespace WdBroker
 
                             //                            App.Socket.SendCommandResponseAsync(args, RES_ACK);
                             res = RES_ACK;
-                            mServerSock.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
+                            mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
                             MessageEvent(string.Format("Response to Publisher: {0}", res));
                             break;
 
@@ -262,7 +263,7 @@ namespace WdBroker
                     // invalid command word
                     //                    App.Socket.SendCommandResponseAsync(args, RES_NAK);
                     res = RES_ACK;
-                    mServerSock.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
+                    mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
                     MessageEvent(string.Format("Response to Publisher: {0}", res));
                 }
             }

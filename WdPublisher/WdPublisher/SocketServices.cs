@@ -109,7 +109,7 @@ namespace WillDevicesSampleApp
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                this.SocketClientMessage?.Invoke(this, message);
+                this.SocketMessage?.Invoke(this, message);
             });
         }
 
@@ -153,7 +153,7 @@ namespace WillDevicesSampleApp
         /// <param name="port"></param>
         public void Connect(IPAddress ip, int port)
         {
-            // ソケットの作成
+            // Create a socket
             this.Close();
             mSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
@@ -165,6 +165,18 @@ namespace WillDevicesSampleApp
             mSocket.ConnectAsync(args);
         }
 
+        public void Disonnect()
+        {
+            try
+            {
+                this.Close();
+            }
+            catch (Exception ex)
+            {
+                SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+            }
+        }
+        
         /// <summary>
         /// クライアントのソケットからサーバーへパケットを送信する
         /// </summary>
@@ -350,9 +362,9 @@ namespace WillDevicesSampleApp
                     {
                         // 残りのバッファを読み込み
                         token.PacketBuffer.Write(e.Buffer, 0, e.Buffer.Length + remainSize);
-                        
+
                         // 受信完了イベント
-                        this.ReceivePacketComplete?.Invoke(this, 
+                        this.ReceivePacketComplete?.Invoke(this,
                             new ReceivePacketEventArgs(System.Net.Sockets.SocketError.Success, token.PacketBuffer.ToArray()));
 
                         // 受信用バッファのクリア
@@ -421,14 +433,14 @@ namespace WillDevicesSampleApp
 
         HostName hostName;
         public StreamSocket streamSocket;
-//        public StreamSocketListener streamSocketListener;
+        //        public StreamSocketListener streamSocketListener;
 
         // Delegate handlers
         public delegate void MessageEventHandler(object sender, string message);
         public delegate void SocketClientConnectCompletedNotificationHandler(object sender, bool result);
 
         // Properties
-        public event MessageEventHandler SocketClientMessage;
+        public event MessageEventHandler SocketMessage;
         public event SocketClientConnectCompletedNotificationHandler SocketClientConnectCompletedNotification;
 
         public async Task StreamSocket_Connect(string hostNameString = DEFAULT_HOSTNAME,
@@ -488,8 +500,6 @@ namespace WillDevicesSampleApp
             catch (Exception ex)
             {
                 SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                //Debug.WriteLine(string.Format("Disconnect(): Exception: {0}",
-                //    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
 

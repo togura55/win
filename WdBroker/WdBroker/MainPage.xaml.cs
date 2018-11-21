@@ -46,7 +46,7 @@ namespace WdBroker
         {
             this.InitializeComponent();
 
-            App.Socket.SocketServerMessage += ReceiveMessage;
+            App.Socket.SocketMessage += ReceiveMessage;
             App.Broker.AppConnectPublisher += ReceiveAppConnectPublisher;
             App.Broker.BrokerMessage += ReceiveMessage;
             //            App.AppConnectPublisher += ReceiveAppConnectPublisher;
@@ -71,7 +71,7 @@ namespace WdBroker
             {
                 int count = 0;
                 int index = 0;
-                foreach (Windows.Networking.HostName host in App.Socket.HostNames)
+                foreach (Windows.Networking.HostName host in App.HostNames)
                 {
                     viewModel.HostNameCollection.Add(host.ToString());
                     if (HostNameString == host.ToString())
@@ -105,18 +105,18 @@ namespace WdBroker
                 string.Format("{0} button was clicked.", resourceLoader.GetString(fStart ? "IDC_Start" : "IDC_Stop")));
 
             GetUiState();
-            App.Socket.ServerHostName = new Windows.Networking.HostName(HostNameString); // for debug
+            App.ServerHostName = new Windows.Networking.HostName(HostNameString); // for debug
 
             try
             {
                 if (fStart)
                 {
 //                    await App.Socket.Start(PortNumberString);
-                    await App.Broker.Start(HostNameString, PortNumberString);
+                    await App.Broker.Start(App.ServerHostName, PortNumberString);
                 }
                 else
                 {
-                    App.Socket.Stop();
+                    App.Socket.StreamSocket_Stop();
                 }
 
                 fStart = fStart ? false : true;   // toggle if success
@@ -142,7 +142,12 @@ namespace WdBroker
 
             StoreSettings();
 
-            App.Socket.SocketServerMessage -= ReceiveMessage;
+            if (App.Socket != null) App.Socket.SocketMessage -= ReceiveMessage;
+            if (App.Broker != null)
+            {
+                App.Broker.AppConnectPublisher -= ReceiveAppConnectPublisher;
+                App.Broker.BrokerMessage -= ReceiveMessage;
+            }
             App.AppConnectPublisher -= ReceiveAppConnectPublisher;
             App.AppMessage -= ReceiveMessage;
             App.AppDrawing -= ReceiveDrawing;  // for drawing

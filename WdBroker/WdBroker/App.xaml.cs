@@ -17,6 +17,8 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 using Windows.Networking.Sockets;   //
+using Windows.Networking;
+using Windows.Networking.Connectivity;
 
 namespace WdBroker
 {
@@ -26,8 +28,11 @@ namespace WdBroker
     sealed partial class App : Application
     {
         public static Broker Broker = null;
-        public static SocketServer Socket = null; // Single instance of SocketServer using this app
+        public static SocketServices Socket = null; // Single instance of SocketServices using this app
         public static List<Publisher> Pubs = new List<Publisher>(); // List of Publisher object to be managed in this app
+
+        public static HostName ServerHostName;
+        public static List<HostName> HostNames = new List<HostName>();
 
         // Delegeat handlers
         public delegate void MessageEventHandler(object sender, string message);
@@ -67,18 +72,23 @@ namespace WdBroker
         }
         private void AppInitialize()
         {
-            Broker = new Broker();
-            Socket = new SocketServer();
+            ServerHostName = NetworkInformation.GetHostNames().Where(q => q.Type == HostNameType.Ipv4).First();
+            RetrieveHostNames();
 
-            Socket.CommandEvent += OnCommandPublisherEvent;
-            Socket.DataEvent += OnDataPublisherEvent;
+            Broker = new Broker();
+            Socket = new SocketServices();
+
+            //            Socket.CommandEvent += OnCommandPublisherEvent;
+            Socket.ReceivePacketComplete += OnCommandPublisherEvent;
+            Socket.StreamSocketReceiveEvent += OnDataPublisherEvent;
         }
+
         private void AppDispose()
         {
-            Socket.CommandEvent -= OnCommandPublisherEvent;
-            Socket.DataEvent -= OnDataPublisherEvent;
+            Socket.ReceivePacketComplete -= OnCommandPublisherEvent;
+            Socket.StreamSocketReceiveEvent -= OnDataPublisherEvent;
 
-            Socket.Stop();
+            Socket.StreamSocket_Stop();
             Socket = null;
         }
 
@@ -108,10 +118,46 @@ namespace WdBroker
             });
         }
 
-        private void OnCommandPublisherEvent(StreamSocketListenerConnectionReceivedEventArgs args, string request)
+        // for Networking
+        public void RetrieveHostNames()
+        {
+            foreach (HostName hostName in NetworkInformation.GetHostNames())
+            {
+                if (hostName.IPInformation != null)
+                {
+                    if (hostName.Type == HostNameType.Ipv4)
+                    {
+                        HostNames.Add(new HostName(hostName.ToString()));
+                    }
+                }
+            }
+        }
+
+        public async void SendCommandResponseAsync(string response)
+        {
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+            () =>
+            {
+                App.Socket.SendToClient(System.Text.Encoding.UTF8.GetBytes(response));
+            });
+        }
+
+        //        private void OnCommandPublisherEvent(StreamSocketListenerConnectionReceivedEventArgs args, string request)
+        private void OnCommandPublisherEvent(object sender, ReceivePacketEventArgs e)
         {
             try
             {
+                if (e.Error != System.Net.Sockets.SocketError.Success)
+                {
+                    // 受信に失敗
+                    MessageEvent(string.Format("Command packet receive error: {0}", e.Error));
+                    return;
+                }
+
+                // 受信したデータをテキストに変換
+                string request = System.Text.Encoding.UTF8.GetString(e.Data);
+                MessageEvent(string.Format("packet received : {0}", request));
+
                 char sp = ','; // separater
                 string[] arr = request.Split(sp);
                 var list = new List<string>();
@@ -140,7 +186,7 @@ namespace WdBroker
 
                             //// Do the publisher 1st contact process
                             //// 1. Create a new instance
-  //                          Publisher publisher = new Publisher();
+                            //                          Publisher publisher = new Publisher();
                             App.Pubs.Add(new Publisher());
 
                             //// 2. Generate Publisher Id, smallest number of pubs
@@ -157,16 +203,16 @@ namespace WdBroker
                                 id++;
                             }
                             App.Pubs[App.Pubs.Count - 1].Id = id_new;
- //                           ConnectPublisherEvent(App.Pubs.Count - 1);  // Notify to caller 
+                            //                           ConnectPublisherEvent(App.Pubs.Count - 1);  // Notify to caller 
 
                             //// 3. Respond to the publisher
                             //// response back.
-                            App.Socket.SendCommandResponseAsync(args, id_new.ToString());
+                            SendCommandResponseAsync(id_new.ToString());
                             MessageEvent(string.Format("Assigned and sent Publisher ID: {0}", id_new.ToString()));
 
                             break;
 
-                            // Suppose getting this request only one time at the Publisher connection...
+                        // Suppose getting this request only one time at the Publisher connection...
                         case CMD_SET_ATTRIBUTES:
                             var list_data = new List<string>();
                             list_data.AddRange(data.Split(sp));
@@ -181,7 +227,7 @@ namespace WdBroker
                             pub.DeviceType = list_data[6];
                             pub.TransferMode = list_data[7];
 
-                            App.Socket.SendCommandResponseAsync(args, RES_ACK);
+                            SendCommandResponseAsync(RES_ACK);
                             MessageEvent(string.Format("Response to Publisher: {0}", RES_ACK));
 
                             // ToDo: What shoud we do when the Publisher request to change the attribute?
@@ -193,21 +239,21 @@ namespace WdBroker
                         case CMD_START_PUBLISHER:
                             App.Pubs[int.Parse(publisher_id)].Start();
 
-                            App.Socket.SendCommandResponseAsync(args, RES_ACK);
+                            SendCommandResponseAsync(RES_ACK);
                             MessageEvent(string.Format("Response to Publisher: {0}", RES_ACK));
                             break;
 
                         case CMD_STOP_PUBLISHER:
                             App.Pubs[int.Parse(publisher_id)].Stop();
 
-                            App.Socket.SendCommandResponseAsync(args, RES_ACK);
+                            SendCommandResponseAsync(RES_ACK);
                             MessageEvent(string.Format("Response to Publisher: {0}", RES_ACK));
                             break;
 
                         case CMD_DISPOSE_PUBLISHER:
                             App.Pubs[int.Parse(publisher_id)].Dispose();
 
-                            App.Socket.SendCommandResponseAsync(args, RES_ACK);
+                            SendCommandResponseAsync(RES_ACK);
                             MessageEvent(string.Format("Response to Publisher: {0}", RES_ACK));
                             break;
 
@@ -217,12 +263,11 @@ namespace WdBroker
                         default:
                             break;
                     }
-
                 }
                 else
                 {
                     // invalid command word
-                    App.Socket.SendCommandResponseAsync(args, RES_NAK);
+                    SendCommandResponseAsync(RES_NAK);
                     MessageEvent(string.Format("Response to Publisher: {0}", RES_NAK));
                 }
             }
@@ -320,7 +365,7 @@ namespace WdBroker
 
                 //                        if (index == 5) break;  // for debug
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageEvent(string.Format("OnDataPublisherEvent: Exception: {0}", ex.Message));
             }

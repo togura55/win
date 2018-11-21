@@ -19,8 +19,8 @@ namespace WdBroker
 {
     public class SocketServer
     {
-        public HostName ServerHostName;
-        public List<HostName> HostNames = new List<HostName>();
+        //public HostName ServerHostName;
+        //public List<HostName> HostNames = new List<HostName>();
         private StreamSocketListener streamSocketListenerData = null;
         private StreamSocketListener streamSocketListenerCommand = null;
 

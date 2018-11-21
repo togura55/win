@@ -39,8 +39,8 @@ namespace WillDevicesSampleApp
             AppObjects.Instance.WacomDevice = new WacomDevices();     // stored for using this app 
             AppObjects.Instance.WacomDevice.WacomDevicesMessage += ReceivedMessage; // set the message delegate
 
-            AppObjects.Instance.SocketClient = new SocketClient();
-            AppObjects.Instance.SocketClient.SocketClientMessage += ReceivedMessage; // 
+            AppObjects.Instance.SocketService = new SocketServices();
+            AppObjects.Instance.SocketService.SocketMessage += ReceivedMessage; // 
 
             RestoreSettings();
 
@@ -78,7 +78,7 @@ namespace WillDevicesSampleApp
             StoreSettings();
 
             AppObjects.Instance.WacomDevice.WacomDevicesMessage -= ReceivedMessage;
-            AppObjects.Instance.SocketClient.SocketClientMessage -= ReceivedMessage;
+            AppObjects.Instance.SocketService.SocketMessage -= ReceivedMessage;
 
             wdPubComm.Stop();
         }

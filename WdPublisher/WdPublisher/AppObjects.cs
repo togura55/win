@@ -157,7 +157,7 @@ namespace WillDevicesSampleApp
 
 		public const float micrometerToDip = 96.0f / 25400.0f;
 
-        public SocketClient SocketClient
+        public SocketServices SocketService
         {
             get;
             set;
@@ -170,12 +170,6 @@ namespace WillDevicesSampleApp
         }
 
         public string Token
-        {
-            get;
-            set;
-        }
-
-        public SocketServices SocketService
         {
             get;
             set;
