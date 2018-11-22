@@ -46,12 +46,11 @@ namespace WdBroker
         {
             this.InitializeComponent();
 
+            App.AppMessage += ReceiveMessage;
             App.Socket.SocketMessage += ReceiveMessage;
             App.Broker.AppConnectPublisher += ReceiveAppConnectPublisher;
             App.Broker.BrokerMessage += ReceiveMessage;
-            //            App.AppConnectPublisher += ReceiveAppConnectPublisher;
-            App.AppMessage += ReceiveMessage;
-            App.AppDrawing += ReceiveDrawing;  // for drawing
+            App.Broker.AppDrawing += ReceiveDrawing;  // for drawing
 
             RestoreSettings();
 
@@ -111,12 +110,11 @@ namespace WdBroker
             {
                 if (fStart)
                 {
-//                    await App.Socket.Start(PortNumberString);
                     await App.Broker.Start(App.ServerHostName, PortNumberString);
                 }
                 else
                 {
-                    App.Socket.StreamSocket_Stop();
+                    App.Broker.Stop();
                 }
 
                 fStart = fStart ? false : true;   // toggle if success
@@ -147,10 +145,9 @@ namespace WdBroker
             {
                 App.Broker.AppConnectPublisher -= ReceiveAppConnectPublisher;
                 App.Broker.BrokerMessage -= ReceiveMessage;
+                App.Broker.AppDrawing -= ReceiveDrawing;  // for drawing
             }
-            App.AppConnectPublisher -= ReceiveAppConnectPublisher;
             App.AppMessage -= ReceiveMessage;
-            App.AppDrawing -= ReceiveDrawing;  // for drawing
         }
 
         private void ReceiveAppConnectPublisher(object sender, int index)
