@@ -13,6 +13,7 @@ using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using System.Threading;
 using Windows.Storage.Streams;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace WillDevicesSampleApp
 {
@@ -176,7 +177,7 @@ namespace WillDevicesSampleApp
                 SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
             }
         }
-        
+
         /// <summary>
         /// クライアントのソケットからサーバーへパケットを送信する
         /// </summary>
@@ -433,19 +434,50 @@ namespace WillDevicesSampleApp
 
         HostName hostName;
         public StreamSocket streamSocket;
+        private StreamSocketListener streamSocketListenerData = null;
         //        public StreamSocketListener streamSocketListener;
 
         // Delegate handlers
         public delegate void MessageEventHandler(object sender, string message);
         public delegate void SocketClientConnectCompletedNotificationHandler(object sender, bool result);
+        public delegate void StreamSocketEventHandler(Byte[] byte_array);
 
         // Properties
         public event MessageEventHandler SocketMessage;
         public event SocketClientConnectCompletedNotificationHandler SocketClientConnectCompletedNotification;
+        public event StreamSocketEventHandler StreamSocketReceiveEvent;
+
+        #region StreamSocket services
+        public async Task StreamSocket_Start(HostName hostName, string portNumberString)
+        {
+            try
+            {
+                // --------- For Data stream-------------
+                string port = (int.Parse(portNumberString) + 1).ToString();
+                this.SocketMessage?.Invoke(this,
+                    String.Format("Start(): try to listen the port for data {0}:{1}...", hostName.ToString(), port));
+
+                streamSocketListenerData = new StreamSocketListener();
+
+                // The ConnectionReceived event is raised when connections are received.
+                streamSocketListenerData.ConnectionReceived += StreamSocketListener_ReceiveBinary;
+
+                // Start listening for incoming TCP connections on the specified port. You can specify any port that's not currently in use.
+                await streamSocketListenerData.BindEndpointAsync(hostName, port).AsTask().ConfigureAwait(false);
+
+                this.SocketMessage?.Invoke(this,
+                 String.Format("Start(): The server for data {0}:{1} is now listening...", hostName.ToString(), port));
+            }
+            catch (Exception ex)
+            {
+                SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                throw new Exception(string.Format("Start(): Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+            }
+        }
 
         public async Task StreamSocket_Connect(string hostNameString = DEFAULT_HOSTNAME,
-    string portNumberString = DEFAULT_PORTNUMBER,
-    int timeout = 10000)
+string portNumberString = DEFAULT_PORTNUMBER,
+int timeout = 10000)
         {
             try
             {
@@ -502,15 +534,43 @@ namespace WillDevicesSampleApp
                 SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        public void StreamSocket_Stop()
+        {
+            try
+            {
+                if (streamSocketListenerData != null)
+                {
+                    //                    streamSocketListenerData.ConnectionReceived -= StreamSocketListener_ReceiveBinary;
+                    streamSocketListenerData.Dispose();
+                }
+                MessageEvent("Stop(): Socket services were stop and disposed.");
+            }
+            catch (Exception ex)
+            {
+                SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                throw new Exception(string.Format("Stop(): Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+            }
+        }
 
-        #region SocketClient services
         public void StreamSocket_SendData(IBuffer buffer)
         {
             StreamSocket_SendBinary(this.streamSocket, buffer);
         }
+
+        //public async Task SendCommandResponseAsync(StreamSocketListenerConnectionReceivedEventArgs args, string response)
+        //{
+        //    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
+        //    () =>
+        //    {
+        //        StreamSocket_SendString(args, response);
+        //    });
+        //}
         #endregion
 
-        #region Socket I/O
+        #region StreamSocket I/O
         private void StreamSocket_SendBinary(StreamSocket socket, IBuffer buffer)
         {
             try
@@ -539,6 +599,35 @@ namespace WillDevicesSampleApp
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
+
+        private async void StreamSocketListener_ReceiveBinary(StreamSocketListener sender,
+     StreamSocketListenerConnectionReceivedEventArgs args)
+        {
+            try
+            {
+                using (var dataReader = new DataReader(args.Socket.InputStream))
+                {
+                    dataReader.InputStreamOptions = InputStreamOptions.Partial;
+                    while (true)
+                    {
+                        await dataReader.LoadAsync(256);
+                        if (dataReader.UnconsumedBufferLength == 0) break;
+                        IBuffer requestBuffer = dataReader.ReadBuffer(dataReader.UnconsumedBufferLength);
+                        Byte[] databyte = requestBuffer.ToArray();  //ReadBytes
+
+                        // inform data to caller
+                        this.StreamSocketReceiveEvent?.Invoke(databyte);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                throw new Exception(string.Format("StreamSocketListener_ReceiveBinary: Exception: {0}",
+                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+            }
+        }
+
         #endregion
         #endregion
     }

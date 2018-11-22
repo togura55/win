@@ -9,8 +9,6 @@ using System.Threading.Tasks;
 using Wacom;
 using Wacom.Devices;
 using Wacom.SmartPadCommunication;
-//using Wacom.UX.ViewModels;
-//using Wacom.UX.Gestures;
 using Windows.UI.Xaml;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
@@ -104,13 +102,6 @@ namespace WillDevicesSampleApp
 
         public WacomDevices()
         {
-            //this.InitializeComponent();
-
-            // -> Start()
-            //                Loaded += RealTimeInkPage_Loaded;
-
-            //                Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested += RealTimeInkPage_BackRequested;
-
             m_watcherUSB = new InkDeviceWatcherUSB();
             m_watcherUSB.DeviceAdded += OnDeviceAdded;
             m_watcherUSB.DeviceRemoved += OnDeviceRemoved;
@@ -442,10 +433,10 @@ namespace WillDevicesSampleApp
             }
         }
 
-        //		private void ScanAndConnectPage_Loaded(object sender, RoutedEventArgs e)
-        //        public void StartScanAndConnect(object sender, RoutedEventArgs e)
         public void StartScanAndConnect()
         {
+            MessageEvent("StartScanAndConnect");
+
             AppObjects.Instance.DeviceInfo = null;
 
             if (AppObjects.Instance.Device != null)
@@ -457,8 +448,8 @@ namespace WillDevicesSampleApp
             StartScanning();
         }
 
-        //		private void ScanAndConnectPage_Unloaded(object sender, RoutedEventArgs e)
-        public void StopScanAndConnect(object sender, RoutedEventArgs e)
+ //       public void StopScanAndConnect(object sender, RoutedEventArgs e)
+         public void StopScanAndConnect()
         {
             MessageEvent("StopScanAndConnect");
 
@@ -499,11 +490,10 @@ namespace WillDevicesSampleApp
             m_watcherUSB.Stop();
         }
 
-        //		private async void OnButtonConnectClick(object sender, RoutedEventArgs e)
         private async Task ConnectInkDevice()
         {
             //           int index = listView.SelectedIndex;
-            int index = 0;  // Auto Pilot
+            int index = 0;  // assumed to be connected a deviceat default
 
             if ((index < 0) || (index >= m_deviceInfos.Count))
                 return;
@@ -550,7 +540,6 @@ namespace WillDevicesSampleApp
             catch (Exception ex)
             {
                 MessageEvent(string.Format($"ConnectInkDevice: Device creation failed: {0}", ex.Message));
-                //                await new MessageDialog(message).ShowAsync();
                 return;
             }
 

@@ -9,10 +9,11 @@ using Windows.ApplicationModel.Core;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 using Windows.UI.Core;
+using Windows.UI.Xaml;
 
 namespace WillDevicesSampleApp
 {
-    public class WdPublishComm
+    public class Publisher
     {
         public Socket mSocket = null;
 
@@ -28,10 +29,10 @@ namespace WillDevicesSampleApp
         public delegate void InitializationCompletedNotificationHandler(object sender, bool result);
 
         // Properties
-        public event MessageEventHandler WdPublishCommMessage;
+        public event MessageEventHandler PublisherMessage;
         public event InitializationCompletedNotificationHandler InitializationCompletedNotification;
 
-        public WdPublishComm()
+        public Publisher()
         {
             CommandResponseState = CMD_NEUTRAL;
             PublisherId = 0;
@@ -41,51 +42,67 @@ namespace WillDevicesSampleApp
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                this.WdPublishCommMessage?.Invoke(this, message);
+                this.PublisherMessage?.Invoke(this, message);
             });
         }
 
-        public async Task Initialize(string host, string port)
+        private async Task InitCommandCommunication(string host, string port)
         {
-            HostNameString = host;
-            PortNumberString = port;
+            //HostNameString = host;
+            //PortNumberString = port;
             AppObjects.Instance.SocketService = new SocketServices();
             SocketServices socketService = AppObjects.Instance.SocketService;
 
             try
             {
-                // Socket client delegate settings
-                socketService.ConnectComplete += CommandSocketClientConnect_Completed; // Client_ConnectComplete;
+                // Socket for commands delegate settings
+                socketService.ConnectComplete += CommandSocketClient_Connect_Completed; // Client_ConnectComplete;
                 socketService.ReceivePacketComplete += CommandSocketClient_Response; //  Client_ReceivePacketComplete;
-                socketService.SendPacketComplete += Client_SendPacketComplete;
+                socketService.SendPacketComplete += CommandSocketClient_SendPacket_Completed;
 
                 socketService.Connect(System.Net.IPAddress.Parse(host), int.Parse(port));
             }
             catch (Exception ex)
             {
-                MessageEvent(string.Format("Initialize() Exception: {0}", ex.Message));
+                MessageEvent(string.Format("InitCommandCommunication: Exception: {0}", ex.Message));
             }
         }
 
+        private async Task InitDataCommunication(string host, string base_port)
+        {
+            try
+            {
+                string port = (int.Parse(base_port) + 1).ToString();
+                dataSocketClient = AppObjects.Instance.SocketService;    // share with WacomDevices
+                dataSocketClient.SocketClientConnectCompletedNotification += DataSocketClient_Connect_Completed;
+                await dataSocketClient.StreamSocket_Connect(host, port);
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("InitDataCommunication: Exception: {0}", ex.Message));
+            }
+        }
+
+        #region Services
         public async Task Close()
         {
             try
             {
                 CommandResponseState = CMD_DISPOSE_PUBLISHER;
-                await this.SendCommand(CMD_DISPOSE_PUBLISHER);
+                await this.SendCommandStrings(CMD_DISPOSE_PUBLISHER);
 
                 if (AppObjects.Instance.SocketService != null)
                 {
                     SocketServices socketService = AppObjects.Instance.SocketService;
-                    socketService.ConnectComplete -= CommandSocketClientConnect_Completed; // Client_ConnectComplete;
+                    socketService.ConnectComplete -= CommandSocketClient_Connect_Completed; // Client_ConnectComplete;
                     socketService.ReceivePacketComplete -= CommandSocketClient_Response; //  Client_ReceivePacketComplete;
-                    socketService.SendPacketComplete -= Client_SendPacketComplete;
+                    socketService.SendPacketComplete -= CommandSocketClient_SendPacket_Completed;
                 }
 
                 if (dataSocketClient != null)
                 {
                     dataSocketClient.Disonnect();
-                    dataSocketClient.SocketClientConnectCompletedNotification -= DataSocketClientConnect_Completed;
+                    dataSocketClient.SocketClientConnectCompletedNotification -= DataSocketClient_Connect_Completed;
                     dataSocketClient = null;
                 }
             }
@@ -95,35 +112,48 @@ namespace WillDevicesSampleApp
             }
         }
 
-        //public void Start()
-        //{
-        //    // let WacomDevices post data packets
-        //    try
-        //    {
-        //        if (commandSocketClient == null || dataSocketClient == null)
-        //        {
-        //            throw new Exception("SocketClient object is null.");
-        //        }
-        //        else
-        //        {
+        public void Start(string host, string port)
+        {
+            try
+            {
+                HostNameString = host;
+                PortNumberString = port;
 
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception(string.Format("Start() Exception: {0}", ex.Message));
-        //    }
-        //}
+                // Set task completion delegation 
+                AppObjects.Instance.WacomDevice.ScanAndConnectCompletedNotification += ScanAndConnect_Completed;
+                AppObjects.Instance.WacomDevice.StartRealTimeInkCompletedNotification += StartRealTimeInk_Completed;
+
+                // At first, try to detect a device
+                AppObjects.Instance.WacomDevice.StartScanAndConnect();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Start: Exception: {0}", ex.Message));
+            }
+        }
 
         public async void Stop()
         {
-            // let WacomDevices terminate data transmission
-            // ToDo
+            try
+            {
+                MessageEvent("Stop");
+                // let WacomDevices terminate data transmission
+                // ToDo: check if Realtime Ink is ongoing 
+                await AppObjects.Instance.WacomDevice.StopRealTimeInk();
 
-            // request Broker stop the communication
-            CommandResponseState = CMD_STOP_PUBLISHER;
-            await this.SendCommand(CMD_STOP_PUBLISHER);
+                AppObjects.Instance.WacomDevice.StopScanAndConnect();
+                AppObjects.Instance.Device.Close();
+
+                // request Broker stop the communication
+                CommandResponseState = CMD_STOP_PUBLISHER;
+                await this.SendCommandStrings(CMD_STOP_PUBLISHER);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Stop: Exception: {0}", ex.Message));
+            }
         }
+        #endregion
 
         const float CMD_NEUTRAL = 0x0000;
         const float CMD_REQUEST_PUBLISHER_CONNECTION = 0x1000;
@@ -134,7 +164,7 @@ namespace WillDevicesSampleApp
         const string RES_ACK = "ack";
         const string RES_NAK = "nak";
 
-        public async Task SendCommand(float command)
+        private async Task SendCommandStrings(float command)
         {
             try
             {
@@ -210,7 +240,49 @@ namespace WillDevicesSampleApp
         }
 
         #region Delegate Completion Handlers
-        private async void CommandSocketClientConnect_Completed(object sender, SocketErrorEventArgs e)
+        private async void ScanAndConnect_Completed(object sender, bool result)
+        {
+            try
+            {
+                if (result || AppObjects.Instance.Device != null)
+                {
+                    MessageEvent("ScanAndConnect_Completed: Go Socket initialization");
+
+                    // Second, initialize the command path to Broker
+                    await InitCommandCommunication(HostNameString, PortNumberString);
+                }
+                else
+                {
+                    MessageEvent("ScanAndConnect_Completed: Could not be detected devices.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("ScanAndConnect_Completed: Exception: {0}", ex.Message));
+            }
+        }
+
+        private void StartRealTimeInk_Completed(object sender, bool result)
+        {
+            try
+            {
+                if (result)  // socket was established
+                {
+                    MessageEvent("StartRealTimeInk_Completed: All pre-process were done.");
+                }
+                else
+                {
+                    MessageEvent("StartRealTime_Completed: got false.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("StartRealTimeInk_Completed: Exception: {0}", ex.Message));
+            }
+
+        }
+
+        private async void CommandSocketClient_Connect_Completed(object sender, SocketErrorEventArgs e)
         {
             MessageEvent("CommandSocketClientConnect_Completed.");
 
@@ -222,11 +294,16 @@ namespace WillDevicesSampleApp
             else
             {
                 CommandResponseState = CMD_REQUEST_PUBLISHER_CONNECTION;
-                await this.SendCommand(CMD_REQUEST_PUBLISHER_CONNECTION);
+                await this.SendCommandStrings(CMD_REQUEST_PUBLISHER_CONNECTION);
             }
         }
 
-        private async void DataSocketClientConnect_Completed(object sender, bool result)
+        private async void CommandSocketClient_SendPacket_Completed(object sender, SocketErrorEventArgs e)
+        {
+
+        }
+
+        private async void DataSocketClient_Connect_Completed(object sender, bool result)
         {
             MessageEvent("DataSocketClientConnect_Completed.");
 
@@ -252,18 +329,19 @@ namespace WillDevicesSampleApp
             {
                 if (e.Error != System.Net.Sockets.SocketError.Success)
                 {
-                    // 受信に失敗
                     MessageEvent(string.Format("packet receive error: {0}", e.Error));
                     return;
                 }
 
-                // 受信したデータをテキストに変換
+                // convert to text
                 string response = System.Text.Encoding.UTF8.GetString(e.Data);
                 MessageEvent(string.Format("packet received : {0}", response));
 
+                string msg = string.Empty;
                 switch (CommandResponseState)
                 {
                     case CMD_REQUEST_PUBLISHER_CONNECTION:
+                        msg = string.Format("CMD_REQUEST_PUBLISHER_CONNECTION returns {0}", response);
                         {
                             this.PublisherId = float.Parse(response);
                             AppObjects.Instance.WacomDevice.PublisherAttribute
@@ -275,86 +353,87 @@ namespace WillDevicesSampleApp
                             //await commandSocketClient.SendCommand(RES_ACK);
                             //MessageEvent("Send ACK");
 
-                            await this.SendCommand(CMD_SET_ATTRIBUTES);
+                            await this.SendCommandStrings(CMD_SET_ATTRIBUTES);
                         }
                         break;
 
                     case CMD_SET_ATTRIBUTES:
                         // ACK/NAK
+                        msg = string.Format("CMD_SET_ATTRIBUTES returns {0}", response);
                         switch (response)
                         {
                             case RES_ACK:
+                                MessageEvent(msg);
                                 // Establish the data path
-                                string port = (int.Parse(PortNumberString) + 1).ToString();
-                                dataSocketClient = AppObjects.Instance.SocketService;    // share with WacomDevices
-                                dataSocketClient.SocketClientConnectCompletedNotification += DataSocketClientConnect_Completed;
-                                await dataSocketClient.StreamSocket_Connect(HostNameString, port);
+                                await InitDataCommunication(HostNameString, PortNumberString);
                                 this.CommandResponseState = CMD_NEUTRAL;
 
                                 break;
 
                             case RES_NAK:
-                                throw new Exception("CMD_SET_ATTRIBUTES returns NAK");
-                            //                                break;
+                                throw new Exception(msg);
 
                             default:
-                                break;
+                                throw new Exception(string.Format("Unknown response: {0}", response));
                         }
                         break;
 
                     case CMD_START_PUBLISHER:
                         // ACK/NAK
+                        msg = string.Format("CMD_START_PUBLISHER returns {0}", response);
                         switch (response)
                         {
                             case RES_ACK:
+                                MessageEvent(msg);
                                 this.CommandResponseState = CMD_NEUTRAL;
                                 break;
 
                             case RES_NAK:
-                                throw new Exception("CMD_START_PUBLISHER returns NAK");
-                            //                                break;
+                                throw new Exception(msg);
 
                             default:
-                                break;
+                                throw new Exception(string.Format("Unknown response: {0}", response));
                         }
                         break;
 
                     case CMD_STOP_PUBLISHER:
                         // ACK/NAK
+                        msg = string.Format("CMD_STOP_PUBLISHER returns {0}", response);
                         switch (response)
                         {
                             case RES_ACK:
+                                MessageEvent(msg);
                                 this.CommandResponseState = CMD_NEUTRAL;
                                 break;
 
                             case RES_NAK:
-                                throw new Exception("CMD_STOP_PUBLISHER returns NAK");
-                            //                               break;
+                                throw new Exception(msg);
 
                             default:
-                                break;
+                                throw new Exception(string.Format("Unknown response: {0}", response));
                         }
                         break;
 
                     case CMD_DISPOSE_PUBLISHER:
                         // ACK/NAK
+                        msg = string.Format("CMD_DISPOSE_PUBLISHER returns {0}", response);
                         switch (response)
                         {
                             case RES_ACK:
+                                MessageEvent(msg);
                                 this.CommandResponseState = CMD_NEUTRAL;
                                 break;
 
                             case RES_NAK:
-                                throw new Exception("CMD_DISPOSE_PUBLISHER returns NAK");
-                            //                               break;
+                                throw new Exception(msg);
 
                             default:
-                                break;
+                                throw new Exception(string.Format("Unknown response: {0}", response));
                         }
                         break;
 
                     default:
-                        break;
+                        throw new Exception(string.Format("Unknown CommandResponseState: {0}", CommandResponseState));
                 }
             }
             catch (Exception ex)
@@ -362,12 +441,6 @@ namespace WillDevicesSampleApp
                 throw new Exception(string.Format("CommandSocketClient_Response: Exception: {0}", ex.Message));
             }
         }
-
-        private async void Client_SendPacketComplete(object sender, SocketErrorEventArgs e)
-        {
-
-        }
-
         #endregion
     }
 }

@@ -126,4 +126,7 @@
   <data name="IDC_PortNumber" xml:space="preserve">
     <value>ポート番号</value>
   </data>
+  <data name="IDC_Stop" xml:space="preserve">
+    <value>停止</value>
+  </data>
 </root>
