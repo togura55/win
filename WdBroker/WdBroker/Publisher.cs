@@ -31,7 +31,7 @@ namespace WdBroker
 
     public class Publisher
     {
-        public float Id;
+        public string Id;
         public string HostName;
         public string PortNumber;
         public string DeviceType;
