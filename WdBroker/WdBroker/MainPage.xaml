@@ -24,8 +24,8 @@
         <Button x:Name="Pbtn_Clearlog" Content="Button" HorizontalAlignment="Left" Margin="170,201,0,0" VerticalAlignment="Top" Click="Pbtn_Clearlog_Click"/>
         <ComboBox x:Name="Combo_HostNames" ItemsSource="{Binding HostNameCollection}" HorizontalAlignment="Left" Margin="164,42,0,0" VerticalAlignment="Top" Width="142"/>
         <TextBox x:Name="TextBox_FixedHostNameValue" HorizontalAlignment="Left" Margin="358,41,0,0" Text="TextBox" VerticalAlignment="Top" Width="143"/>
-        <Border BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="585,84,0,0" Width="402" Height="608" Grid.RowSpan="2">
-            <Canvas x:Name="Canvas_Strokes"/>
+        <Border BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="585,84,0,0" Width="432" Height="594" Grid.RowSpan="2">
+            <InkCanvas x:Name="Canvas_Strokes" Height="594" Width="432"/>
         </Border>
     </Grid>
 </Page>

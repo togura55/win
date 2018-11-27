@@ -17,6 +17,7 @@ using Windows.ApplicationModel.Resources;
 using Windows.Storage;
 using System.Collections.ObjectModel;
 using Windows.UI.Xaml.Shapes;
+using Windows.UI.Input.Inking;
 
 namespace WdBroker
 {
@@ -39,6 +40,10 @@ namespace WdBroker
                 HostNameCollection = new ObservableCollection<string>();
             }
         }
+
+        private InkStrokeBuilder m_inkStrokeBuilder = new InkStrokeBuilder();
+        private double mScale = 1;
+        private static float maxP = 1.402218f;
 
         private const uint MASK_COMMAND = 0xF000;
 
@@ -130,7 +135,8 @@ namespace WdBroker
         {
             ListBox_Message.Items.Clear();
 
-            CanvasClear(this.Canvas_Strokes);
+            // ToDo Clear by Windows InkCanvas
+//            CanvasClear(this.Canvas_Strokes);
         }
 
         // App exit procedure
@@ -194,10 +200,42 @@ namespace WdBroker
         private void ReceiveDrawing(object sender, DeviceRawData data, int index)
         {
             uint path_order = ((uint)data.f & 0x0F00) >> 8;
-            DrawStroke((float)path_order, data.x, data.y, index);
+            DrawStroke((float)path_order, data.x, data.y, data.z, index);
         }
 
-        private void DrawStroke(float f, float x, float y, int index)
+        //private async void DrawStrokes(StrokeUpdatedEventArgs e)
+        //{
+        //    if (e.PathPart.DataStride == 3)
+        //    {
+        //        int stride = 3;
+        //        int count = e.PathPart.Data.Count / stride;
+        //        int index = 0;
+
+        //        InkPoint[] points = new InkPoint[count];
+
+        //        for (int i = 0; i < count; i++)
+        //        {
+        //            float x = e.PathPart.Data[index];
+        //            float y = e.PathPart.Data[index + 1];
+        //            float p = e.PathPart.Data[index + 2] / maxP;
+
+        //            points[i] = new InkPoint(new Windows.Foundation.Point(x * mScale, y * mScale), p);
+
+        //            index += stride;
+        //        }
+
+        //        await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+        //        {
+        //            // Make a stroke by array of point
+        //            InkStroke s = m_inkStrokeBuilder.CreateStrokeFromInkPoints(
+        //                points, System.Numerics.Matrix3x2.Identity
+        //                );
+        //            Canvas_Strokes.InkPresenter.StrokeContainer.AddStroke(s);
+        //        });
+        //    }
+        //}
+
+        private async void DrawStroke(float f, float x, float y, float p, int index)
         {
             try
             {
@@ -213,29 +251,54 @@ namespace WdBroker
                 }
                 else
                 {
-                    // intermediates and end
-                    var ellipse = new Ellipse
-                    {
-                        Fill = new SolidColorBrush(UIColors[index]),
-                        Width = 4,
-                        Height = 4,
-                        Margin = new Thickness((x * pub.ViewScale), (y * pub.ViewScale), 0, 0)
-                    };
-                    this.Canvas_Strokes.Children.Add(ellipse);
+                    int count = 1; //  e.PathPart.Data.Count / stride;
+                    int _index = 0;
 
-                    if (!pub.StartState)
+                    InkPoint[] points = new InkPoint[count];
+
+                    points[0] = new InkPoint(new Windows.Foundation.Point(x * mScale, y * mScale), p);
+
+
+                    // intermediates and end
+                    //var ellipse = new Ellipse
+                    //{
+                    //    Fill = new SolidColorBrush(UIColors[index]),
+                    //    Width = 4,
+                    //    Height = 4,
+                    //    Margin = new Thickness((x * pub.ViewScale), (y * pub.ViewScale), 0, 0)
+                    //};
+
+                    //                   this.Canvas_Strokes.Children.Add(ellipse);
+                    await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                     {
-                        //Draw line
-                        var line1 = new Line();
-                        SolidColorBrush brush = new SolidColorBrush(UIColors[index]);
-                        line1.Stroke = brush;
-                        line1.X1 = (pub.PrevRawData.x * pub.ViewScale) + ellipse.Width / 2;
-                        line1.X2 = (x * pub.ViewScale) + ellipse.Width / 2;
-                        line1.Y1 = (pub.PrevRawData.y * pub.ViewScale) + ellipse.Height / 2;
-                        line1.Y2 = (y * pub.ViewScale) + ellipse.Height / 2;
-                        line1.StrokeThickness = 1;
-                        this.Canvas_Strokes.Children.Add(line1);
-                    }
+                        // Make a stroke by array of point
+                        InkStroke s = m_inkStrokeBuilder.CreateStrokeFromInkPoints(
+                            points, System.Numerics.Matrix3x2.Identity
+                            );
+                        Canvas_Strokes.InkPresenter.StrokeContainer.AddStroke(s);
+                    });
+
+                    //if (!pub.StartState)
+                    //{
+                    //    ////Draw line
+                    //    //var line1 = new Line();
+                    //    //SolidColorBrush brush = new SolidColorBrush(UIColors[index]);
+                    //    //line1.Stroke = brush;
+                    //    //line1.X1 = (pub.PrevRawData.x * pub.ViewScale) + ellipse.Width / 2;
+                    //    //line1.X2 = (x * pub.ViewScale) + ellipse.Width / 2;
+                    //    //line1.Y1 = (pub.PrevRawData.y * pub.ViewScale) + ellipse.Height / 2;
+                    //    //line1.Y2 = (y * pub.ViewScale) + ellipse.Height / 2;
+                    //    //line1.StrokeThickness = 1;
+                    //    //                        this.Canvas_Strokes.Children.Add(line1);
+                    //    await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                    //    {
+                    //        // Make a stroke by array of point
+                    //        InkStroke s = m_inkStrokeBuilder.CreateStrokeFromInkPoints(
+                    //            points, System.Numerics.Matrix3x2.Identity
+                    //            );
+                    //        Canvas_Strokes.InkPresenter.StrokeContainer.AddStroke(s);
+                    //    });
+                    //}
 
                     pub.PrevRawData.f = f;
                     pub.PrevRawData.x = x;
@@ -245,16 +308,10 @@ namespace WdBroker
             }
             catch (Exception ex)
             {
-                ListBox_Message.Items.Add(string.Format("DrawStroke: {0}",ex.Message));
+                ListBox_Message.Items.Add(string.Format("DrawStroke: {0}", ex.Message));
             }
         }
 
-        //private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
-        //{
-        //    //            SetCanvasScaling();
-        //}
-
-        //       Canvas_Strokes.DataContext = this;
         private void SetCanvasScaling(int index)
         {
             try
