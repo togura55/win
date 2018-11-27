@@ -14,6 +14,7 @@ xxx
 ## Author(s)
 * Tsuyoshi Ogura (togura55@gmail.com)  
 ## ToDo/Known Issues
-* 起動時にデバイスの接続が無かった場合はエラー表示で終了。タイムアウトで良い。    
 * App configuration utility through the Bluetooth connection   
-* Do the GetAttribute from device before StartRealtimeInk  
+## History
+* 1.0.6 - Implemented command/response scheme
+* 1.0.3 - 1st release

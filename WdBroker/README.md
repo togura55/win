@@ -15,4 +15,5 @@ xxx
 ## ToDo/Known Issues
 * Implement registering Subscribers     
 ## History
-* 1.0 - 1st release  
+* 1.0.6 - Implemented command/response scheme
+* 1.0.3 - 1st release  
