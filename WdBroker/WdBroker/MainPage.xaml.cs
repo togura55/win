@@ -51,6 +51,7 @@ namespace WdBroker
         {
             this.InitializeComponent();
 
+            Loaded += MainPage_Loaded;
             App.AppMessage += ReceiveMessage;
             App.Socket.SocketMessage += ReceiveMessage;
             App.Broker.AppConnectPublisher += ReceiveAppConnectPublisher;
@@ -87,6 +88,32 @@ namespace WdBroker
             }
 
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
+        }
+
+        private async void MainPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            // ToDo: get dynamic from Publisher
+            double deviceHeight = 29700;    // ToDo: get from Publishers
+            double deviceWidth = 21600;
+
+            // preparing for getting stroke raw data
+            //m_deviceSize.Width = deviceWidth;
+            //m_deviceSize.Height = deviceHeight;
+
+            // Calc coordination scale
+            double sx = Canvas_Strokes.Width / deviceWidth;
+            double sy = Canvas_Strokes.Height / deviceHeight;
+
+            mScale = sx < sy ? sx : sy;
+
+            int cw = (int)(deviceWidth * mScale);
+            int ch = (int)(deviceHeight * mScale);
+
+            // InkCanvas size settings for displaying
+            Canvas_Strokes.Width = cw;
+            Canvas_Strokes.Height = ch;
+            //inkContainer.Width = cw;
+            //inkContainer.Height = ch;
         }
 
         private void GetUiState()
@@ -256,6 +283,7 @@ namespace WdBroker
 
                     InkPoint[] points = new InkPoint[count];
 
+                    p = 1;
                     points[0] = new InkPoint(new Windows.Foundation.Point(x * mScale, y * mScale), p);
 
                     // 描画属性を作成する
@@ -283,7 +311,7 @@ namespace WdBroker
                             points, System.Numerics.Matrix3x2.Identity
                             );
 
-                        Canvas_Strokes.InkPresenter.UpdateDefaultDrawingAttributes(attributes);  // set UI attributes
+//                        Canvas_Strokes.InkPresenter.UpdateDefaultDrawingAttributes(attributes);  // set UI attributes
 
                         Canvas_Strokes.InkPresenter.StrokeContainer.AddStroke(s);
                     });
