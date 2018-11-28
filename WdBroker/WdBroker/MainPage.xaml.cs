@@ -258,6 +258,13 @@ namespace WdBroker
 
                     points[0] = new InkPoint(new Windows.Foundation.Point(x * mScale, y * mScale), p);
 
+                    // 描画属性を作成する
+                    InkDrawingAttributes attributes = new InkDrawingAttributes();
+                    attributes.Color = UIColors[index]; // Windows.UI.Colors.Red;   // ペンの色
+                    attributes.Size = new Size(10, 2);          // ペンのサイズ
+                    attributes.IgnorePressure = false;          // ペンの圧力を使用するかどうか
+                    attributes.FitToCurve = false;
+
 
                     // intermediates and end
                     //var ellipse = new Ellipse
@@ -275,6 +282,9 @@ namespace WdBroker
                         InkStroke s = m_inkStrokeBuilder.CreateStrokeFromInkPoints(
                             points, System.Numerics.Matrix3x2.Identity
                             );
+
+                        Canvas_Strokes.InkPresenter.UpdateDefaultDrawingAttributes(attributes);  // set UI attributes
+
                         Canvas_Strokes.InkPresenter.StrokeContainer.AddStroke(s);
                     });
 
