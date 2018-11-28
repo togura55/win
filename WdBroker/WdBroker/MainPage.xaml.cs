@@ -88,9 +88,16 @@ namespace WdBroker
             }
 
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
+
+            InkDrawingAttributes attributes = new InkDrawingAttributes();
+            attributes.Color = Windows.UI.Colors.Red; //UIColors[index]; //
+            attributes.Size = new Size(2, 2);          // ペンのサイズ
+            attributes.IgnorePressure = false;          // ペンの圧力を使用するかどうか
+            attributes.FitToCurve = false;
+            m_inkStrokeBuilder.SetDefaultDrawingAttributes(attributes);
         }
 
-        private async void MainPage_Loaded(object sender, RoutedEventArgs e)
+        private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
             // ToDo: get dynamic from Publisher
             double deviceHeight = 29700;    // ToDo: get from Publishers
@@ -163,7 +170,7 @@ namespace WdBroker
             ListBox_Message.Items.Clear();
 
             // ToDo Clear by Windows InkCanvas
-//            CanvasClear(this.Canvas_Strokes);
+            //            CanvasClear(this.Canvas_Strokes);
         }
 
         // App exit procedure
@@ -268,7 +275,7 @@ namespace WdBroker
             {
                 Publisher pub = App.Pubs[index];
 
-                if (f == 1)
+                if (f == 1 || pub.PrevRawData.f == 1)
                 {
                     // start point, nothing to do
                     pub.PrevRawData.f = f;
@@ -288,12 +295,7 @@ namespace WdBroker
                     points[0] = new InkPoint(new Windows.Foundation.Point(pub.PrevRawData.x * mScale, pub.PrevRawData.y * mScale), pub.PrevRawData.z);
                     points[1] = new InkPoint(new Windows.Foundation.Point(x * mScale, y * mScale), p);
 
-                    // 描画属性を作成する
-                    InkDrawingAttributes attributes = new InkDrawingAttributes();
-                    attributes.Color = UIColors[index]; // Windows.UI.Colors.Red;   // ペンの色
-                    attributes.Size = new Size(10, 2);          // ペンのサイズ
-                    attributes.IgnorePressure = false;          // ペンの圧力を使用するかどうか
-                    attributes.FitToCurve = false;
+
 
 
                     // intermediates and end
@@ -308,13 +310,18 @@ namespace WdBroker
                     //                   this.Canvas_Strokes.Children.Add(ellipse);
                     await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                     {
+                        // 描画属性を作成する
+                        InkDrawingAttributes attributes = new InkDrawingAttributes();
+                        attributes.Color =  UIColors[index]; //Windows.UI.Colors.Red; //
+                                                             //attributes.Size = new Size(10, 2);          // ペンのサイズ
+                                                             //attributes.IgnorePressure = false;          // ペンの圧力を使用するかどうか
+                                                             //attributes.FitToCurve = false;
+                        Canvas_Strokes.InkPresenter.UpdateDefaultDrawingAttributes(attributes);  // set UI attributes
+
                         // Make a stroke by array of point
                         InkStroke s = m_inkStrokeBuilder.CreateStrokeFromInkPoints(
                             points, System.Numerics.Matrix3x2.Identity
                             );
-
-                        Canvas_Strokes.InkPresenter.UpdateDefaultDrawingAttributes(attributes);  // set UI attributes
-
                         Canvas_Strokes.InkPresenter.StrokeContainer.AddStroke(s);
                     });
 
