@@ -274,17 +274,19 @@ namespace WdBroker
                     pub.PrevRawData.f = f;
                     pub.PrevRawData.x = x;
                     pub.PrevRawData.y = y;
+                    pub.PrevRawData.z = p;
                     pub.StartState = true;
                 }
                 else
                 {
-                    int count = 1; //  e.PathPart.Data.Count / stride;
-                    int _index = 0;
+                    int count = 2; //  e.PathPart.Data.Count / stride;
 
                     InkPoint[] points = new InkPoint[count];
 
                     p = 1;
-                    points[0] = new InkPoint(new Windows.Foundation.Point(x * mScale, y * mScale), p);
+
+                    points[0] = new InkPoint(new Windows.Foundation.Point(pub.PrevRawData.x * mScale, pub.PrevRawData.y * mScale), pub.PrevRawData.z);
+                    points[1] = new InkPoint(new Windows.Foundation.Point(x * mScale, y * mScale), p);
 
                     // 描画属性を作成する
                     InkDrawingAttributes attributes = new InkDrawingAttributes();
@@ -311,7 +313,7 @@ namespace WdBroker
                             points, System.Numerics.Matrix3x2.Identity
                             );
 
-//                        Canvas_Strokes.InkPresenter.UpdateDefaultDrawingAttributes(attributes);  // set UI attributes
+                        Canvas_Strokes.InkPresenter.UpdateDefaultDrawingAttributes(attributes);  // set UI attributes
 
                         Canvas_Strokes.InkPresenter.StrokeContainer.AddStroke(s);
                     });
@@ -341,6 +343,7 @@ namespace WdBroker
                     pub.PrevRawData.f = f;
                     pub.PrevRawData.x = x;
                     pub.PrevRawData.y = y;
+                    pub.PrevRawData.z = p;
                     pub.StartState = false;
                 }
             }
