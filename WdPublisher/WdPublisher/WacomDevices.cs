@@ -156,30 +156,6 @@ namespace WillDevicesSampleApp
 
             try
             {
-                //                uint width = (uint)await device.GetPropertyAsync("Width", m_cts.Token);
-                //                uint height = (uint)await device.GetPropertyAsync("Height", m_cts.Token);
-                //                uint ptSize = (uint)await device.GetPropertyAsync("PointSize", m_cts.Token);
-                //Attribute.Width = ((uint)await device.GetPropertyAsync("Width", m_cts.Token)).ToString();
-                //Attribute.Height = ((uint)await device.GetPropertyAsync("Height", m_cts.Token)).ToString();
-                //Attribute.PointSize = ((uint)await device.GetPropertyAsync("PointSize", m_cts.Token)).ToString();
-                //Attribute.Name = ((uint)await device.GetPropertyAsync(SmartPadProperties.DeviceName, m_cts.Token)).ToString();
-                //Attribute.ESN = ((uint)await device.GetPropertyAsync(SmartPadProperties.SerialNumber, m_cts.Token)).ToString();
-                //Attribute.Battery = ((uint)await device.GetPropertyAsync(SmartPadProperties.BatteryLevel, m_cts.Token)).ToString();
-                //Attribute.TransferMode = "LiveMode";
-                //Attribute.DeviceType = "PHU-111";
-
-                //service.Transform = AppObjects.CalculateTransform(width, height, ptSize);
-
-                //float scaleFactor = ptSize * AppObjects.micrometerToDip;
-
-                //InkCanvasDocument document = new InkCanvasDocument();
-                //document.Size = new Windows.Foundation.Size(height * scaleFactor, width * scaleFactor);
-                //document.InkCanvasLayers.Add(new InkCanvasLayer());
-
-                //inkCanvas.InkCanvasDocument = document;
-                //inkCanvas.GesturesManager = new GesturesManager();
-                //inkCanvas.StrokeDataProvider = service;
-
                 bool start_flag = false;
                 if (!service.IsStarted)
                 {
@@ -191,7 +167,6 @@ namespace WillDevicesSampleApp
                 {
                     this.StartRealTimeInkCompletedNotification?.Invoke(this, start_flag);
                 });
-
             }
             catch (Exception ex)
             {
@@ -220,133 +195,189 @@ namespace WillDevicesSampleApp
         #region Stroke event handlers
         private void Service_StrokeEnded(object sender, StrokeEndedEventArgs e)
         {
-            m_StrokeOrder = 2;
-            AppObjects.Instance.WacomDevice.PublisherAttribute =
-                ((uint)AppObjects.Instance.WacomDevice.PublisherAttribute & ~MASK_STROKE) | ((uint)m_StrokeOrder << 8);
+            try
+            {
+                m_StrokeOrder = 2;
+                AppObjects.Instance.WacomDevice.PublisherAttribute =
+                    ((uint)AppObjects.Instance.WacomDevice.PublisherAttribute & ~MASK_STROKE) | ((uint)m_StrokeOrder << 8);
 
-            m_addNewStrokeToModel = true;
+                m_addNewStrokeToModel = true;
 
-            var pathPart = e.PathPart;
-
-            if (AppObjects.Instance.SocketService != null)
-                //               AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
-                AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(pathPart));
-
+                var pathPart = e.PathPart;
+                if (AppObjects.Instance.SocketService != null)
+                    AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(pathPart));
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("Service_StrokeEnded: Exception: {0}", ex.Message));
+            }
         }
 
         private void Service_StrokeUpdated(object sender, StrokeUpdatedEventArgs e)
         {
-            m_StrokeOrder = 0;
-            AppObjects.Instance.WacomDevice.PublisherAttribute =
-                ((uint)AppObjects.Instance.WacomDevice.PublisherAttribute & ~MASK_STROKE) | ((uint)m_StrokeOrder << 8);
-
-            var pathPart = e.PathPart;
-
-            if (AppObjects.Instance.SocketService != null)
-                //               AppObjects.Instance.SocketClient.BatchedSends(CreateBuffer(pathPart));
-                AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(pathPart));
-
-
-            //var point = new StylusPoint(x * m_scale, y * m_scale, w);
-            if (m_addNewStrokeToModel)
+            try
             {
-                m_addNewStrokeToModel = false;
-                //    var points = new StylusPointCollection { point };
-                //    points.Add(point);
+                m_StrokeOrder = 0;
+                AppObjects.Instance.WacomDevice.PublisherAttribute =
+                    ((uint)AppObjects.Instance.WacomDevice.PublisherAttribute & ~MASK_STROKE) | ((uint)m_StrokeOrder << 8);
 
-                //    var stroke = new WinStroke(points) { DrawingAttributes = m_DrawingAttributes };
+                var pathPart = e.PathPart;
+                if (AppObjects.Instance.SocketService != null)
+                    AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(pathPart));
 
-                //    Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
-                //    {
-                //        _strokes.Add(stroke);
-                //    }));
+                //var point = new StylusPoint(x * m_scale, y * m_scale, w);
+                if (m_addNewStrokeToModel)
+                {
+                    m_addNewStrokeToModel = false;
+                }
+                PointCount++;
             }
-            //else
-            //{
-            //    Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
-            //    {
-            //        _strokes[_strokes.Count - 1].StylusPoints.Add(point);
-            //    }));
-            //}
-
-            PointCount++;
-
-            // Add to ListBox
-            //var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            ////Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
-            //{
-            //    m_StrokeRawData.Add(new StrokeRawData(PointCount.ToString(), StrokeCount.ToString(), x.ToString(), y.ToString(), w.ToString()));
-            //});
-
-            // data transfer
-            //            inkTransfer.Send(pathPart);
-
-
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("Service_StrokeUpdated: Exception: {0}", ex.Message));
+            }
         }
 
         private void Service_StrokeStarted(object sender, StrokeStartedEventArgs e)
         {
-            m_StrokeOrder = 1;
-            AppObjects.Instance.WacomDevice.PublisherAttribute =
-                ((uint)AppObjects.Instance.WacomDevice.PublisherAttribute & ~MASK_STROKE) | ((uint)m_StrokeOrder << 8);
+            try
+            {
+                m_StrokeOrder = 1;
+                AppObjects.Instance.WacomDevice.PublisherAttribute =
+                    ((uint)AppObjects.Instance.WacomDevice.PublisherAttribute & ~MASK_STROKE) | ((uint)m_StrokeOrder << 8);
 
-            m_addNewStrokeToModel = true;
-            StrokeCount++;
+                m_addNewStrokeToModel = true;
+                StrokeCount++;
 
-            if (AppObjects.Instance.SocketService != null)
-                AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(null));
+                if (AppObjects.Instance.SocketService != null)
+                    AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(null));
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("Service_StrokeStarted: Exception: {0}", ex.Message));
+            }
         }
 
         private IBuffer CreateBuffer(Wacom.Ink.Path pathPart)
         {
-            IBuffer buffer;
+            IBuffer buffer = null;
 
-            //Data is stored XYW
-            float f = AppObjects.Instance.WacomDevice.PublisherAttribute;
-            float x = -1;
-            float y = -1;
-            float w = -1;
-
-            if (pathPart == null)  // StartStroke
+            try
             {
-                x = y = w = 0;
+                if (pathPart == null) // StartStroke
+                {
+
+                }
+                else
+                {
+                    if (pathPart.DataStride == 3)
+                    {
+                        int stride = 3;
+                        int count = pathPart.Data.Count / stride;
+                        int index = 0;
+
+                        //                    InkPoint[] points = new InkPoint[count];
+
+                        float f = AppObjects.Instance.WacomDevice.PublisherAttribute;
+                        int num_bytes = sizeof(float);
+                        byte[] ByteArray = new byte[num_bytes * 4 * count];
+
+                        for (int i = 0; i < count; i++)
+                        {
+                            float x = pathPart.Data[index];
+                            float y = pathPart.Data[index + 1];
+                            float p = pathPart.Data[index + 2] / maxP;
+
+                            //                        points[i] = new InkPoint(new Windows.Foundation.Point(x * mScale, y * mScale), p);
+
+                            int offset = 0;
+                            Array.Copy(BitConverter.GetBytes(f), 0, ByteArray, offset, num_bytes);
+                            Array.Copy(BitConverter.GetBytes(x), 0, ByteArray, offset += num_bytes, num_bytes);
+                            Array.Copy(BitConverter.GetBytes(y), 0, ByteArray, offset += num_bytes, num_bytes);
+                            Array.Copy(BitConverter.GetBytes(p), 0, ByteArray, offset += num_bytes, num_bytes);
+
+                            index += stride;
+                        }
+
+                        using (DataWriter writer = new DataWriter())
+                        {
+                            writer.WriteBytes(ByteArray);
+                            buffer = writer.DetachBuffer();
+                        }
+
+                        //await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                        //{
+                        //    // Make a stroke by array of point
+                        //    InkStroke s = m_inkStrokeBuilder.CreateStrokeFromInkPoints(
+                        //        points, System.Numerics.Matrix3x2.Identity
+                        //        );
+                        //    inkCanvas.InkPresenter.StrokeContainer.AddStroke(s);
+                        //});
+                    }
+                    else
+                    {
+
+                    }
+                }
             }
-            else   // others
+            catch (Exception ex)
             {
-                var data = pathPart.Data.GetEnumerator();
-
-                if (data.MoveNext())
-                {
-                    x = data.Current;
-                }
-
-                if (data.MoveNext())
-                {
-                    y = data.Current;
-                }
-
-                if (data.MoveNext())
-                {
-                    //Clamp to 0.0 -> 1.0
-                    w = Math.Max(0.0f, Math.Min(1.0f, (data.Current - 1.0f) * pFactor));
-                }
-            }
-
-            int num_bytes = sizeof(float);
-            byte[] ByteArray = new byte[num_bytes * 4];
-            int offset = 0;
-            Array.Copy(BitConverter.GetBytes(f), 0, ByteArray, offset, num_bytes);
-            Array.Copy(BitConverter.GetBytes(x), 0, ByteArray, offset += num_bytes, num_bytes);
-            Array.Copy(BitConverter.GetBytes(y), 0, ByteArray, offset += num_bytes, num_bytes);
-            Array.Copy(BitConverter.GetBytes(w), 0, ByteArray, offset += num_bytes, num_bytes);
-            using (DataWriter writer = new DataWriter())
-            {
-                writer.WriteBytes(ByteArray);
-                buffer = writer.DetachBuffer();
+                throw new Exception(string.Format("CreateBuffer: Exception: {0}", ex.Message));
             }
 
             return buffer;
         }
+
+        //private IBuffer CreateBuffer(Wacom.Ink.Path pathPart)
+        //{
+        //    IBuffer buffer;
+
+        //    //Data is stored XYW
+        //    float f = AppObjects.Instance.WacomDevice.PublisherAttribute;
+        //    float x = -1;
+        //    float y = -1;
+        //    float w = -1;
+
+        //    if (pathPart == null)  // StartStroke
+        //    {
+        //        x = y = w = 0;
+        //    }
+        //    else   // others
+        //    {
+        //        var data = pathPart.Data.GetEnumerator();
+
+        //        if (data.MoveNext())
+        //        {
+        //            x = data.Current;
+        //        }
+
+        //        if (data.MoveNext())
+        //        {
+        //            y = data.Current;
+        //        }
+
+        //        if (data.MoveNext())
+        //        {
+        //            //Clamp to 0.0 -> 1.0
+        //            w = Math.Max(0.0f, Math.Min(1.0f, (data.Current - 1.0f) * pFactor));
+        //        }
+        //    }
+
+        //    int num_bytes = sizeof(float);
+        //    byte[] ByteArray = new byte[num_bytes * 4];
+        //    int offset = 0;
+        //    Array.Copy(BitConverter.GetBytes(f), 0, ByteArray, offset, num_bytes);
+        //    Array.Copy(BitConverter.GetBytes(x), 0, ByteArray, offset += num_bytes, num_bytes);
+        //    Array.Copy(BitConverter.GetBytes(y), 0, ByteArray, offset += num_bytes, num_bytes);
+        //    Array.Copy(BitConverter.GetBytes(w), 0, ByteArray, offset += num_bytes, num_bytes);
+        //    using (DataWriter writer = new DataWriter())
+        //    {
+        //        writer.WriteBytes(ByteArray);
+        //        buffer = writer.DetachBuffer();
+        //    }
+
+        //    return buffer;
+        //}
         #endregion
 
         private void OnHoverPointReceived(object sender, HoverPointReceivedEventArgs e)
