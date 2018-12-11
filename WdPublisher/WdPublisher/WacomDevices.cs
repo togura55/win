@@ -147,9 +147,9 @@ namespace WillDevicesSampleApp
             }
 
             //// Register private events for getting stroke data /////
-            service.StrokeStarted += Service_StrokeStarted;
-            service.StrokeUpdated += Service_StrokeUpdated;
-            service.StrokeEnded += Service_StrokeEnded;
+            service.StrokeStarted += Service_BeginStroke;
+            service.StrokeUpdated += Service_MiddleStroke;
+            service.StrokeEnded += Service_EndStroke;
             /////////////////////////////////////////////////////////////
 
             //textBlockPrompt.Text = AppObjects.GetStringForDeviceStatus(device.DeviceStatus);
@@ -193,131 +193,123 @@ namespace WillDevicesSampleApp
         }
 
         #region Stroke event handlers
-        private void Service_StrokeEnded(object sender, StrokeEndedEventArgs e)
-        {
-            try
-            {
-                m_StrokeOrder = 2;
-                AppObjects.Instance.WacomDevice.PublisherAttribute =
-                    ((uint)AppObjects.Instance.WacomDevice.PublisherAttribute & ~MASK_STROKE) | ((uint)m_StrokeOrder << 8);
-
-                m_addNewStrokeToModel = true;
-
-                var pathPart = e.PathPart;
-                if (AppObjects.Instance.SocketService != null)
-                    AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(pathPart));
-            }
-            catch (Exception ex)
-            {
-                MessageEvent(string.Format("Service_StrokeEnded: Exception: {0}", ex.Message));
-            }
-        }
-
-        private void Service_StrokeUpdated(object sender, StrokeUpdatedEventArgs e)
-        {
-            try
-            {
-                m_StrokeOrder = 0;
-                AppObjects.Instance.WacomDevice.PublisherAttribute =
-                    ((uint)AppObjects.Instance.WacomDevice.PublisherAttribute & ~MASK_STROKE) | ((uint)m_StrokeOrder << 8);
-
-                var pathPart = e.PathPart;
-                if (AppObjects.Instance.SocketService != null)
-                    AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(pathPart));
-
-                //var point = new StylusPoint(x * m_scale, y * m_scale, w);
-                if (m_addNewStrokeToModel)
-                {
-                    m_addNewStrokeToModel = false;
-                }
-                PointCount++;
-            }
-            catch (Exception ex)
-            {
-                MessageEvent(string.Format("Service_StrokeUpdated: Exception: {0}", ex.Message));
-            }
-        }
-
-        private void Service_StrokeStarted(object sender, StrokeStartedEventArgs e)
+        private void Service_BeginStroke(object sender, StrokeStartedEventArgs e)
         {
             try
             {
                 m_StrokeOrder = 1;
-                AppObjects.Instance.WacomDevice.PublisherAttribute =
-                    ((uint)AppObjects.Instance.WacomDevice.PublisherAttribute & ~MASK_STROKE) | ((uint)m_StrokeOrder << 8);
 
-                m_addNewStrokeToModel = true;
+                //m_addNewStrokeToModel = true;
                 StrokeCount++;
 
                 if (AppObjects.Instance.SocketService != null)
-                    AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(null));
+                    AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(null, m_StrokeOrder));
             }
             catch (Exception ex)
             {
-                MessageEvent(string.Format("Service_StrokeStarted: Exception: {0}", ex.Message));
+                MessageEvent(string.Format("Service_BeginStroke: Exception: {0}", ex.Message));
             }
         }
 
-        private IBuffer CreateBuffer(Wacom.Ink.Path pathPart)
+        private void Service_MiddleStroke(object sender, StrokeUpdatedEventArgs e)
+        {
+            try
+            {
+                m_StrokeOrder = 0;
+
+                var pathPart = e.PathPart;
+                if (AppObjects.Instance.SocketService != null)
+                    AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(pathPart, m_StrokeOrder));
+
+                //var point = new StylusPoint(x * m_scale, y * m_scale, w);
+                //if (m_addNewStrokeToModel)
+                //{
+                //    m_addNewStrokeToModel = false;
+                //}
+                PointCount++;
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("Service_MiddleStroke: Exception: {0}", ex.Message));
+            }
+        }
+
+        private void Service_EndStroke(object sender, StrokeEndedEventArgs e)
+        {
+            try
+            {
+                m_StrokeOrder = 2;
+ //               m_addNewStrokeToModel = true;
+
+                var pathPart = e.PathPart;
+                if (AppObjects.Instance.SocketService != null)
+                    AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(pathPart, m_StrokeOrder));
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("Service_EndStroke: Exception: {0}", ex.Message));
+            }
+        }
+
+        private IBuffer CreateBuffer(Wacom.Ink.Path pathPart, int strokeOrder)
         {
             IBuffer buffer = null;
+            int count = 0;
+            int index = 0;
+            float x = 0, y = 0, p = 0, f = 0;
+            int stride = 0;
+            int num_bytes = sizeof(float);  // 4 bytes
 
             try
             {
-                if (pathPart == null) // StartStroke
-                {
+                f = ((uint)AppObjects.Instance.WacomDevice.PublisherAttribute & ~MASK_STROKE) | ((uint)strokeOrder << 8);
+                AppObjects.Instance.WacomDevice.PublisherAttribute = f;
 
+                if (pathPart == null) // BeginStroke
+                {
+                    count = 1;
                 }
-                else
+                else  // MiddleStroke ot EndStroke
                 {
                     if (pathPart.DataStride == 3)
                     {
-                        int stride = 3;
-                        int count = pathPart.Data.Count / stride;
-                        int index = 0;
-
-                        //                    InkPoint[] points = new InkPoint[count];
-
-                        float f = AppObjects.Instance.WacomDevice.PublisherAttribute;
-                        int num_bytes = sizeof(float);
-                        byte[] ByteArray = new byte[num_bytes * 4 * count];
-
-                        for (int i = 0; i < count; i++)
-                        {
-                            float x = pathPart.Data[index];
-                            float y = pathPart.Data[index + 1];
-                            float p = pathPart.Data[index + 2] / maxP;
-
-                            //                        points[i] = new InkPoint(new Windows.Foundation.Point(x * mScale, y * mScale), p);
-
-                            int offset = 0;
-                            Array.Copy(BitConverter.GetBytes(f), 0, ByteArray, offset, num_bytes);
-                            Array.Copy(BitConverter.GetBytes(x), 0, ByteArray, offset += num_bytes, num_bytes);
-                            Array.Copy(BitConverter.GetBytes(y), 0, ByteArray, offset += num_bytes, num_bytes);
-                            Array.Copy(BitConverter.GetBytes(p), 0, ByteArray, offset += num_bytes, num_bytes);
-
-                            index += stride;
-                        }
-
-                        using (DataWriter writer = new DataWriter())
-                        {
-                            writer.WriteBytes(ByteArray);
-                            buffer = writer.DetachBuffer();
-                        }
-
-                        //await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                        //{
-                        //    // Make a stroke by array of point
-                        //    InkStroke s = m_inkStrokeBuilder.CreateStrokeFromInkPoints(
-                        //        points, System.Numerics.Matrix3x2.Identity
-                        //        );
-                        //    inkCanvas.InkPresenter.StrokeContainer.AddStroke(s);
-                        //});
+                        stride = 3;
+                        count = pathPart.Data.Count / stride;
                     }
                     else
                     {
 
                     }
+                }
+
+                //                    InkPoint[] points = new InkPoint[count];
+
+                byte[] ByteArray = new byte[num_bytes * 4 * count];
+                int offset = 0;
+                for (int i = 0; i < count; i++)
+                {
+                    if (pathPart != null)  // only for MiddleStroke or EndStroke
+                    {
+                        x = pathPart.Data[index];
+                        y = pathPart.Data[index + 1];
+                        p = pathPart.Data[index + 2] / maxP;
+                    }
+
+                    //                        points[i] = new InkPoint(new Windows.Foundation.Point(x * mScale, y * mScale), p);
+
+                    Array.Copy(BitConverter.GetBytes(f), 0, ByteArray, offset, num_bytes);
+                    Array.Copy(BitConverter.GetBytes(x), 0, ByteArray, offset += num_bytes, num_bytes);
+                    Array.Copy(BitConverter.GetBytes(y), 0, ByteArray, offset += num_bytes, num_bytes);
+                    Array.Copy(BitConverter.GetBytes(p), 0, ByteArray, offset += num_bytes, num_bytes);
+
+                    index += stride;
+                    offset += num_bytes;
+                }
+
+                using (DataWriter writer = new DataWriter())
+                {
+                    writer.WriteBytes(ByteArray);
+                    buffer = writer.DetachBuffer();
                 }
             }
             catch (Exception ex)
@@ -479,8 +471,8 @@ namespace WillDevicesSampleApp
             StartScanning();
         }
 
- //       public void StopScanAndConnect(object sender, RoutedEventArgs e)
-         public void StopScanAndConnect()
+        //       public void StopScanAndConnect(object sender, RoutedEventArgs e)
+        public void StopScanAndConnect()
         {
             MessageEvent("StopScanAndConnect");
 
