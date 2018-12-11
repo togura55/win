@@ -17,7 +17,7 @@ namespace WdBroker
         // Delegate event handlers
         public delegate void BrokerEventHandler(object sender, string message);
         public delegate void ConnectPublisherEventHandler(object sender, int index);
-        public delegate void DrawingEventHandler(object sender, DeviceRawData data, int index); // for drawing
+        public delegate void DrawingEventHandler(object sender, List<DeviceRawData> data, int index); // for drawing
 
         // Properties
         public event BrokerEventHandler BrokerMessage;
@@ -60,7 +60,7 @@ namespace WdBroker
             });
         }
 
-        private async void DrawingEvent(DeviceRawData data, int index)
+        private async void DrawingEvent(List<DeviceRawData> data, int index)
         {
             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
@@ -154,7 +154,7 @@ namespace WdBroker
 
         private void DataPublisherEvent(Byte[] databyte)
         {
-            const int num_bytes = sizeof(float);
+            const int num_bytes = sizeof(float);  // 4 bytes
             int index = 0;
             int count = 0;
             float f = 0, x = 0, y = 0, z = 0;
@@ -162,6 +162,9 @@ namespace WdBroker
 
             try
             {
+                uint path_order = 0;
+                int pi = 0;
+
                 // It's depend on each packets how many bytes are included.. 
                 for (int i = 0; i < databyte.Length / num_bytes; i++)
                 {
@@ -185,21 +188,24 @@ namespace WdBroker
                             label = "z"; z = data; break;
                     }
 
-                    string output = "DataPublisherEvent(): Received data [{0}]:[{1}]:[{2}] {3}=";
-                    if (label == "f")
-                        //                                output += "\"0x{3:X4}\"";
-                        output += "\"{4}\"";
-                    else if (label == "z")
-                        output += "\"{4:0.######}\"";
-                    else
-                        output += "\"{4}\"";
-                    MessageEvent(string.Format(output, index, ((uint)f & MASK_ID), ((uint)f & MASK_STROKE) >> 8, label, data));
+                    if (App.ShowStrokeRawData)
+                    {
+                        string output = "DataPublisherEvent(): Received data [{0}]:[{1}]:[{2}] {3}=";
+                        if (label == "f")
+                            //                                output += "\"0x{3:X4}\"";
+                            output += "\"{4}\"";
+                        else if (label == "z")
+                            output += "\"{4:0.######}\"";
+                        else
+                            output += "\"{4}\"";
+                        MessageEvent(string.Format(output, index, ((uint)f & MASK_ID), ((uint)f & MASK_STROKE) >> 8, label, data));
+                    }
 
                     // --------------------------
                     if (label == "z")  // all together
                     {
                         uint pub_id = ((uint)f & MASK_ID);
-                        uint path_order = ((uint)f & MASK_STROKE) >> 8;
+                        path_order = ((uint)f & MASK_STROKE) >> 8;
 
                         if (!App.Pubs.Exists(pubs => pubs.Id == pub_id.ToString()))
                         {
@@ -210,7 +216,7 @@ namespace WdBroker
                         else  // Publisher existed
                         {
                             // Search by Id, add data list and store raw data
-                            int pi = App.Pubs.FindIndex(n => n.Id == pub_id.ToString());
+                            pi = App.Pubs.FindIndex(n => n.Id == pub_id.ToString());
 
                             DeviceRawData drd = new DeviceRawData(f, x, y, z);
                             if (path_order == 1)  // begin storoke?
@@ -226,16 +232,22 @@ namespace WdBroker
                                 int s = App.Pubs[pi].Strokes.Count - 1;
                                 App.Pubs[pi].Strokes[s].DeviceRawDataList.Add(drd);
                             }
-                            else  // intermediate
+                            else  // middle?
                             {
                                 int s = App.Pubs[pi].Strokes.Count - 1;
                                 App.Pubs[pi].Strokes[s].DeviceRawDataList.Add(drd);
                             }
-                            DrawingEvent(drd, pi);  // for drawing
+                            //                           DrawingEvent(drd, pi);  // for drawing
                         }
                     }
                     index++;
                     count++;
+                }
+
+                if (path_order != 1)
+                {
+                    int s = App.Pubs[pi].Strokes.Count - 1;
+                    DrawingEvent(App.Pubs[pi].Strokes[s].DeviceRawDataList, pi);  // for drawing
                 }
 
                 //                        if (index == 5) break;  // for debug

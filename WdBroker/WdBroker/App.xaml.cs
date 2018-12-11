@@ -34,6 +34,8 @@ namespace WdBroker
         public static HostName ServerHostName;
         public static List<HostName> HostNames = new List<HostName>();
 
+        public static bool ShowStrokeRawData;
+
         // Delegeat handlers
         public delegate void MessageEventHandler(object sender, string message);
 

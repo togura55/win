@@ -27,5 +27,7 @@
         <Border BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="585,84,0,0" Width="432" Height="594" Grid.RowSpan="2">
             <InkCanvas x:Name="Canvas_Strokes" Height="594" Width="432"/>
         </Border>
+        <CheckBox x:Name="CB_ShowStrokeRawData" Content="CheckBox" HorizontalAlignment="Left" Margin="269,201,0,0" VerticalAlignment="Top"
+                  Click="ShowStrokeRawData_Click"/>
     </Grid>
 </Page>
