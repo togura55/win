@@ -126,6 +126,9 @@
   <data name="IDC_PortNumber" xml:space="preserve">
     <value>ポート番号:  </value>
   </data>
+  <data name="IDC_ShowStrokeRawData" xml:space="preserve">
+    <value>生データ表示</value>
+  </data>
   <data name="IDC_Start" xml:space="preserve">
     <value>開始</value>
   </data>

@@ -66,6 +66,7 @@ namespace WdBroker
             this.Pbtn_Start.Content = resourceLoader.GetString(fStart ? "IDC_Start" : "IDC_Stop");
             this.TextBox_PortNumberValue.Text = PortNumberString;
             this.Pbtn_Clearlog.Content = resourceLoader.GetString("IDC_Clearlog");
+            this.CB_ShowStrokeRawData.Content = resourceLoader.GetString("IDC_ShowStrokeRawData");
 
             this.TextBox_FixedHostNameValue.Visibility = Visibility.Collapsed;
             this.TextBlock_HostNameValue.Visibility = Visibility.Collapsed;
@@ -86,6 +87,8 @@ namespace WdBroker
                 // update UI
                 this.Combo_HostNames.SelectedIndex = index;
             }
+
+            CB_ShowStrokeRawData.IsChecked = App.ShowStrokeRawData;
 
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
 
@@ -127,6 +130,7 @@ namespace WdBroker
         {
             PortNumberString = this.TextBox_PortNumberValue.Text;
             HostNameString = (string)this.Combo_HostNames.SelectedValue;
+            App.ShowStrokeRawData = (bool)this.CB_ShowStrokeRawData.IsChecked;
         }
 
         // Message event handler sent by SocketServer object
@@ -173,6 +177,11 @@ namespace WdBroker
             //            CanvasClear(this.Canvas_Strokes);
         }
 
+        private void ShowStrokeRawData_Click(object sender, RoutedEventArgs e)
+        {
+            App.ShowStrokeRawData = (bool)this.CB_ShowStrokeRawData.IsChecked ? true : false;
+        }
+
         // App exit procedure
         void App_Suspending(Object sender, Windows.ApplicationModel.SuspendingEventArgs e)
         {
@@ -202,6 +211,8 @@ namespace WdBroker
             ApplicationDataContainer container = ApplicationData.Current.LocalSettings;
             container.Values["PortNumberString"] = PortNumberString;
             container.Values["HostNameString"] = HostNameString;
+            string flag = (bool)this.CB_ShowStrokeRawData.IsChecked ? "1" : "0";
+            container.Values["ShowStrokeRawData"] = flag;
         }
 
         private void RestoreSettings()
@@ -211,6 +222,8 @@ namespace WdBroker
                 PortNumberString = container.Values["PortNumberString"].ToString();
             if (container.Values.ContainsKey("HostNameString"))
                 HostNameString = container.Values["HostNameString"].ToString();
+            if (container.Values.ContainsKey("ShowStrokeRawData"))
+                App.ShowStrokeRawData = (container.Values["ShowStrokeRawData"].ToString() == "1") ? true : false;
         }
         #endregion
 
@@ -231,128 +244,46 @@ namespace WdBroker
         }
 
         // Raw data event handler sent by SocketServer object
-        private void ReceiveDrawing(object sender, DeviceRawData data, int index)
+        private void ReceiveDrawing(object sender, List<DeviceRawData> data_list, int index)
         {
-            uint path_order = ((uint)data.f & 0x0F00) >> 8;
-            DrawStroke((float)path_order, data.x, data.y, data.z, index);
+            DrawStroke(data_list, index);
         }
 
-        //private async void DrawStrokes(StrokeUpdatedEventArgs e)
-        //{
-        //    if (e.PathPart.DataStride == 3)
-        //    {
-        //        int stride = 3;
-        //        int count = e.PathPart.Data.Count / stride;
-        //        int index = 0;
-
-        //        InkPoint[] points = new InkPoint[count];
-
-        //        for (int i = 0; i < count; i++)
-        //        {
-        //            float x = e.PathPart.Data[index];
-        //            float y = e.PathPart.Data[index + 1];
-        //            float p = e.PathPart.Data[index + 2] / maxP;
-
-        //            points[i] = new InkPoint(new Windows.Foundation.Point(x * mScale, y * mScale), p);
-
-        //            index += stride;
-        //        }
-
-        //        await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-        //        {
-        //            // Make a stroke by array of point
-        //            InkStroke s = m_inkStrokeBuilder.CreateStrokeFromInkPoints(
-        //                points, System.Numerics.Matrix3x2.Identity
-        //                );
-        //            Canvas_Strokes.InkPresenter.StrokeContainer.AddStroke(s);
-        //        });
-        //    }
-        //}
-
-        private async void DrawStroke(float f, float x, float y, float p, int index)
+        //       private async void DrawStroke(float f, float x, float y, float p, int index)
+        private async void DrawStroke(List<DeviceRawData> deviceRawDataList, int index)
         {
             try
             {
-                Publisher pub = App.Pubs[index];
+//                Publisher pub = App.Pubs[index];
 
-                if (f == 1 || pub.PrevRawData.f == 1)
+                int count = deviceRawDataList.Count;
+
+                InkPoint[] points = new InkPoint[count];
+                for (int i = 0; i < count; i++)
                 {
-                    // start point, nothing to do
-                    pub.PrevRawData.f = f;
-                    pub.PrevRawData.x = x;
-                    pub.PrevRawData.y = y;
-                    pub.PrevRawData.z = p;
-                    pub.StartState = true;
+                    points[i] = new InkPoint(new Windows.Foundation.Point(
+                        deviceRawDataList[i].x * mScale,
+                        deviceRawDataList[i].y * mScale),
+                        deviceRawDataList[i].z);
                 }
-                else
-                {
-                    int count = 2; //  e.PathPart.Data.Count / stride;
 
-                    InkPoint[] points = new InkPoint[count];
+                //await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                //{
+                // 描画属性を作成する
+                InkDrawingAttributes attributes = new InkDrawingAttributes();
+                attributes.Color = UIColors[index]; //Windows.UI.Colors.Red; //
+                                                    //attributes.Size = new Size(10, 2);          // ペンのサイズ
+                                                    //attributes.IgnorePressure = false;          // ペンの圧力を使用するかどうか
+                                                    //attributes.FitToCurve = false;
+                Canvas_Strokes.InkPresenter.UpdateDefaultDrawingAttributes(attributes);  // set UI attributes
 
-                    p = 1;
+                // Make a stroke by array of point
+                InkStroke s = m_inkStrokeBuilder.CreateStrokeFromInkPoints(
+                    points, System.Numerics.Matrix3x2.Identity);
+                Canvas_Strokes.InkPresenter.StrokeContainer.AddStroke(s);
 
-                    points[0] = new InkPoint(new Windows.Foundation.Point(pub.PrevRawData.x * mScale, pub.PrevRawData.y * mScale), pub.PrevRawData.z);
-                    points[1] = new InkPoint(new Windows.Foundation.Point(x * mScale, y * mScale), p);
-
-
-
-
-                    // intermediates and end
-                    //var ellipse = new Ellipse
-                    //{
-                    //    Fill = new SolidColorBrush(UIColors[index]),
-                    //    Width = 4,
-                    //    Height = 4,
-                    //    Margin = new Thickness((x * pub.ViewScale), (y * pub.ViewScale), 0, 0)
-                    //};
-
-                    //                   this.Canvas_Strokes.Children.Add(ellipse);
-                    await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                    {
-                        // 描画属性を作成する
-                        InkDrawingAttributes attributes = new InkDrawingAttributes();
-                        attributes.Color =  UIColors[index]; //Windows.UI.Colors.Red; //
-                                                             //attributes.Size = new Size(10, 2);          // ペンのサイズ
-                                                             //attributes.IgnorePressure = false;          // ペンの圧力を使用するかどうか
-                                                             //attributes.FitToCurve = false;
-                        Canvas_Strokes.InkPresenter.UpdateDefaultDrawingAttributes(attributes);  // set UI attributes
-
-                        // Make a stroke by array of point
-                        InkStroke s = m_inkStrokeBuilder.CreateStrokeFromInkPoints(
-                            points, System.Numerics.Matrix3x2.Identity
-                            );
-                        Canvas_Strokes.InkPresenter.StrokeContainer.AddStroke(s);
-                    });
-
-                    //if (!pub.StartState)
-                    //{
-                    //    ////Draw line
-                    //    //var line1 = new Line();
-                    //    //SolidColorBrush brush = new SolidColorBrush(UIColors[index]);
-                    //    //line1.Stroke = brush;
-                    //    //line1.X1 = (pub.PrevRawData.x * pub.ViewScale) + ellipse.Width / 2;
-                    //    //line1.X2 = (x * pub.ViewScale) + ellipse.Width / 2;
-                    //    //line1.Y1 = (pub.PrevRawData.y * pub.ViewScale) + ellipse.Height / 2;
-                    //    //line1.Y2 = (y * pub.ViewScale) + ellipse.Height / 2;
-                    //    //line1.StrokeThickness = 1;
-                    //    //                        this.Canvas_Strokes.Children.Add(line1);
-                    //    await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                    //    {
-                    //        // Make a stroke by array of point
-                    //        InkStroke s = m_inkStrokeBuilder.CreateStrokeFromInkPoints(
-                    //            points, System.Numerics.Matrix3x2.Identity
-                    //            );
-                    //        Canvas_Strokes.InkPresenter.StrokeContainer.AddStroke(s);
-                    //    });
-                    //}
-
-                    pub.PrevRawData.f = f;
-                    pub.PrevRawData.x = x;
-                    pub.PrevRawData.y = y;
-                    pub.PrevRawData.z = p;
-                    pub.StartState = false;
-                }
+                //});
+ //               pub.StartState = false;
             }
             catch (Exception ex)
             {
