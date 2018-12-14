@@ -1,0 +1,97 @@
+******************************************
+目次
+１．データパケット仕様
+２．コマンドパケット仕様
+
+******************************************
+１．データパケット
+ストロークシーケンス
+----------------------
+ Begine
+  | f | x | y | z |
+----------------------
+ Middle
+   | f | x | y | z | - | f | x | y | z | - | f | x | y | z | - ...
+----------------------
+ End
+   | f | x | y | z |
+
+
+パケット内容
+----------------------
+f:  フラグバイト：8 byte
+  バイト列：| reserved | C | S |  I  |
+  　I: 2 byte, Publisher ID #: 0x00 - 0xFF, 0x00 = RequestConnectionコマンド用
+  　S: 1 byte, ストローク順序: 0x0 - Middle, 0x1 -  Begin, 0x2 - End
+  　C: 1 byte, コマンドバイト：0 - 15, コマンドパケット仕様参照
+  　reserved: 4 byte: 未使用
+
+----------------------
+x: X座標バイト: 8 byte
+
+----------------------
+y: Y座標バイト: 8 byte
+
+----------------------
+z: Z座標バイト：８ byte
+
+
+******************************************
+２．コマンドパケット
+
+コマンド名：RequestConnection
+コマンドバイト：1
+データ：（なし）
+レスポンス：Publisher ID
+
+----------------------
+コマンド名：SetAttributes
+コマンドバイト：２
+データ：
+　Width 
+　Height
+　PointSize
+　Name
+　ESN
+　Battery
+   DeviceType
+   TransferMode
+レスポンス：ACK/NAK
+
+-----------------------
+コマンド名：StartPublisher
+コマンドバイト：３
+データ：(なし)
+レスポンス：ACK /NAK
+
+-----------------------
+コマンド名：StopPublisher
+コマンドバイト：４
+データ：（なし）
+レスポンス：ACK/NAK
+
+-----------------------
+コマンド名：DisposePublisher
+コマンドバイト：5
+データ：（なし）
+レスポンス：ACK/NAK
+
+===========================
+書式（Format)
+message = PublisherID,Command,data1,data2,....,dataN
+
+例
+Request Connection
+message = 0,1,token
+
+SetAttributes
+message = 0,2,2345,3423,1,PHU-111 Clipboard,SN4536875,20,PHU-111,Live
+
+StartPublisher
+message = PublisherID,3
+
+StopPublisher
+message = PublisherID,4
+
+DisposePublisher
+message = PublisherID,5
