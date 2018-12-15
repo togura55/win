@@ -15,13 +15,12 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
+using System.Threading.Tasks;
 using Windows.Storage.Streams;
 using Windows.Devices.Bluetooth;
+using Windows.Devices.Enumeration;
+using Windows.ApplicationModel.Resources;
 
-
-// 空白ページの項目テンプレートについては、https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x411 を参照してください
-
-// https://docs.microsoft.com/ja-jp/windows/uwp/devices-sensors/send-or-receive-files-with-rfcomm
 
 namespace BtClient
 {
@@ -33,6 +32,9 @@ namespace BtClient
         public MainPage()
         {
             this.InitializeComponent();
+
+            ResourceLoader resource = ResourceLoader.GetForCurrentView();
+            Pbtn_Start.Content = resource.GetString("IDC_Start");
         }
 
         Windows.Devices.Bluetooth.Rfcomm.RfcommDeviceService _service;
@@ -44,21 +46,21 @@ namespace BtClient
             {
                 // Enumerate devices with the object push service
                 var services =
-                    await Windows.Devices.Enumeration.DeviceInformation.FindAllAsync(
+                    await DeviceInformation.FindAllAsync(
                         RfcommDeviceService.GetDeviceSelector(
                             RfcommServiceId.ObexObjectPush));
 
                 if (services.Count > 0)
                 {
-                    // Initialize the target Bluetooth BR device
+                    // ターゲットBluetooth BR deviceの初期化
                     var service = await RfcommDeviceService.FromIdAsync(services[0].Id);
 
-                    // Check that the service meets this App's minimum requirement
+                    // サービスがアプリの最小要件を満たしているかチェック
                     if (SupportsProtection(service) && await IsCompatibleVersionAsync(service))
                     {
                         _service = service;
 
-                        // Create a socket and connect to the target
+                        // ソケットのチェックとターゲットへの接続
                         _socket = new StreamSocket();
                         await _socket.ConnectAsync(
                             _service.ConnectionHostName,
@@ -76,7 +78,7 @@ namespace BtClient
                 }
                 else
                 {
-                    ListBox_Messages.Items.Add(string.Format("RfcommDeviceService Count={0}",services.Count));
+                    ListBox_Messages.Items.Add(string.Format("RfcommDeviceService Count={0}", services.Count));
                 }
             }
             catch (Exception ex)
@@ -116,31 +118,33 @@ namespace BtClient
             return false;
         }
 
-        // This App relies on CRC32 checking available in version 2.0 of the service.
+        // このアプリはサービスのバージョン2.0で利用可能なCRC32チェックに依存
         const uint SERVICE_VERSION_ATTRIBUTE_ID = 0x0300;
         const byte SERVICE_VERSION_ATTRIBUTE_TYPE = 0x0A;   // UINT32
         const uint MINIMUM_SERVICE_VERSION = 200;
-        async System.Threading.Tasks.Task<bool> IsCompatibleVersionAsync(RfcommDeviceService service)
+        async Task<bool> IsCompatibleVersionAsync(RfcommDeviceService service)
         {
             try
             {
                 var attributes = await service.GetSdpRawAttributesAsync(
-    BluetoothCacheMode.Uncached);
+                    BluetoothCacheMode.Uncached);
                 var attribute = attributes[SERVICE_VERSION_ATTRIBUTE_ID];
                 var reader = DataReader.FromBuffer(attribute);
 
-                // The first byte contains the attribute's type
+                // 第１バイトは属性のタイプを含む
                 byte attributeType = reader.ReadByte();
                 if (attributeType == SERVICE_VERSION_ATTRIBUTE_TYPE)
                 {
-                    // The remainder is the data
+                    // 残りはデータ
                     uint version = reader.ReadUInt32();
                     return version >= MINIMUM_SERVICE_VERSION;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return true;
+                ListBox_Messages.Items.Add(string.Format("IsCompatibleVersionAsync: Exception: {0}",ex.Message));
+                //                return true;
+                return false;
             }
 
             return false;
