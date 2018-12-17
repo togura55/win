@@ -10,7 +10,9 @@
 
     <Grid>
         <Button x:Name="Pbtn_Start" Content="Button" HorizontalAlignment="Left" Margin="170,221,0,0" VerticalAlignment="Top" Height="52" Width="180" Click="Pbtn_Start_Click"/>
-        <ListBox x:Name="ListBox_Messages" HorizontalAlignment="Left" Height="275" Margin="162,287,0,0" VerticalAlignment="Top" Width="510" RenderTransformOrigin="0.508,-0.321"/>
+        <ListBox x:Name="ListBox_Messages" HorizontalAlignment="Left" Height="275" Margin="162,287,0,0" VerticalAlignment="Top" Width="510" RenderTransformOrigin="0.508,-0.321" 
+                 ScrollViewer.HorizontalScrollMode="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                 ScrollViewer.VerticalScrollMode="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"/>
         <Button x:Name="Pbtn_SetConfig" Content="Button" HorizontalAlignment="Left" Margin="401,103,0,0" VerticalAlignment="Top" Width="143"/>
         <Button x:Name="Pbtn_GetConfig" Content="Button" HorizontalAlignment="Left" Margin="401,241,0,0" VerticalAlignment="Top" Width="143"/>
         <TextBox x:Name="TextBox_IP" HorizontalAlignment="Left" Margin="573,103,0,0" Text="TextBox" VerticalAlignment="Top" Width="170"/>
