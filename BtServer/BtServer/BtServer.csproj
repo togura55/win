@@ -105,6 +105,8 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="BtServer_TemporaryKey.pfx" />
+    <PRIResource Include="Strings\ja-JP\Resources.resw" />
+    <PRIResource Include="Strings\en-US\Resources.resw" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Properties\Default.rd.xml" />

@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Navigation;
 
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Rfcomm;
+using Windows.ApplicationModel.Resources;
 
 // 空白ページの項目テンプレートについては、https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x411 を参照してください
 
@@ -32,6 +33,9 @@ namespace BtServer
         public MainPage()
         {
             this.InitializeComponent();
+
+            ResourceLoader resource = ResourceLoader.GetForCurrentView();
+            Pbtn_Start.Content = resource.GetString("IDC_Start");
         }
 
         RfcommServiceProvider _provider;
