@@ -1,1 +1,15 @@
 BTだと、最初のペアリング時に、双方でユーザーアクション（確認、OKなど）が必要になる。
+
+StreamSocket.ConnectAsyncでの接続と受信。BTサーバー側はStreamSocketListener受け
+
+
+*****************************
+BTサーバー側（WdPublisher側）設定
+　[Bluetoothデバイスの表示]でBluetoothをオンにする。「"XXXXX"として発見可能になりました」と表示される。
+
+BTクライアント側（WdControl側）設定
+　[Bluetoothデバイスの表示]でBluetoothをオンにし、[Bluetoothまたはその他のデバイスを追加する]の[+]をクリックする。
+　[デバイスを追加する]ウィンドウで、[Bluetooth]をクリックする。
+　リストされるデバイスの中から、BTサーバーのデバイス名"XXXXX"を探し、クリックする。
+   [Bluetoothとその他のデバイス]ウィンドウに戻って、"XXXXX"が「ペアリング済み」と表示されていることを確認する。
+
