@@ -32,7 +32,7 @@ namespace BtServer
     class Constants
     {
         // The Chat Server's custom service Uuid: 34B1CF4D-1069-4AD6-89B6-E161D79BE4D8
-        public static readonly Guid RfcommChatServiceUuid = Guid.Parse("34B1CF4D-1069-4AD6-89B6-E161D79BE4D8");
+        public static readonly Guid RfcommChatServiceUuid = Guid.Parse("34B1CF4D-1069-4AD6-89B6-E161D79BE4D9");
 
         // The Id of the Service Name SDP attribute
         public const UInt16 SdpServiceNameAttributeId = 0x100;
@@ -44,7 +44,7 @@ namespace BtServer
         public const byte SdpServiceNameAttributeType = (4 << 3) | 5;
 
         // The value of the Service Name SDP attribute
-        public const string SdpServiceName = "Bluetooth Rfcomm Chat Service";
+        public const string SdpServiceName = "TestTest";
     }
 
 
@@ -60,9 +60,9 @@ namespace BtServer
         // The watcher trigger used to configure the background task registration 
         private RfcommConnectionTrigger trigger;
         // A name is given to the task in order for it to be identifiable across context. 
-        private string taskName = "Scenario3_BackgroundTask";
+        private string taskName = "BtServer_BackgroundTask";
         // Entry point for the background task. 
-        private string taskEntryPoint = "BackgroundTasks.RfcommServerTask";
+        private string taskEntryPoint = "BtServer.RfcommServerTask";
 
 
         // Define the raw bytes that are converted into SDP record
@@ -77,7 +77,7 @@ namespace BtServer
                 0x42, 0x6c, 0x75, 0x65, 0x74, 0x6f, 0x6f, 0x74, 0x68, 0x20,     // Bluetooth <sp>
                 0x52, 0x66, 0x63, 0x6f, 0x6d, 0x6d, 0x20,                       // Rfcomm <sp>
                 0x43, 0x68, 0x61, 0x74, 0x20,                                   // Chat <sp>
-                0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,                       // Service <sp>
+                0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x64,                       // Service <sp>
             // Vol 3 Part B 5.1.15 ServiceDescription
             // 40 bytes
             0x09, 0x01, 0x01, // UINT16 (0x09) value = 0x0101 [ServiceDescription]
@@ -85,7 +85,7 @@ namespace BtServer
                 0x42, 0x6c, 0x75, 0x65, 0x74, 0x6f, 0x6f, 0x74, 0x68, 0x20,     // Bluetooth <sp>
                 0x52, 0x66, 0x63, 0x6f, 0x6d, 0x6d, 0x20,                       // Rfcomm <sp>
                 0x43, 0x68, 0x61, 0x74, 0x20,                                   // Chat <sp>
-                0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x20,                  // Service <sp>
+                0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x64, 0x20,                  // Service <sp>
                 0x69, 0x6e, 0x20, 0x43, 0x23                                    // in C#
 
         };
@@ -169,9 +169,9 @@ namespace BtServer
                         //                        rootPage.NotifyUser("Background tasks may be disabled for this app", NotifyType.ErrorMessage);
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    ListBox_Messages.Items.Add("Background task not registered");
+                    ListBox_Messages.Items.Add(string.Format("Exception: Background task not registered: {0}", ex.Message));
                     //                    rootPage.NotifyUser("Background task not registered",
                     //                            NotifyType.ErrorMessage);
                 }
