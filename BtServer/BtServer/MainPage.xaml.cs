@@ -138,7 +138,8 @@ namespace BtServer
 
             if (taskRegistration != null)
             {
-//                rootPage.NotifyUser("Background watcher already registered.", NotifyType.StatusMessage);
+                ListBox_Messages.Items.Add("Background watcher already registered.");
+                //                rootPage.NotifyUser("Background watcher already registered.", NotifyType.StatusMessage);
                 return;
             }
             else
@@ -159,17 +160,20 @@ namespace BtServer
                     // Even though the trigger is registered successfully, it might be blocked. Notify the user if that is the case.
                     if ((backgroundAccessStatus == BackgroundAccessStatus.AlwaysAllowed) || (backgroundAccessStatus == BackgroundAccessStatus.AllowedSubjectToSystemPolicy))
                     {
-//                        rootPage.NotifyUser("Background watcher registered.", NotifyType.StatusMessage);
+                        ListBox_Messages.Items.Add("Background watcher registered.");
+                        //                        rootPage.NotifyUser("Background watcher registered.", NotifyType.StatusMessage);
                     }
                     else
                     {
-//                        rootPage.NotifyUser("Background tasks may be disabled for this app", NotifyType.ErrorMessage);
+                        ListBox_Messages.Items.Add("Background tasks may be disabled for this app");
+                        //                        rootPage.NotifyUser("Background tasks may be disabled for this app", NotifyType.ErrorMessage);
                     }
                 }
                 catch (Exception)
                 {
-//                    rootPage.NotifyUser("Background task not registered",
-//                            NotifyType.ErrorMessage);
+                    ListBox_Messages.Items.Add("Background task not registered");
+                    //                    rootPage.NotifyUser("Background task not registered",
+                    //                            NotifyType.ErrorMessage);
                 }
             }
         }
@@ -231,14 +235,16 @@ namespace BtServer
             {
                 await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-//                    rootPage.NotifyUser("Task cancelled unexpectedly - reason: " + settings.Values["TaskCancelationReason"].ToString(), NotifyType.ErrorMessage);
+                    ListBox_Messages.Items.Add("Task cancelled unexpectedly - reason: ");
+                    //                    rootPage.NotifyUser("Task cancelled unexpectedly - reason: " + settings.Values["TaskCancelationReason"].ToString(), NotifyType.ErrorMessage);
                 });
             }
             else
             {
                 await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                 {
-//                    rootPage.NotifyUser("Background task completed", NotifyType.StatusMessage);
+                    ListBox_Messages.Items.Add("Background task completed");
+                    //                    rootPage.NotifyUser("Background task completed", NotifyType.StatusMessage);
                 });
             }
             try
@@ -247,7 +253,8 @@ namespace BtServer
             }
             catch (Exception ex)
             {
-//                rootPage.NotifyUser(ex.Message, NotifyType.ErrorMessage);
+                ListBox_Messages.Items.Add(ex.Message);
+                //                rootPage.NotifyUser(ex.Message, NotifyType.ErrorMessage);
             }
             Disconnect();
         }
