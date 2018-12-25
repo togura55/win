@@ -47,7 +47,6 @@ namespace BtServer
         public const string SdpServiceName = "TestTest";
     }
 
-
     public sealed partial class MainPage : Page
     {
         public MainPage()
