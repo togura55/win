@@ -65,6 +65,7 @@ namespace BtClient
             Pbtn_Start.Content = resource.GetString("IDC_Start");
             Pbtn_Connect.Content = resource.GetString("IDC_Connect");
             Pbtn_RequestAccess.Content = resource.GetString("IDC_RequestAccess");
+            Pbtn_SetConfig.Content = resource.GetString("IDC_Config");
         }
 
         //       public sealed partial class Scenario1_ChatClient : Page
@@ -306,7 +307,7 @@ namespace BtClient
             {
                 ListBox_Messages.Items.Add(
                    "Could not discover the chat service on the remote device");
-                ResetMainUI();
+ //               ResetMainUI();
                 return;
             }
 
@@ -610,6 +611,9 @@ namespace BtClient
                 }
             }
         }
+
+
+
         //Windows.Devices.Bluetooth.Rfcomm.RfcommDeviceService _service;
         //Windows.Networking.Sockets.StreamSocket _socket;
 
