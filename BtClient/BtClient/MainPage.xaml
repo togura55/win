@@ -37,7 +37,7 @@
                  ScrollViewer.HorizontalScrollMode="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto"
                  ScrollViewer.VerticalScrollMode="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"/>
         <Button x:Name="Pbtn_SetConfig" Content="Button" HorizontalAlignment="Left" Margin="401,103,0,0" VerticalAlignment="Top" Width="143"/>
-        <Button x:Name="Pbtn_Connect" Content="Button" HorizontalAlignment="Left" Margin="401,241,0,0" VerticalAlignment="Top" Width="143"/>
+        <Button x:Name="Pbtn_Connect" Content="Button" HorizontalAlignment="Left" Margin="401,241,0,0" VerticalAlignment="Top" Width="143" Click="Pbtn_Connect_Click"/>
         <TextBox x:Name="TextBox_IP" HorizontalAlignment="Left" Margin="573,103,0,0" Text="TextBox" VerticalAlignment="Top" Width="170"/>
         <TextBox x:Name="TextBox_Port" HorizontalAlignment="Left" Margin="573,150,0,0" Text="TextBox" VerticalAlignment="Top" Width="170"/>
         <Button x:Name="Pbtn_RequestAccess" Content="Button" HorizontalAlignment="Left" Margin="573,241,0,0" VerticalAlignment="Top" Width="143"/>
