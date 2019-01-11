@@ -1,0 +1,12 @@
+BT RfcommでPC-PC間テキスト通信ができた。
+
+１．Bluetoothを持つ2台のPCにWindows 10 ver.1809をセットアップ。ver 1803の場合はサンプルアプリのプロジェクト設定でターゲットを変更する必要がある。
+２．2台のPC間でBluetoothデバイスのペアリングをしておく。「Bluetoothデバイスの表示」で「ペアリング済み」と表示される
+３．サンプルアプリBluetoothRfcommChatアプリを双方のPCで起動
+４．１台目のPC上のBluetoothRfcommChatアプリで、[2) Foreground Char Server]をクリック。
+５．１台目のPCで、[Start Listening]ボタンをクリック。
+６．２台目のPC上のBluetoothRfcommChatアプリで、[1) Chat Client]をクリック。
+７．２台目のPCで、[Start]ボタンをクリック
+８．２台目のPCで、リストされたデバイス名から1台目のPC名を探して選択。[Connect to Selected Device]をクリック。
+９．メッセージの送受信を行う。
+
