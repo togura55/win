@@ -10,6 +10,7 @@
 //*********************************************************
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel.Background;
 using Windows.Devices.Bluetooth.Rfcomm;
@@ -270,6 +271,10 @@ namespace SDKTemplate
                         rootPage.NotifyUser("Client Connected: " + remoteDeviceName, NotifyType.StatusMessage);
                         ConversationListBox.Items.Add("Received: " + backgroundMessage);
                     });
+
+
+                    // send backgroundMessage to dispatcher
+                    ConfigCommandsDispatcher(backgroundMessage);
                 }
             }
         }
@@ -278,6 +283,218 @@ namespace SDKTemplate
         {
             task.Progress += new BackgroundTaskProgressEventHandler(OnProgress);
             task.Completed += new BackgroundTaskCompletedEventHandler(OnCompleted);
+        }
+
+        // --------------------------------------------------
+        private async void MessageEvent(string message)
+        {
+            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            {
+                rootPage.NotifyUser(message, NotifyType.StatusMessage);
+            });
+        }
+
+        private void SendResponce(string response)
+        {
+//            var message = MessageTextBox.Text;
+            var previousMessage = (string)ApplicationData.Current.LocalSettings.Values["SendMessage"];
+
+            // Make sure previous message has been sent
+            if (previousMessage == null || previousMessage == "")
+            {
+                // Save the current message to local settings so the background task can pick it up. 
+                ApplicationData.Current.LocalSettings.Values["SendMessage"] = response;
+
+                // Clear the messageTextBox for a new message
+//                MessageTextBox.Text = "";
+//                ConversationListBox.Items.Add("Sent: " + message);
+            }
+            else
+            {
+                // Do nothing until previous message has been sent.  
+            }
+        }
+
+        private const string CMD_START = "start";
+        private const string CMD_STOP = "stop";
+        private const string CMD_GETCONFIG = "getconfig";
+        private const string CMD_SETCONFIG = "setconfig";  // setconfig,aaa,bbb,ccc
+        private const string CMD_GETVERSION = "getversion";
+        private const string RES_ACK = "ack";
+        private const string RES_NAK = "nak";
+//        static List<string> CommandList = new List<string> { "1", "2", "3", "4", "5" };  // Command word sent by Publisher
+
+        private void ConfigCommandsDispatcher(string message)
+        {
+            try
+            {
+                string res = string.Empty;
+
+                char sp = ','; // separater
+                string[] arr = message.Split(sp);
+                var list = new List<string>();
+                list.AddRange(arr);
+
+                // decode
+                if (list.Count < 1)
+                {
+                    // error, resend?
+                    return;
+                }
+//                string publisher_id = list[0];
+                string command = list[1];
+
+                int index = -1;
+
+                //int command_index = CommandList.IndexOf(command) + 1;
+                //if (command_index > 0)
+                //{
+//                    switch (command_index)
+                    switch (command)
+                    {
+                        case CMD_START:
+
+                            SendResponce(RES_ACK);
+                            break;
+
+                        case CMD_STOP:
+
+                            SendResponce(RES_ACK);
+                            break;
+                        case CMD_GETCONFIG:
+                            break;
+
+                        case CMD_SETCONFIG:
+                            break;
+
+                        case CMD_GETVERSION:
+                            break;
+
+                        default:
+                            break;
+
+                        //case CMD_REQUEST_PUBLISHER_CONNECTION:
+                        //    this.MessageEvent("Request Publisher Connect command is received.");
+
+                        //    //// Do the publisher 1st contact process
+                        //    //// 1. Create a new instance
+                        //    //                          Publisher publisher = new Publisher();
+                        //    App.Pubs.Add(new Publisher());
+
+                        //    // ToDo: rewrite GeneratePublisherId for identical ID strings
+                        //    //// 2. Generate Publisher Id, smallest number of pubs
+                        //    float id = 1; // set the base id number
+                        //    float id_new = id;
+                        //    for (int j = 0; j < App.Pubs.Count; j++)
+                        //    {
+                        //        if (App.Pubs[j].Id != id.ToString())
+                        //        {
+                        //            // ToDo: find if id is already stored into another pubs[].Id
+                        //            id_new = id;
+                        //            break;
+                        //        }
+                        //        id++;
+                        //    }
+                        //    App.Pubs[App.Pubs.Count - 1].Id = id_new.ToString();
+                        //    //                           ConnectPublisherEvent(App.Pubs.Count - 1);  // Notify to caller 
+
+                        //    //// 3. Respond to the publisher
+                        //    //// response back.
+                        //    //                            App.Socket.SendCommandResponseAsync(args, id_new.ToString());
+                        //    res = id_new.ToString();
+                        //    mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
+                        //    MessageEvent(string.Format("Assigned and sent Publisher ID: {0}", res));
+
+                        //    break;
+
+                        //// Suppose getting this request only one time at the Publisher connection...
+                        //case CMD_SET_ATTRIBUTES:
+                        //    MessageEvent(string.Format("CMD_SET_ATTRIBUTES received from ID: {0}", publisher_id));
+                        //    if ((index = FindPublisherId(publisher_id)) < 0)
+                        //        res = RES_NAK;
+                        //    else
+                        //    {
+                        //        int i = 1;
+                        //        Publisher pub = App.Pubs[index];
+                        //        pub.DeviceSize.Width = double.Parse(list[++i]);
+                        //        pub.DeviceSize.Height = double.Parse(list[++i]);
+                        //        pub.PointSize = float.Parse(list[++i]);
+                        //        pub.DeviceName = list[++i];
+                        //        pub.SerialNumber = list[++i];
+                        //        pub.Battery = float.Parse(list[++i]);
+                        //        pub.DeviceType = list[++i];
+                        //        pub.TransferMode = list[++i];
+
+                        //        // ToDo: What shoud we do when the Publisher request to change the attribute?
+                        //        ConnectPublisherEvent(App.Pubs.Count - 1);  // Notify to caller 
+                        //        MessageEvent(string.Format("Notify: Publisher is connected ID={0}", pub.Id));
+
+                        //        res = RES_ACK;
+                        //    }
+                        //    mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
+                        //    MessageEvent(string.Format("Response to Publisher ID {0}: {1}", publisher_id, res));
+
+                        //    break;
+
+                        //case CMD_START_PUBLISHER:
+                        //    MessageEvent(string.Format("CMD_START_PUBLISHER received from ID: {0}", publisher_id));
+                        //    if ((index = FindPublisherId(publisher_id)) < 0)
+                        //        res = RES_NAK;
+                        //    else
+                        //    {
+                        //        App.Pubs[index].Start();
+                        //        res = RES_ACK;
+                        //    }
+                        //    mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
+                        //    MessageEvent(string.Format("Response to Publisher ID {0}: {1}", publisher_id, res));
+                        //    break;
+
+                        //case CMD_STOP_PUBLISHER:
+                        //    MessageEvent(string.Format("CMD_STOP_PUBLISHER received from ID: {0}", publisher_id));
+                        //    if ((index = FindPublisherId(publisher_id)) < 0)
+                        //        res = RES_NAK;
+                        //    else
+                        //    {
+                        //        App.Pubs[index].Stop();
+                        //        res = RES_ACK;
+                        //    }
+                        //    mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
+                        //    MessageEvent(string.Format("Response to Publisher ID {0}: {1}", publisher_id, res));
+                        //    break;
+
+                        //case CMD_DISPOSE_PUBLISHER:
+                        //    MessageEvent(string.Format("CMD_DISPOSE_PUBLISHER received from ID: {0}", publisher_id));
+                        //    if ((index = FindPublisherId(publisher_id)) < 0)
+                        //        res = RES_NAK;
+                        //    else
+                        //    {
+                        //        // ToDo: do something
+                        //        res = RES_ACK;
+                        //    }
+                        //    mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
+                        //    MessageEvent(string.Format("Response to Publisher ID {0}: {1}", publisher_id, res));
+                        //    break;
+
+                        ////default:
+                        ////    commandString = string.Empty;
+
+                        //default:
+                        //    break;
+                    }
+                //}
+                //else
+                //{
+                //    // invalid command word
+                //    //                    App.Socket.SendCommandResponseAsync(args, RES_NAK);
+                //    res = RES_ACK;
+                //    mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
+                //    MessageEvent(string.Format("Response to Publisher: {0}", res));
+                //}
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("ConfigCommandsDispatcher: Exception: {0}", ex.Message));
+            }
         }
     }
 }
