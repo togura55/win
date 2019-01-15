@@ -18,6 +18,7 @@ using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Rfcomm;
 using Windows.ApplicationModel.Background;
 using Windows.Storage;
+using Windows.ApplicationModel.Resources;
 
 // 空白ページの項目テンプレートについては、https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x411 を参照してください
 
@@ -49,9 +50,14 @@ namespace BtServer
 
     public sealed partial class MainPage : Page
     {
+        ResourceLoader resource = null;
+
         public MainPage()
         {
             this.InitializeComponent();
+
+            resource = ResourceLoader.GetForCurrentView();
+            Pbtn_Start.Content = resource.GetString("IDC_Start");
         }
 
         // The background task registration for the background advertisement watcher 

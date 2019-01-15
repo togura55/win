@@ -317,6 +317,7 @@ namespace SDKTemplate
 
         private const string CMD_START = "start";
         private const string CMD_STOP = "stop";
+        private const string CMD_RESTART = "restart";
         private const string CMD_GETCONFIG = "getconfig";
         private const string CMD_SETCONFIG = "setconfig";  // setconfig,aaa,bbb,ccc
         private const string CMD_GETVERSION = "getversion";
@@ -342,9 +343,9 @@ namespace SDKTemplate
                     return;
                 }
 //                string publisher_id = list[0];
-                string command = list[1];
+                string command = list[0];
 
-                int index = -1;
+   //             int index = -1;
 
                 //int command_index = CommandList.IndexOf(command) + 1;
                 //if (command_index > 0)

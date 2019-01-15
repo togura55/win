@@ -46,6 +46,11 @@ namespace BackgroundTasks
             // Get the deferral to prevent the task from closing prematurely
             deferral = taskInstance.GetDeferral();
 
+            // ------
+            ApplicationData.Current.LocalSettings.Values["SendMessage"] = null;
+            ApplicationData.Current.LocalSettings.Values["ReceivedMessage"] = null;
+            // ------
+
             // Setup our onCanceled callback and progress
             this.taskInstance = taskInstance;
             this.taskInstance.Canceled += new BackgroundTaskCanceledEventHandler(OnCanceled);
