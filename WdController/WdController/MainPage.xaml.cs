@@ -35,6 +35,18 @@ namespace WdController
         ResourceLoader resource = null;
         string CommandState = CMD_NEUTRAL;
         bool DeviceStarted = false;
+        string Width = String.Empty;
+        string Height = String.Empty;
+        string PointSize = String.Empty;
+        string DeviceName = String.Empty;
+        string ESN = String.Empty;
+        string Battery = String.Empty;
+        string DeviceType = String.Empty;
+        string TransferMode = String.Empty;
+        string IpAddress = String.Empty;
+        string PortNumberBase = String.Empty;
+        string DeviceState = String.Empty;
+        string DeviceVersionNumber = String.Empty;
 
         public MainPage()
         {
@@ -600,7 +612,7 @@ namespace WdController
                 string command = CMD_SETCONFIG;
                 string separater = ",";
 
-                if(!String.IsNullOrEmpty(TextBox_Name.Text))
+                if (!String.IsNullOrEmpty(TextBox_Name.Text))
                 {
                     command += separater + TextBox_Name.ToString();
                 }
@@ -681,7 +693,7 @@ namespace WdController
 
                     //                    ConversationList.Items.Add("Sent: " + MessageTextBox.Text);
                     ListBox_Messages.Items.Add("Sent: " + command);
-//                    TextBox_Message.Text = "";
+                    //                    TextBox_Message.Text = "";
                     await chatWriter.StoreAsync();
 
                 }
@@ -698,20 +710,6 @@ namespace WdController
             try
             {
                 string res = string.Empty;
-
-                char sp = ','; // separater
-                string[] arr = message.Split(sp);
-                var list = new List<string>();
-                list.AddRange(arr);
-
-                // decode
-                if (list.Count < 1)
-                {
-                    // error, resend?
-                    return;
-                }
-                //                string publisher_id = list[0];
-                string command = list[0];
 
                 switch (CommandState)
                 {
@@ -740,6 +738,36 @@ namespace WdController
                         break;
 
                     case CMD_GETCONFIG:
+                        char sp = ','; // separater
+                        string[] arr = message.Split(sp);
+                        var list = new List<string>();
+                        list.AddRange(arr);
+
+                        // decode
+                        if (list.Count < 11)
+                        {
+                            // error, resend?
+                            throw new Exception("GetConfig returns the smaller number of parameters.");
+                        }
+                        else
+                        {
+                            int i = -1;
+
+                            Width = list[++i];
+                            Height = list[++i];
+                            PointSize = list[++i];
+                            Name = list[++i];
+                            ESN = list[++i];
+                            Battery = list[++i];
+                            DeviceType = list[++i];
+                            TransferMode = list[++i];
+                            IpAddress = list[++i];
+                            PortNumberBase = list[++i];
+                            DeviceState = list[++i];
+
+                            UpdateUI();
+                        }
+
                         break;
 
                     case CMD_SETCONFIG:
@@ -755,6 +783,8 @@ namespace WdController
                         break;
 
                     case CMD_GETVERSION:
+                        DeviceVersionNumber = message;
+                        UpdateUI();
                         break;
 
                     default:
@@ -765,6 +795,14 @@ namespace WdController
             {
                 ListBox_Messages.Items.Add(string.Format("CommandsDispatcher: Exception: {0}", ex.Message));
             }
+        }
+
+        private void UpdateUI()
+        {
+            TextBox_Name.Text = Name;
+            TextBox_IP.Text = IpAddress;
+            TextBox_Port.Text = PortNumberBase;
+            TextBlock_DeviceVersion.Text = DeviceVersionNumber;
         }
     }
 }

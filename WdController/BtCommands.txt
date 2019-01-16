@@ -8,6 +8,8 @@ GetStatus
 @Battery
    DeviceType
    TransferMode
+    IP address
+    Port Number Base
    State
 
 SetStatus
