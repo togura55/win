@@ -135,6 +135,9 @@
   <data name="IDC_GetConfig" xml:space="preserve">
     <value>Get Configure</value>
   </data>
+  <data name="IDC_GetVersion" xml:space="preserve">
+    <value>Get Version</value>
+  </data>
   <data name="IDC_RequestAccess" xml:space="preserve">
     <value>Request Access</value>
   </data>

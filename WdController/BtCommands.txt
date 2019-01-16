@@ -1,0 +1,31 @@
+
+GetStatus
+   Width 
+　Height
+　PointSize
+　Name
+　ESN
+　Battery
+   DeviceType
+   TransferMode
+   State
+
+SetStatus
+   (Width) 
+　(Height)
+　(PointSize)
+　Name
+　(ESN)
+　(Battery)
+   (DeviceType)
+   (TransferMode)
+    IP address
+    Port Number Base
+
+GetVersion
+
+Start
+
+Stop
+
+Restart

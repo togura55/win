@@ -33,19 +33,23 @@ namespace WdController
     public sealed partial class MainPage : Page
     {
         ResourceLoader resource = null;
+        string CommandState = CMD_NEUTRAL;
+        bool DeviceStarted = false;
 
         public MainPage()
         {
             this.InitializeComponent();
 
             resource = ResourceLoader.GetForCurrentView();
-            Pbtn_Start.Content = resource.GetString("IDC_Start");
+            Pbtn_Start.Content = DeviceStarted ? resource.GetString("IDC_Start") : resource.GetString("IDC_Stop");
             Pbtn_Connect.Content = resource.GetString("IDC_Connect");
             Pbtn_RequestAccess.Content = resource.GetString("IDC_RequestAccess");
             Pbtn_SetConfig.Content = resource.GetString("IDC_Config");
             Pbtn_GetConfig.Content = resource.GetString("IDC_GetConfig");
             Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStart");
-//            Pbtn_DeviceRestart.Content = resource.GetString("IDC_DeviceRestart");
+            Pbtn_GetVersion.Content = resource.GetString("IDC_GetVersion");
+
+            //            Pbtn_DeviceRestart.Content = resource.GetString("IDC_DeviceRestart");
         }
 
         public ObservableCollection<RfcommChatDeviceDisplay> ResultCollection
@@ -382,17 +386,17 @@ namespace WdController
         {
             try
             {
-                if (TextBox_Message.Text.Length != 0)
-                {
-                    chatWriter.WriteUInt32((uint)TextBox_Message.Text.Length);
-                    chatWriter.WriteString(TextBox_Message.Text);
+                //if (TextBox_Message.Text.Length != 0)
+                //{
+                //    chatWriter.WriteUInt32((uint)TextBox_Message.Text.Length);
+                //    chatWriter.WriteString(TextBox_Message.Text);
 
-                    //                    ConversationList.Items.Add("Sent: " + MessageTextBox.Text);
-                    ListBox_Messages.Items.Add("Sent: " + TextBox_Message.Text);
-                    TextBox_Message.Text = "";
-                    await chatWriter.StoreAsync();
+                //    //                    ConversationList.Items.Add("Sent: " + MessageTextBox.Text);
+                //    ListBox_Messages.Items.Add("Sent: " + TextBox_Message.Text);
+                //    TextBox_Message.Text = "";
+                //    await chatWriter.StoreAsync();
 
-                }
+                //}
             }
             catch (Exception ex) when ((uint)ex.HResult == 0x80072745)
             {
@@ -422,6 +426,9 @@ namespace WdController
 
                 //                ConversationList.Items.Add("Received: " + chatReader.ReadString(stringLength));
                 ListBox_Messages.Items.Add("Received: " + chatReader.ReadString(stringLength));
+
+                // handle responses sent by BLE server
+                ResponseDispatcher(chatReader.ReadString(stringLength));
 
                 ReceiveStringLoop(chatReader);
             }
@@ -588,17 +595,66 @@ namespace WdController
 
         private void Pbtn_SetConfig_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                string command = CMD_SETCONFIG;
+                string separater = ",";
 
+                if(!String.IsNullOrEmpty(TextBox_Name.Text))
+                {
+                    command += separater + TextBox_Name.ToString();
+                }
+                else
+                {
+                    throw new Exception(string.Format("SetConfig: Exception: DeviceName text box is empty."));
+                }
+
+                if (!String.IsNullOrEmpty(TextBox_IP.Text))
+                {
+                    command += separater + TextBox_IP.ToString();
+                }
+                else
+                {
+                    throw new Exception(string.Format("SetConfig: Exception: IP Address text box is empty."));
+                }
+
+                if (!String.IsNullOrEmpty(TextBox_Port.Text))
+                {
+                    command += separater + TextBox_Port.ToString();
+                }
+                else
+                {
+                    throw new Exception(string.Format("SetConfig: Exception: Port Number text box is empty."));
+                }
+
+                CommandState = CMD_SETCONFIG;
+                SendCommand(command);
+            }
+            catch (Exception ex)
+            {
+                ListBox_Messages.Items.Add(String.Format("Pbtn_SetConfig_Click: Exception: {0}", ex.Message));
+            }
         }
 
         private void Pbtn_GetConfig_Click(object sender, RoutedEventArgs e)
         {
-
+            CommandState = CMD_GETCONFIG;
+            SendCommand(CMD_GETCONFIG);
         }
 
         private void Pbtn_DeviceStart_Click(object sender, RoutedEventArgs e)
         {
+            CommandState = CMD_START;
             SendCommand(CMD_START);
+
+            DeviceStarted = !DeviceStarted;
+            Pbtn_DeviceStart.Content = DeviceStarted ? resource.GetString("IDC_Start") : resource.GetString("IDC_Stop");
+        }
+
+        private void Pbtn_GetVersion_Click(object sender, RoutedEventArgs e)
+        {
+            CommandState = CMD_GETVERSION;
+            SendCommand(CMD_GETVERSION);
         }
 
         private const string CMD_START = "start";
@@ -607,6 +663,7 @@ namespace WdController
         private const string CMD_GETCONFIG = "getconfig";
         private const string CMD_SETCONFIG = "setconfig";  // setconfig,aaa,bbb,ccc
         private const string CMD_GETVERSION = "getversion";
+        private const string CMD_NEUTRAL = "neutral";
         private const string RES_ACK = "ack";
         private const string RES_NAK = "nak";
 
@@ -633,6 +690,80 @@ namespace WdController
             {
                 // The remote device has disconnected the connection
                 ListBox_Messages.Items.Add("Remote side disconnect: " + ex.HResult.ToString() + " - " + ex.Message);
+            }
+        }
+
+        private void ResponseDispatcher(string message)
+        {
+            try
+            {
+                string res = string.Empty;
+
+                char sp = ','; // separater
+                string[] arr = message.Split(sp);
+                var list = new List<string>();
+                list.AddRange(arr);
+
+                // decode
+                if (list.Count < 1)
+                {
+                    // error, resend?
+                    return;
+                }
+                //                string publisher_id = list[0];
+                string command = list[0];
+
+                switch (CommandState)
+                {
+                    case CMD_START:
+
+                        if (message.Equals((string)RES_ACK))
+                        {
+                            // ok
+                        }
+                        else
+                        {
+                            // error
+                        }
+                        break;
+
+                    case CMD_STOP:
+
+                        if (message.Equals((string)RES_ACK))
+                        {
+                            // ok
+                        }
+                        else
+                        {
+                            // error
+                        }
+                        break;
+
+                    case CMD_GETCONFIG:
+                        break;
+
+                    case CMD_SETCONFIG:
+
+                        if (message.Equals((string)RES_ACK))
+                        {
+                            // ok
+                        }
+                        else
+                        {
+                            // error
+                        }
+                        break;
+
+                    case CMD_GETVERSION:
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                ListBox_Messages.Items.Add(string.Format("CommandsDispatcher: Exception: {0}", ex.Message));
             }
         }
     }

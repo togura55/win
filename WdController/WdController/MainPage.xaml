@@ -30,7 +30,7 @@
             </Grid>
         </DataTemplate>
     </Page.Resources>
-    
+
     <Grid>
         <Button x:Name="Pbtn_Start" Content="Button" HorizontalAlignment="Left" Margin="170,221,0,0" VerticalAlignment="Top" Height="52" Width="180" Click="Pbtn_Start_Click"/>
         <ListBox x:Name="ListBox_Messages" HorizontalAlignment="Left" Height="275" Margin="162,287,0,0" VerticalAlignment="Top" Width="510" RenderTransformOrigin="0.508,-0.321" 
@@ -38,6 +38,7 @@
                  ScrollViewer.VerticalScrollMode="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"/>
         <Button x:Name="Pbtn_SetConfig" Content="Button" HorizontalAlignment="Left" Margin="401,56,0,0" VerticalAlignment="Top" Width="143" Click="Pbtn_SetConfig_Click"/>
         <Button x:Name="Pbtn_Connect" Content="Button" HorizontalAlignment="Left" Margin="401,241,0,0" VerticalAlignment="Top" Width="143" Click="Pbtn_Connect_Click"/>
+        <TextBox x:Name="TextBox_Name" HorizontalAlignment="Left" Margin="573,56,0,0" Text="TextBox" VerticalAlignment="Top" Height="26" Width="170"/>
         <TextBox x:Name="TextBox_IP" HorizontalAlignment="Left" Margin="573,103,0,0" Text="TextBox" VerticalAlignment="Top" Width="170"/>
         <TextBox x:Name="TextBox_Port" HorizontalAlignment="Left" Margin="573,150,0,0" Text="TextBox" VerticalAlignment="Top" Width="170"/>
         <Button x:Name="Pbtn_RequestAccess" Content="Button" HorizontalAlignment="Left" Margin="573,241,0,0" VerticalAlignment="Top" Width="143"/>
@@ -46,10 +47,10 @@
                   ItemsSource="{Binding Path=ResultCollection}"
                  SelectionChanged="ResultsListView_SelectionChanged"/>
         <TextBlock x:Name="TextBlock_ServiceName" HorizontalAlignment="Left" Margin="803,103,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top" Height="16" Width="122"/>
-        <TextBlock x:Name="TextBlock_DeviceName" HorizontalAlignment="Left" Margin="803,150,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
-        <TextBox x:Name="TextBox_Message" HorizontalAlignment="Left" Margin="573,56,0,0" Text="TextBox" VerticalAlignment="Top" Height="26" Width="170"/>
+        <TextBlock x:Name="TextBlock_DeviceName" HorizontalAlignment="Left" Margin="816,146,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <Button x:Name="Pbtn_GetConfig" Content="Button" HorizontalAlignment="Left" Margin="401,106,0,0" VerticalAlignment="Top" Width="142" Click="Pbtn_GetConfig_Click"/>
         <Button x:Name="Pbtn_DeviceStart" Content="Button" HorizontalAlignment="Left" Margin="400,154,0,0" VerticalAlignment="Top" Width="144" Click="Pbtn_DeviceStart_Click"/>
+        <Button x:Name="Pbtn_GetVersion" Content="Button" HorizontalAlignment="Left" Margin="401,198,0,0" VerticalAlignment="Top" Width="144" Click="Pbtn_GetVersion_Click"/>
 
     </Grid>
 </Page>
