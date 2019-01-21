@@ -175,5 +175,11 @@ namespace WillDevicesSampleApp
             set;
         }
 
+        public RemoteControllers RemoteController
+        {
+            get;
+            set;
+        }
+
     }
 }

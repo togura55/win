@@ -34,6 +34,9 @@ namespace WillDevicesSampleApp
             AppObjects.Instance.SocketService = new SocketServices();
             AppObjects.Instance.SocketService.SocketMessage += ReceivedMessage; // 
 
+            AppObjects.Instance.RemoteController = new RemoteControllers();
+            AppObjects.Instance.RemoteController.RCMessage += ReceivedMessage; // 
+
             RestoreSettings();
 
             resourceLoader = ResourceLoader.GetForCurrentView();
