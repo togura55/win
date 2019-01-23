@@ -48,6 +48,9 @@ namespace WillDevicesSampleApp
             this.TextBox_PortNumber.Text = PortNumberString;
 
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
+
+            // Start Remote Controller services
+            AppObjects.Instance.RemoteController.StartListen();
         }
 
         private void GetUiState()

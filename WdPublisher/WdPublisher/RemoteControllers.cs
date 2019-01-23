@@ -22,7 +22,7 @@ namespace WillDevicesSampleApp
         private RfcommConnectionTrigger trigger;
         // A name is given to the task in order for it to be identifiable across context. 
         //         private string taskName = "Scenario3_BackgroundTask";
-        private string taskName = "BtServer_BackgroundTask";
+        private string taskName = "WdPublisher_BackgroundTask";
         // Entry point for the background task. 
         private string taskEntryPoint = "BackgroundTasks.RfcommServerTask";
 
@@ -140,9 +140,9 @@ namespace WillDevicesSampleApp
                         MessageEvent("Background tasks may be disabled for this app");
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    MessageEvent("Background task not registered");
+                    MessageEvent(string.Format("Background task not registered.:{0}", ex.Message));
                 }
             }
         }
