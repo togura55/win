@@ -81,7 +81,7 @@ namespace WillDevicesSampleApp
         private void Pbtn_Exec_Click(object sender, RoutedEventArgs e)
         {
             GetUiState();
-
+            
             try
             {
                 if (fStart)

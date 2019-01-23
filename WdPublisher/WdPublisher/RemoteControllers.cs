@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
 using Windows.ApplicationModel.Core;
 using Windows.Devices.Bluetooth.Rfcomm;
+using Windows.Storage;
 using Windows.UI.Core;
 
 namespace WillDevicesSampleApp
@@ -92,7 +93,7 @@ namespace WillDevicesSampleApp
         //}
 
         public async void StartListen()
-//        private async void ListenButton_Click(object sender, RoutedEventArgs e)
+        //        private async void ListenButton_Click(object sender, RoutedEventArgs e)
         {
             //ListenButton.IsEnabled = false;
             //DisconnectButton.IsEnabled = true;
@@ -163,9 +164,9 @@ namespace WillDevicesSampleApp
         /// Sends the current message in MessageTextBox.  Also makes sure the text is not empty and updates the conversation list.  
         /// </summary>
         private void SendMessage(string message)
-//         private void SendMessage()
+        //         private void SendMessage()
         {
-//            var message = MessageTextBox.Text;
+            //            var message = MessageTextBox.Text;
             var previousMessage = (string)ApplicationData.Current.LocalSettings.Values["SendMessage"];
 
             // Make sure previous message has been sent
@@ -177,7 +178,7 @@ namespace WillDevicesSampleApp
                 // Clear the messageTextBox for a new message
                 //                MessageTextBox.Text = "";
                 MessageEvent("Sent: " + message);
-//                ConversationListBox.Items.Add("Sent: " + message);
+                //                ConversationListBox.Items.Add("Sent: " + message);
             }
             else
             {
@@ -223,24 +224,26 @@ namespace WillDevicesSampleApp
         /// </summary>
         private async void Disconnect()
         {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                ListenButton.IsEnabled = true;
-                DisconnectButton.IsEnabled = false;
-                ConversationListBox.Items.Clear();
+                //ListenButton.IsEnabled = true;
+                //DisconnectButton.IsEnabled = false;
+                //ConversationListBox.Items.Clear();
 
-                    // Unregistering the background task will remove the Rfcomm Chat Service from the SDP record and stop listening for incoming connections
-                    // First get the existing tasks to see if we already registered for it
-                    if (taskRegistration != null)
+                // Unregistering the background task will remove the Rfcomm Chat Service from the SDP record and stop listening for incoming connections
+                // First get the existing tasks to see if we already registered for it
+                if (taskRegistration != null)
                 {
                     taskRegistration.Unregister(true);
                     taskRegistration = null;
-                    rootPage.NotifyUser("Background watcher unregistered.", NotifyType.StatusMessage);
+                    //                   rootPage.NotifyUser("Background watcher unregistered.", NotifyType.StatusMessage);
+                    MessageEvent("Disconnect: Background watcher unregistered.");
                 }
                 else
                 {
-                        // At this point we assume we haven't found any existing tasks matching the one we want to unregister
-                        rootPage.NotifyUser("No registered background watcher found.", NotifyType.StatusMessage);
+                    // At this point we assume we haven't found any existing tasks matching the one we want to unregister
+                    //                       rootPage.NotifyUser("No registered background watcher found.", NotifyType.StatusMessage);
+                    MessageEvent("Disconnect: No registered background watcher found.");
                 }
             });
 
