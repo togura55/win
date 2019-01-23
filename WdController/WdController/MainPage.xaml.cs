@@ -53,7 +53,7 @@ namespace WdController
             this.InitializeComponent();
 
             resource = ResourceLoader.GetForCurrentView();
-            Pbtn_Start.Content = DeviceStarted ? resource.GetString("IDC_Start") : resource.GetString("IDC_Stop");
+            Pbtn_Start.Content = DeviceStarted ? resource.GetString("IDC_Stop") : resource.GetString("IDC_Start");
             Pbtn_Connect.Content = resource.GetString("IDC_Connect");
             Pbtn_RequestAccess.Content = resource.GetString("IDC_RequestAccess");
             Pbtn_SetConfig.Content = resource.GetString("IDC_Config");
@@ -660,7 +660,7 @@ namespace WdController
             SendCommand(CMD_START);
 
             DeviceStarted = !DeviceStarted;
-            Pbtn_DeviceStart.Content = DeviceStarted ? resource.GetString("IDC_Start") : resource.GetString("IDC_Stop");
+            Pbtn_DeviceStart.Content = DeviceStarted ? resource.GetString("IDC_Stop") : resource.GetString("IDC_Start");
         }
 
         private void Pbtn_GetVersion_Click(object sender, RoutedEventArgs e)
