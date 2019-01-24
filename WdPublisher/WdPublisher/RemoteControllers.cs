@@ -22,7 +22,7 @@ namespace WillDevicesSampleApp
         private RfcommConnectionTrigger trigger;
         // A name is given to the task in order for it to be identifiable across context. 
         //         private string taskName = "Scenario3_BackgroundTask";
-        private string taskName = "WdPublisher_BackgroundTask";
+        private string taskName = "WdPublisher_BackgroundTask";  // Equivalent with the assembly name of Tasks
         // Entry point for the background task. 
         private string taskEntryPoint = "BackgroundTasks.RfcommServerTask";
 

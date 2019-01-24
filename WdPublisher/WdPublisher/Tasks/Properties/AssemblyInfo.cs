@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("HogeHogeTasks")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("WdPublisherBackgroundTask")]
+[assembly: AssemblyDescription("BLE Communication Background Tasks")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Wacom Co., Ltd.")]
 [assembly: AssemblyProduct("Tasks")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyCopyright("Copyright © Wacom BSU, 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
