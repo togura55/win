@@ -57,6 +57,7 @@ namespace WillDevicesSampleApp
 
         // Properties
         public event MessageEventHandler RCMessage;
+        public event MessageEventHandler UpdateUi, PublisherControl;
 
         private async void MessageEvent(string message)
         {
@@ -64,6 +65,34 @@ namespace WillDevicesSampleApp
             {
                 this.RCMessage?.Invoke(this, message);
             });
+        }
+        private async void MessageUpdateUi()
+        {
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        this.UpdateUi?.Invoke(this, null);
+                    });
+        }
+        private async Task<bool> MessagePublisherControl(string message)
+        {
+            bool responce = true;
+
+            Publishers pub = AppObjects.Instance.Publisher;
+
+            if ((message == CMD_START && pub.State == pub.PUBLISHER_STATE_STOP) ||
+                (message == CMD_STOP && pub.State == pub.PUBLISHER_STATE_START))
+            {
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    this.PublisherControl?.Invoke(this, message);
+                });
+            }
+            else
+            {
+                responce = false;
+            }
+
+            return responce;
         }
 
         // A pointer back to the main page.  This is needed if you want to call methods in MainPage such
@@ -81,7 +110,7 @@ namespace WillDevicesSampleApp
             trigger.InboundConnection.SdpRecord = sdpRecordBlob.AsBuffer();
         }
 
-//        protected override void OnNavigatedTo(NavigationEventArgs e)
+        //        protected override void OnNavigatedTo(NavigationEventArgs e)
         public void RegisterBackgroundTask()
         {
             foreach (var task in BackgroundTaskRegistration.AllTasks)
@@ -143,7 +172,7 @@ namespace WillDevicesSampleApp
                 }
                 catch (Exception ex)
                 {
-                    MessageEvent(string.Format("Background task not registered.:{0}", ex.Message));
+                    MessageEvent(string.Format("StartListen: Exception: Background task not registered.:{0}", ex.Message));
                 }
             }
         }
@@ -186,11 +215,6 @@ namespace WillDevicesSampleApp
                 // Do nothing until previous message has been sent.  
             }
         }
-
-        //private void DisconnectButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    Disconnect();
-        //}
 
         /// <summary>
         /// Called when background task defferal is completed.  This can happen for a number of reasons (both expected and unexpected).  
@@ -286,15 +310,6 @@ namespace WillDevicesSampleApp
             task.Completed += new BackgroundTaskCompletedEventHandler(OnCompleted);
         }
 
-        // --------------------------------------------------
-        //private async void MessageEvent(string message)
-        //{
-        //    await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-        //    {
-        //        rootPage.NotifyUser(message, NotifyType.StatusMessage);
-        //    });
-        //}
-
         private void SendResponce(string response)
         {
             //            var message = MessageTextBox.Text;
@@ -309,6 +324,7 @@ namespace WillDevicesSampleApp
                 // Clear the messageTextBox for a new message
                 //                MessageTextBox.Text = "";
                 //                ConversationListBox.Items.Add("Sent: " + message);
+                MessageEvent("Sent: " + response);
             }
             else
             {
@@ -326,7 +342,106 @@ namespace WillDevicesSampleApp
         private const string RES_NAK = "nak";
         //        static List<string> CommandList = new List<string> { "1", "2", "3", "4", "5" };  // Command word sent by Publisher
 
-        private void ConfigCommandsDispatcher(string message)
+        private string ExecuteGetConfig()
+        {
+            string responce = string.Empty;
+            string sep = ",";
+            try
+            {
+                WacomDevices.DeviceAttributes DevAttr = AppObjects.Instance.WacomDevice.Attribute;
+                Publishers Pub = AppObjects.Instance.Publisher;
+
+                responce +=
+                    DevAttr.Width + sep +
+                    DevAttr.Height + sep +
+                    DevAttr.PointSize + sep +
+                    DevAttr.Name + sep +
+                    DevAttr.ESN + sep +
+                    DevAttr.Battery + sep +
+                    DevAttr.DeviceType + sep +
+                    DevAttr.TransferMode + sep +
+                    Pub.HostNameString + sep +
+                    Pub.PortNumberString + sep +
+                    Pub.State;
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("ExecuteGetConfig: Exception: {0}", ex.Message));
+            }
+
+            return responce;
+        }
+
+        private async Task<string> ExecuteSetConfig(string message)
+        {
+            string responce = string.Empty;
+            try
+            {
+                //WacomDevices.DeviceAttributes DevAttr = AppObjects.Instance.WacomDevice.Attribute;
+                Publishers Pub = AppObjects.Instance.Publisher;
+
+                char sp = ','; // separater
+                string[] arr = message.Split(sp);
+                var list = new List<string>();
+                list.AddRange(arr);
+
+                // decode
+                if (list.Count != 4)
+                {
+                    // error, resend?
+                    throw new Exception("ExecuteSetConfig: Number of parameters are wrong.");
+                }
+                else
+                {
+                    int i = 0;
+                    //                    string command = list[i];
+
+                    if (list[++i] != string.Empty)
+                    {
+                        // Set Device Name
+                    }
+                    if (list[++i] != string.Empty)
+                    {
+                        // Set Broker's IP address
+                        Pub.HostNameString = list[i];
+                    }
+                    if (list[++i] != string.Empty)
+                    {
+                        // Set Broker's Port number
+                        Pub.PortNumberString = list[i];
+                    }
+
+                    MessageUpdateUi();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("ExecuteSetConfig: Exception: {0}", ex.Message));
+            }
+
+            return responce;
+        }
+
+        private string ExecuteGetVersion()
+        {
+            string responce = string.Empty;
+            try
+            {
+                var versionInfo = Windows.ApplicationModel.Package.Current.Id.Version;
+                responce = string.Format(
+                                   "{0}.{1}.{2}.{3}",
+                                   versionInfo.Major, versionInfo.Minor,
+                                   versionInfo.Build, versionInfo.Revision);
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("ExecuteGetVersion: Exception: {0}", ex.Message));
+            }
+
+            return responce;
+        }
+
+        private async void ConfigCommandsDispatcher(string message)
         {
             try
             {
@@ -348,21 +463,24 @@ namespace WillDevicesSampleApp
                 switch (command)
                 {
                     case CMD_START:
-
-                        SendResponce(RES_ACK);
-                        break;
-
                     case CMD_STOP:
-
-                        SendResponce(RES_ACK);
+                        // Check and Start Publisher
+                        SendResponce(
+                            await MessagePublisherControl(command) ? RES_ACK : RES_NAK);
                         break;
+
                     case CMD_GETCONFIG:
+                        SendResponce(ExecuteGetConfig());
                         break;
 
                     case CMD_SETCONFIG:
+                        SendResponce(await ExecuteSetConfig(message));
                         break;
 
                     case CMD_GETVERSION:
+                        string ver = ExecuteGetVersion();
+                        SendResponce(
+                            string.IsNullOrEmpty(ver) ? RES_NAK : ver);
                         break;
 
                     default:
@@ -374,5 +492,6 @@ namespace WillDevicesSampleApp
                 MessageEvent(string.Format("ConfigCommandsDispatcher: Exception: {0}", ex.Message));
             }
         }
+
     }
 }

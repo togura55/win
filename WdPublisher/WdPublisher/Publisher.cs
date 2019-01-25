@@ -13,7 +13,7 @@ using Windows.UI.Xaml;
 
 namespace WillDevicesSampleApp
 {
-    public class Publisher
+    public class Publishers
     {
         public Socket mSocket = null;
 
@@ -21,8 +21,13 @@ namespace WillDevicesSampleApp
 
         float CommandResponseState;
         float PublisherId;
-        string HostNameString = string.Empty;
-        string PortNumberString = string.Empty;
+        public string HostNameString = string.Empty;
+        public string PortNumberString = string.Empty;
+
+        public readonly bool PUBLISHER_STATE_STOP = false;
+        public readonly bool PUBLISHER_STATE_START = true;
+
+        public bool State;
 
         // Delegate handlers
         public delegate void MessageEventHandler(object sender, string message);
@@ -32,10 +37,13 @@ namespace WillDevicesSampleApp
         public event MessageEventHandler PublisherMessage;
         public event InitializationCompletedNotificationHandler InitializationCompletedNotification;
 
-        public Publisher()
+        public Publishers()
         {
             CommandResponseState = CMD_NEUTRAL;
             PublisherId = 0;
+            HostNameString = "192.168.0.7";
+            PortNumberString = "1337";
+            State = PUBLISHER_STATE_STOP;
         }
 
         private async void MessageEvent(string message)
@@ -112,12 +120,16 @@ namespace WillDevicesSampleApp
             }
         }
 
-        public void Start(string host, string port)
+//        public void Start(string host, string port)
+         public void Start()
         {
             try
             {
-                HostNameString = host;
-                PortNumberString = port;
+                MessageEvent("Start");
+                State = !State;
+
+                //HostNameString = host;
+                //PortNumberString = port;
 
                 // Set task completion delegation 
                 AppObjects.Instance.WacomDevice.ScanAndConnectCompletedNotification += ScanAndConnect_Completed;
@@ -137,6 +149,8 @@ namespace WillDevicesSampleApp
             try
             {
                 MessageEvent("Stop");
+                State = !State;
+
                 // let WacomDevices terminate data transmission
                 // ToDo: check if Realtime Ink is ongoing 
                 await AppObjects.Instance.WacomDevice.StopRealTimeInk();

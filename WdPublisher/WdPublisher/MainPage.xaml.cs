@@ -10,23 +10,26 @@ using Windows.Storage;
 using Windows.ApplicationModel.Resources;
 
 namespace WillDevicesSampleApp
-{    
+{
     public sealed partial class MainPage : Page
     {
         CancellationTokenSource m_cts = new CancellationTokenSource();
 
-        static Publisher publisher;
-        string HostNameString = "192.168.0.7";
-        string PortNumberString = "1337";
-        static bool fStart = true;
+        //        static Publishers publisher;
+        //string HostNameString = "192.168.0.7";
+        //string PortNumberString = "1337";
+        //        static bool fStart = true;
         ResourceLoader resourceLoader = null;
 
         public MainPage()
         {
             this.InitializeComponent();
 
-            publisher = new Publisher();  // single instance
-            publisher.PublisherMessage += ReceivedMessage; // set the message delegate
+            //            publisher = new Publisher();  // single instance
+            //            publisher.PublisherMessage += ReceivedMessage; // set the message delegate
+
+            AppObjects.Instance.Publisher = new Publishers();
+            AppObjects.Instance.Publisher.PublisherMessage += ReceivedMessage; // set the message delegate         publisher = AppObjects.Instance.Publisher;
 
             AppObjects.Instance.WacomDevice = new WacomDevices();     // stored for using this app 
             AppObjects.Instance.WacomDevice.WacomDevicesMessage += ReceivedMessage; // set the message delegate
@@ -36,16 +39,17 @@ namespace WillDevicesSampleApp
 
             AppObjects.Instance.RemoteController = new RemoteControllers();
             AppObjects.Instance.RemoteController.RCMessage += ReceivedMessage; // 
+            AppObjects.Instance.RemoteController.UpdateUi += ReceivedUpdateUi;
+            AppObjects.Instance.RemoteController.PublisherControl += ReceivedPublisherControl;
 
             RestoreSettings();
 
             resourceLoader = ResourceLoader.GetForCurrentView();
             this.TextBlock_IPAddr.Text = resourceLoader.GetString("IDC_HostName");
             this.TextBlock_PortNumber.Text = resourceLoader.GetString("IDC_PortNumber");
-            this.Pbtn_Exec.Content = resourceLoader.GetString(fStart? "IDC_Exec" : "IDC_Stop");
+            this.Pbtn_Exec.Content = resourceLoader.GetString(AppObjects.Instance.Publisher.State ? "IDC_Exec" : "IDC_Stop");
 
-            this.TextBox_HostName.Text = HostNameString;
-            this.TextBox_PortNumber.Text = PortNumberString;
+            SetUiState();
 
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
 
@@ -59,11 +63,34 @@ namespace WillDevicesSampleApp
 
         private void GetUiState()
         {
-            HostNameString = this.TextBox_HostName.Text;
-            PortNumberString = this.TextBox_PortNumber.Text;
+            AppObjects.Instance.Publisher.HostNameString = this.TextBox_HostName.Text;
+            AppObjects.Instance.Publisher.PortNumberString = this.TextBox_PortNumber.Text;
+        }
+
+        private void SetUiState()
+        {
+            Publishers pub = AppObjects.Instance.Publisher;
+
+            this.TextBox_HostName.Text = pub.HostNameString;
+            this.TextBox_PortNumber.Text = pub.PortNumberString;
+
+            Pbtn_Exec.Content = resourceLoader.GetString(
+                pub.State == pub.PUBLISHER_STATE_START ? "IDC_Stop" : "IDC_Exec");
         }
 
         #region Event Handlers of MainPage
+        private void ReceivedUpdateUi(object sender, string message)
+        {
+            SetUiState();
+        }
+
+        private void ReceivedPublisherControl(object sender, string message)
+        {
+            RunPublisher();  // Do toggle
+
+            SetUiState();
+        }
+
         /// <summary>
         /// Message event handler sent by instance object
         /// </summary>
@@ -82,27 +109,38 @@ namespace WillDevicesSampleApp
             AppObjects.Instance.WacomDevice.WacomDevicesMessage -= ReceivedMessage;
             AppObjects.Instance.SocketService.SocketMessage -= ReceivedMessage;
 
-            publisher.Stop();
+            AppObjects.Instance.Publisher.Stop();
+
+            AppObjects.Instance.Publisher.PublisherMessage -= ReceivedMessage;
+            AppObjects.Instance.RemoteController.PublisherControl -= ReceivedPublisherControl;
+            AppObjects.Instance.RemoteController.UpdateUi -= ReceivedUpdateUi;
+        }
+
+        private void RunPublisher()
+        {
+            Publishers pub = AppObjects.Instance.Publisher;
+
+            if (pub.State == pub.PUBLISHER_STATE_STOP)
+            {
+                pub.InitializationCompletedNotification += PublisherInitialization_Completed;
+                pub.Start();
+            }
+            else
+            {
+                pub.Stop();
+                pub.InitializationCompletedNotification -= PublisherInitialization_Completed;
+            }
         }
 
         private void Pbtn_Exec_Click(object sender, RoutedEventArgs e)
         {
             GetUiState();
-            
+
             try
             {
-                if (fStart)
-                {
-                    publisher.InitializationCompletedNotification += PublisherInitialization_Completed;
-                    publisher.Start(HostNameString, PortNumberString);
-                }
-                else
-                {
-                    publisher.Stop();
-                    publisher.InitializationCompletedNotification -= PublisherInitialization_Completed;
-                }
-                fStart = fStart ? false : true; // toggle if success
-                Pbtn_Exec.Content = resourceLoader.GetString(fStart ? "IDC_Exec" : "IDC_Stop");
+                RunPublisher();
+
+                SetUiState();
             }
             catch (Exception ex)
             {
@@ -133,17 +171,17 @@ namespace WillDevicesSampleApp
         private void StoreSettings()
         {
             ApplicationDataContainer container = ApplicationData.Current.LocalSettings;
-            container.Values["HostNameString"] = HostNameString;
-            container.Values["PortNumberString"] = PortNumberString;
+            container.Values["HostNameString"] = AppObjects.Instance.Publisher.HostNameString;
+            container.Values["PortNumberString"] = AppObjects.Instance.Publisher.PortNumberString;
         }
 
         private void RestoreSettings()
         {
             ApplicationDataContainer container = ApplicationData.Current.LocalSettings;
             if (container.Values.ContainsKey("HostNameString"))
-                HostNameString = container.Values["HostNameString"].ToString();
+                AppObjects.Instance.Publisher.HostNameString = container.Values["HostNameString"].ToString();
             if (container.Values.ContainsKey("PortNumberString"))
-                PortNumberString = container.Values["PortNumberString"].ToString();
+                AppObjects.Instance.Publisher.PortNumberString = container.Values["PortNumberString"].ToString();
         }
         #endregion
     }

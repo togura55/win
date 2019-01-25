@@ -157,6 +157,12 @@ namespace WillDevicesSampleApp
 
 		public const float micrometerToDip = 96.0f / 25400.0f;
 
+        public Publishers Publisher
+        {
+            get;
+            set;
+        }
+
         public SocketServices SocketService
         {
             get;

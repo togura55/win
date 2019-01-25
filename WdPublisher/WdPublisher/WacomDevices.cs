@@ -73,14 +73,14 @@ namespace WillDevicesSampleApp
         #region Device attribute definition and object sharing between Publisher and Broker
         public class DeviceAttributes
         {
-            public string Width;
-            public string Height;
-            public string PointSize;
-            public string Name;
-            public string ESN;
-            public string Battery;
-            public string DeviceType;
-            public string TransferMode;
+            public string Width = string.Empty;
+            public string Height = string.Empty;
+            public string PointSize = string.Empty;
+            public string Name = string.Empty;
+            public string ESN = string.Empty;
+            public string Battery = string.Empty;
+            public string DeviceType = string.Empty;
+            public string TransferMode = string.Empty;
 
             public DeviceAttributes()
             {
