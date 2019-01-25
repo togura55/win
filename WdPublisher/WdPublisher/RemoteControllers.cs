@@ -81,16 +81,17 @@ namespace WillDevicesSampleApp
             trigger.InboundConnection.SdpRecord = sdpRecordBlob.AsBuffer();
         }
 
-        //protected override void OnNavigatedTo(NavigationEventArgs e)
-        //{
-        //    foreach (var task in BackgroundTaskRegistration.AllTasks)
-        //    {
-        //        if (task.Value.Name == taskName)
-        //        {
-        //            AttachProgressAndCompletedHandlers(task.Value);
-        //        }
-        //    }
-        //}
+//        protected override void OnNavigatedTo(NavigationEventArgs e)
+        public void RegisterBackgroundTask()
+        {
+            foreach (var task in BackgroundTaskRegistration.AllTasks)
+            {
+                if (task.Value.Name == taskName)
+                {
+                    AttachProgressAndCompletedHandlers(task.Value);
+                }
+            }
+        }
 
         public async void StartListen()
         //        private async void ListenButton_Click(object sender, RoutedEventArgs e)

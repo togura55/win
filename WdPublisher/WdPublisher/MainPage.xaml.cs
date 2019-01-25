@@ -49,6 +49,10 @@ namespace WillDevicesSampleApp
 
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
 
+
+            // Background Task Registration
+            AppObjects.Instance.RemoteController.RegisterBackgroundTask();
+
             // Start Remote Controller services
             AppObjects.Instance.RemoteController.StartListen();
         }
