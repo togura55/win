@@ -48,20 +48,44 @@ namespace WdController
         string DeviceState = String.Empty;
         string DeviceVersionNumber = String.Empty;
 
+        string BleServiceName = string.Empty;
+        string BleDeviceName = string.Empty;
+
         public MainPage()
         {
             this.InitializeComponent();
+
+            DeviceState = "false";
 
             resource = ResourceLoader.GetForCurrentView();
             Pbtn_Start.Content = DeviceStarted ? resource.GetString("IDC_Stop") : resource.GetString("IDC_Start");
             Pbtn_Connect.Content = resource.GetString("IDC_Connect");
             Pbtn_RequestAccess.Content = resource.GetString("IDC_RequestAccess");
-            Pbtn_SetConfig.Content = resource.GetString("IDC_Config");
+            Pbtn_SetConfig.Content = resource.GetString("IDC_SetConfig");
             Pbtn_GetConfig.Content = resource.GetString("IDC_GetConfig");
             Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStart");
             Pbtn_GetVersion.Content = resource.GetString("IDC_GetVersion");
+            TextBlock_PublisherDeviceName.Text = resource.GetString("IDC_PublisherDeviceName");
+            TextBlock_IP.Text = resource.GetString("IDC_IP");
+            TextBlock_Port.Text = resource.GetString("IDC_Port");
 
+            UpdateUI();
             //            Pbtn_DeviceRestart.Content = resource.GetString("IDC_DeviceRestart");
+        }
+
+        private void UpdateUI()
+        {
+            TextBox_Name.Text = Name;
+            TextBox_IP.Text = IpAddress;
+            TextBox_Port.Text = PortNumberBase;
+            TextBlock_DeviceVersion.Text = DeviceVersionNumber;
+            TextBlock_ServiceName.Text = BleServiceName;
+            TextBlock_DeviceName.Text = BleDeviceName;
+
+            if (DeviceState == "false")
+                Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStart");
+            else
+                Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceSop");
         }
 
         public ObservableCollection<RfcommChatDeviceDisplay> ResultCollection
@@ -274,7 +298,7 @@ namespace WdController
             catch (Exception ex)
             {
                 ListBox_Messages.Items.Add(ex.Message);
-                ResetMainUI();
+ //               ResetMainUI();
                 return;
             }
             // If we were unable to get a valid Bluetooth device object,
@@ -308,7 +332,7 @@ namespace WdController
                 ListBox_Messages.Items.Add(
                     "The Chat service is not advertising the Service Name attribute (attribute id=0x100). " +
                     "Please verify that you are running the BluetoothRfcommChat server.");
-                ResetMainUI();
+//                ResetMainUI();
                 return;
             }
             var attributeReader = DataReader.FromBuffer(attributes[Constants.SdpServiceNameAttributeId]);
@@ -318,7 +342,7 @@ namespace WdController
                 ListBox_Messages.Items.Add(
                     "The Chat service is using an unexpected format for the Service Name attribute. " +
                     "Please verify that you are running the BluetoothRfcommChat server.");
-                ResetMainUI();
+//                ResetMainUI();
                 return;
             }
             var serviceNameLength = attributeReader.ReadByte();
@@ -336,7 +360,9 @@ namespace WdController
             {
                 await chatSocket.ConnectAsync(chatService.ConnectionHostName, chatService.ConnectionServiceName);
 
-                SetChatUI(attributeReader.ReadString(serviceNameLength), bluetoothDevice.Name);
+                BleDeviceName = bluetoothDevice.Name;
+                BleServiceName = attributeReader.ReadString(serviceNameLength);
+                SetChatUI(BleServiceName, BleDeviceName);
                 chatWriter = new DataWriter(chatSocket.OutputStream);
 
                 DataReader chatReader = new DataReader(chatSocket.InputStream);
@@ -345,12 +371,12 @@ namespace WdController
             catch (Exception ex) when ((uint)ex.HResult == 0x80070490) // ERROR_ELEMENT_NOT_FOUND
             {
                 ListBox_Messages.Items.Add("Please verify that you are running the BluetoothRfcommChat server.");
-                ResetMainUI();
+ //               ResetMainUI();
             }
             catch (Exception ex) when ((uint)ex.HResult == 0x80072740) // WSAEADDRINUSE
             {
                 ListBox_Messages.Items.Add("Please verify that there is no other RFCOMM connection to the same device.");
-                ResetMainUI();
+//                ResetMainUI();
             }
         }
 
@@ -436,11 +462,12 @@ namespace WdController
                     return;
                 }
 
+                string readString = chatReader.ReadString(stringLength);
                 //                ConversationList.Items.Add("Received: " + chatReader.ReadString(stringLength));
-                ListBox_Messages.Items.Add("Received: " + chatReader.ReadString(stringLength));
+                ListBox_Messages.Items.Add("Received: " + readString);
 
                 // handle responses sent by BLE server
-                ResponseDispatcher(chatReader.ReadString(stringLength));
+                ResponseDispatcher(readString);
 
                 ReceiveStringLoop(chatReader);
             }
@@ -458,7 +485,7 @@ namespace WdController
                     }
                     else
                     {
-                        Disconnect("Read stream failed with error: " + ex.Message);
+                        Disconnect("ReceiveStringLoop: Exception: Read stream failed with error: " + ex.Message);
                     }
                 }
             }
@@ -482,7 +509,6 @@ namespace WdController
                 chatWriter = null;
             }
 
-
             if (chatService != null)
             {
                 chatService.Dispose();
@@ -498,7 +524,7 @@ namespace WdController
             }
 
             ListBox_Messages.Items.Add(disconnectReason);
-            ResetMainUI();
+//            ResetMainUI();
         }
 
         private void SetChatUI(string serviceName, string deviceName)
@@ -614,7 +640,7 @@ namespace WdController
 
                 if (!String.IsNullOrEmpty(TextBox_Name.Text))
                 {
-                    command += separater + TextBox_Name.ToString();
+                    command += separater + TextBox_Name.Text;
                 }
                 else
                 {
@@ -623,7 +649,7 @@ namespace WdController
 
                 if (!String.IsNullOrEmpty(TextBox_IP.Text))
                 {
-                    command += separater + TextBox_IP.ToString();
+                    command += separater + TextBox_IP.Text;
                 }
                 else
                 {
@@ -632,7 +658,7 @@ namespace WdController
 
                 if (!String.IsNullOrEmpty(TextBox_Port.Text))
                 {
-                    command += separater + TextBox_Port.ToString();
+                    command += separater + TextBox_Port.Text;
                 }
                 else
                 {
@@ -718,6 +744,7 @@ namespace WdController
                         if (message.Equals((string)RES_ACK))
                         {
                             // ok
+                            Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStop");
                         }
                         else
                         {
@@ -730,6 +757,7 @@ namespace WdController
                         if (message.Equals((string)RES_ACK))
                         {
                             // ok
+                            Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStart");
                         }
                         else
                         {
@@ -795,14 +823,6 @@ namespace WdController
             {
                 ListBox_Messages.Items.Add(string.Format("CommandsDispatcher: Exception: {0}", ex.Message));
             }
-        }
-
-        private void UpdateUI()
-        {
-            TextBox_Name.Text = Name;
-            TextBox_IP.Text = IpAddress;
-            TextBox_Port.Text = PortNumberBase;
-            TextBlock_DeviceVersion.Text = DeviceVersionNumber;
         }
     }
 }
