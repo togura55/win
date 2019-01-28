@@ -120,23 +120,20 @@ namespace WillDevicesSampleApp
             }
         }
 
-//        public void Start(string host, string port)
-         public void Start()
+        public void Start()
         {
             try
             {
                 MessageEvent("Start");
                 State = !State;
 
-                //HostNameString = host;
-                //PortNumberString = port;
-
                 // Set task completion delegation 
-                AppObjects.Instance.WacomDevice.ScanAndConnectCompletedNotification += ScanAndConnect_Completed;
-                AppObjects.Instance.WacomDevice.StartRealTimeInkCompletedNotification += StartRealTimeInk_Completed;
+                WacomDevices wacomDevice = AppObjects.Instance.WacomDevice;
+                wacomDevice.ScanAndConnectCompletedNotification += ScanAndConnect_Completed;
+                wacomDevice.StartRealTimeInkCompletedNotification += StartRealTimeInk_Completed;
 
                 // At first, try to detect a device
-                AppObjects.Instance.WacomDevice.StartScanAndConnect();
+                wacomDevice.StartScanAndConnect();
             }
             catch (Exception ex)
             {
@@ -153,10 +150,18 @@ namespace WillDevicesSampleApp
 
                 // let WacomDevices terminate data transmission
                 // ToDo: check if Realtime Ink is ongoing 
-                await AppObjects.Instance.WacomDevice.StopRealTimeInk();
+                WacomDevices wacomDevice = AppObjects.Instance.WacomDevice;
+                if (wacomDevice.DeviceInfos.Count != 0)
+                {
+                    await wacomDevice.StopRealTimeInk();
+                    wacomDevice.StopScanAndConnect();
+                }
+                wacomDevice.ScanAndConnectCompletedNotification -= ScanAndConnect_Completed;
+                wacomDevice.StartRealTimeInkCompletedNotification -= StartRealTimeInk_Completed;
 
-                AppObjects.Instance.WacomDevice.StopScanAndConnect();
-                AppObjects.Instance.Device.Close();
+
+                if (AppObjects.Instance.Device != null)
+                    AppObjects.Instance.Device.Close();
 
                 // request Broker stop the communication
                 CommandResponseState = CMD_STOP_PUBLISHER;
