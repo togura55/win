@@ -388,18 +388,26 @@ namespace WillDevicesSampleApp
                 // decode
                 if (list.Count != 4)
                 {
-                    // error, resend?
+                    responce = RES_NAK;
                     throw new Exception("ExecuteSetConfig: Number of parameters are wrong.");
                 }
                 else
                 {
                     int i = 0;
-                    //                    string command = list[i];
-
+ 
                     if (list[++i] != string.Empty)
                     {
                         // Set Device Name
+                        WacomDevices wacomDevice = AppObjects.Instance.WacomDevice;
+
+                        if (wacomDevice != null)
+                        {
+                            wacomDevice.Attribute.Name = list[i];
+                            
+                            // ToDo: issue settings to the device
+                        }
                     }
+
                     if (list[++i] != string.Empty)
                     {
                         // Set Broker's IP address
@@ -412,6 +420,7 @@ namespace WillDevicesSampleApp
                     }
 
                     MessageUpdateUi();
+                    responce = RES_ACK;
                 }
             }
             catch (Exception ex)
