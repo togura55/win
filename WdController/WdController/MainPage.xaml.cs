@@ -82,10 +82,10 @@ namespace WdController
             TextBlock_ServiceName.Text = BleServiceName;
             TextBlock_DeviceName.Text = BleDeviceName;
 
-            if (DeviceState == "false")
+            if (DeviceState == "false" || DeviceState == "False")
                 Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStart");
             else
-                Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceSop");
+                Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStop");
         }
 
         public ObservableCollection<RfcommChatDeviceDisplay> ResultCollection
@@ -165,17 +165,19 @@ namespace WdController
 
         private void ResetMainUI()
         {
-            Pbtn_Start.Content = resource.GetString("IDC_Start");
-            Pbtn_Start.IsEnabled = true;
-            Pbtn_Connect.Visibility = Visibility.Visible;
-            resultsListView.Visibility = Visibility.Visible;
-            resultsListView.IsEnabled = true;
+            //            Pbtn_Start.Content = resource.GetString("IDC_Start");
+            //            Pbtn_Start.IsEnabled = true;
+
+            //            Pbtn_Connect.Visibility = Visibility.Visible;
+            //            resultsListView.Visibility = Visibility.Visible;
+            //            resultsListView.IsEnabled = true;
 
             // Re-set device specific UX
             //            ChatBox.Visibility = Visibility.Collapsed;
-            Pbtn_RequestAccess.Visibility = Visibility.Collapsed;
+            //           Pbtn_RequestAccess.Visibility = Visibility.Collapsed;
             //            if (ConversationList.Items != null) ConversationList.Items.Clear();
-            if (ListBox_Messages.Items != null) ListBox_Messages.Items.Clear();
+            //           if (ListBox_Messages.Items != null) ListBox_Messages.Items.Clear();
+
             StopWatcher();
         }
 
@@ -404,44 +406,6 @@ namespace WdController
                 ListBox_Messages.Items.Add("Access granted, you are free to pair devices");
             }
         }
-        //private void SendButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    SendMessage();
-        //}
-
-        //public void KeyboardKey_Pressed(object sender, KeyRoutedEventArgs e)
-        //{
-        //    if (e.Key == Windows.System.VirtualKey.Enter)
-        //    {
-        //        SendMessage();
-        //    }
-        //}
-
-        /// <summary>
-        /// Takes the contents of the MessageTextBox and writes it to the outgoing chatWriter
-        /// </summary>
-        private async void SendMessage()
-        {
-            try
-            {
-                //if (TextBox_Message.Text.Length != 0)
-                //{
-                //    chatWriter.WriteUInt32((uint)TextBox_Message.Text.Length);
-                //    chatWriter.WriteString(TextBox_Message.Text);
-
-                //    //                    ConversationList.Items.Add("Sent: " + MessageTextBox.Text);
-                //    ListBox_Messages.Items.Add("Sent: " + TextBox_Message.Text);
-                //    TextBox_Message.Text = "";
-                //    await chatWriter.StoreAsync();
-
-                //}
-            }
-            catch (Exception ex) when ((uint)ex.HResult == 0x80072745)
-            {
-                // The remote device has disconnected the connection
-                ListBox_Messages.Items.Add("Remote side disconnect: " + ex.HResult.ToString() + " - " + ex.Message);
-            }
-        }
 
         private async void ReceiveStringLoop(DataReader chatReader)
         {
@@ -495,7 +459,6 @@ namespace WdController
         {
             Disconnect("Disconnected");
         }
-
 
         /// <summary>
         /// Cleans up the socket and DataWriter and reset the UI
@@ -638,14 +601,15 @@ namespace WdController
                 string command = CMD_SETCONFIG;
                 string separater = ",";
 
-                if (!String.IsNullOrEmpty(TextBox_Name.Text))
-                {
-                    command += separater + TextBox_Name.Text;
-                }
-                else
-                {
-                    throw new Exception(string.Format("SetConfig: Exception: DeviceName text box is empty."));
-                }
+                command += separater + TextBox_Name.Text;
+                //if (!String.IsNullOrEmpty(TextBox_Name.Text))
+                //{
+                //    command += separater + TextBox_Name.Text;
+                //}
+                //else
+                //{
+                //    throw new Exception(string.Format("SetConfig: Exception: DeviceName text box is empty."));
+                //}
 
                 if (!String.IsNullOrEmpty(TextBox_IP.Text))
                 {
@@ -682,11 +646,13 @@ namespace WdController
 
         private void Pbtn_DeviceStart_Click(object sender, RoutedEventArgs e)
         {
-            CommandState = CMD_START;
-            SendCommand(CMD_START);
+            CommandState = DeviceStarted? CMD_STOP: CMD_START;  // toggle command
 
-            DeviceStarted = !DeviceStarted;
-            Pbtn_DeviceStart.Content = DeviceStarted ? resource.GetString("IDC_Stop") : resource.GetString("IDC_Start");
+            SendCommand(CommandState);
+
+            DeviceStarted = !DeviceStarted;  // toggle state, ToDo: should be moved into the completion delegate.
+            Pbtn_DeviceStart.Content = 
+                DeviceStarted ? resource.GetString("IDC_Stop") : resource.GetString("IDC_Start");
         }
 
         private void Pbtn_GetVersion_Click(object sender, RoutedEventArgs e)
