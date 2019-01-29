@@ -1,0 +1,2 @@
+- Connectの非同期メッセージプロセスを見直す。
+  2 device xxxxxx が出ない
