@@ -144,6 +144,7 @@ namespace WdController
                 chatWriter = new DataWriter(chatSocket.OutputStream);
 
                 DataReader chatReader = new DataReader(chatSocket.InputStream);
+                MessageEvent("RfConnect: Connection established. Set the receive message loop.");
                 ReceiveStringLoop(chatReader);
             }
             catch (Exception ex) when ((uint)ex.HResult == 0x80070490) // ERROR_ELEMENT_NOT_FOUND

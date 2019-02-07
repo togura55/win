@@ -10,6 +10,7 @@ using Windows.ApplicationModel.Resources;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Windows.UI.Core;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
@@ -128,6 +129,14 @@ namespace WdController
             TextBlock_Port.Text = resource.GetString("IDC_Port");
 
             UpdateUI();
+
+            var versionInfo = Windows.ApplicationModel.Package.Current.Id.Version;
+            string version = string.Format(
+                               "{0}.{1}.{2}.{3}",
+                               versionInfo.Major, versionInfo.Minor,
+                               versionInfo.Build, versionInfo.Revision);
+            ApplicationView appView = ApplicationView.GetForCurrentView();
+            appView.Title = version;
         }
 
         private void ReceivedMessage(object sender, string message)
@@ -188,10 +197,17 @@ namespace WdController
         private void SetDeviceWatcherUI()
         {
             // Disable the button while we do async operations so the user can't Run twice.
-            Pbtn_Start.Content = resource.GetString("IDC_Stop");
-            ListBox_Messages.Items.Add("Device watcher started");
-            resultsListView.Visibility = Visibility.Visible;
-            resultsListView.IsEnabled = true;
+            //            Pbtn_Start.Content = resource.GetString("IDC_Stop");
+            if (wdController != null)
+            {
+                Pbtn_Start.Content = wdController.DeviceStarted ? resource.GetString("IDC_Stop") : resource.GetString("IDC_Start");
+
+                string message = wdController.DeviceStarted ? "Device watcher started" : "Device watcher stopped";
+                ListBox_Messages.Items.Add(message);
+
+                resultsListView.Visibility = wdController.DeviceStarted ? Visibility.Visible : Visibility.Collapsed;
+                resultsListView.IsEnabled = wdController.DeviceStarted ? true : false;
+            }
         }
 
         private void ResetMainUI()
@@ -344,8 +360,8 @@ namespace WdController
 
             if (wdController.deviceWatcher == null)
             {
-                SetDeviceWatcherUI();
                 StartUnpairedDeviceWatcher();
+//                SetDeviceWatcherUI();
             }
             else
             {
