@@ -18,6 +18,7 @@ using Windows.Storage;
 using System.Collections.ObjectModel;
 using Windows.UI.Xaml.Shapes;
 using Windows.UI.Input.Inking;
+using Windows.UI.ViewManagement;
 
 namespace WdBroker
 {
@@ -89,6 +90,14 @@ namespace WdBroker
             }
 
             CB_ShowStrokeRawData.IsChecked = App.ShowStrokeRawData;
+
+            var versionInfo = Windows.ApplicationModel.Package.Current.Id.Version;
+            string version = string.Format(
+                               "{0}.{1}.{2}.{3}",
+                               versionInfo.Major, versionInfo.Minor,
+                               versionInfo.Build, versionInfo.Revision);
+            ApplicationView appView = ApplicationView.GetForCurrentView();
+            appView.Title = version;
 
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
 

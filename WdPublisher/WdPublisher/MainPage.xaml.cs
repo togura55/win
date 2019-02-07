@@ -8,6 +8,7 @@ using Windows.UI.Xaml.Controls;
 
 using Windows.Storage;
 using Windows.ApplicationModel.Resources;
+using Windows.UI.ViewManagement;
 
 namespace WillDevicesSampleApp
 {
@@ -48,6 +49,14 @@ namespace WillDevicesSampleApp
             this.TextBlock_IPAddr.Text = resourceLoader.GetString("IDC_HostName");
             this.TextBlock_PortNumber.Text = resourceLoader.GetString("IDC_PortNumber");
             this.Pbtn_Exec.Content = resourceLoader.GetString(AppObjects.Instance.Publisher.State ? "IDC_Exec" : "IDC_Stop");
+
+            var versionInfo = Windows.ApplicationModel.Package.Current.Id.Version;
+            string version = string.Format(
+                               "{0}.{1}.{2}.{3}",
+                               versionInfo.Major, versionInfo.Minor,
+                               versionInfo.Build, versionInfo.Revision);
+            ApplicationView appView = ApplicationView.GetForCurrentView();
+            appView.Title = version;
 
             SetUiState();
 
