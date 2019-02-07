@@ -154,16 +154,37 @@ namespace WillDevicesSampleApp
         /// <param name="port"></param>
         public void Connect(IPAddress ip, int port)
         {
-            // Create a socket
-            this.Close();
-            mSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            try
+            {
+                // Create a socket
+                this.Close();
+                mSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-            // 接続の開始
-            IPEndPoint ep = new IPEndPoint(ip, port);
-            SocketAsyncEventArgs args = new SocketAsyncEventArgs();
-            args.RemoteEndPoint = ep;
-            args.Completed += Connect_Completed;
-            mSocket.ConnectAsync(args);
+                // start the connection
+                IPEndPoint ep = new IPEndPoint(ip, port);
+                SocketAsyncEventArgs args = new SocketAsyncEventArgs();
+                args.RemoteEndPoint = ep;
+                args.Completed += Connect_Completed;
+                bool result = mSocket.ConnectAsync(args);
+                if (!result)    // 接続拒否などは AggregateException
+                {
+                    this.Close();
+                    throw new SocketException(10060);   // 10060 -> WSAETIMEDOUT
+                }
+            }
+            catch (SocketException ex)
+            {
+                // timeout でのタイムアウト
+                throw new Exception(string.Format("Connect: SocketException: {0}",ex));
+            }
+            catch (AggregateException ex)
+            {
+                if (ex.InnerException is SocketException)
+                {
+                    // 接続失敗 拒否されたか Socket でのタイムアウト
+                    throw new Exception(string.Format("Connect: AggregateException: {0}", ex));
+                }
+            }
         }
 
         public void Disonnect()
@@ -290,16 +311,26 @@ namespace WillDevicesSampleApp
         /// <param name="e"></param>
         private void Connect_Completed(object sender, SocketAsyncEventArgs e)
         {
-            if (e.SocketError != System.Net.Sockets.SocketError.Success)
+            try
             {
-                // 接続失敗
-                this.Close();
+                if (e.SocketError != System.Net.Sockets.SocketError.Success)
+                {
+                    // 接続失敗
+                    this.Close();
+                    throw new Exception(string.Format("SocketError: {0}", e.SocketError.ToString()));
+                }
+                else
+                {
+                    // 受信の開始
+                    this.StartReceive(mSocket);
+                    // 接続完了イベント
+                    this.ConnectComplete?.Invoke(this, new SocketErrorEventArgs(e.SocketError));
+                }
             }
-
-            // 受信の開始
-            this.StartReceive(mSocket);
-            // 接続完了イベント
-            this.ConnectComplete?.Invoke(this, new SocketErrorEventArgs(e.SocketError));
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("Connect_Completed: {0}", ex.Message));
+            }
         }
 
         /// <summary>
@@ -476,8 +507,8 @@ namespace WillDevicesSampleApp
         }
 
         public async Task StreamSocket_Connect(string hostNameString = DEFAULT_HOSTNAME,
-string portNumberString = DEFAULT_PORTNUMBER,
-int timeout = 10000)
+        string portNumberString = DEFAULT_PORTNUMBER,
+        int timeout = 10000)
         {
             try
             {
@@ -546,12 +577,12 @@ int timeout = 10000)
                     //                    streamSocketListenerData.ConnectionReceived -= StreamSocketListener_ReceiveBinary;
                     streamSocketListenerData.Dispose();
                 }
-                MessageEvent("Stop(): Socket services were stop and disposed.");
+                MessageEvent("StreamSocket_Stop: Socket services were stop and disposed.");
             }
             catch (Exception ex)
             {
                 SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("Stop(): Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+                throw new Exception(string.Format("StreamSocket_Stop: Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
 
@@ -560,14 +591,6 @@ int timeout = 10000)
             StreamSocket_SendBinary(this.streamSocket, buffer);
         }
 
-        //public async Task SendCommandResponseAsync(StreamSocketListenerConnectionReceivedEventArgs args, string response)
-        //{
-        //    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-        //    () =>
-        //    {
-        //        StreamSocket_SendString(args, response);
-        //    });
-        //}
         #endregion
 
         #region StreamSocket I/O
@@ -601,7 +624,7 @@ int timeout = 10000)
         }
 
         private async void StreamSocketListener_ReceiveBinary(StreamSocketListener sender,
-     StreamSocketListenerConnectionReceivedEventArgs args)
+        StreamSocketListenerConnectionReceivedEventArgs args)
         {
             try
             {

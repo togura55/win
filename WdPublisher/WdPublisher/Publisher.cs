@@ -56,9 +56,11 @@ namespace WillDevicesSampleApp
 
         private async Task InitCommandCommunication(string host, string port)
         {
-            //HostNameString = host;
-            //PortNumberString = port;
-            AppObjects.Instance.SocketService = new SocketServices();
+            if (AppObjects.Instance.SocketService == null)
+            {
+                throw new Exception("SocketServices is not created yet.");
+            }
+
             SocketServices socketService = AppObjects.Instance.SocketService;
 
             try
