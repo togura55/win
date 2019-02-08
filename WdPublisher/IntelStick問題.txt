@@ -1,0 +1,26 @@
+Intel StickでWdPublisherがストロークデータをWeBrokerに送信しない問題
+
+---Spec----
+Intel Stick
+
+WdPublisher
+Release x86 Package
+1.0.0.10
+
+WdBroker
+Debug x64
+1.0.0.7
+-----------
+
+1. Intel Stickのスペックは？
+
+2. Intel StickでのWdPublisher実行シーケンスメッセージのレビューは？
+
+3. Intel StickでCDLStrokeは動くか？
+
+4. WdPublisher x86 Release Packageは、PC-PCで正常に動作するか？
+
+5. WILL DeviceとWILL Inkの参照ワーニングの問題は？
+
+
+
