@@ -114,7 +114,7 @@ namespace WillDevicesSampleApp
             //SystemNavigationManager.GetForCurrentView().BackRequested += ScanAndConnectPage_BackRequested;
         }
 
-        private async void MessageEvent(string message)
+        private async Task MessageEvent(string message)
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
@@ -129,7 +129,7 @@ namespace WillDevicesSampleApp
 
             if (device == null)
             {
-                MessageEvent("StartRealtimeInk: Device not connected.");
+                await MessageEvent("StartRealtimeInk: Device not connected.");
                 return;
             }
 
@@ -138,11 +138,9 @@ namespace WillDevicesSampleApp
             device.PairingModeEnabledCallback = OnPairingModeEnabledAsync;
 
             IRealTimeInkService service = device.GetService(InkDeviceService.RealTimeInk) as IRealTimeInkService;
-            service.HoverPointReceived += OnHoverPointReceived;
-
             if (service == null)
             {
-                MessageEvent("StartRealTimeInk: The Real-time Ink service is not supported on this device");
+                await MessageEvent("StartRealTimeInk: The Real-time Ink service is not supported on this device");
                 return;
             }
 
@@ -150,6 +148,8 @@ namespace WillDevicesSampleApp
             service.StrokeStarted += Service_BeginStroke;
             service.StrokeUpdated += Service_MiddleStroke;
             service.StrokeEnded += Service_EndStroke;
+
+            service.HoverPointReceived += OnHoverPointReceived;
             /////////////////////////////////////////////////////////////
 
             //textBlockPrompt.Text = AppObjects.GetStringForDeviceStatus(device.DeviceStatus);
@@ -170,7 +170,7 @@ namespace WillDevicesSampleApp
             }
             catch (Exception ex)
             {
-                MessageEvent(string.Format("StartRealTimeInk: Exception: {0}", ex.Message));
+                await MessageEvent(string.Format("StartRealTimeInk: Exception: {0}", ex.Message));
             }
         }
 
@@ -188,13 +188,13 @@ namespace WillDevicesSampleApp
             }
             catch (Exception ex)
             {
-                MessageEvent(string.Format("StopRealtimeInk: Exception: {0}", ex.Message));
+                await MessageEvent(string.Format("StopRealtimeInk: Exception: {0}", ex.Message));
             }
         }
 
         #region Stroke event handlers
 //        private async void Service_BeginStroke(object sender, StrokeStartedEventArgs e)
-        private void Service_BeginStroke(object sender, StrokeStartedEventArgs e)
+        private async void Service_BeginStroke(object sender, StrokeStartedEventArgs e)
         {
             try
             {
@@ -208,12 +208,12 @@ namespace WillDevicesSampleApp
             }
             catch (Exception ex)
             {
-                MessageEvent(string.Format("Service_BeginStroke: Exception: {0}", ex.Message));
+                await MessageEvent(string.Format("Service_BeginStroke: Exception: {0}", ex.Message));
             }
         }
 
 //        private async void Service_MiddleStroke(object sender, StrokeUpdatedEventArgs e)
-        private void Service_MiddleStroke(object sender, StrokeUpdatedEventArgs e)
+        private async void Service_MiddleStroke(object sender, StrokeUpdatedEventArgs e)
         {
             try
             {
@@ -232,12 +232,12 @@ namespace WillDevicesSampleApp
             }
             catch (Exception ex)
             {
-                MessageEvent(string.Format("Service_MiddleStroke: Exception: {0}", ex.Message));
+                await MessageEvent(string.Format("Service_MiddleStroke: Exception: {0}", ex.Message));
             }
         }
 
 //        private async void Service_EndStroke(object sender, StrokeEndedEventArgs e)
-        private void Service_EndStroke(object sender, StrokeEndedEventArgs e)
+        private async void Service_EndStroke(object sender, StrokeEndedEventArgs e)
         {
             try
             {
@@ -250,7 +250,7 @@ namespace WillDevicesSampleApp
             }
             catch (Exception ex)
             {
-                MessageEvent(string.Format("Service_EndStroke: Exception: {0}", ex.Message));
+                await MessageEvent(string.Format("Service_EndStroke: Exception: {0}", ex.Message));
             }
         }
 
@@ -484,7 +484,7 @@ namespace WillDevicesSampleApp
 
             if (m_connectingDeviceInfo != null)
             {
-                MessageEvent(string.Format("ConnectInkDevice(): Initializing connection with device: {0}", m_connectingDeviceInfo.DeviceName));
+                await MessageEvent(string.Format("ConnectInkDevice(): Initializing connection with device: {0}", m_connectingDeviceInfo.DeviceName));
 
                 switch (m_connectingDeviceInfo.TransportProtocol)
                 {
@@ -514,13 +514,13 @@ namespace WillDevicesSampleApp
             }
             catch (Exception ex)
             {
-                MessageEvent(string.Format($"ConnectInkDevice: Device creation failed: {0}", ex.Message));
+                await MessageEvent(string.Format($"ConnectInkDevice: Device creation failed: {0}", ex.Message));
                 return;
             }
 
             if (device == null)
             {
-                MessageEvent($"ConnectInkDevice: InkDeviceFactory: CreateDeviceAsync returns null.");
+                await MessageEvent($"ConnectInkDevice: InkDeviceFactory: CreateDeviceAsync returns null.");
 
                 //SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
                 m_connectingDeviceInfo = null;
@@ -529,7 +529,7 @@ namespace WillDevicesSampleApp
                 return;
             }
 
-            MessageEvent($"ConnectInkDevice: InkDeviceFactory: CreateDeviceAsync successfully gets the device object");
+            await MessageEvent($"ConnectInkDevice: InkDeviceFactory: CreateDeviceAsync successfully gets the device object");
             AppObjects.Instance.DeviceInfo = m_connectingDeviceInfo;
             AppObjects.Instance.Device = device;
             m_connectingDeviceInfo = null;
@@ -548,7 +548,7 @@ namespace WillDevicesSampleApp
             catch (Exception ex)
             {
                 string message = string.Format($"ConnectInkDevice: The final process got an error: {0}", ex.Message);
-                MessageEvent(message);
+                await MessageEvent(message);
                 throw new Exception(message);
             }
 
@@ -598,7 +598,7 @@ namespace WillDevicesSampleApp
         {
             if (m_deviceInfos.Count == 0)
             {
-                MessageEvent("OnUsbEnumerationCompleted: No devices were enumarated.");
+                await MessageEvent("OnUsbEnumerationCompleted: No devices were enumarated.");
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
                     this.ScanAndConnectCompletedNotification?.Invoke(this, false);
@@ -608,7 +608,7 @@ namespace WillDevicesSampleApp
 
         private async void OnDeviceAdded(object sender, InkDeviceInfo info)
         {
-            MessageEvent("OnDeviceAdded: Device is added");
+            await MessageEvent("OnDeviceAdded: Device is added");
 
             //var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             //{
