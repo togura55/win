@@ -159,14 +159,14 @@ namespace WillDevicesSampleApp
         #endregion
 
         #region Delegate Completion Handlers
-        private async void PublisherInitialization_Completed(object sender, bool result)
+        private void PublisherInitialization_Completed(object sender, bool result)
         {
             try
             {
                 if (result)
                 {
                     clientListBox.Items.Add("PublisherInitialization_Completed: Go to StartRealTimeInk.");
-                    await AppObjects.Instance.WacomDevice.StartRealTimeInk();
+                    AppObjects.Instance.WacomDevice.StartRealTimeInk();
                 }
             }
             catch (Exception ex)

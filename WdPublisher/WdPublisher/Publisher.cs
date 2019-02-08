@@ -54,7 +54,8 @@ namespace WillDevicesSampleApp
             });
         }
 
-        private async Task InitCommandCommunication(string host, string port)
+//        private async Task InitCommandCommunication(string host, string port)
+        private void InitCommandCommunication(string host, string port)
         {
             if (AppObjects.Instance.SocketService == null)
             {
@@ -261,7 +262,8 @@ namespace WillDevicesSampleApp
         }
 
         #region Delegate Completion Handlers
-        private async void ScanAndConnect_Completed(object sender, bool result)
+//        private async void ScanAndConnect_Completed(object sender, bool result)
+        private void ScanAndConnect_Completed(object sender, bool result)
         {
             try
             {
@@ -270,7 +272,8 @@ namespace WillDevicesSampleApp
                     MessageEvent("ScanAndConnect_Completed: Go Socket initialization");
 
                     // Second, initialize the command path to Broker
-                    await InitCommandCommunication(HostNameString, PortNumberString);
+ //                   await InitCommandCommunication(HostNameString, PortNumberString);
+                    InitCommandCommunication(HostNameString, PortNumberString);
                 }
                 else
                 {
@@ -319,7 +322,7 @@ namespace WillDevicesSampleApp
             }
         }
 
-        private async void CommandSocketClient_SendPacket_Completed(object sender, SocketErrorEventArgs e)
+        private void CommandSocketClient_SendPacket_Completed(object sender, SocketErrorEventArgs e)
         {
 
         }

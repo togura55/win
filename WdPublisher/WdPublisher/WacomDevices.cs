@@ -24,7 +24,7 @@ namespace WillDevicesSampleApp
 
         private const float micrometerToDip = 96.0f / 25400.0f;
         private CancellationTokenSource m_cts = new CancellationTokenSource();
-        private bool m_addNewStrokeToModel = true;
+//        private bool m_addNewStrokeToModel = true;
         private static readonly float maxP = 1.402218f;
         private static readonly float pFactor = 1.0f / (maxP - 1.0f);
         int PointCount;
@@ -123,7 +123,7 @@ namespace WillDevicesSampleApp
         }
 
         #region RealTimeInk
-        public async Task StartRealTimeInk()
+        public async void StartRealTimeInk()
         {
             IDigitalInkDevice device = AppObjects.Instance.Device;
 
@@ -193,6 +193,7 @@ namespace WillDevicesSampleApp
         }
 
         #region Stroke event handlers
+//        private async void Service_BeginStroke(object sender, StrokeStartedEventArgs e)
         private void Service_BeginStroke(object sender, StrokeStartedEventArgs e)
         {
             try
@@ -211,6 +212,7 @@ namespace WillDevicesSampleApp
             }
         }
 
+//        private async void Service_MiddleStroke(object sender, StrokeUpdatedEventArgs e)
         private void Service_MiddleStroke(object sender, StrokeUpdatedEventArgs e)
         {
             try
@@ -234,6 +236,7 @@ namespace WillDevicesSampleApp
             }
         }
 
+//        private async void Service_EndStroke(object sender, StrokeEndedEventArgs e)
         private void Service_EndStroke(object sender, StrokeEndedEventArgs e)
         {
             try
@@ -320,58 +323,6 @@ namespace WillDevicesSampleApp
             return buffer;
         }
 
-        //private IBuffer CreateBuffer(Wacom.Ink.Path pathPart)
-        //{
-        //    IBuffer buffer;
-
-        //    //Data is stored XYW
-        //    float f = AppObjects.Instance.WacomDevice.PublisherAttribute;
-        //    float x = -1;
-        //    float y = -1;
-        //    float w = -1;
-
-        //    if (pathPart == null)  // StartStroke
-        //    {
-        //        x = y = w = 0;
-        //    }
-        //    else   // others
-        //    {
-        //        var data = pathPart.Data.GetEnumerator();
-
-        //        if (data.MoveNext())
-        //        {
-        //            x = data.Current;
-        //        }
-
-        //        if (data.MoveNext())
-        //        {
-        //            y = data.Current;
-        //        }
-
-        //        if (data.MoveNext())
-        //        {
-        //            //Clamp to 0.0 -> 1.0
-        //            w = Math.Max(0.0f, Math.Min(1.0f, (data.Current - 1.0f) * pFactor));
-        //        }
-        //    }
-
-        //    int num_bytes = sizeof(float);
-        //    byte[] ByteArray = new byte[num_bytes * 4];
-        //    int offset = 0;
-        //    Array.Copy(BitConverter.GetBytes(f), 0, ByteArray, offset, num_bytes);
-        //    Array.Copy(BitConverter.GetBytes(x), 0, ByteArray, offset += num_bytes, num_bytes);
-        //    Array.Copy(BitConverter.GetBytes(y), 0, ByteArray, offset += num_bytes, num_bytes);
-        //    Array.Copy(BitConverter.GetBytes(w), 0, ByteArray, offset += num_bytes, num_bytes);
-        //    using (DataWriter writer = new DataWriter())
-        //    {
-        //        writer.WriteBytes(ByteArray);
-        //        buffer = writer.DetachBuffer();
-        //    }
-
-        //    return buffer;
-        //}
-        #endregion
-
         private void OnHoverPointReceived(object sender, HoverPointReceivedEventArgs e)
         {
             string hoverPointCoords = string.Empty;
@@ -389,6 +340,7 @@ namespace WillDevicesSampleApp
             //        //textBlockHoverCoordinates.Text = hoverPointCoords;
             //    });
         }
+        #endregion
 
         private void OnDeviceStatusChanged(object sender, DeviceStatusChangedEventArgs e)
         {
@@ -441,8 +393,8 @@ namespace WillDevicesSampleApp
             //				Frame.Navigate(typeof(ScanAndConnectPage));
             //});
         }
-        #endregion
 
+        #endregion
         #region ScanAndConnect
         InkDeviceWatcherUSB m_watcherUSB;
         InkDeviceInfo m_connectingDeviceInfo;
