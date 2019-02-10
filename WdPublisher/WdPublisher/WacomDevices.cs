@@ -408,9 +408,9 @@ namespace WillDevicesSampleApp
             }
         }
 
-        public void StartScanAndConnect()
+        public async void StartScanAndConnect()
         {
-            MessageEvent("StartScanAndConnect");
+            await MessageEvent("StartScanAndConnect");
 
             AppObjects.Instance.DeviceInfo = null;
 
@@ -424,9 +424,9 @@ namespace WillDevicesSampleApp
         }
 
         //       public void StopScanAndConnect(object sender, RoutedEventArgs e)
-        public void StopScanAndConnect()
+        public async void StopScanAndConnect()
         {
-            MessageEvent("StopScanAndConnect");
+            await MessageEvent("StopScanAndConnect");
 
             if (AppObjects.Instance.Device != null)
             {
@@ -617,18 +617,18 @@ namespace WillDevicesSampleApp
             await ConnectInkDevice();
         }
 
-        private void OnDeviceRemoved(object sender, InkDeviceInfo info)
+        private async void OnDeviceRemoved(object sender, InkDeviceInfo info)
         {
-            MessageEvent("OnDeviceRemoved: Device is removed");
+            await MessageEvent("OnDeviceRemoved: Device is removed");
             //var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             //{
             RemoveDevice(info);
             //});
         }
 
-        private void OnUsbWatcherStopped(object sender, object e)
+        private async void OnUsbWatcherStopped(object sender, object e)
         {
-            MessageEvent("OnUsbWatcherStopped: ");
+            await MessageEvent("OnUsbWatcherStopped: ");
             //var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             //{
             if ((m_connectingDeviceInfo != null) && (m_connectingDeviceInfo.TransportProtocol == TransportProtocol.USB))
