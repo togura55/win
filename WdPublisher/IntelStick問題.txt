@@ -1,24 +1,28 @@
-Intel StickでWdPublisherがストロークデータをWeBrokerに送信しない問題
+Intel StickでWdPublisherがストロークデータをWdBrokerに送信しない問題
 
 ---Spec----
 Intel Stick
+ W10 x86 1803 (17134.556)
 
 WdPublisher
-Release x86 Package
-1.0.0.10
+ Release x86 Package
+ 1.0.0.10
 
 WdBroker
-Debug x64
-1.0.0.7
+ Debug x64
+ 1.0.0.7
 -----------
 
-1. Intel Stickのスペックは？
+1. Intel Stickのスペックは？ ：W10 x86 1803 (17134.556)
 
-2. Intel StickでのWdPublisher実行シーケンスメッセージのレビューは？
+2. Intel StickでのWdPublisher実行シーケンスメッセージのレビューは？: 正常
 
-3. Intel StickでCDLStrokeは動くか？
+3. Intel StickでCDLStrokeは動くか？：x86_x64 packageで正常に動く
 
 4. WdPublisher x86 Release Packageは、PC-PCで正常に動作するか？
+　　　x86 Debugでは正常に送信
+        x86 Releaseでは送信せず
+　　 Intel Stickにx86 Debug packageをインストールしても、正常送信しなかった
 
 5. WILL DeviceとWILL Inkの参照ワーニングの問題は？
 
