@@ -222,7 +222,7 @@ namespace WillDevicesSampleApp
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        private async void OnCompleted(BackgroundTaskRegistration sender, BackgroundTaskCompletedEventArgs args)
+        private void OnCompleted(BackgroundTaskRegistration sender, BackgroundTaskCompletedEventArgs args)
         {
             var settings = ApplicationData.Current.LocalSettings;
             if (settings.Values.ContainsKey("TaskCancelationReason"))
@@ -233,6 +233,7 @@ namespace WillDevicesSampleApp
             {
                 MessageEvent("Background task completed");
             }
+
             try
             {
                 args.CheckResult();
@@ -280,7 +281,7 @@ namespace WillDevicesSampleApp
         /// </summary>
         /// <param name="task"></param>
         /// <param name="args"></param>
-        private async void OnProgress(IBackgroundTaskRegistration task, BackgroundTaskProgressEventArgs args)
+        private void OnProgress(IBackgroundTaskRegistration task, BackgroundTaskProgressEventArgs args)
         {
 
             if (ApplicationData.Current.LocalSettings.Values.Keys.Contains("ReceivedMessage"))
@@ -372,7 +373,7 @@ namespace WillDevicesSampleApp
             return responce;
         }
 
-        private async Task<string> ExecuteSetConfig(string message)
+        private string ExecuteSetConfig(string message)
         {
             string responce = string.Empty;
             try
@@ -483,7 +484,7 @@ namespace WillDevicesSampleApp
                         break;
 
                     case CMD_SETCONFIG:
-                        SendResponce(await ExecuteSetConfig(message));
+                        SendResponce(ExecuteSetConfig(message));
                         break;
 
                     case CMD_GETVERSION:

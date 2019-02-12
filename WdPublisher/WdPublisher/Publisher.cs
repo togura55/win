@@ -95,12 +95,12 @@ namespace WillDevicesSampleApp
         }
 
         #region Services
-        public async Task Close()
+        public void Close()
         {
             try
             {
                 CommandResponseState = CMD_DISPOSE_PUBLISHER;
-                await this.SendCommandStrings(CMD_DISPOSE_PUBLISHER);
+                this.SendCommandStrings(CMD_DISPOSE_PUBLISHER);
 
                 if (AppObjects.Instance.SocketService != null)
                 {
@@ -168,7 +168,7 @@ namespace WillDevicesSampleApp
 
                 // request Broker stop the communication
                 CommandResponseState = CMD_STOP_PUBLISHER;
-                await this.SendCommandStrings(CMD_STOP_PUBLISHER);
+                this.SendCommandStrings(CMD_STOP_PUBLISHER);
             }
             catch (Exception ex)
             {
@@ -186,7 +186,7 @@ namespace WillDevicesSampleApp
         const string RES_ACK = "ack";
         const string RES_NAK = "nak";
 
-        private async Task SendCommandStrings(float command)
+        private void SendCommandStrings(float command)
         {
             try
             {
@@ -227,7 +227,11 @@ namespace WillDevicesSampleApp
                     }
 
                     CommandResponseState = command;
-                    socketService.SendToServer(System.Text.Encoding.UTF8.GetBytes(commandString));
+                    //var task = Task.Run(() =>
+                    //{
+                        socketService.SendToServer(System.Text.Encoding.UTF8.GetBytes(commandString));
+                    //});
+
 
                     // Then, waiting for response string at CommandSocketClient_Response
                     //                    await commandSocketClient.ResponseReceiveAsync();
@@ -306,7 +310,7 @@ namespace WillDevicesSampleApp
 
         }
 
-        private async void CommandSocketClient_Connect_Completed(object sender, SocketErrorEventArgs e)
+        private void CommandSocketClient_Connect_Completed(object sender, SocketErrorEventArgs e)
         {
             MessageEvent("CommandSocketClientConnect_Completed.");
 
@@ -318,7 +322,7 @@ namespace WillDevicesSampleApp
             else
             {
                 CommandResponseState = CMD_REQUEST_PUBLISHER_CONNECTION;
-                await this.SendCommandStrings(CMD_REQUEST_PUBLISHER_CONNECTION);
+                this.SendCommandStrings(CMD_REQUEST_PUBLISHER_CONNECTION);
             }
         }
 
@@ -377,7 +381,7 @@ namespace WillDevicesSampleApp
                             //await commandSocketClient.SendCommand(RES_ACK);
                             //MessageEvent("Send ACK");
 
-                            await this.SendCommandStrings(CMD_SET_ATTRIBUTES);
+                            this.SendCommandStrings(CMD_SET_ATTRIBUTES);
                         }
                         break;
 
