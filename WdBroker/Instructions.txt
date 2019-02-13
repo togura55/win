@@ -1,0 +1,31 @@
+                             WdBroker
+
+<Description>
+Windows UWP application program for gathering stroke data sent by plural number of WdPublisher(s) through the TCP/IP connection.
+
+<Instruction>
+1. Connect install PC to the TCP/IP network that can be reached to the WdPublisher installed PC
+2. Install the certification file to the PC
+3. Double-click appxbundle package file for proceeding the application installation   
+4. Click the WdBroker listed in the start menu
+5. Configure IP address and port number on the pull down menu.
+6. Click a Start button on the UI.
+
+<Functions/Features>
+- Handling multiple connection from WdPublisher(s)  
+- Drawing stroke image
+- Listing stroke raw data
+
+<Environment>
+- PC with Ethernet port of IPv4 TCP/IP network (Wired or WiFi)
+- Windows 10 version 1803 or higher
+- WdPublisher 1.0.10 or higher
+- Wacom PHU-111 used with the USB interface
+
+<ToDo/Known Issues>
+- 
+
+<History>
+* 1.0.7 - Support WdPublisher 1.0.10
+* 1.0.6 - Implemented command/response scheme
+* 1.0.3 - 1st release

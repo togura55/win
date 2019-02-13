@@ -1,0 +1,16 @@
+Start
+
+StartScanAndConnect
+
+OnDeviceAdded: Device is added
+
+OnUsbEnumerationCompleted: No devices were enumarated.
+
+ConnectInkDevice(): Initializing connection with device: Wacom Clipboard PHU-111
+
+ScanAndConnect_Completed: Could not be detected devices.
+
+ConnectInkDevice: InkDeviceFactory: CreateDeviceAsync succesfully get the device object.
+
+ScanAndConnect_Completed: Go Socket initialization
+

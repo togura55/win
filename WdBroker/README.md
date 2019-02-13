@@ -15,5 +15,6 @@ xxx
 ## ToDo/Known Issues
 * Implement registering Subscribers     
 ## History
+* 1.0.7 - Support WdPublisher 1.0.10
 * 1.0.6 - Implemented command/response scheme
 * 1.0.3 - 1st release  

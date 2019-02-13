@@ -1,0 +1,34 @@
+                             WdPublisher
+
+<Description>
+Windows UWP application program for manipulating Wacom Smartpad devices and transmitting device's stroke data to WdBroker through the TCP/IP connection.
+
+<Instruction>
+1. Connect Smartpad device to the USB port of the install PC
+2. Install the certification file to the PC
+3. Double-click appxbundle package file for proceeding the application installation   
+4. Click the WdPublisher listed in the start menu
+5. Configure WdBroker's IP address and port number on the UI. Make sure that WdBroker is running properly before to do this.
+6. Click a Start button on the UI.
+
+<Functions/Features>
+- Handling PHU-111 with USB  
+- Accessing WdBroker's IP communication
+- Allow WdController configure the application setting on BLE
+
+<Environment>
+- PC with USB, Bluetooth LE 4.2 and Ethernet (Wired or WiFi)
+- Windows 10 version 1803 or higher
+- WdBroker 1.0.7 or higher
+- WdController 1.0.0 or higher
+- Wacom PHU-111 used with the USB interface
+
+<ToDo/Known Issues>
+- 
+
+<History>
+* 1.0.10 
+ - Support communicating with WdController
+ - Confirmed to be run on the Intel Stick environment
+* 1.0.6 - Implemented command/response scheme
+* 1.0.3 - 1st release

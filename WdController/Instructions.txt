@@ -1,0 +1,50 @@
+                             WdController for Windows
+
+<Description>
+Windows UWP application for configuring WdPublisher settings through the Bluetooth LE connection. This utility is helpful for the use wit WdPublisher which do not have the display monitor.
+
+<Instruction>
+1. Install the certification file to the PC
+2. Double-click appxbundle package file for proceeding the application installation   
+3. Click the WdController listed in the start menu
+4. Click a Start button on the UI.
+5. Select one of the WdPublisher installed PC in the BLE device list.
+6. Click a Connect button
+7. Get/Set the WdPublisher's attributes on the UI operation
+
+<Functions/Features>
+- GetStatus
+   Width 
+　Height
+　PointSize
+　Name
+　ESN
+　Battery
+   DeviceType
+   TransferMode
+    IP address of WdBroker
+    Port Number Base of WdBroker
+   State
+- SetStatus
+　Name
+   IP address of WdBroker
+   Port Number Base of WdBroker
+- GetVersion
+- Start
+- Stop
+- Restart
+
+<Environment>
+- PC with Bluetooth LE 4.2
+- Windows 10 version 1803 or higher
+- WdPublisher 1.0.10 or higher
+- Wacom PHU-111 used with the USB interface
+
+<ToDo/Known Issues>
+- 
+
+<History>
+* 1.0.1 
+ - Support WdPublisher 1.0.10
+* 1.0.0
+ - 1st release
