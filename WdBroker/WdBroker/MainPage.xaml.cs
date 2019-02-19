@@ -1,17 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 using Windows.ApplicationModel.Resources;
 using Windows.Storage;
@@ -27,6 +18,14 @@ namespace WdBroker
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        //            List<DrawPoint> DrawPointList;
+        int Count;
+        int MaxCount;
+        List<InkCanvas> CanvasStrokesList;
+        List<Border> BorderList;
+        InkStrokeBuilder inkStrokeBuilder;
+        List<InkStrokeBuilder> InkStrokeBuilderList;
+
         static string PortNumberString = "1337";
         static string HostNameString = "192.168.0.7";
         static bool fStart = true;
@@ -61,17 +60,6 @@ namespace WdBroker
 
             RestoreSettings();
 
-            resourceLoader = ResourceLoader.GetForCurrentView();
-            this.TextBlock_HostName.Text = resourceLoader.GetString("IDC_HostName");
-            this.TextBlock_PortNumber.Text = resourceLoader.GetString("IDC_PortNumber");
-            this.Pbtn_Start.Content = resourceLoader.GetString(fStart ? "IDC_Start" : "IDC_Stop");
-            this.TextBox_PortNumberValue.Text = PortNumberString;
-            this.Pbtn_Clearlog.Content = resourceLoader.GetString("IDC_Clearlog");
-            this.CB_ShowStrokeRawData.Content = resourceLoader.GetString("IDC_ShowStrokeRawData");
-
-            this.TextBox_FixedHostNameValue.Visibility = Visibility.Collapsed;
-            this.TextBlock_HostNameValue.Visibility = Visibility.Collapsed;
-
             MainViewModel viewModel = new MainViewModel();
             this.DataContext = viewModel;
 
@@ -101,16 +89,50 @@ namespace WdBroker
 
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
 
-            InkDrawingAttributes attributes = new InkDrawingAttributes();
-            attributes.Color = Windows.UI.Colors.Red; //UIColors[index]; //
-            attributes.Size = new Size(2, 2);          // ペンのサイズ
-            attributes.IgnorePressure = false;          // ペンの圧力を使用するかどうか
-            attributes.FitToCurve = false;
-            m_inkStrokeBuilder.SetDefaultDrawingAttributes(attributes);
+            //InkDrawingAttributes attributes = new InkDrawingAttributes();
+            //attributes.Color = Windows.UI.Colors.Red; //UIColors[index]; //
+            //attributes.Size = new Size(2, 2);          // ペンのサイズ
+            //attributes.IgnorePressure = false;          // ペンの圧力を使用するかどうか
+            //attributes.FitToCurve = false;
+            //m_inkStrokeBuilder.SetDefaultDrawingAttributes(attributes);
+
+//            DrawPointList = new List<DrawPoint>();
+            Count = 0;
+            MaxCount = 6;
+            InkStrokeBuilderList = new List<InkStrokeBuilder>();
+
+            CanvasStrokesList = new List<InkCanvas> {
+                Canvas_Strokes_1,
+                Canvas_Strokes_2,
+                Canvas_Strokes_3,
+                Canvas_Strokes_4,
+                Canvas_Strokes_5,
+                Canvas_Strokes_6
+            };
+            BorderList = new List<Border>
+            {
+                Border_1,
+                Border_2,
+                Border_3,
+                Border_4,
+                Border_5,
+                Border_6
+            };
         }
 
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
+            resourceLoader = ResourceLoader.GetForCurrentView();
+            this.TextBlock_HostName.Text = resourceLoader.GetString("IDC_HostName");
+            this.TextBlock_PortNumber.Text = resourceLoader.GetString("IDC_PortNumber");
+            this.Pbtn_Start.Content = resourceLoader.GetString(fStart ? "IDC_Start" : "IDC_Stop");
+            this.TextBox_PortNumberValue.Text = PortNumberString;
+            this.Pbtn_Clearlog.Content = resourceLoader.GetString("IDC_Clearlog");
+            this.CB_ShowStrokeRawData.Content = resourceLoader.GetString("IDC_ShowStrokeRawData");
+
+            this.TextBox_FixedHostNameValue.Visibility = Visibility.Collapsed;
+            this.TextBlock_HostNameValue.Visibility = Visibility.Collapsed;
+
             // ToDo: get dynamic from Publisher
             double deviceHeight = 29700;    // ToDo: get from Publishers
             double deviceWidth = 21600;
@@ -131,8 +153,11 @@ namespace WdBroker
             // InkCanvas size settings for displaying
             Canvas_Strokes.Width = cw;
             Canvas_Strokes.Height = ch;
-            //inkContainer.Width = cw;
-            //inkContainer.Height = ch;
+
+            foreach (Border b in BorderList)
+            {
+                b.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void GetUiState()
@@ -158,6 +183,34 @@ namespace WdBroker
             GetUiState();
             App.ServerHostName = new Windows.Networking.HostName(HostNameString); // for debug
 
+            // --------
+            if (Count >= MaxCount)
+            {
+                return;
+            }
+            BorderList[Count].Visibility = Visibility.Visible;
+
+            DrawPoint drawPoints = new DrawPoint();
+            drawPoints.DrawPointAction += ReceivedAction; // set the action message delegate
+            drawPoints.index = Count;
+            DrawPointList.Add(drawPoints);
+
+            // 描画属性を作成する
+            InkDrawingAttributes attributes = new InkDrawingAttributes();
+            attributes.Size = new Size(2, 2);          // ペンのサイズ
+            attributes.IgnorePressure = false;          // ペンの圧力を使用するかどうか
+            attributes.FitToCurve = false;
+            attributes.Color = UIColors[Count];
+
+            inkStrokeBuilder = new InkStrokeBuilder();
+            inkStrokeBuilder.SetDefaultDrawingAttributes(attributes);
+            InkStrokeBuilderList.Add(inkStrokeBuilder);
+
+            CanvasStrokesList[Count].InkPresenter.UpdateDefaultDrawingAttributes(attributes);  // set UI attributes
+                                                                                               //            CanvasStrokesList[Count].InkPresenter.InputDeviceTypes = Windows.UI.Core.CoreInputDeviceTypes.Mouse | Windows.UI.Core.CoreInputDeviceTypes.Pen;
+            Count++;
+            // -----
+
             try
             {
                 if (fStart)
@@ -167,6 +220,20 @@ namespace WdBroker
                 else
                 {
                     App.Broker.Stop();
+
+                    // -----
+                    DrawPoint drawPoints = DrawPointList.Last();
+                    drawPoints.stop();
+                    CanvasStrokesList[DrawPointList.Count - 1].InkPresenter.StrokeContainer.Clear();
+                    BorderList[DrawPointList.Count - 1].Visibility = Visibility.Collapsed;
+                    DrawPointList.RemoveAt(DrawPointList.Count - 1);
+
+                    if (DrawPointList.Count == 0)
+                    {
+                        Pbtn_Stop.IsEnabled = false;
+                    }
+                    Count--;
+                    // -----
                 }
 
                 fStart = fStart ? false : true;   // toggle if success
@@ -319,6 +386,57 @@ namespace WdBroker
             }
         }
 
+        private void DrawStroke(int x, int y, int index)
+        {
+            try
+            {
+                //                Publisher pub = App.Pubs[index];
+
+                //               int count = deviceRawDataList.Count;
+
+                //                int count = 5;
+                int r = 5;
+                int _x, _y;
+
+                InkPoint[] points = new InkPoint[5];
+                for (int i = 0; i < 5; i++)
+                {
+                    _x = x;
+                    _y = y;
+                    switch (i)
+                    {
+                        case 0:
+                        case 4:
+                            _y = y - r;
+                            break;
+                        case 1:
+                            _x = x - r;
+                            break;
+                        case 2:
+                            _y = y + r;
+                            break;
+                        case 3:
+                            _x = x + r;
+                            break;
+                    }
+                    points[i] = new InkPoint(new Windows.Foundation.Point(_x, _y), 1);
+                }
+
+                //await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () =>
+                //{
+                // Make a stroke by array of point
+                InkStroke s = InkStrokeBuilderList[index].CreateStrokeFromInkPoints(
+                points, System.Numerics.Matrix3x2.Identity);
+                CanvasStrokesList[index].InkPresenter.StrokeContainer.AddStroke(s);
+
+                //});
+            }
+            catch (Exception ex)
+            {
+                //               ListBox_Message.Items.Add(string.Format("DrawStroke: {0}", ex.Message));
+            }
+        }
+
         // A list of color table
         List<Windows.UI.Color> UIColors = new List<Windows.UI.Color>() {
             Windows.UI.Colors.SteelBlue,
@@ -326,11 +444,11 @@ namespace WdBroker
             //           colors.Add(Windows.UI.Colors.AntiqueWhite);
             Windows.UI.Colors.Aqua,
             Windows.UI.Colors.Aquamarine,
-            Windows.UI.Colors.Azure,
-            Windows.UI.Colors.Beige,
-            Windows.UI.Colors.Bisque,
-            Windows.UI.Colors.Black,
-            Windows.UI.Colors.BlanchedAlmond,
+//            Windows.UI.Colors.Azure,
+            //Windows.UI.Colors.Beige,
+            //Windows.UI.Colors.Bisque,
+            //Windows.UI.Colors.Black,
+            //Windows.UI.Colors.BlanchedAlmond,
             Windows.UI.Colors.Blue,
             Windows.UI.Colors.BlueViolet,
             Windows.UI.Colors.Brown,
