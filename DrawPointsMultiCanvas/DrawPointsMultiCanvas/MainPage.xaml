@@ -13,24 +13,28 @@
             <RowDefinition Height="233*"/>
             <RowDefinition Height="767*"/>
         </Grid.RowDefinitions>
-        <Border BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="300" VerticalAlignment="Top" Margin="726,36,0,0" Width="257" Grid.RowSpan="2">
-            <InkCanvas x:Name="Canvas_Strokes_1" HorizontalAlignment="Stretch" Margin="-0.4,-0.4,-2.6,-2.4" VerticalAlignment="Stretch"/>
+        <Border x:Name="Border_1" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="300" Margin="430,37,0,0" VerticalAlignment="Top" Width="257" Grid.RowSpan="2">
+            <InkCanvas x:Name="Canvas_Strokes_1" Margin="-12,-2,8,-2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         </Border>
-        <Border BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="300" VerticalAlignment="Top" Margin="1017,37,0,0" Width="257"  Grid.RowSpan="2">
-            <InkCanvas x:Name="Canvas_Strokes_2" Margin="-12.4,-2.4,8.4,-2.4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <Border x:Name="Border_2" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="300" VerticalAlignment="Top" Margin="726,36,0,0" Width="257" Grid.RowSpan="2">
+            <InkCanvas x:Name="Canvas_Strokes_2" Margin="-12,-2,8,-2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         </Border>
-        <Border BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="300" Margin="430,37,0,0" VerticalAlignment="Top" Width="257" Grid.RowSpan="2">
-            <InkCanvas x:Name="Canvas_Strokes_3" Margin="-12.4,-2.4,8.6,-2.2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <Border x:Name="Border_3" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="300" VerticalAlignment="Top" Margin="1017,37,0,0" Width="257"  Grid.RowSpan="2">
+            <InkCanvas x:Name="Canvas_Strokes_3" Margin="-12,-2,8,-2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         </Border>
-        <Border BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="300" Margin="430,214,0,0" VerticalAlignment="Top" Width="257" Grid.Row="1">
-            <InkCanvas x:Name="Canvas_Strokes_4" Margin="-12.4,-2.4,8.4,-2.4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <Border x:Name="Border_4" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="300" Margin="430,214,0,0" VerticalAlignment="Top" Width="257" Grid.Row="1">
+            <InkCanvas x:Name="Canvas_Strokes_4" Margin="-12,-2,8,-2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         </Border>
-        <Border BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="300" Margin="726,221,0,0" VerticalAlignment="Top" Width="257" Grid.Row="1">
-            <InkCanvas x:Name="Canvas_Strokes_5" Margin="-12.4,-2.4,8.4,-2.4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <Border x:Name="Border_5" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="300" Margin="726,215,0,0" VerticalAlignment="Top" Width="257" Grid.Row="1">
+            <InkCanvas x:Name="Canvas_Strokes_5" Margin="-12,-2,8,-2"/>
         </Border>
-        <Border BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="300" Margin="1017,214,0,0" VerticalAlignment="Top" Width="257" Grid.Row="1">
-            <InkCanvas x:Name="Canvas_Strokes_6" Margin="-12.4,-2.4,8.4,-2.4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <Border x:Name="Border_6" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="300" Margin="1017,215,0,0" VerticalAlignment="Top" Width="257" Grid.Row="1">
+            <InkCanvas x:Name="Canvas_Strokes_6" Margin="-12,-2,8,-2"/>
         </Border>
         <Button x:Name="Pbtn_Run" Content="Run" HorizontalAlignment="Left" Margin="147,129,0,0" VerticalAlignment="Top" Click="Pbtn_Run_Click"/>
+        <Button x:Name="Pbtn_Stop" Content="Button" HorizontalAlignment="Left" Margin="225,129,0,0" VerticalAlignment="Top" Click="Pbtn_Stop_Click"/>
+        <TextBlock x:Name="TextBlock_1"  HorizontalAlignment="Left" Margin="147,10,0,0" Grid.Row="1" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <TextBlock x:Name="TextBlock_2"  HorizontalAlignment="Left" Margin="147,58,0,0" Grid.Row="1" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <TextBlock x:Name="TextBlock_3"  HorizontalAlignment="Left" Margin="147,114,0,0" Grid.Row="1" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
     </Grid>
 </Page>
