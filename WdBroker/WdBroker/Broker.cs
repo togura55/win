@@ -13,6 +13,7 @@ namespace WdBroker
     public class Broker
     {
         SocketServices mServerSocket = null;
+        public List<Subscriber> subs = null;
 
         // Delegate event handlers
         public delegate void BrokerEventHandler(object sender, string message);
@@ -42,6 +43,7 @@ namespace WdBroker
         public Broker()
         {
             mServerSocket = new SocketServices();
+            subs = new List<Subscriber>();
         }
 
         private async void MessageEvent(string message)
@@ -71,6 +73,7 @@ namespace WdBroker
         #region Services
         public async Task Start(HostName hostName, string portNumber)
         {
+
             // ------- For Commands -------------
             // Delegation settings
             mServerSocket.AcceptComplete += Server_AcceptComplete;
@@ -303,6 +306,11 @@ namespace WdBroker
                     {
                         case CMD_REQUEST_PUBLISHER_CONNECTION:
                             this.MessageEvent("Request Publisher Connect command is received.");
+
+                            if (Count >= MaxCount)
+                            {
+                                return;
+                            }
 
                             //// Do the publisher 1st contact process
                             //// 1. Create a new instance

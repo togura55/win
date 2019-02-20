@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Windows.Foundation;
+using Windows.UI.Input.Inking;
 
 namespace WdBroker
 {
@@ -47,6 +48,8 @@ namespace WdBroker
         public bool StartState;
         public double ViewScale;
 
+        public int Index;
+
         public Publisher()
         {
             this.DeviceSize.Height = 29700;    // ToDo: get from Publishers
@@ -56,7 +59,6 @@ namespace WdBroker
             this.PrevRawData = new DeviceRawData();
             this.StartState = true;
             this.ViewScale = 1.0;
-
         }
 
         public void Start()
