@@ -387,7 +387,8 @@ namespace WdBroker
                         deviceRawDataList[i].z);
                 }
 
-                InkStroke s = App.Subs[index].StrokeBuilder.CreateStrokeFromInkPoints(
+                // 本来ならBroker内のsubsではなく、Subscriber側で持つべき
+                InkStroke s = App.Broker.subs[index].StrokeBuilder.CreateStrokeFromInkPoints(
                     points, System.Numerics.Matrix3x2.Identity);
                 CanvasStrokesList[index].InkPresenter.StrokeContainer.AddStroke(s);
             }
