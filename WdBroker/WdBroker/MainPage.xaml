@@ -32,20 +32,20 @@
             <InkCanvas x:Name="Canvas_Strokes_6" Margin="-12,-2,8,-2"/>
         </Border>
 
-        <ListBox x:Name="ListBox_Message" HorizontalAlignment="Left" Height="479" Margin="40,88,0,0" VerticalAlignment="Top" Width="325" 
+        <ListBox x:Name="ListBox_Message" HorizontalAlignment="Left" Height="479" Margin="41,49,0,0" VerticalAlignment="Top" Width="325" 
                  ScrollViewer.HorizontalScrollMode="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" Grid.Row="1"/>
-        <Button x:Name="Pbtn_Start" Content="Button" HorizontalAlignment="Left" Margin="64,201,0,0" VerticalAlignment="Top" Click="Pbtn_Start_Click"/>
+        <Button x:Name="Pbtn_Start" Content="Button" HorizontalAlignment="Left" Margin="64,201,0,0" VerticalAlignment="Top" Click="Pbtn_Start_Click" Height="32" Grid.RowSpan="2"/>
         <TextBlock x:Name="TextBlock_HostName" HorizontalAlignment="Left" Margin="64,46,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <TextBlock x:Name="TextBlock_PortNumber" HorizontalAlignment="Left" Margin="64,90,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <TextBox x:Name="TextBox_PortNumberValue" HorizontalAlignment="Left" Margin="164,84,0,0" Text="TextBox" VerticalAlignment="Top" Width="142"/>
         <TextBlock x:Name="TextBlock_HostNameValue" HorizontalAlignment="Left" Margin="358,16,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
-        <Button x:Name="Pbtn_Clearlog" Content="Button" HorizontalAlignment="Left" Margin="170,201,0,0" VerticalAlignment="Top" Click="Pbtn_Clearlog_Click"/>
+        <Button x:Name="Pbtn_Clearlog" Content="Button" HorizontalAlignment="Left" Margin="170,201,0,0" VerticalAlignment="Top" Click="Pbtn_Clearlog_Click" Height="32" Grid.RowSpan="2"/>
         <ComboBox x:Name="Combo_HostNames" ItemsSource="{Binding HostNameCollection}" HorizontalAlignment="Left" Margin="164,42,0,0" VerticalAlignment="Top" Width="142"/>
         <TextBox x:Name="TextBox_FixedHostNameValue" HorizontalAlignment="Left" Margin="358,41,0,0" Text="TextBox" VerticalAlignment="Top" Width="143"/>
-        <Border BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="585,84,0,0" Width="432" Height="594" Grid.RowSpan="2">
+        <Border x:Name="Border_debug" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="585,84,0,0" Width="432" Height="594" Grid.RowSpan="2">
             <InkCanvas x:Name="Canvas_Strokes" Height="594" Width="432"/>
         </Border>
         <CheckBox x:Name="CB_ShowStrokeRawData" Content="CheckBox" HorizontalAlignment="Left" Margin="269,201,0,0" VerticalAlignment="Top"
-                  Click="ShowStrokeRawData_Click"/>
+                  Click="ShowStrokeRawData_Click" Grid.RowSpan="2"/>
     </Grid>
 </Page>

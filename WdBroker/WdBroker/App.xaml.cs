@@ -30,6 +30,7 @@ namespace WdBroker
         public static Broker Broker = null;
         public static SocketServices Socket = null; // Single instance of SocketServices using this app
         public static List<Publisher> Pubs = new List<Publisher>(); // List of Publisher object to be managed in this app
+        public static List<Subscriber> Subs = new List<Subscriber>(); // List of Sunbcriber object which is connected to the Broker 
 
         public static HostName ServerHostName;
         public static List<HostName> HostNames = new List<HostName>();

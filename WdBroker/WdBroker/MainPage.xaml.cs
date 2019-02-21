@@ -96,10 +96,10 @@ namespace WdBroker
             //attributes.FitToCurve = false;
             //m_inkStrokeBuilder.SetDefaultDrawingAttributes(attributes);
 
-//            DrawPointList = new List<DrawPoint>();
+            //            DrawPointList = new List<DrawPoint>();
             Count = 0;
             MaxCount = 6;
-            InkStrokeBuilderList = new List<InkStrokeBuilder>();
+            //            InkStrokeBuilderList = new List<InkStrokeBuilder>();
 
             CanvasStrokesList = new List<InkCanvas> {
                 Canvas_Strokes_1,
@@ -158,6 +158,8 @@ namespace WdBroker
             {
                 b.Visibility = Visibility.Collapsed;
             }
+            // using for debug
+            Border_debug.Visibility = Visibility.Collapsed;
         }
 
         private void GetUiState()
@@ -305,50 +307,51 @@ namespace WdBroker
         // Raw data event handler sent by SocketServer object
         private void ReceiveDrawing(object sender, List<DeviceRawData> data_list, int index)
         {
+            //            DrawStroke(data_list, index);
             DrawStroke(data_list, index);
         }
 
         //       private async void DrawStroke(float f, float x, float y, float p, int index)
-        private async void DrawStroke(List<DeviceRawData> deviceRawDataList, int index)
-        {
-            try
-            {
-//                Publisher pub = App.Pubs[index];
+        //        private async void DrawStroke(List<DeviceRawData> deviceRawDataList, int index)
+        //        {
+        //            try
+        //            {
+        ////                Publisher pub = App.Pubs[index];
 
-                int count = deviceRawDataList.Count;
+        //                int count = deviceRawDataList.Count;
 
-                InkPoint[] points = new InkPoint[count];
-                for (int i = 0; i < count; i++)
-                {
-                    points[i] = new InkPoint(new Windows.Foundation.Point(
-                        deviceRawDataList[i].x * mScale,
-                        deviceRawDataList[i].y * mScale),
-                        deviceRawDataList[i].z);
-                }
+        //                InkPoint[] points = new InkPoint[count];
+        //                for (int i = 0; i < count; i++)
+        //                {
+        //                    points[i] = new InkPoint(new Windows.Foundation.Point(
+        //                        deviceRawDataList[i].x * mScale,
+        //                        deviceRawDataList[i].y * mScale),
+        //                        deviceRawDataList[i].z);
+        //                }
 
-                //await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-                //{
-                // 描画属性を作成する
-                InkDrawingAttributes attributes = new InkDrawingAttributes();
-                attributes.Color = UIColors[index]; //Windows.UI.Colors.Red; //
-                                                    //attributes.Size = new Size(10, 2);          // ペンのサイズ
-                                                    //attributes.IgnorePressure = false;          // ペンの圧力を使用するかどうか
-                                                    //attributes.FitToCurve = false;
-                Canvas_Strokes.InkPresenter.UpdateDefaultDrawingAttributes(attributes);  // set UI attributes
+        //                //await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+        //                //{
+        //                // 描画属性を作成する
+        //                InkDrawingAttributes attributes = new InkDrawingAttributes();
+        //                attributes.Color = UIColors[index]; //Windows.UI.Colors.Red; //
+        //                                                    //attributes.Size = new Size(10, 2);          // ペンのサイズ
+        //                                                    //attributes.IgnorePressure = false;          // ペンの圧力を使用するかどうか
+        //                                                    //attributes.FitToCurve = false;
+        //                Canvas_Strokes.InkPresenter.UpdateDefaultDrawingAttributes(attributes);  // set UI attributes
 
-                // Make a stroke by array of point
-                InkStroke s = m_inkStrokeBuilder.CreateStrokeFromInkPoints(
-                    points, System.Numerics.Matrix3x2.Identity);
-                Canvas_Strokes.InkPresenter.StrokeContainer.AddStroke(s);
+        //                // Make a stroke by array of point
+        //                InkStroke s = m_inkStrokeBuilder.CreateStrokeFromInkPoints(
+        //                    points, System.Numerics.Matrix3x2.Identity);
+        //                Canvas_Strokes.InkPresenter.StrokeContainer.AddStroke(s);
 
-                //});
- //               pub.StartState = false;
-            }
-            catch (Exception ex)
-            {
-                ListBox_Message.Items.Add(string.Format("DrawStroke: {0}", ex.Message));
-            }
-        }
+        //                //});
+        // //               pub.StartState = false;
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                ListBox_Message.Items.Add(string.Format("DrawStroke: {0}", ex.Message));
+        //            }
+        //        }
 
         private void SetCanvasScaling(int index)
         {
@@ -369,6 +372,32 @@ namespace WdBroker
             }
         }
 
+        private void DrawStroke(List<DeviceRawData> deviceRawDataList, int index)
+        {
+            try
+            {
+                int count = deviceRawDataList.Count;
+
+                InkPoint[] points = new InkPoint[count];
+                for (int i = 0; i < count; i++)
+                {
+                    points[i] = new InkPoint(new Windows.Foundation.Point(
+                        deviceRawDataList[i].x * mScale,
+                        deviceRawDataList[i].y * mScale),
+                        deviceRawDataList[i].z);
+                }
+
+                InkStroke s = App.Subs[index].StrokeBuilder.CreateStrokeFromInkPoints(
+                    points, System.Numerics.Matrix3x2.Identity);
+                CanvasStrokesList[index].InkPresenter.StrokeContainer.AddStroke(s);
+            }
+            catch (Exception ex)
+            {
+                ListBox_Message.Items.Add(string.Format("DrawStroke: {0}", ex.Message));
+            }
+        }
+
+        // for debug
         private void DrawStroke(int x, int y, int index)
         {
             try
@@ -408,7 +437,8 @@ namespace WdBroker
                 //await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () =>
                 //{
                 // Make a stroke by array of point
-                InkStroke s = InkStrokeBuilderList[index].CreateStrokeFromInkPoints(
+
+                InkStroke s = App.Subs[index].StrokeBuilder.CreateStrokeFromInkPoints(
                 points, System.Numerics.Matrix3x2.Identity);
                 CanvasStrokesList[index].InkPresenter.StrokeContainer.AddStroke(s);
 

@@ -307,10 +307,10 @@ namespace WdBroker
                         case CMD_REQUEST_PUBLISHER_CONNECTION:
                             this.MessageEvent("Request Publisher Connect command is received.");
 
-                            if (Count >= MaxCount)
-                            {
-                                return;
-                            }
+                            //if (Count >= MaxCount)
+                            //{
+                            //    return;
+                            //}
 
                             //// Do the publisher 1st contact process
                             //// 1. Create a new instance
