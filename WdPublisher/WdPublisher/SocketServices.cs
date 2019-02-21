@@ -516,6 +516,8 @@ namespace WillDevicesSampleApp
                 //   the server and client are in the same process.
                 if (hostNameString != DEFAULT_HOSTNAME)
                     HostNameString = hostNameString;
+                else
+                    HostNameString = DEFAULT_HOSTNAME;
                 hostName = new HostName(HostNameString);
 
                 if (portNumberString != DEFAULT_PORTNUMBER)
@@ -540,7 +542,7 @@ namespace WillDevicesSampleApp
             catch (Exception ex)
             {
                 SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("SocketClient.Connect(): Exception: {0}",
+                throw new Exception(string.Format("SocketClient.Connect: Exception: {0}",
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
 
