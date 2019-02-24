@@ -1,8 +1,0 @@
-
-
-SocketServicesのStreamSocketListenerReceiveBinaryで例外
-
-ユーザーが処理していない例外
-System.Exception: StreamSocketListenerReceiveBinary: ConnectionResetByPeer
-
-Windows.Networking.Sockets.SocketError から、ex.Message = ConnectionResetByPeer
