@@ -32,6 +32,7 @@ namespace WdBroker
 
     public class Publisher
     {
+        // sent by Publisher device
         public string Id;
         public string HostName;
         public string PortNumber;
@@ -48,11 +49,13 @@ namespace WdBroker
         public bool StartState;
         public double ViewScale;
 
+        // Publisher attributes depend on the running environment
+        public string IpAddress;
         public int Index;
 
         public Publisher()
         {
-            this.DeviceSize.Height = 29700;    // ToDo: get from Publishers
+            this.DeviceSize.Height = 29700;    // ToDo: get from each Publisher devices
             this.DeviceSize.Width = 21600;
 
             this.Strokes = new List<Stroke>();
@@ -75,7 +78,5 @@ namespace WdBroker
         {
 
         }
-
     }
-
 }

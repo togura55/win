@@ -18,13 +18,8 @@ namespace WdBroker
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        //            List<DrawPoint> DrawPointList;
-        int Count;
-        int MaxCount;
         List<InkCanvas> CanvasStrokesList;
         List<Border> BorderList;
-        //InkStrokeBuilder inkStrokeBuilder;
-        //List<InkStrokeBuilder> InkStrokeBuilderList;
 
         static string PortNumberString = "1337";
         static string HostNameString = "192.168.0.7";
@@ -43,7 +38,6 @@ namespace WdBroker
 
         private InkStrokeBuilder m_inkStrokeBuilder = new InkStrokeBuilder();
         private double mScale = 1;
-        private static float maxP = 1.402218f;
 
         private const uint MASK_COMMAND = 0xF000;
 
@@ -55,6 +49,8 @@ namespace WdBroker
             App.AppMessage += ReceiveMessage;
             App.Socket.SocketMessage += ReceiveMessage;
             App.Broker.AppConnectPublisher += ReceiveAppConnectPublisher;
+            App.Broker.AppDisconnectPublisher += ReceiveAppDisconnectPublisher;
+
             App.Broker.BrokerMessage += ReceiveMessage;
             App.Broker.AppDrawing += ReceiveDrawing;  // for drawing
 
@@ -88,18 +84,6 @@ namespace WdBroker
             appView.Title = version;
 
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
-
-            //InkDrawingAttributes attributes = new InkDrawingAttributes();
-            //attributes.Color = Windows.UI.Colors.Red; //UIColors[index]; //
-            //attributes.Size = new Size(2, 2);          // ペンのサイズ
-            //attributes.IgnorePressure = false;          // ペンの圧力を使用するかどうか
-            //attributes.FitToCurve = false;
-            //m_inkStrokeBuilder.SetDefaultDrawingAttributes(attributes);
-
-            //            DrawPointList = new List<DrawPoint>();
-            Count = 0;
-            MaxCount = 6;
-            //            InkStrokeBuilderList = new List<InkStrokeBuilder>();
 
             CanvasStrokesList = new List<InkCanvas> {
                 Canvas_Strokes_1,
@@ -229,6 +213,7 @@ namespace WdBroker
             if (App.Broker != null)
             {
                 App.Broker.AppConnectPublisher -= ReceiveAppConnectPublisher;
+                App.Broker.AppDisconnectPublisher -= ReceiveAppDisconnectPublisher;
                 App.Broker.BrokerMessage -= ReceiveMessage;
                 App.Broker.AppDrawing -= ReceiveDrawing;  // for drawing
             }
@@ -447,7 +432,7 @@ namespace WdBroker
             }
             catch (Exception ex)
             {
-                //               ListBox_Message.Items.Add(string.Format("DrawStroke: {0}", ex.Message));
+                ListBox_Message.Items.Add(string.Format("DrawStroke: {0}", ex.Message));
             }
         }
 

@@ -18,11 +18,13 @@ namespace WdBroker
         // Delegate event handlers
         public delegate void BrokerEventHandler(object sender, string message);
         public delegate void ConnectPublisherEventHandler(object sender, int index);
+        public delegate void DisconnectPublisherEventHandler(object sender, int index);
         public delegate void DrawingEventHandler(object sender, List<DeviceRawData> data, int index); // for drawing
 
         // Properties
         public event BrokerEventHandler BrokerMessage;
         public event ConnectPublisherEventHandler AppConnectPublisher;
+        public event DisconnectPublisherEventHandler AppDisconnectPublisher;
         public event DrawingEventHandler AppDrawing; // for drawing
 
         // Definition of constants
@@ -46,6 +48,7 @@ namespace WdBroker
             subs = new List<Subscriber>();
         }
 
+        #region Wrapper of invoke property messages
         private async void MessageEvent(string message)
         {
             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -62,6 +65,14 @@ namespace WdBroker
             });
         }
 
+        private async void DisconnectPublisherEvent(int index)
+        {
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                AppDisconnectPublisher?.Invoke(this, index);
+            });
+        }
+
         private async void DrawingEvent(List<DeviceRawData> data, int index)
         {
             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -69,53 +80,10 @@ namespace WdBroker
                 AppDrawing?.Invoke(this, data, index);
             });
         }
-
-        #region Services
-        public async Task Start(HostName hostName, string portNumber)
-        {
-
-            // ------- For Commands -------------
-            // Delegation settings
-            mServerSocket.AcceptComplete += Server_AcceptComplete;
-            mServerSocket.ReceivePacketComplete += Server_ReceivePacketComplete;
-            mServerSocket.SendPacketComplete += Server_SendPacketComplete;
-
-            // Start server listen for command
-            mServerSocket.Listen(IPAddress.Parse(hostName.ToString()), int.Parse(portNumber));
-
-            // -------- For Data -----------------
-            // Delegation Settings
-            App.Socket.StreamSocketReceiveEvent += DataPublisherEvent;
-
-            // Start
-            await App.Socket.StreamSocket_Start(hostName, portNumber);
-        }
-
-        public void Stop()
-        {
-            try
-            {
-                // ---- For Data ----
-                App.Socket.StreamSocket_Stop();
-
-                App.Socket.StreamSocketReceiveEvent -= DataPublisherEvent;
-
-                // ---- For Command -------
-                mServerSocket.Disonnect();
-
-                mServerSocket.AcceptComplete -= Server_AcceptComplete;
-                mServerSocket.ReceivePacketComplete -= Server_ReceivePacketComplete;
-                mServerSocket.SendPacketComplete -= Server_SendPacketComplete;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(string.Format("Stop: Exception: {0}", ex.Message));
-            }
-        }
         #endregion
 
         #region Delegate handlers
-        private async void Server_AcceptComplete(object sender, SocketErrorEventArgs e)
+        private void Server_AcceptComplete(object sender, SocketErrorEventArgs e)
         {
             MessageEvent(string.Format("client socket accepted: {0}", e.Error));
         }
@@ -125,7 +93,7 @@ namespace WdBroker
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void Server_ReceivePacketComplete(object sender, ReceivePacketEventArgs e)
+        private void Server_ReceivePacketComplete(object sender, ReceivePacketEventArgs e)
         {
             if (e.Error != SocketError.Success)
             {
@@ -138,11 +106,10 @@ namespace WdBroker
             string msg = System.Text.Encoding.UTF8.GetString(e.Data);
             MessageEvent(string.Format("packet received: {0}", msg));
 
-            // パケットの返信
-            //msg += " From Server";
-            //mServerSock.SendToClient(System.Text.Encoding.UTF8.GetBytes(msg));
-            CommandPublisher(msg);
-            //     MessageEvent(string.Format("return message: {0}", msg));
+            // 受信コマンドの振り分け
+
+            string remoteEndPoint = e.Socket.RemoteEndPoint.ToString();
+            PublisherResponseDispatcher(msg, remoteEndPoint);
         }
 
         /// <summary>
@@ -150,12 +117,12 @@ namespace WdBroker
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void Server_SendPacketComplete(object sender, SocketErrorEventArgs e)
+        private void Server_SendPacketComplete(object sender, SocketErrorEventArgs e)
         {
             MessageEvent(string.Format("packet send completed: {0}", e.Error));
         }
 
-        private void DataPublisherEvent(Byte[] databyte)
+        private void DataPublisherReceiveEvent(Byte[] databyte)
         {
             const int num_bytes = sizeof(float);  // 4 bytes
             int index = 0;
@@ -260,6 +227,97 @@ namespace WdBroker
                 MessageEvent(string.Format("DataPublisherEvent: Exception: {0}", ex.Message));
             }
         }
+
+        private void DataPublisherErrorEvent(HostName host, string message)
+        {
+            try
+            {
+                switch (message)
+                {
+                    case "ConnectionResetByPeer":
+                        string hostNameString = host.ToString();
+                        int index = -1;
+                        for (int i = 0; i < App.Pubs.Count; i++)
+                        {
+                            if (App.Pubs[i].IpAddress == hostNameString)
+                            {
+                                index = i;
+                                break;
+                            }
+                        }
+                        if (index < 0)
+                        {
+                            throw new Exception(string.Format("No match HostName: {0} in Pubs.", hostNameString));
+                        }
+                        else
+                        {
+                            DisconnectPublisherEvent(index);
+                            App.Pubs[index].Dispose();
+                        }
+                        break;
+
+                    default:
+                        throw new Exception(string.Format("Unresolved error codes: {0}", message));
+                        //          break;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("DataPublisherErrorEvent: Exception: {0}", ex.Message));
+            }
+        }
+        #endregion
+
+        #region Services
+        public async Task Start(HostName hostName, string portNumber)
+        {
+            try
+            {
+                // ------- For Commands -------------
+                // Delegation settings
+                mServerSocket.AcceptComplete += Server_AcceptComplete;
+                mServerSocket.ReceivePacketComplete += Server_ReceivePacketComplete;
+                mServerSocket.SendPacketComplete += Server_SendPacketComplete;
+
+                // Start server listen for command
+                mServerSocket.Listen(IPAddress.Parse(hostName.ToString()), int.Parse(portNumber));
+
+                // -------- For Data -----------------
+                // Delegation Settings
+                App.Socket.StreamSocketReceiveEvent += DataPublisherReceiveEvent;
+                App.Socket.StreamSocketErrorEvent += DataPublisherErrorEvent;
+
+                // Start
+                await App.Socket.StreamSocket_Start(hostName, portNumber);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Broker.Start: Exception: {0}", ex.Message));
+            }
+        }
+
+        public void Stop()
+        {
+            try
+            {
+                // ---- For Data ----
+                App.Socket.StreamSocket_Stop();
+
+                App.Socket.StreamSocketReceiveEvent -= DataPublisherReceiveEvent;
+                App.Socket.StreamSocketErrorEvent -= DataPublisherErrorEvent;
+
+                // ---- For Command -------
+                mServerSocket.Disonnect();
+
+                mServerSocket.AcceptComplete -= Server_AcceptComplete;
+                mServerSocket.ReceivePacketComplete -= Server_ReceivePacketComplete;
+                mServerSocket.SendPacketComplete -= Server_SendPacketComplete;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Broker.Stop: Exception: {0}", ex.Message));
+            }
+        }
         #endregion
 
         private int FindPublisherId(string id)
@@ -278,7 +336,12 @@ namespace WdBroker
             return index;
         }
 
-        private void CommandPublisher(string request)
+        /// <summary>
+        /// Dispatch command responses sent by Publisher
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="remoteEndPoint"></param>
+        private void PublisherResponseDispatcher(string request, string remoteEndPoint)
         {
             try
             {
@@ -318,7 +381,7 @@ namespace WdBroker
                             App.Pubs.Add(new Publisher());
 
                             // ToDo: rewrite GeneratePublisherId for identical ID strings
-                            //// 2. Generate Publisher Id, smallest number of pubs
+                            //// 2. Generate unique Publisher Id, smallest number of pubs
                             float id = 1; // set the base id number
                             float id_new = id;
                             for (int j = 0; j < App.Pubs.Count; j++)
@@ -332,11 +395,19 @@ namespace WdBroker
                                 id++;
                             }
                             App.Pubs[App.Pubs.Count - 1].Id = id_new.ToString();
-                            //                           ConnectPublisherEvent(App.Pubs.Count - 1);  // Notify to caller 
 
-                            //// 3. Respond to the publisher
+                            // 3. Get the Publisher's IP address and store it 
+                            {
+                                char sp2 = ':'; // separater
+                                string[] arr2 = remoteEndPoint.Split(sp2);
+                                var list2 = new List<string>();
+                                list2.AddRange(arr2);
+
+                                App.Pubs[App.Pubs.Count - 1].IpAddress = list2[0];
+                            }
+
+                            //// 4. Respond to the Publisher
                             //// response back.
-                            //                            App.Socket.SendCommandResponseAsync(args, id_new.ToString());
                             res = id_new.ToString();
                             mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
                             MessageEvent(string.Format("Assigned and sent Publisher ID: {0}", res));

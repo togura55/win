@@ -27,9 +27,15 @@ namespace WdBroker
             get;
         }
 
-        public ReceivePacketEventArgs(System.Net.Sockets.SocketError err, byte[] recvData) : base(err)
+        public Socket Socket
+        {
+            get;
+        }
+
+        public ReceivePacketEventArgs(System.Net.Sockets.SocketError err, byte[] recvData, Socket socket) : base(err)
         {
             this.Data = recvData;
+            this.Socket = socket;
         }
     }
     /// <summary>
@@ -299,6 +305,7 @@ namespace WdBroker
             // 受信の開始
             this.StartReceive(mSocket);
             // 接続完了イベント
+            SocketAddress socketAddress = e.RemoteEndPoint.Serialize();
             this.ConnectComplete?.Invoke(this, new SocketErrorEventArgs(e.SocketError));
         }
 
@@ -327,7 +334,8 @@ namespace WdBroker
                 {
                     // 受信に失敗
                     this.ReceivePacketComplete?.Invoke(this,
-                        new ReceivePacketEventArgs(e.SocketError, null));
+                        new ReceivePacketEventArgs(e.SocketError, null, (Socket)sender)
+                        );
 
                     // 受信用バッファのクリア
                     token.ReceiveSocket = null;
@@ -352,7 +360,9 @@ namespace WdBroker
                         // 受信完了イベント
                         byte[] data = new byte[packetSize];
                         Array.Copy(e.Buffer, 4, data, 0, packetSize);
-                        this.ReceivePacketComplete?.Invoke(this, new ReceivePacketEventArgs(System.Net.Sockets.SocketError.Success, data));
+                        this.ReceivePacketComplete?.Invoke(this, 
+                            new ReceivePacketEventArgs(System.Net.Sockets.SocketError.Success, data, (Socket)sender)
+                            );
                     }
                 }
                 else
@@ -366,7 +376,8 @@ namespace WdBroker
 
                         // 受信完了イベント
                         this.ReceivePacketComplete?.Invoke(this,
-                            new ReceivePacketEventArgs(System.Net.Sockets.SocketError.Success, token.PacketBuffer.ToArray()));
+                            new ReceivePacketEventArgs(System.Net.Sockets.SocketError.Success, token.PacketBuffer.ToArray(), (Socket)sender)
+                            );
 
                         // 受信用バッファのクリア
                         token.PacketSize = 0;
@@ -432,22 +443,29 @@ namespace WdBroker
         public string HostNameString { get; private set; }
         public string PortNumberString { get; private set; }
 
-        HostName hostName;
+        private HostName hostName;
         public StreamSocket streamSocket;
         private StreamSocketListener streamSocketListenerData = null;
-        //        public StreamSocketListener streamSocketListener;
-
+ 
         // Delegate handlers
         public delegate void MessageEventHandler(object sender, string message);
         public delegate void SocketClientConnectCompletedNotificationHandler(object sender, bool result);
         public delegate void StreamSocketEventHandler(Byte[] byte_array);
+        public delegate void StreamSocketErrorHandler(HostName host, string description);
 
         // Properties
         public event MessageEventHandler SocketMessage;
         public event SocketClientConnectCompletedNotificationHandler SocketClientConnectCompletedNotification;
         public event StreamSocketEventHandler StreamSocketReceiveEvent;
+        public event StreamSocketErrorHandler StreamSocketErrorEvent; // StreamSocket error通知用のイベントハンドラを実装
 
         #region StreamSocket services
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hostName"></param>
+        /// <param name="portNumberString"></param>
+        /// <returns></returns>
         public async Task StreamSocket_Start(HostName hostName, string portNumberString)
         {
             try
@@ -455,7 +473,7 @@ namespace WdBroker
                 // --------- For Data stream-------------
                 string port = (int.Parse(portNumberString) + 1).ToString();
                 this.SocketMessage?.Invoke(this,
-                    String.Format("Start(): try to listen the port for data {0}:{1}...", hostName.ToString(), port));
+                    String.Format("StreamSocket_Start: try to listen the port for data {0}:{1}...", hostName.ToString(), port));
 
                 streamSocketListenerData = new StreamSocketListener();
 
@@ -466,18 +484,26 @@ namespace WdBroker
                 await streamSocketListenerData.BindEndpointAsync(hostName, port).AsTask().ConfigureAwait(false);
 
                 this.SocketMessage?.Invoke(this,
-                 String.Format("Start(): The server for data {0}:{1} is now listening...", hostName.ToString(), port));
+                 String.Format("StreamSocket_Start: The server for data {0}:{1} is now listening...", hostName.ToString(), port));
             }
             catch (Exception ex)
             {
                 SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("Start(): Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+                throw new Exception(string.Format("StreamSocket_Start: Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
 
-        public async Task StreamSocket_Connect(string hostNameString = DEFAULT_HOSTNAME,
-string portNumberString = DEFAULT_PORTNUMBER,
-int timeout = 10000)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hostNameString"></param>
+        /// <param name="portNumberString"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
+        public async Task StreamSocket_Connect(
+            string hostNameString = DEFAULT_HOSTNAME,
+            string portNumberString = DEFAULT_PORTNUMBER,
+            int timeout = 10000)
         {
             try
             {
@@ -490,7 +516,7 @@ int timeout = 10000)
                 if (portNumberString != DEFAULT_PORTNUMBER)
                     PortNumberString = portNumberString;
 
-                MessageEvent(string.Format("SocketClient.Connect({0},{1}): call ConnectAsync with timeout {2}",
+                MessageEvent(string.Format("StreamSocket_Connect({0},{1}): call ConnectAsync with timeout {2}",
                             HostNameString, PortNumberString, timeout.ToString()));
 
                 // Create the StreamSocket and establish a connection to the echo server.
@@ -503,13 +529,13 @@ int timeout = 10000)
             }
             catch (TaskCanceledException ex)
             {
-                throw new TaskCanceledException(string.Format("SocketClient.Connect(): TaskCanceledException: {0}",
+                throw new TaskCanceledException(string.Format("StreamSocket_Connect: TaskCanceledException: {0}",
                      ex.Message));
             }
             catch (Exception ex)
             {
                 SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("SocketClient.Connect(): Exception: {0}",
+                throw new Exception(string.Format("StreamSocket_Connect: Exception: {0}",
                     webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
 
@@ -532,8 +558,10 @@ int timeout = 10000)
             catch (Exception ex)
             {
                 SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
+                MessageEvent("StreamSocket_Disonnect: Socket services were disconnected.");
             }
         }
+        
         /// <summary>
         /// 
         /// </summary>
@@ -546,31 +574,32 @@ int timeout = 10000)
                     //                    streamSocketListenerData.ConnectionReceived -= StreamSocketListener_ReceiveBinary;
                     streamSocketListenerData.Dispose();
                 }
-                MessageEvent("Stop(): Socket services were stop and disposed.");
+                MessageEvent("StreamSocket_Stop: Socket services were stopped.");
             }
             catch (Exception ex)
             {
                 SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("Stop(): Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+                throw new Exception(string.Format("StreamSocket_Stop: Exception: {0}", webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="buffer"></param>
         public void StreamSocket_SendData(IBuffer buffer)
         {
             StreamSocket_SendBinary(this.streamSocket, buffer);
         }
 
-        //public async Task SendCommandResponseAsync(StreamSocketListenerConnectionReceivedEventArgs args, string response)
-        //{
-        //    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal,
-        //    () =>
-        //    {
-        //        StreamSocket_SendString(args, response);
-        //    });
-        //}
         #endregion
 
         #region StreamSocket I/O
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="socket"></param>
+        /// <param name="buffer"></param>
         private void StreamSocket_SendBinary(StreamSocket socket, IBuffer buffer)
         {
             try
@@ -600,8 +629,14 @@ int timeout = 10000)
             }
         }
 
-        private async void StreamSocketListener_ReceiveBinary(StreamSocketListener sender,
-     StreamSocketListenerConnectionReceivedEventArgs args)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private async void StreamSocketListener_ReceiveBinary(
+            StreamSocketListener sender,
+            StreamSocketListenerConnectionReceivedEventArgs args)
         {
             try
             {
@@ -623,12 +658,16 @@ int timeout = 10000)
             catch (Exception ex)
             {
                 SocketErrorStatus webErrorStatus = Windows.Networking.Sockets.SocketError.GetStatus(ex.GetBaseException().HResult);
-                throw new Exception(string.Format("StreamSocketListener_ReceiveBinary: Exception: {0}",
-                    webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message));
+                string message = webErrorStatus.ToString() != "Unknown" ? webErrorStatus.ToString() : ex.Message;
+
+                // Inform to caller
+                this.StreamSocketErrorEvent?.Invoke(args.Socket.Information.RemoteHostName, message);
+
+//                throw new Exception(string.Format("StreamSocketListener_ReceiveBinary: Exception: {0}", message));
             }
         }
-
         #endregion
+        
         #endregion
     }
 }
