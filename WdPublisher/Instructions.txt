@@ -17,7 +17,7 @@ Windows UWP application program for manipulating Wacom Smartpad devices and tran
 - Allow WdController configure the application setting on BLE
 
 <Environment>
-- PC with USB, Bluetooth LE 4.2 and Ethernet (Wired or WiFi)
+- PC with USB, Bluetooth LE 4.2 and IPv4 Ethernet (Wired or WiFi)
 - Windows 10 version 1803 or higher
 - WdBroker 1.0.7 or higher
 - WdController 1.0.0 or higher

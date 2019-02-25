@@ -1,10 +1,10 @@
 # WdBroker
 ## Description
-Socket server for WdPublisher  
+Socket server application program which uses TCP/IP communication with multi-clients such as WdPublisher.  
 ## Build Instruction
 Load .sln by Visual Studio 2017 and build it. 
 ## Functions/Features
-* Allow to connect multipule WdPublisher through the TCP/IP network
+* Allow to connect multipule WdPublisher through the TCP/IP network connection  
 * Display connection information and raw data collected by each WdPublisher   
 ## Environment
 UWP platforms  

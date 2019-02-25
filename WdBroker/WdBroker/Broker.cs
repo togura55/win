@@ -73,22 +73,28 @@ namespace WdBroker
         #region Services
         public async Task Start(HostName hostName, string portNumber)
         {
+            try
+            {
+                // ------- For Commands -------------
+                // Delegation settings
+                mServerSocket.AcceptComplete += Server_AcceptComplete;
+                mServerSocket.ReceivePacketComplete += Server_ReceivePacketComplete;
+                mServerSocket.SendPacketComplete += Server_SendPacketComplete;
 
-            // ------- For Commands -------------
-            // Delegation settings
-            mServerSocket.AcceptComplete += Server_AcceptComplete;
-            mServerSocket.ReceivePacketComplete += Server_ReceivePacketComplete;
-            mServerSocket.SendPacketComplete += Server_SendPacketComplete;
+                // Start server listen for command
+                mServerSocket.Listen(IPAddress.Parse(hostName.ToString()), int.Parse(portNumber));
 
-            // Start server listen for command
-            mServerSocket.Listen(IPAddress.Parse(hostName.ToString()), int.Parse(portNumber));
+                // -------- For Data -----------------
+                // Delegation Settings
+                App.Socket.StreamSocketReceiveEvent += DataPublisherEvent;
 
-            // -------- For Data -----------------
-            // Delegation Settings
-            App.Socket.StreamSocketReceiveEvent += DataPublisherEvent;
-
-            // Start
-            await App.Socket.StreamSocket_Start(hostName, portNumber);
+                // Start
+                await App.Socket.StreamSocket_Start(hostName, portNumber);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Broker: Start: Exception: {0}", ex.Message));
+            }
         }
 
         public void Stop()
@@ -109,7 +115,7 @@ namespace WdBroker
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("Stop: Exception: {0}", ex.Message));
+                throw new Exception(string.Format("Broker: Stop: Exception: {0}", ex.Message));
             }
         }
         #endregion

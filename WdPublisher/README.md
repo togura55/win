@@ -6,8 +6,8 @@ Socket client application for reading raw data of WILL devices and transferring 
 2. Load sln by Visual Studio 2017   
 3. Build it   
 ## Functions/Features
-- Handling PHU-111 USB interface  
-- Accessing WdBroker's Socket IP communication
+- Handling PHU-111 over USB interface  
+- Accessing WdBroker's TCP/IP Socket communication
 - Accepting the app configuration by WdController on BLE
 ## Environment
 UWP platforms  
@@ -16,6 +16,7 @@ xxx
 ## Author(s)
 * Tsuyoshi Ogura (togura55@gmail.com)  
 ## ToDo/Known Issues
+*   
 *   
 ## History
 * 1.0.10 

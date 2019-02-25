@@ -249,7 +249,6 @@ namespace WdBroker
             // Publisherが接続されたら、購読を希望しているSubscriberを紐づける
             // 本来ならSubscriberからのリクエストに応じて、Subscriber向けのコネクタ等を
             // 準備する。
-            // ここでは便宜的に、ひとつのSubscriberをこのアプリ内に自発的に持つことにする
             Subscriber sub = new Subscriber();
             sub.CanvasStrokes = CanvasStrokesList[index];
             sub.Create(index);
