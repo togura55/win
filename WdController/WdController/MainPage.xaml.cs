@@ -116,7 +116,8 @@ namespace WdController
 
             // UI initialization
             resource = ResourceLoader.GetForCurrentView();
-            Pbtn_Start.Content = wdController.DeviceStarted ? resource.GetString("IDC_Stop") : resource.GetString("IDC_Start");
+//            Pbtn_Start.Content = wdController.DeviceStarted ? resource.GetString("IDC_Stop") : resource.GetString("IDC_Scan");
+            Pbtn_Start.Content = resource.GetString("IDC_Scan");
             Pbtn_Connect.Content = resource.GetString("IDC_Connect");
             Pbtn_RequestAccess.Content = resource.GetString("IDC_RequestAccess");
             Pbtn_SetConfig.Content = resource.GetString("IDC_SetConfig");
@@ -200,7 +201,7 @@ namespace WdController
             //            Pbtn_Start.Content = resource.GetString("IDC_Stop");
             if (wdController != null)
             {
-                Pbtn_Start.Content = wdController.DeviceStarted ? resource.GetString("IDC_Stop") : resource.GetString("IDC_Start");
+//                Pbtn_Start.Content = wdController.DeviceStarted ? resource.GetString("IDC_Stop") : resource.GetString("IDC_Start");
 
                 string message = wdController.DeviceStarted ? "Device watcher started" : "Device watcher stopped";
                 ListBox_Messages.Items.Add(message);
@@ -472,8 +473,8 @@ namespace WdController
 
 
             wdController.DeviceStarted = !wdController.DeviceStarted;  // toggle state, ToDo: should be moved into the completion delegate.
-            Pbtn_DeviceStart.Content = 
-                wdController.DeviceStarted ? resource.GetString("IDC_Stop") : resource.GetString("IDC_Start");
+            //Pbtn_DeviceStart.Content = 
+            //    wdController.DeviceStarted ? resource.GetString("IDC_Stop") : resource.GetString("IDC_Start");
         }
 
         private async void Pbtn_GetVersion_Click(object sender, RoutedEventArgs e)

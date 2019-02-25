@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using Windows.UI.Xaml.Shapes;
 using Windows.UI.Input.Inking;
 using Windows.UI.ViewManagement;
+using Windows.UI.Xaml.Media;
 
 namespace WdBroker
 {
@@ -18,13 +19,8 @@ namespace WdBroker
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        //            List<DrawPoint> DrawPointList;
-        int Count;
-        int MaxCount;
         List<InkCanvas> CanvasStrokesList;
         List<Border> BorderList;
-        //InkStrokeBuilder inkStrokeBuilder;
-        //List<InkStrokeBuilder> InkStrokeBuilderList;
 
         static string PortNumberString = "1337";
         static string HostNameString = "192.168.0.7";
@@ -43,7 +39,6 @@ namespace WdBroker
 
         private InkStrokeBuilder m_inkStrokeBuilder = new InkStrokeBuilder();
         private double mScale = 1;
-        private static float maxP = 1.402218f;
 
         private const uint MASK_COMMAND = 0xF000;
 
@@ -55,6 +50,8 @@ namespace WdBroker
             App.AppMessage += ReceiveMessage;
             App.Socket.SocketMessage += ReceiveMessage;
             App.Broker.AppConnectPublisher += ReceiveAppConnectPublisher;
+            App.Broker.AppDisconnectPublisher += ReceiveAppDisconnectPublisher;
+
             App.Broker.BrokerMessage += ReceiveMessage;
             App.Broker.AppDrawing += ReceiveDrawing;  // for drawing
 
@@ -88,18 +85,6 @@ namespace WdBroker
             appView.Title = version;
 
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
-
-            //InkDrawingAttributes attributes = new InkDrawingAttributes();
-            //attributes.Color = Windows.UI.Colors.Red; //UIColors[index]; //
-            //attributes.Size = new Size(2, 2);          // ペンのサイズ
-            //attributes.IgnorePressure = false;          // ペンの圧力を使用するかどうか
-            //attributes.FitToCurve = false;
-            //m_inkStrokeBuilder.SetDefaultDrawingAttributes(attributes);
-
-            //            DrawPointList = new List<DrawPoint>();
-            Count = 0;
-            MaxCount = 6;
-            //            InkStrokeBuilderList = new List<InkStrokeBuilder>();
 
             CanvasStrokesList = new List<InkCanvas> {
                 Canvas_Strokes_1,
@@ -156,7 +141,8 @@ namespace WdBroker
 
             foreach (Border b in BorderList)
             {
-                b.Visibility = Visibility.Collapsed;
+//                b.Visibility = Visibility.Collapsed;
+                b.BorderBrush = new SolidColorBrush(Windows.UI.Colors.LightGray);
             }
             // using for debug
             Border_debug.Visibility = Visibility.Collapsed;
@@ -229,6 +215,7 @@ namespace WdBroker
             if (App.Broker != null)
             {
                 App.Broker.AppConnectPublisher -= ReceiveAppConnectPublisher;
+                App.Broker.AppDisconnectPublisher -= ReceiveAppDisconnectPublisher;
                 App.Broker.BrokerMessage -= ReceiveMessage;
                 App.Broker.AppDrawing -= ReceiveDrawing;  // for drawing
             }
@@ -244,11 +231,13 @@ namespace WdBroker
         {
             //            SetCanvasScaling(index);
 
-            BorderList[index].Visibility = Visibility.Visible;  // Visible the drawing area
+ //           BorderList[index].Visibility = Visibility.Visible;  // Visible the drawing area
+            BorderList[index].BorderBrush = new SolidColorBrush(Windows.UI.Colors.Black);
 
             // Publisherが接続されたら、購読を希望しているSubscriberを紐づける
             // 本来ならSubscriberからのリクエストに応じて、Subscriber向けのコネクタ等を
             // 準備する。
+            // ここでは便宜的に、ひとつのSubscriberをこのアプリ内に持つことにする
             Subscriber sub = new Subscriber();
             sub.CanvasStrokes = CanvasStrokesList[index];
             sub.Create(index);
@@ -261,7 +250,9 @@ namespace WdBroker
             sub.Dispose(index);
             App.Broker.subs.RemoveAt(index);
 
-            BorderList[index].Visibility = Visibility.Collapsed;
+            //           BorderList[index].Visibility = Visibility.Collapsed;
+            CanvasStrokesList[index].InkPresenter.StrokeContainer.Clear();
+            BorderList[index].BorderBrush = new SolidColorBrush(Windows.UI.Colors.Black);
         }
         #endregion
 
@@ -288,20 +279,20 @@ namespace WdBroker
         #endregion
 
         #region Drawing
-        private void CanvasClear(Canvas canvas)
-        {
-            try
-            {
-                foreach (UIElement ui in canvas.Children)
-                {
-                    canvas.Children.Remove(ui);
-                }
-            }
-            catch (Exception ex)
-            {
-                ListBox_Message.Items.Add(ex.Message);
-            }
-        }
+        //private void CanvasClear(Canvas canvas)
+        //{
+        //    try
+        //    {
+        //        foreach (UIElement ui in canvas.Children)
+        //        {
+        //            canvas.Children.Remove(ui);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ListBox_Message.Items.Add(ex.Message);
+        //    }
+        //}
 
         // Raw data event handler sent by SocketServer object
         private void ReceiveDrawing(object sender, List<DeviceRawData> data_list, int index)
@@ -309,48 +300,6 @@ namespace WdBroker
             //            DrawStroke(data_list, index);
             DrawStroke(data_list, index);
         }
-
-        //       private async void DrawStroke(float f, float x, float y, float p, int index)
-        //        private async void DrawStroke(List<DeviceRawData> deviceRawDataList, int index)
-        //        {
-        //            try
-        //            {
-        ////                Publisher pub = App.Pubs[index];
-
-        //                int count = deviceRawDataList.Count;
-
-        //                InkPoint[] points = new InkPoint[count];
-        //                for (int i = 0; i < count; i++)
-        //                {
-        //                    points[i] = new InkPoint(new Windows.Foundation.Point(
-        //                        deviceRawDataList[i].x * mScale,
-        //                        deviceRawDataList[i].y * mScale),
-        //                        deviceRawDataList[i].z);
-        //                }
-
-        //                //await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-        //                //{
-        //                // 描画属性を作成する
-        //                InkDrawingAttributes attributes = new InkDrawingAttributes();
-        //                attributes.Color = UIColors[index]; //Windows.UI.Colors.Red; //
-        //                                                    //attributes.Size = new Size(10, 2);          // ペンのサイズ
-        //                                                    //attributes.IgnorePressure = false;          // ペンの圧力を使用するかどうか
-        //                                                    //attributes.FitToCurve = false;
-        //                Canvas_Strokes.InkPresenter.UpdateDefaultDrawingAttributes(attributes);  // set UI attributes
-
-        //                // Make a stroke by array of point
-        //                InkStroke s = m_inkStrokeBuilder.CreateStrokeFromInkPoints(
-        //                    points, System.Numerics.Matrix3x2.Identity);
-        //                Canvas_Strokes.InkPresenter.StrokeContainer.AddStroke(s);
-
-        //                //});
-        // //               pub.StartState = false;
-        //            }
-        //            catch (Exception ex)
-        //            {
-        //                ListBox_Message.Items.Add(string.Format("DrawStroke: {0}", ex.Message));
-        //            }
-        //        }
 
         private void SetCanvasScaling(int index)
         {
@@ -446,7 +395,7 @@ namespace WdBroker
             }
             catch (Exception ex)
             {
-                //               ListBox_Message.Items.Add(string.Format("DrawStroke: {0}", ex.Message));
+                ListBox_Message.Items.Add(string.Format("DrawStroke: {0}", ex.Message));
             }
         }
 

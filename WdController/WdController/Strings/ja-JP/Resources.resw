@@ -147,11 +147,11 @@
   <data name="IDC_RequestAccess" xml:space="preserve">
     <value>アクセス要求</value>
   </data>
+  <data name="IDC_Scan" xml:space="preserve">
+    <value>スキャン</value>
+  </data>
   <data name="IDC_SetConfig" xml:space="preserve">
     <value>設定送信</value>
-  </data>
-  <data name="IDC_Start" xml:space="preserve">
-    <value>スタート</value>
   </data>
   <data name="IDC_Stop" xml:space="preserve">
     <value>ストップ</value>

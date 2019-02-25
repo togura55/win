@@ -147,11 +147,11 @@
   <data name="IDC_RequestAccess" xml:space="preserve">
     <value>Request Access</value>
   </data>
+  <data name="IDC_Scan" xml:space="preserve">
+    <value>Scan</value>
+  </data>
   <data name="IDC_SetConfig" xml:space="preserve">
     <value>Set Configure</value>
-  </data>
-  <data name="IDC_Start" xml:space="preserve">
-    <value>Start</value>
   </data>
   <data name="IDC_Stop" xml:space="preserve">
     <value>Stop</value>
