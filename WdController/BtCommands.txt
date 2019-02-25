@@ -1,5 +1,5 @@
 
-GetStatus
+GetConfig
    Width 
 　Height
 　PointSize
@@ -8,11 +8,12 @@ GetStatus
 　Battery
    DeviceType
    TransferMode
-    IP address
-    Port Number Base
-   State
+   Server IP Address
+   Server Port Number Base
+   Client IP Address 
+   DeviceState
 
-SetStatus
+SetConfig
    (Width) 
 　(Height)
 　(PointSize)
@@ -21,8 +22,10 @@ SetStatus
 　(Battery)
    (DeviceType)
    (TransferMode)
-    IP address
-    Port Number Base
+   Server IP Address
+   Server Port Number Base
+   (Client IP Address)
+   (DeviceState)
 
 GetVersion
 
@@ -30,4 +33,8 @@ Start
 
 Stop
 
+Discard
+
 Restart
+
+Poweroff

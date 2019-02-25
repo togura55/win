@@ -6,6 +6,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
+using Windows.Networking;
+using Windows.Networking.Connectivity;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 using Windows.UI.Core;
@@ -23,6 +25,7 @@ namespace WillDevicesSampleApp
         float PublisherId;
         public string HostNameString = string.Empty;
         public string PortNumberString = string.Empty;
+        public string ClientIpAddress = string.Empty;
 
         public readonly bool PUBLISHER_STATE_STOP = false;
         public readonly bool PUBLISHER_STATE_START = true;
@@ -44,6 +47,8 @@ namespace WillDevicesSampleApp
             HostNameString = "192.168.0.7";
             PortNumberString = "1337";
             State = PUBLISHER_STATE_STOP;
+            HostName hostName = NetworkInformation.GetHostNames().Where(q => q.Type == HostNameType.Ipv4).First();
+            ClientIpAddress = hostName.ToString();
         }
 
         private async void MessageEvent(string message)

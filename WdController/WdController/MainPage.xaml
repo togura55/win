@@ -46,8 +46,8 @@
                   ItemTemplate="{StaticResource ResultsListViewTemplate}"
                   ItemsSource="{Binding Path=ResultCollection}"
                  SelectionChanged="ResultsListView_SelectionChanged"/>
-        <TextBlock x:Name="TextBlock_ServiceName" HorizontalAlignment="Left" Margin="772,102,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top" Height="16" Width="122"/>
-        <TextBlock x:Name="TextBlock_DeviceName" HorizontalAlignment="Left" Margin="772,134,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <TextBlock x:Name="TextBlock_ServiceName" HorizontalAlignment="Left" Margin="772,102,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top" Height="23" Width="122"/>
+        <TextBlock x:Name="TextBlock_DeviceName" HorizontalAlignment="Left" Margin="772,134,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top" Height="21"/>
         <Button x:Name="Pbtn_GetConfig" Content="Button" HorizontalAlignment="Left" Margin="226,99,0,0" VerticalAlignment="Top" Width="142" Click="Pbtn_GetConfig_Click"/>
         <Button x:Name="Pbtn_DeviceStart" Content="Button" HorizontalAlignment="Left" Margin="225,147,0,0" VerticalAlignment="Top" Width="144" Click="Pbtn_DeviceStart_Click"/>
         <Button x:Name="Pbtn_GetVersion" Content="Button" HorizontalAlignment="Left" Margin="401,198,0,0" VerticalAlignment="Top" Width="144" Click="Pbtn_GetVersion_Click"/>
@@ -55,6 +55,7 @@
         <TextBlock x:Name="TextBlock_PublisherDeviceName" HorizontalAlignment="Left" Margin="452,65,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <TextBlock x:Name="TextBlock_IP" HorizontalAlignment="Left" Margin="452,109,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <TextBlock x:Name="TextBlock_Port" HorizontalAlignment="Left" Margin="452,156,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <TextBlock x:Name="TextBlock_ClientIpAddress" HorizontalAlignment="Left" Margin="772,163,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
 
     </Grid>
 </Page>

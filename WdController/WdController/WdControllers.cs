@@ -22,9 +22,10 @@ namespace WdController
         string Battery = String.Empty;
         string DeviceType = String.Empty;
         string TransferMode = String.Empty;
-        public string IpAddress = String.Empty;
-        public string PortNumberBase = String.Empty;
+        public string ServerIpAddress = String.Empty;
+        public string ServerPortNumberBase = String.Empty;
         public string DeviceState = String.Empty;
+        public string ClientIpAddress = String.Empty;
         public string DeviceVersionNumber = String.Empty;
 
         public DeviceWatcher deviceWatcher = null;
@@ -183,9 +184,10 @@ namespace WdController
                             Battery = list[++i];
                             DeviceType = list[++i];
                             TransferMode = list[++i];
-                            IpAddress = list[++i];
-                            PortNumberBase = list[++i];
+                            ServerIpAddress = list[++i];
+                            ServerPortNumberBase = list[++i];
                             DeviceState = list[++i];
+                            ClientIpAddress = list[++i];    // added 1.0.2
 
                             ActionEvent("UpdateUI");
                         }

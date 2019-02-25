@@ -349,21 +349,22 @@ namespace WillDevicesSampleApp
             string sep = ",";
             try
             {
-                WacomDevices.DeviceAttributes DevAttr = AppObjects.Instance.WacomDevice.Attribute;
-                Publishers Pub = AppObjects.Instance.Publisher;
+                WacomDevices.DeviceAttributes devAttr = AppObjects.Instance.WacomDevice.Attribute;
+                Publishers pub = AppObjects.Instance.Publisher;
 
                 responce +=
-                    DevAttr.Width + sep +
-                    DevAttr.Height + sep +
-                    DevAttr.PointSize + sep +
-                    DevAttr.Name + sep +
-                    DevAttr.ESN + sep +
-                    DevAttr.Battery + sep +
-                    DevAttr.DeviceType + sep +
-                    DevAttr.TransferMode + sep +
-                    Pub.HostNameString + sep +
-                    Pub.PortNumberString + sep +
-                    Pub.State;
+                    devAttr.Width + sep +
+                    devAttr.Height + sep +
+                    devAttr.PointSize + sep +
+                    devAttr.Name + sep +
+                    devAttr.ESN + sep +
+                    devAttr.Battery + sep +
+                    devAttr.DeviceType + sep +
+                    devAttr.TransferMode + sep +
+                    pub.HostNameString + sep +
+                    pub.PortNumberString + sep +
+                    pub.ClientIpAddress + sep +
+                    pub.State;
             }
             catch (Exception ex)
             {
@@ -379,7 +380,7 @@ namespace WillDevicesSampleApp
             try
             {
                 //WacomDevices.DeviceAttributes DevAttr = AppObjects.Instance.WacomDevice.Attribute;
-                Publishers Pub = AppObjects.Instance.Publisher;
+                Publishers pub = AppObjects.Instance.Publisher;
 
                 char sp = ','; // separater
                 string[] arr = message.Split(sp);
@@ -412,12 +413,12 @@ namespace WillDevicesSampleApp
                     if (list[++i] != string.Empty)
                     {
                         // Set Broker's IP address
-                        Pub.HostNameString = list[i];
+                        pub.HostNameString = list[i];
                     }
                     if (list[++i] != string.Empty)
                     {
                         // Set Broker's Port number
-                        Pub.PortNumberString = list[i];
+                        pub.PortNumberString = list[i];
                     }
 
                     MessageUpdateUi();

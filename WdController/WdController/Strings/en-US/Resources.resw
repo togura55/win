@@ -117,8 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="IDC_Connect" xml:space="preserve">
-    <value>Connect</value>
+  <data name="IDC_BleConnect" xml:space="preserve">
+    <value>BLE Connect</value>
+  </data>
+  <data name="IDC_BleDisconnect" xml:space="preserve">
+    <value>BLE Disconnect</value>
   </data>
   <data name="IDC_DeviceRestart" xml:space="preserve">
     <value>Restart Device</value>

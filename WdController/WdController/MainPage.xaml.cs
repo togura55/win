@@ -183,11 +183,12 @@ namespace WdController
         private void UpdateUI()
         {
             TextBox_Name.Text = Name;
-            TextBox_IP.Text = wdController.IpAddress;
-            TextBox_Port.Text = wdController.PortNumberBase;
+            TextBox_IP.Text = wdController.ServerIpAddress;
+            TextBox_Port.Text = wdController.ServerPortNumberBase;
             TextBlock_DeviceVersion.Text = wdController.DeviceVersionNumber;
             TextBlock_ServiceName.Text = wdController.rfComm.BleServiceName;
             TextBlock_DeviceName.Text = wdController.rfComm.BleDeviceName;
+            TextBlock_ClientIpAddress.Text = wdController.ClientIpAddress;
 
             if (wdController.DeviceState == "false" || wdController.DeviceState == "False")
                 Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStart");
