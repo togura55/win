@@ -48,7 +48,6 @@ namespace WillDevicesSampleApp
             resourceLoader = ResourceLoader.GetForCurrentView();
             this.TextBlock_IPAddr.Text = resourceLoader.GetString("IDC_HostName");
             this.TextBlock_PortNumber.Text = resourceLoader.GetString("IDC_PortNumber");
-            this.Pbtn_Exec.Content = resourceLoader.GetString(AppObjects.Instance.Publisher.State ? "IDC_Exec" : "IDC_Stop");
 
             var versionInfo = Windows.ApplicationModel.Package.Current.Id.Version;
             string version = string.Format(
@@ -83,8 +82,24 @@ namespace WillDevicesSampleApp
             this.TextBox_HostName.Text = pub.HostNameString;
             this.TextBox_PortNumber.Text = pub.PortNumberString;
 
-            Pbtn_Exec.Content = resourceLoader.GetString(
-                pub.State == pub.PUBLISHER_STATE_START ? "IDC_Stop" : "IDC_Exec");
+            // swich UI correspond to the current state of Publisher
+            if (pub.CurrentState == pub.STATE_NEUTRAL)
+            {
+                this.Pbtn_Exec.Content = resourceLoader.GetString("IDC_Exec");
+                this.Pbtn_Discard.Visibility = Visibility.Collapsed;    // hide
+            }
+            else if (pub.CurrentState == pub.STATE_ACTIVE)
+            {
+                this.Pbtn_Exec.Content = resourceLoader.GetString("IDC_Stop");
+                this.Pbtn_Discard.Content = resourceLoader.GetString("IDC_Disconnect");
+                this.Pbtn_Discard.Visibility = Visibility.Visible;    // show
+            }
+            else if (pub.CurrentState == pub.STATE_IDLE)
+            {
+                this.Pbtn_Exec.Content = resourceLoader.GetString("IDC_Exec");
+                this.Pbtn_Discard.Content = resourceLoader.GetString("IDC_Disconnect");
+                this.Pbtn_Discard.Visibility = Visibility.Visible;    // show
+            }
         }
 
         #region Event Handlers of MainPage
@@ -129,7 +144,8 @@ namespace WillDevicesSampleApp
         {
             Publishers pub = AppObjects.Instance.Publisher;
 
-            if (pub.State == pub.PUBLISHER_STATE_STOP)
+            if (pub.CurrentState == pub.STATE_NEUTRAL ||
+                pub.CurrentState == pub.STATE_IDLE)
             {
                 pub.InitializationCompletedNotification += PublisherInitialization_Completed;
                 pub.Start();

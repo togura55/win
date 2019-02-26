@@ -117,14 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="IDC_Discard" xml:space="preserve">
+    <value>接続解除</value>
+  </data>
   <data name="IDC_Exec" xml:space="preserve">
     <value>実行</value>
   </data>
   <data name="IDC_HostName" xml:space="preserve">
-    <value>ホストIP</value>
+    <value>ホストIPアドレス</value>
   </data>
   <data name="IDC_PortNumber" xml:space="preserve">
-    <value>ポート番号</value>
+    <value>ホストポート番号</value>
   </data>
   <data name="IDC_Stop" xml:space="preserve">
     <value>停止</value>

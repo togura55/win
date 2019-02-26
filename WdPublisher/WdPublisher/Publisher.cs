@@ -27,10 +27,16 @@ namespace WillDevicesSampleApp
         public string PortNumberString = string.Empty;
         public string ClientIpAddress = string.Empty;
 
-        public readonly bool PUBLISHER_STATE_STOP = false;
-        public readonly bool PUBLISHER_STATE_START = true;
+        //public readonly bool PUBLISHER_STATE_STOP = false;
+        //public readonly bool PUBLISHER_STATE_START = true;
 
-        public bool State;
+//        public bool State;
+        public int CurrentState;
+
+        public readonly int STATE_NEUTRAL = 0;
+        public readonly int STATE_ACTIVE = 1;
+        public readonly int STATE_IDLE = 2;
+
 
         // Delegate handlers
         public delegate void MessageEventHandler(object sender, string message);
@@ -46,7 +52,8 @@ namespace WillDevicesSampleApp
             PublisherId = 0;
             HostNameString = "192.168.0.7";
             PortNumberString = "1337";
-            State = PUBLISHER_STATE_STOP;
+            //            State = PUBLISHER_STATE_STOP;
+            CurrentState = STATE_NEUTRAL;
             HostName hostName = NetworkInformation.GetHostNames().Where(q => q.Type == HostNameType.Ipv4).First();
             ClientIpAddress = hostName.ToString();
         }

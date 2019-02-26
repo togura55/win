@@ -9,8 +9,9 @@
 	  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Height="642.005" Width="879.475">
 
     <Grid>
-        <ListBox x:Name="clientListBox" HorizontalAlignment="Center" Height="349" Margin="152,224,82,0" VerticalAlignment="Top" Width="646" FontSize="12"/>
+        <ListBox x:Name="clientListBox" HorizontalAlignment="Left" Height="349" Margin="124,249,0,0" VerticalAlignment="Top" Width="646" FontSize="12"/>
         <Button x:Name="Pbtn_Exec" Content="Button" HorizontalAlignment="Left" Margin="124,142,0,0" VerticalAlignment="Top" Click="Pbtn_Exec_Click"/>
+        <Button x:Name="Pbtn_Discard" Content="Button" HorizontalAlignment="Left" Margin="124,194,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="TextBox_HostName" HorizontalAlignment="Left" Margin="227,38,0,0" Text="TextBox" VerticalAlignment="Top" Width="139"/>
         <TextBlock x:Name="TextBlock_IPAddr" HorizontalAlignment="Left" Margin="124,44,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <TextBox x:Name="TextBox_PortNumber" HorizontalAlignment="Left" Margin="227,84,0,0" Text="TextBox" VerticalAlignment="Top" Width="139"/>

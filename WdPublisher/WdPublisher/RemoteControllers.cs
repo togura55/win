@@ -79,8 +79,8 @@ namespace WillDevicesSampleApp
 
             Publishers pub = AppObjects.Instance.Publisher;
 
-            if ((message == CMD_START && pub.State == pub.PUBLISHER_STATE_STOP) ||
-                (message == CMD_STOP && pub.State == pub.PUBLISHER_STATE_START))
+            if ((message == CMD_START && pub.CurrentState == pub.PUBLISHER_STATE_STOP) ||
+                (message == CMD_STOP && pub.CurrentState == pub.PUBLISHER_STATE_START))
             {
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
@@ -364,7 +364,7 @@ namespace WillDevicesSampleApp
                     pub.HostNameString + sep +
                     pub.PortNumberString + sep +
                     pub.ClientIpAddress + sep +
-                    pub.State;
+                    pub.CurrentState.ToString();
             }
             catch (Exception ex)
             {
