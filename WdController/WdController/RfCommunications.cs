@@ -98,7 +98,7 @@ namespace WdController
             else
             {
                 MessageEvent(
-                   "Could not discover the chat service on the remote device");
+                   "Could not discover the WdX service on the remote device");
                 //               ResetMainUI();
                 return;
             }
@@ -108,8 +108,8 @@ namespace WdController
             if (!attributes.ContainsKey(Constants.SdpServiceNameAttributeId))
             {
                 MessageEvent(
-                    "The Chat service is not advertising the Service Name attribute (attribute id=0x100). " +
-                    "Please verify that you are running the BluetoothRfcommChat server.");
+                    "The WdX service is not advertising the Service Name attribute (attribute id=0x100). " +
+                    "Please verify that you are running the BluetoothRfcomm server.");
                 //                ResetMainUI();
                 return;
             }
@@ -118,8 +118,8 @@ namespace WdController
             if (attributeType != Constants.SdpServiceNameAttributeType)
             {
                 MessageEvent(
-                    "The Chat service is using an unexpected format for the Service Name attribute. " +
-                    "Please verify that you are running the BluetoothRfcommChat server.");
+                    "The WdX service is using an unexpected format for the Service Name attribute. " +
+                    "Please verify that you are running the BluetoothRfcomm server.");
                 //                ResetMainUI();
                 return;
             }

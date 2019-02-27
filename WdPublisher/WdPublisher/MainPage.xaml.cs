@@ -110,9 +110,20 @@ namespace WillDevicesSampleApp
 
         private void ReceivedPublisherControl(object sender, string message)
         {
-            RunPublisher();  // Do toggle
+            //switch (message)
+            //{
+            //    case "":
+                    RunPublisher();  // Do toggle
+                    SetUiState();
+                //    break;
 
-            SetUiState();
+                //case "":
+                //    break;
+
+                //default:
+                //    break;
+//            }
+
         }
 
         /// <summary>

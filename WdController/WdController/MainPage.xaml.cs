@@ -190,9 +190,39 @@ namespace WdController
             TextBlock_DeviceName.Text = wdController.rfComm.BleDeviceName;
             TextBlock_ClientIpAddress.Text = wdController.ClientIpAddress;
 
-            if (wdController.DeviceState == "false" || wdController.DeviceState == "False")
+            if (wdController.State == wdController.STATE_NEUTRAL)
+            {
+                Pbtn_Start.IsEnabled = true;
+                Pbtn_Connect.IsEnabled = false;
+                Pbtn_RequestAccess.IsEnabled = false;
+                Pbtn_SetConfig.IsEnabled = false;
+                Pbtn_GetConfig.IsEnabled = false;
+                Pbtn_GetVersion.IsEnabled = false;
+                Pbtn_DeviceStart.IsEnabled = false;
+                Pbtn_DeviceDiscard.IsEnabled = false;
+                TextBox_Name.IsEnabled = false;
+                TextBox_IP.IsEnabled = false;
+                TextBox_Port.IsEnabled = false;
+            }
+            else if (wdController.State == wdController.STATE_ACTIVE)
+            {
+                Pbtn_Start.IsEnabled = true;
+                Pbtn_Connect.IsEnabled = true;
+                Pbtn_RequestAccess.IsEnabled = true;
+                Pbtn_SetConfig.IsEnabled = true;
+                Pbtn_GetConfig.IsEnabled = true;
+                Pbtn_GetVersion.IsEnabled = true;
+                Pbtn_DeviceStart.IsEnabled = true;
+                Pbtn_DeviceDiscard.IsEnabled = true;
+                TextBox_Name.IsEnabled = true;
+                TextBox_IP.IsEnabled = true;
+                TextBox_Port.IsEnabled = true;
+            }
+
+            if ((wdController.DeviceState == wdController.PUBLISHER_STATE_NEUTRAL) ||
+                (wdController.DeviceState == wdController.PUBLISHER_STATE_IDLE))
                 Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStart");
-            else
+            else if (wdController.DeviceState == wdController.PUBLISHER_STATE_ACTIVE)
                 Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStop");
 
             // swich UI correspond to the current state of Publisher
@@ -201,6 +231,7 @@ namespace WdController
                 this.Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStart");
                 this.Pbtn_DeviceDiscard.Visibility = Visibility.Collapsed;    // hide
             }
+            
             else if (wdController.PublisherCurrentState == wdController.PUBLISHER_STATE_ACTIVE)
             {
                 this.Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStop");
@@ -418,7 +449,21 @@ namespace WdController
 
                 RfcommChatDeviceDisplay deviceInfoDisp = resultsListView.SelectedItem as RfcommChatDeviceDisplay;
 
-                await wdController.Connect(deviceInfoDisp.Id);
+                if (wdController.BleDeviceId == string.Empty)
+                    await wdController.Connect(deviceInfoDisp.Id);
+
+                else if (wdController.BleDeviceId != deviceInfoDisp.Id)
+                {
+                    // Reset
+                    wdController.Disconnect();
+                    wdController.Reset();
+                    UpdateUI();
+
+                    // Try a new connection
+                    await wdController.Connect(deviceInfoDisp.Id);
+                }
+                else
+                    ListBox_Messages.Items.Add(string.Format("Device {0} is already handled.", deviceInfoDisp.Id));
             }
             catch (Exception ex)
             {

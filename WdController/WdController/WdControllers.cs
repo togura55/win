@@ -12,26 +12,33 @@ namespace WdController
 {
     public class WdControllers
     {
+        public string BleDeviceId;
+
+        public int State;
+        public readonly int STATE_NEUTRAL = 0; // initial state
+        public readonly int STATE_ACTIVE = 1;  // under handling BLE device
+
+
         public int PublisherCurrentState;
         public readonly int PUBLISHER_STATE_NEUTRAL = 0;
         public readonly int PUBLISHER_STATE_ACTIVE = 1;
         public readonly int PUBLISHER_STATE_IDLE = 2;
 
-        string CommandState = string.Empty;
+        string CommandState;
         public bool DeviceStarted;
-        string Width = String.Empty;
-        string Height = String.Empty;
-        string PointSize = String.Empty;
-        string DeviceName = String.Empty;
-        string ESN = String.Empty;
-        string Battery = String.Empty;
-        string DeviceType = String.Empty;
-        string TransferMode = String.Empty;
-        public string ServerIpAddress = String.Empty;
-        public string ServerPortNumberBase = String.Empty;
-        public string DeviceState = String.Empty;
-        public string ClientIpAddress = String.Empty;
-        public string DeviceVersionNumber = String.Empty;
+        string Width;
+        string Height;
+        string PointSize;
+        string DeviceName;
+        string ESN;
+        string Battery;
+        string DeviceType;
+        string TransferMode;
+        public string ServerIpAddress;
+        public string ServerPortNumberBase;
+        public int DeviceState;
+        public string ClientIpAddress;
+        public string DeviceVersionNumber;
 
         public DeviceWatcher deviceWatcher = null;
 
@@ -39,11 +46,7 @@ namespace WdController
 
         public WdControllers()
         {
-            PublisherCurrentState = PUBLISHER_STATE_NEUTRAL;
-
-            CommandState = CMD_NEUTRAL;
-            DeviceState = "false";
-            DeviceStarted = false;
+            Reset(); // reset all parameters as default
 
             rfComm = new RfCommunications();
 
@@ -71,8 +74,31 @@ namespace WdController
                 this.WdControllerAction?.Invoke(this, message);
             });
         }
-        
+
         #region Services
+        public void Reset()
+        {
+            BleDeviceId = string.Empty;
+
+            PublisherCurrentState = PUBLISHER_STATE_NEUTRAL;
+
+            CommandState = CMD_NEUTRAL;
+            DeviceState = PUBLISHER_STATE_NEUTRAL;
+            DeviceStarted = false;
+            Width = String.Empty;
+            Height = String.Empty;
+            PointSize = String.Empty;
+            DeviceName = String.Empty;
+            ESN = String.Empty;
+            Battery = String.Empty;
+            DeviceType = String.Empty;
+            TransferMode = String.Empty;
+            ServerIpAddress = String.Empty;
+            ServerPortNumberBase = String.Empty;
+            ClientIpAddress = String.Empty;
+            DeviceVersionNumber = String.Empty;
+        }
+
         public async Task Connect(string deviceId)
         {
             await rfComm.RfConnect(deviceId);
@@ -180,13 +206,13 @@ namespace WdController
                 switch (CommandState)
                 {
                     case CMD_START:
-                        DeviceState = message.Equals((string)RES_ACK) ? "true" : "false";
-                        ActionEvent("UpdateUI");
+                        DeviceState = message.Equals((string)RES_ACK) ?
+                            PUBLISHER_STATE_ACTIVE : PUBLISHER_STATE_NEUTRAL;
                         break;
 
                     case CMD_STOP:
-                        DeviceState = message.Equals((string)RES_ACK) ? "false" : "true";
-                        ActionEvent("UpdateUI");
+                        DeviceState = message.Equals((string)RES_ACK) ?
+                            PUBLISHER_STATE_IDLE : PUBLISHER_STATE_ACTIVE; ;
                         break;
 
                     case CMD_GETCONFIG:
@@ -215,16 +241,12 @@ namespace WdController
                             TransferMode = list[++i];
                             ServerIpAddress = list[++i];
                             ServerPortNumberBase = list[++i];
-                            DeviceState = list[++i];
+                            DeviceState = int.Parse(list[++i]);
                             ClientIpAddress = list[++i];    // added 1.0.2
-
-                            ActionEvent("UpdateUI");
                         }
-
                         break;
 
                     case CMD_SETCONFIG:
-
                         if (message.Equals((string)RES_ACK))
                         {
                             // ok
@@ -232,26 +254,33 @@ namespace WdController
                         else
                         {
                             // error
+                            throw new Exception("SetConfig returns NAK.");
                         }
                         break;
 
                     case CMD_GETVERSION:
                         DeviceVersionNumber = message;
-                        ActionEvent("UpdateUI");
                         break;
 
                     case CMD_DISCARD:
+                        DeviceState = message.Equals((string)RES_ACK) ?
+                            PUBLISHER_STATE_NEUTRAL : DeviceState;
                         break;
 
                     case CMD_RESTART:
+                        DeviceState = message.Equals((string)RES_ACK) ?
+                            PUBLISHER_STATE_NEUTRAL : DeviceState;
                         break;
 
                     case CMD_POWEROFF:
+                        DeviceState = message.Equals((string)RES_ACK) ?
+                            PUBLISHER_STATE_NEUTRAL : DeviceState;
                         break;
 
                     default:
                         break;
                 }
+                ActionEvent("UpdateUI");
             }
             catch (Exception ex)
             {

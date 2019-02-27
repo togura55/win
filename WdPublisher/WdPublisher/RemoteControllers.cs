@@ -461,7 +461,7 @@ namespace WillDevicesSampleApp
             string responce = string.Empty;
             try
             {
-
+                responce = RES_ACK;
             }
             catch (Exception ex)
             {
@@ -477,6 +477,7 @@ namespace WillDevicesSampleApp
             try
             {
 
+                responce = RES_ACK;
             }
             catch (Exception ex)
             {
@@ -486,9 +487,8 @@ namespace WillDevicesSampleApp
             return responce;
         }
 
-        private string ExecutePoweroff()
+        private void ExecutePoweroff()
         {
-            string responce = string.Empty;
             try
             {
 
@@ -497,8 +497,6 @@ namespace WillDevicesSampleApp
             {
                 MessageEvent(string.Format("ExecutePoweroff: Exception: {0}", ex.Message));
             }
-
-            return responce;
         }
 
         private async void ConfigCommandsDispatcher(string message)
@@ -544,15 +542,14 @@ namespace WillDevicesSampleApp
                         break;
 
                     case CMD_DISCARD:
-                        SendResponce(ExecuteDiscard());
-                        break;
-
                     case CMD_RESTART:
-                        SendResponce(ExecuteRestart());
+                        SendResponce(
+                            await MessagePublisherControl(command) ? RES_ACK : RES_NAK);
                         break;
 
                     case CMD_POWEROFF:
-                        SendResponce(ExecutePoweroff());
+                        SendResponce(RES_ACK);
+                        ExecutePoweroff();
                         break;
 
                     default:
