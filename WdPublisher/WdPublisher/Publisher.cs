@@ -15,7 +15,7 @@ using Windows.UI.Xaml;
 
 namespace WillDevicesSampleApp
 {
-    public class Publishers
+    public class Publisher
     {
         public Socket mSocket = null;
 
@@ -23,20 +23,15 @@ namespace WillDevicesSampleApp
 
         float CommandResponseState;
         float PublisherId;
+
         public string HostNameString = string.Empty;
         public string PortNumberString = string.Empty;
         public string ClientIpAddress = string.Empty;
-
-        //public readonly bool PUBLISHER_STATE_STOP = false;
-        //public readonly bool PUBLISHER_STATE_START = true;
-
-//        public bool State;
-        public int CurrentState;
+        public int CurrentState;  // State of Publisher 
 
         public readonly int STATE_NEUTRAL = 0;
         public readonly int STATE_ACTIVE = 1;
         public readonly int STATE_IDLE = 2;
-
 
         // Delegate handlers
         public delegate void MessageEventHandler(object sender, string message);
@@ -46,7 +41,7 @@ namespace WillDevicesSampleApp
         public event MessageEventHandler PublisherMessage;
         public event InitializationCompletedNotificationHandler InitializationCompletedNotification;
 
-        public Publishers()
+        public Publisher()
         {
             CommandResponseState = CMD_NEUTRAL;
             PublisherId = 0;
@@ -56,6 +51,13 @@ namespace WillDevicesSampleApp
             CurrentState = STATE_NEUTRAL;
             HostName hostName = NetworkInformation.GetHostNames().Where(q => q.Type == HostNameType.Ipv4).First();
             ClientIpAddress = hostName.ToString();
+        }
+
+        private string GeneratePublisherAttributeStrings()
+        {
+            string s = HostNameString + "," + PortNumberString + "," + ClientIpAddress + "," + CurrentState.ToString();
+
+            return s;
         }
 
         private async void MessageEvent(string message)
@@ -111,8 +113,11 @@ namespace WillDevicesSampleApp
         {
             try
             {
-                CommandResponseState = CMD_DISPOSE_PUBLISHER;
-                this.SendCommandStrings(CMD_DISPOSE_PUBLISHER);
+                MessageEvent("Close");
+                CurrentState = STATE_NEUTRAL;
+
+                CommandResponseState = CMD_DISCARD_PUBLISHER;
+                this.SendCommandStrings(CMD_DISCARD_PUBLISHER);
 
                 if (AppObjects.Instance.SocketService != null)
                 {
@@ -140,7 +145,7 @@ namespace WillDevicesSampleApp
             try
             {
                 MessageEvent("Start");
-                State = !State;
+                CurrentState = STATE_ACTIVE;
 
                 // Set task completion delegation 
                 WacomDevices wacomDevice = AppObjects.Instance.WacomDevice;
@@ -161,7 +166,7 @@ namespace WillDevicesSampleApp
             try
             {
                 MessageEvent("Stop");
-                State = !State;
+                CurrentState = STATE_IDLE;
 
                 // let WacomDevices terminate data transmission
                 // ToDo: check if Realtime Ink is ongoing 
@@ -194,7 +199,10 @@ namespace WillDevicesSampleApp
         const float CMD_SET_ATTRIBUTES = 0x2000;
         const float CMD_START_PUBLISHER = 0x3000;
         const float CMD_STOP_PUBLISHER = 0x4000;
-        const float CMD_DISPOSE_PUBLISHER = 0x5000;
+        const float CMD_DISCARD_PUBLISHER = 0x5000;
+        const float CMD_RESTART_PUBLISHER = 0x6000;
+        const float CMD_POWEROFF_PUBLISHER = 0x7000;
+
         const string RES_ACK = "ack";
         const string RES_NAK = "nak";
 
@@ -218,7 +226,9 @@ namespace WillDevicesSampleApp
 
                         case CMD_SET_ATTRIBUTES:
                             commandString = string.Format("{0},{1},{2}", PublisherId, 2,
-                                AppObjects.Instance.WacomDevice.Attribute.GenerateStrings());
+                                AppObjects.Instance.WacomDevice.Attribute.GenerateStrings() +
+                                "," +
+                                GeneratePublisherAttributeStrings());
                             break;
 
                         case CMD_START_PUBLISHER:
@@ -229,7 +239,7 @@ namespace WillDevicesSampleApp
                             commandString = string.Format("{0},{1}", PublisherId, 4);
                             break;
 
-                        case CMD_DISPOSE_PUBLISHER:
+                        case CMD_DISCARD_PUBLISHER:
                             commandString = string.Format("{0},{1}", PublisherId, 5);
                             break;
 
@@ -454,7 +464,7 @@ namespace WillDevicesSampleApp
                         }
                         break;
 
-                    case CMD_DISPOSE_PUBLISHER:
+                    case CMD_DISCARD_PUBLISHER:
                         // ACK/NAK
                         msg = string.Format("CMD_DISPOSE_PUBLISHER returns {0}", response);
                         switch (response)

@@ -77,10 +77,11 @@ namespace WillDevicesSampleApp
         {
             bool responce = true;
 
-            Publishers pub = AppObjects.Instance.Publisher;
+            Publisher pub = AppObjects.Instance.Publisher;
 
-            if ((message == CMD_START && pub.CurrentState == pub.PUBLISHER_STATE_STOP) ||
-                (message == CMD_STOP && pub.CurrentState == pub.PUBLISHER_STATE_START))
+            if ((message == CMD_START && pub.CurrentState == pub.STATE_NEUTRAL) ||
+                (message == CMD_START && pub.CurrentState == pub.STATE_IDLE) ||
+                (message == CMD_STOP && pub.CurrentState == pub.STATE_ACTIVE))
             {
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
@@ -333,12 +334,15 @@ namespace WillDevicesSampleApp
             }
         }
 
-        private const string CMD_START = "start";
-        private const string CMD_STOP = "stop";
-        private const string CMD_RESTART = "restart";
         private const string CMD_GETCONFIG = "getconfig";
         private const string CMD_SETCONFIG = "setconfig";  // setconfig,aaa,bbb,ccc
         private const string CMD_GETVERSION = "getversion";
+        private const string CMD_START = "start";
+        private const string CMD_STOP = "stop";
+        private const string CMD_DISCARD = "discard";
+        private const string CMD_RESTART = "restart";
+        private const string CMD_POWEROFF = "poweroff";
+
         private const string RES_ACK = "ack";
         private const string RES_NAK = "nak";
         //        static List<string> CommandList = new List<string> { "1", "2", "3", "4", "5" };  // Command word sent by Publisher
@@ -350,7 +354,7 @@ namespace WillDevicesSampleApp
             try
             {
                 WacomDevices.DeviceAttributes devAttr = AppObjects.Instance.WacomDevice.Attribute;
-                Publishers pub = AppObjects.Instance.Publisher;
+                Publisher pub = AppObjects.Instance.Publisher;
 
                 responce +=
                     devAttr.Width + sep +
@@ -380,7 +384,7 @@ namespace WillDevicesSampleApp
             try
             {
                 //WacomDevices.DeviceAttributes DevAttr = AppObjects.Instance.WacomDevice.Attribute;
-                Publishers pub = AppObjects.Instance.Publisher;
+                Publisher pub = AppObjects.Instance.Publisher;
 
                 char sp = ','; // separater
                 string[] arr = message.Split(sp);
@@ -452,6 +456,51 @@ namespace WillDevicesSampleApp
             return responce;
         }
 
+        private string ExecuteDiscard()
+        {
+            string responce = string.Empty;
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("ExecuteDiscard: Exception: {0}", ex.Message));
+            }
+
+            return responce;
+        }
+
+        private string ExecuteRestart()
+        {
+            string responce = string.Empty;
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("ExecuteRestart: Exception: {0}", ex.Message));
+            }
+
+            return responce;
+        }
+
+        private string ExecutePoweroff()
+        {
+            string responce = string.Empty;
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("ExecutePoweroff: Exception: {0}", ex.Message));
+            }
+
+            return responce;
+        }
+
         private async void ConfigCommandsDispatcher(string message)
         {
             try
@@ -492,6 +541,18 @@ namespace WillDevicesSampleApp
                         string ver = ExecuteGetVersion();
                         SendResponce(
                             string.IsNullOrEmpty(ver) ? RES_NAK : ver);
+                        break;
+
+                    case CMD_DISCARD:
+                        SendResponce(ExecuteDiscard());
+                        break;
+
+                    case CMD_RESTART:
+                        SendResponce(ExecuteRestart());
+                        break;
+
+                    case CMD_POWEROFF:
+                        SendResponce(ExecutePoweroff());
                         break;
 
                     default:

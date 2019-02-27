@@ -29,7 +29,7 @@ namespace WillDevicesSampleApp
             //            publisher = new Publisher();  // single instance
             //            publisher.PublisherMessage += ReceivedMessage; // set the message delegate
 
-            AppObjects.Instance.Publisher = new Publishers();
+            AppObjects.Instance.Publisher = new Publisher();
             AppObjects.Instance.Publisher.PublisherMessage += ReceivedMessage; // set the message delegate         publisher = AppObjects.Instance.Publisher;
 
             AppObjects.Instance.WacomDevice = new WacomDevices();     // stored for using this app 
@@ -77,7 +77,7 @@ namespace WillDevicesSampleApp
 
         private void SetUiState()
         {
-            Publishers pub = AppObjects.Instance.Publisher;
+            Publisher pub = AppObjects.Instance.Publisher;
 
             this.TextBox_HostName.Text = pub.HostNameString;
             this.TextBox_PortNumber.Text = pub.PortNumberString;
@@ -142,7 +142,7 @@ namespace WillDevicesSampleApp
 
         private void RunPublisher()
         {
-            Publishers pub = AppObjects.Instance.Publisher;
+            Publisher pub = AppObjects.Instance.Publisher;
 
             if (pub.CurrentState == pub.STATE_NEUTRAL ||
                 pub.CurrentState == pub.STATE_IDLE)

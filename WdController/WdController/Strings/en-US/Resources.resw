@@ -132,6 +132,9 @@
   <data name="IDC_DeviceStop" xml:space="preserve">
     <value>Stop Device</value>
   </data>
+  <data name="IDC_Discard" xml:space="preserve">
+    <value>Server Disconnect</value>
+  </data>
   <data name="IDC_GetConfig" xml:space="preserve">
     <value>Get Configure</value>
   </data>

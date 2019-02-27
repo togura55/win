@@ -118,7 +118,7 @@ namespace WdController
             resource = ResourceLoader.GetForCurrentView();
 //            Pbtn_Start.Content = wdController.DeviceStarted ? resource.GetString("IDC_Stop") : resource.GetString("IDC_Scan");
             Pbtn_Start.Content = resource.GetString("IDC_Scan");
-            Pbtn_Connect.Content = resource.GetString("IDC_Connect");
+            Pbtn_Connect.Content = resource.GetString("IDC_BleConnect");
             Pbtn_RequestAccess.Content = resource.GetString("IDC_RequestAccess");
             Pbtn_SetConfig.Content = resource.GetString("IDC_SetConfig");
             Pbtn_GetConfig.Content = resource.GetString("IDC_GetConfig");
@@ -194,6 +194,25 @@ namespace WdController
                 Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStart");
             else
                 Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStop");
+
+            // swich UI correspond to the current state of Publisher
+            if (wdController.PublisherCurrentState == wdController.PUBLISHER_STATE_NEUTRAL)
+            {
+                this.Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStart");
+                this.Pbtn_DeviceDiscard.Visibility = Visibility.Collapsed;    // hide
+            }
+            else if (wdController.PublisherCurrentState == wdController.PUBLISHER_STATE_ACTIVE)
+            {
+                this.Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStop");
+                this.Pbtn_DeviceStart.Content = resource.GetString("IDC_Discard");
+                this.Pbtn_DeviceDiscard.Visibility = Visibility.Visible;    // show
+            }
+            else if (wdController.PublisherCurrentState == wdController.PUBLISHER_STATE_IDLE)
+            {
+                this.Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStart");
+                this.Pbtn_DeviceDiscard.Content = resource.GetString("IDC_Discard");
+                this.Pbtn_DeviceDiscard.Visibility = Visibility.Visible;    // show
+            }
         }
 
         private void SetDeviceWatcherUI()
@@ -478,10 +497,17 @@ namespace WdController
             //    wdController.DeviceStarted ? resource.GetString("IDC_Stop") : resource.GetString("IDC_Start");
         }
 
+        private void Pbtn_DeviceDiscard_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         private async void Pbtn_GetVersion_Click(object sender, RoutedEventArgs e)
         {
             await wdController.GetVersion();
         }
         #endregion
+
+
     }
 }
