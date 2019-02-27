@@ -4,9 +4,11 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.ApplicationModel;
 using Windows.ApplicationModel.Background;
 using Windows.ApplicationModel.Core;
 using Windows.Devices.Bluetooth.Rfcomm;
+using Windows.Foundation.Metadata;
 using Windows.Storage;
 using Windows.UI.Core;
 
@@ -487,11 +489,14 @@ namespace WillDevicesSampleApp
             return responce;
         }
 
-        private void ExecutePoweroff()
+        private async void ExecutePoweroff()
         {
             try
             {
-
+                if (ApiInformation.IsApiContractPresent("Windows.ApplicationModel.FullTrustAppContract", 1, 0))
+                {
+                    await FullTrustProcessLauncher.LaunchFullTrustProcessForCurrentAppAsync();
+                }
             }
             catch (Exception ex)
             {

@@ -157,6 +157,9 @@
     <SDKReference Include="WILLInk, Version=2.1">
       <Name>WILL Ink 2.1</Name>
     </SDKReference>
+    <SDKReference Include="WindowsDesktop, Version=10.0.17134.0">
+      <Name>Windows Desktop Extensions for the UWP</Name>
+    </SDKReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Tasks\Tasks.csproj">
