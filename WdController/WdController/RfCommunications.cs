@@ -140,7 +140,7 @@ namespace WdController
 
                 BleDeviceName = bluetoothDevice.Name;
                 BleServiceName = attributeReader.ReadString(serviceNameLength);
-                ActionEvent("SetChatUI"); //  SetChatUI(BleServiceName, BleDeviceName);
+                ActionEvent("EnableControlUI"); //  SetChatUI(BleServiceName, BleDeviceName);
                 chatWriter = new DataWriter(chatSocket.OutputStream);
 
                 DataReader chatReader = new DataReader(chatSocket.InputStream);

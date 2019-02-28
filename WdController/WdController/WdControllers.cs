@@ -16,10 +16,11 @@ namespace WdController
 
         public int State;
         public readonly int STATE_NEUTRAL = 0; // initial state
-        public readonly int STATE_ACTIVE = 1;  // under handling BLE device
+        public readonly int STATE_READY = 1;   // Scan BLE completed
+        public readonly int STATE_ACTIVE = 2;  // under handling BLE device
 
 
-        public int PublisherCurrentState;
+//        public int PublisherCurrentState;
         public readonly int PUBLISHER_STATE_NEUTRAL = 0;
         public readonly int PUBLISHER_STATE_ACTIVE = 1;
         public readonly int PUBLISHER_STATE_IDLE = 2;
@@ -80,8 +81,6 @@ namespace WdController
         {
             BleDeviceId = string.Empty;
 
-            PublisherCurrentState = PUBLISHER_STATE_NEUTRAL;
-
             CommandState = CMD_NEUTRAL;
             DeviceState = PUBLISHER_STATE_NEUTRAL;
             DeviceStarted = false;
@@ -97,6 +96,12 @@ namespace WdController
             ServerPortNumberBase = String.Empty;
             ClientIpAddress = String.Empty;
             DeviceVersionNumber = String.Empty;
+
+            if (rfComm != null)
+            {
+                rfComm.BleDeviceName = string.Empty;
+                rfComm.BleServiceName = string.Empty;
+            }
         }
 
         public async Task Connect(string deviceId)
@@ -150,11 +155,13 @@ namespace WdController
 
         public async Task DeviceStart()
         {
+            CommandState = CMD_START;
             await rfComm.SendCommand(CMD_START);
         }
 
         public async Task DeviceStop()
         {
+            CommandState = CMD_STOP;
             await rfComm.SendCommand(CMD_STOP);
         }
 
@@ -222,7 +229,7 @@ namespace WdController
                         list.AddRange(arr);
 
                         // decode
-                        if (list.Count < 11)
+                        if (list.Count < 12)   // ToDo: should be set by enum
                         {
                             // error, resend?
                             throw new Exception("GetConfig returns the smaller number of parameters.");
@@ -284,7 +291,7 @@ namespace WdController
             }
             catch (Exception ex)
             {
-                MessageEvent(string.Format("CommandsDispatcher: Exception: {0}", ex.Message));
+                MessageEvent(string.Format("ResponseDispatcher: Exception: {0}", ex.Message));
             }
         }
     }

@@ -124,7 +124,10 @@ namespace WdController
             Pbtn_GetConfig.Content = resource.GetString("IDC_GetConfig");
             Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStart");
             Pbtn_GetVersion.Content = resource.GetString("IDC_GetVersion");
-            //            Pbtn_DeviceRestart.Content = resource.GetString("IDC_DeviceRestart");
+            Pbtn_DeviceDiscard.Content = resource.GetString("IDC_DeviceDiscard");
+            Pbtn_DeviceRestart.Content = resource.GetString("IDC_DeviceRestart");
+            Pbtn_DevicePoweroff.Content = resource.GetString("IDC_DevicePoweroff");
+
             TextBlock_PublisherDeviceName.Text = resource.GetString("IDC_PublisherDeviceName");
             TextBlock_IP.Text = resource.GetString("IDC_IP");
             TextBlock_Port.Text = resource.GetString("IDC_Port");
@@ -143,6 +146,7 @@ namespace WdController
         private void ReceivedMessage(object sender, string message)
         {
             ListBox_Messages.Items.Add(message);
+            ListBox_Messages.ScrollIntoView(message);    // scroll to bottom
         }
 
         private void ReceivedAction(object sender, string message)
@@ -151,10 +155,13 @@ namespace WdController
                 UpdateUI();
             else if (message == "StopWatcher")
                 wdController.StopWatcher();
-            else if (message == "SetChatUI")
+            else if (message == "EnableControlUI")
+            {
+                wdController.State = wdController.STATE_ACTIVE;     // transit the current state
                 UpdateUI();
+            }
             else
-                ListBox_Messages.Items.Add(string.Format("ReceivedAction: No match {0}", message));
+                ReceivedMessage(this, string.Format("ReceivedAction: No match {0}", message));
         }
 
         #region System UI operations
@@ -173,7 +180,7 @@ namespace WdController
         void App_Suspending(object sender, Windows.ApplicationModel.SuspendingEventArgs e)
         {
             // Make sure we clean up resources on suspend.
-            ListBox_Messages.Items.Add("App Suspension disconnects.");
+            ReceivedMessage(this, "App Suspension disconnects.");
             wdController.Disconnect();
 
             wdController.WdControllerMessage -= ReceivedMessage;
@@ -200,6 +207,9 @@ namespace WdController
                 Pbtn_GetVersion.IsEnabled = false;
                 Pbtn_DeviceStart.IsEnabled = false;
                 Pbtn_DeviceDiscard.IsEnabled = false;
+                Pbtn_DeviceRestart.IsEnabled = false;
+                Pbtn_DevicePoweroff.IsEnabled = false;
+
                 TextBox_Name.IsEnabled = false;
                 TextBox_IP.IsEnabled = false;
                 TextBox_Port.IsEnabled = false;
@@ -214,6 +224,9 @@ namespace WdController
                 Pbtn_GetVersion.IsEnabled = true;
                 Pbtn_DeviceStart.IsEnabled = true;
                 Pbtn_DeviceDiscard.IsEnabled = true;
+                Pbtn_DeviceRestart.IsEnabled = true;
+                Pbtn_DevicePoweroff.IsEnabled = true;
+
                 TextBox_Name.IsEnabled = true;
                 TextBox_IP.IsEnabled = true;
                 TextBox_Port.IsEnabled = true;
@@ -226,22 +239,20 @@ namespace WdController
                 Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStop");
 
             // swich UI correspond to the current state of Publisher
-            if (wdController.PublisherCurrentState == wdController.PUBLISHER_STATE_NEUTRAL)
+            if (wdController.DeviceState == wdController.PUBLISHER_STATE_NEUTRAL)
             {
                 this.Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStart");
                 this.Pbtn_DeviceDiscard.Visibility = Visibility.Collapsed;    // hide
             }
             
-            else if (wdController.PublisherCurrentState == wdController.PUBLISHER_STATE_ACTIVE)
+            else if (wdController.DeviceState == wdController.PUBLISHER_STATE_ACTIVE)
             {
                 this.Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStop");
-                this.Pbtn_DeviceStart.Content = resource.GetString("IDC_Discard");
                 this.Pbtn_DeviceDiscard.Visibility = Visibility.Visible;    // show
             }
-            else if (wdController.PublisherCurrentState == wdController.PUBLISHER_STATE_IDLE)
+            else if (wdController.DeviceState == wdController.PUBLISHER_STATE_IDLE)
             {
                 this.Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStart");
-                this.Pbtn_DeviceDiscard.Content = resource.GetString("IDC_Discard");
                 this.Pbtn_DeviceDiscard.Visibility = Visibility.Visible;    // show
             }
         }
@@ -255,7 +266,7 @@ namespace WdController
 //                Pbtn_Start.Content = wdController.DeviceStarted ? resource.GetString("IDC_Stop") : resource.GetString("IDC_Start");
 
                 string message = wdController.DeviceStarted ? "Device watcher started" : "Device watcher stopped";
-                ListBox_Messages.Items.Add(message);
+                ReceivedMessage(this, message);
 
                 resultsListView.Visibility = wdController.DeviceStarted ? Visibility.Visible : Visibility.Collapsed;
                 resultsListView.IsEnabled = wdController.DeviceStarted ? true : false;
@@ -280,9 +291,9 @@ namespace WdController
             wdController.StopWatcher();
         }
 
-        private void SetChatUI(string serviceName, string deviceName)
+        private void EnableControlUI(string serviceName, string deviceName)
         {
-            ListBox_Messages.Items.Add("Connected");
+            ReceivedMessage(this, "Connected");
             TextBlock_ServiceName.Text = "Service Name: " + serviceName;
             TextBlock_DeviceName.Text = "Connected to: " + deviceName;
             Pbtn_Start.IsEnabled = false;
@@ -313,86 +324,89 @@ namespace WdController
 
         public void StartUnpairedDeviceWatcher()
         {
-            // Request additional properties
-            string[] requestedProperties = new string[] { "System.Devices.Aep.DeviceAddress", "System.Devices.Aep.IsConnected" };
-
-            wdController.deviceWatcher = DeviceInformation.CreateWatcher("(System.Devices.Aep.ProtocolId:=\"{e0cbf06c-cd8b-4647-bb8a-263b43f0f974}\")",
-                                                            requestedProperties,
-                                                            DeviceInformationKind.AssociationEndpoint);
-
-            // Hook up handlers for the watcher events before starting the watcher
-            wdController.deviceWatcher.Added += new TypedEventHandler<DeviceWatcher, DeviceInformation>(async (watcher, deviceInfo) =>
+            try
             {
+                // Request additional properties
+                string[] requestedProperties = new string[] { "System.Devices.Aep.DeviceAddress", "System.Devices.Aep.IsConnected" };
+
+                wdController.deviceWatcher = DeviceInformation.CreateWatcher("(System.Devices.Aep.ProtocolId:=\"{e0cbf06c-cd8b-4647-bb8a-263b43f0f974}\")",
+                                                                requestedProperties,
+                                                                DeviceInformationKind.AssociationEndpoint);
+
+                // Hook up handlers for the watcher events before starting the watcher
+                wdController.deviceWatcher.Added += new TypedEventHandler<DeviceWatcher, DeviceInformation>(async (watcher, deviceInfo) =>
+                {
 
                 // Since we have the collection databound to a UI element, we need to update the collection on the UI thread.
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                {
+                    {
                     // Make sure device name isn't blank
                     if (deviceInfo.Name != "")
-                    {
-                        ResultCollection.Add(new RfcommChatDeviceDisplay(deviceInfo));
-                        ListBox_Messages.Items.Add(
-                            String.Format("{0} devices found.", ResultCollection.Count));
-                    }
-
-                });
-            });
-
-            wdController.deviceWatcher.Updated += new TypedEventHandler<DeviceWatcher, DeviceInformationUpdate>(async (watcher, deviceInfoUpdate) =>
-            {
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Low, () =>
-                {
-                    foreach (RfcommChatDeviceDisplay rfcommInfoDisp in ResultCollection)
-                    {
-                        if (rfcommInfoDisp.Id == deviceInfoUpdate.Id)
                         {
-                            rfcommInfoDisp.Update(deviceInfoUpdate);
-                            break;
+                            ResultCollection.Add(new RfcommChatDeviceDisplay(deviceInfo));
+                            ReceivedMessage(this, String.Format("{0} devices found.", ResultCollection.Count));
                         }
-                    }
-                });
-            });
 
-            wdController.deviceWatcher.EnumerationCompleted += new TypedEventHandler<DeviceWatcher, Object>(async (watcher, obj) =>
-            {
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Low, () =>
+                    });
+                });
+
+                wdController.deviceWatcher.Updated += new TypedEventHandler<DeviceWatcher, DeviceInformationUpdate>(async (watcher, deviceInfoUpdate) =>
                 {
-
-                    ListBox_Messages.Items.Add(
-                    String.Format("{0} devices found. Enumeration completed. Watching for updates...",
-                    ResultCollection.Count));
+                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Low, () =>
+                    {
+                        foreach (RfcommChatDeviceDisplay rfcommInfoDisp in ResultCollection)
+                        {
+                            if (rfcommInfoDisp.Id == deviceInfoUpdate.Id)
+                            {
+                                rfcommInfoDisp.Update(deviceInfoUpdate);
+                                break;
+                            }
+                        }
+                    });
                 });
-            });
 
-            wdController.deviceWatcher.Removed += new TypedEventHandler<DeviceWatcher, DeviceInformationUpdate>(async (watcher, deviceInfoUpdate) =>
-            {
+                wdController.deviceWatcher.EnumerationCompleted += new TypedEventHandler<DeviceWatcher, Object>(async (watcher, obj) =>
+                {
+                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Low, () =>
+                    {
+                        ReceivedMessage(this,
+                            String.Format("{0} devices found. Enumeration completed. Watching for updates...", ResultCollection.Count));
+                    });
+                });
+
+                wdController.deviceWatcher.Removed += new TypedEventHandler<DeviceWatcher, DeviceInformationUpdate>(async (watcher, deviceInfoUpdate) =>
+                {
                 // Since we have the collection databound to a UI element, we need to update the collection on the UI thread.
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Low, () =>
-                {
+                    {
                     // Find the corresponding DeviceInformation in the collection and remove it
                     foreach (RfcommChatDeviceDisplay rfcommInfoDisp in ResultCollection)
-                    {
-                        if (rfcommInfoDisp.Id == deviceInfoUpdate.Id)
                         {
-                            ResultCollection.Remove(rfcommInfoDisp);
-                            break;
+                            if (rfcommInfoDisp.Id == deviceInfoUpdate.Id)
+                            {
+                                ResultCollection.Remove(rfcommInfoDisp);
+                                break;
+                            }
                         }
-                    }
 
-                    ListBox_Messages.Items.Add(
-                        String.Format("{0} devices found.", ResultCollection.Count));
+                        ReceivedMessage(this, String.Format("{0} devices found.", ResultCollection.Count));
+                    });
                 });
-            });
 
-            wdController.deviceWatcher.Stopped += new TypedEventHandler<DeviceWatcher, Object>(async (watcher, obj) =>
-            {
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Low, () =>
+                wdController.deviceWatcher.Stopped += new TypedEventHandler<DeviceWatcher, Object>(async (watcher, obj) =>
                 {
-                    ResultCollection.Clear();
+                    await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Low, () =>
+                    {
+                        ResultCollection.Clear();
+                    });
                 });
-            });
 
-            wdController.deviceWatcher.Start();
+                wdController.deviceWatcher.Start();
+            }
+            catch (Exception ex)
+            {
+                ReceivedMessage(this, String.Format("StartUnpairedDeviceWatcher: Exception: {0}", ex.Message));
+            }
         }
 
         #endregion
@@ -407,18 +421,18 @@ namespace WdController
         //        private void RunButton_Click(object sender, RoutedEventArgs e)
         private void Pbtn_Start_Click(object sender, RoutedEventArgs e)
         {
-            ListBox_Messages.Items.Add("Start Initialization");
-            //            Initialize();
+            ReceivedMessage(this, "Start Initialization");
 
-            if (wdController.deviceWatcher == null)
+            //wdController.Reset();
+            //wdController.State = wdController.STATE_NEUTRAL;
+
+            if (wdController.deviceWatcher == null)  // 1st time
             {
                 StartUnpairedDeviceWatcher();
 //                SetDeviceWatcherUI();
             }
-            else
-            {
-                ResetMainUI();
-            }
+
+            UpdateUI();
         }
 
         //private void DisconnectButton_Click(object sender, RoutedEventArgs e)
@@ -439,35 +453,39 @@ namespace WdController
                 // Make sure user has selected a device first
                 if (resultsListView.SelectedItem != null)
                 {
-                    ListBox_Messages.Items.Add("Connecting to remote device. Please wait...");
+                    ReceivedMessage(this, "Connecting to remote device. Please wait...");
                 }
                 else
                 {
-                    ListBox_Messages.Items.Add("Please select an item to connect to");
+                    ReceivedMessage(this, "Please select an item to connect to");
                     return;
                 }
 
                 RfcommChatDeviceDisplay deviceInfoDisp = resultsListView.SelectedItem as RfcommChatDeviceDisplay;
 
-                if (wdController.BleDeviceId == string.Empty)
-                    await wdController.Connect(deviceInfoDisp.Id);
-
-                else if (wdController.BleDeviceId != deviceInfoDisp.Id)
+                if (wdController.BleDeviceId == deviceInfoDisp.Id)
                 {
-                    // Reset
-                    wdController.Disconnect();
-                    wdController.Reset();
-                    UpdateUI();
-
-                    // Try a new connection
-                    await wdController.Connect(deviceInfoDisp.Id);
+                    // No action, stay it is.
+                    ReceivedMessage(this, string.Format("Device {0} is already handled.", deviceInfoDisp.Id));
                 }
                 else
-                    ListBox_Messages.Items.Add(string.Format("Device {0} is already handled.", deviceInfoDisp.Id));
-            }
+                {
+                    if (wdController.BleDeviceId != string.Empty)
+                    {
+                        // Reset
+                        wdController.Disconnect();
+                        wdController.Reset();
+                        wdController.State = wdController.STATE_NEUTRAL;
+                        UpdateUI();
+                    }
+                    // Try a new connection
+                    wdController.BleDeviceId = deviceInfoDisp.Id;
+                    await wdController.Connect(wdController.BleDeviceId);
+                }
+             }
             catch (Exception ex)
             {
-                ListBox_Messages.Items.Add(string.Format("Pbtn_Connect_Click: Exception: {0}", ex.Message));
+                ReceivedMessage(this, string.Format("Pbtn_Connect_Click: Exception: {0}", ex.Message));
             }
         }
 
@@ -536,10 +554,7 @@ namespace WdController
             else
                 await wdController.DeviceStart();
 
-
             wdController.DeviceStarted = !wdController.DeviceStarted;  // toggle state, ToDo: should be moved into the completion delegate.
-            //Pbtn_DeviceStart.Content = 
-            //    wdController.DeviceStarted ? resource.GetString("IDC_Stop") : resource.GetString("IDC_Start");
         }
 
         private void Pbtn_DeviceDiscard_Click(object sender, RoutedEventArgs e)
@@ -551,8 +566,17 @@ namespace WdController
         {
             await wdController.GetVersion();
         }
+
+        private async void Pbtn_DevicePoweroff_Click(object sender, RoutedEventArgs e)
+        {
+            await wdController.DevicePoweroff();
+        }
+
+        private async void Pbtn_DeviceRestart_Click(object sender, RoutedEventArgs e)
+        {
+            await wdController.DeviceRestart();
+        }
+
         #endregion
-
-
     }
 }
