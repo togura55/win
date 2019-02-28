@@ -117,10 +117,12 @@ namespace WillDevicesSampleApp
         {
             switch (message)
             {
-                //    case "":
-                //RunPublisher();  // Do toggle
-                //        SetUiState();
-                //    break;
+                case "Discard":
+                    // RemoteController以外、止めて破棄
+                    AppObjects.Instance.Publisher.Stop();
+                    AppObjects.Instance.Publisher.Close();
+
+                    break;
 
                 case "RegisterBackgroundWatcher":
                     StartRemoteControllerTask();

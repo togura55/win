@@ -469,11 +469,16 @@ namespace WillDevicesSampleApp
             return responce;
         }
 
-        private string ExecuteDiscard()
+        private async Task<string> ExecuteDiscard()
         {
             string responce = string.Empty;
             try
             {
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    this.PublisherControl?.Invoke(this, "Discard");
+                });
+
                 responce = RES_ACK;
             }
             catch (Exception ex)
