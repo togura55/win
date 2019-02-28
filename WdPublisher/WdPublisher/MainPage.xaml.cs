@@ -62,6 +62,11 @@ namespace WillDevicesSampleApp
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
 
 
+            StartRemoteControllerTask();
+        }
+
+        private void StartRemoteControllerTask()
+        {
             // Background Task Registration
             AppObjects.Instance.RemoteController.RegisterBackgroundTask();
 
@@ -110,19 +115,20 @@ namespace WillDevicesSampleApp
 
         private void ReceivedPublisherControl(object sender, string message)
         {
-            //switch (message)
-            //{
-            //    case "":
-                    RunPublisher();  // Do toggle
-                    SetUiState();
+            switch (message)
+            {
+                //    case "":
+                //RunPublisher();  // Do toggle
+                //        SetUiState();
                 //    break;
 
-                //case "":
-                //    break;
+                case "RegisterBackgroundWatcher":
+                    StartRemoteControllerTask();
+                    break;
 
-                //default:
-                //    break;
-//            }
+                default:
+                    break;
+            }
 
         }
 

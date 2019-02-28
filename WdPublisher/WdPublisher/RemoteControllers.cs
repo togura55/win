@@ -225,12 +225,15 @@ namespace WillDevicesSampleApp
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        private void OnCompleted(BackgroundTaskRegistration sender, BackgroundTaskCompletedEventArgs args)
+        private async void OnCompleted(BackgroundTaskRegistration sender, BackgroundTaskCompletedEventArgs args)
         {
+            bool fRegister = false;
+
             var settings = ApplicationData.Current.LocalSettings;
             if (settings.Values.ContainsKey("TaskCancelationReason"))
             {
                 MessageEvent(string.Format("Task cancelled unexpectedly - reason: {0}", settings.Values["TaskCancelationReason"].ToString()));
+                fRegister = true; // re-register the Background watcher
             }
             else
             {
@@ -246,6 +249,14 @@ namespace WillDevicesSampleApp
                 MessageEvent(string.Format("OnComplete: Exception: {0}", ex.Message));
             }
             Disconnect();
+
+            if (fRegister)
+            {
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    this.PublisherControl?.Invoke(this, "RegisterBackgroundWatcher");
+                });
+            }
         }
 
         /// <summary>
@@ -369,8 +380,8 @@ namespace WillDevicesSampleApp
                     devAttr.TransferMode + sep +
                     pub.HostNameString + sep +
                     pub.PortNumberString + sep +
-                    pub.ClientIpAddress + sep +
-                    pub.CurrentState.ToString();
+                    pub.CurrentState.ToString() + sep +
+                    pub.ClientIpAddress;   // added at WdController 1.0.2
             }
             catch (Exception ex)
             {
