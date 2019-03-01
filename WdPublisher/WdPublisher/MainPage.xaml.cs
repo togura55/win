@@ -16,18 +16,11 @@ namespace WillDevicesSampleApp
     {
         CancellationTokenSource m_cts = new CancellationTokenSource();
 
-        //        static Publishers publisher;
-        //string HostNameString = "192.168.0.7";
-        //string PortNumberString = "1337";
-        //        static bool fStart = true;
         ResourceLoader resourceLoader = null;
 
         public MainPage()
         {
             this.InitializeComponent();
-
-            //            publisher = new Publisher();  // single instance
-            //            publisher.PublisherMessage += ReceivedMessage; // set the message delegate
 
             AppObjects.Instance.Publisher = new Publisher();
             AppObjects.Instance.Publisher.PublisherMessage += ReceivedMessage; // set the message delegate         publisher = AppObjects.Instance.Publisher;
@@ -60,7 +53,6 @@ namespace WillDevicesSampleApp
             SetUiState();
 
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
-
 
             StartRemoteControllerTask();
         }
@@ -118,10 +110,15 @@ namespace WillDevicesSampleApp
             switch (message)
             {
                 case "Discard":
-                    // RemoteController以外、止めて破棄
-                    AppObjects.Instance.Publisher.Stop();
-                    AppObjects.Instance.Publisher.Close();
+                    StopPublisher();
+                    break;
 
+                case "Suspend":
+                    SuspendPublisher();
+                    break;
+
+                case "Resume":
+                    ResumePublisher();
                     break;
 
                 case "RegisterBackgroundWatcher":
@@ -131,7 +128,6 @@ namespace WillDevicesSampleApp
                 default:
                     break;
             }
-
         }
 
         /// <summary>
@@ -142,6 +138,7 @@ namespace WillDevicesSampleApp
         private void ReceivedMessage(object sender, string message)
         {
             clientListBox.Items.Add(message);
+            clientListBox.ScrollIntoView(message);    // scroll to the bottom
         }
 
         void App_Suspending(Object sender, Windows.ApplicationModel.SuspendingEventArgs s)
@@ -174,6 +171,23 @@ namespace WillDevicesSampleApp
                 pub.Stop();
                 pub.InitializationCompletedNotification -= PublisherInitialization_Completed;
             }
+        }
+
+        private void StopPublisher()
+        {
+            // RemoteController以外、止めて破棄
+            AppObjects.Instance.Publisher.Stop();
+            AppObjects.Instance.Publisher.Close();
+        }
+
+        private void SuspendPublisher()
+        {
+
+        }
+
+        private void ResumePublisher()
+        {
+
         }
 
         private void Pbtn_Exec_Click(object sender, RoutedEventArgs e)
