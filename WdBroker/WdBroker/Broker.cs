@@ -421,8 +421,9 @@ namespace WdBroker
                                 res = RES_NAK;
                             else
                             {
-                                int i = 1;
+                                int i = 1;  // skip 0,1
                                 Publisher pub = App.Pubs[index];
+
                                 pub.DeviceSize.Width = double.Parse(list[++i]);
                                 pub.DeviceSize.Height = double.Parse(list[++i]);
                                 pub.PointSize = float.Parse(list[++i]);
@@ -431,6 +432,11 @@ namespace WdBroker
                                 pub.Battery = float.Parse(list[++i]);
                                 pub.DeviceType = list[++i];
                                 pub.TransferMode = list[++i];
+
+                                pub.HostName = list[++i];
+                                pub.PortNumber = list[++i];
+                                pub.IpAddress = list[++i];
+                                pub.State = int.Parse(list[++i]);
 
                                 // ToDo: What shoud we do when the Publisher request to change the attribute?
                                 ConnectPublisherEvent(App.Pubs.Count - 1);  // Notify to caller 
@@ -500,7 +506,7 @@ namespace WdBroker
             }
             catch (Exception ex)
             {
-                MessageEvent(string.Format("CommandPublisher: Exception: {0}", ex.Message));
+                MessageEvent(string.Format("PublisherResponseDispatcher: Exception: {0}", ex.Message));
             }
         }
     }

@@ -51,6 +51,7 @@ namespace WdBroker
 
         // Publisher attributes depend on the running environment
         public string IpAddress;
+        public int State;
         public int Index;
 
         public Publisher()
