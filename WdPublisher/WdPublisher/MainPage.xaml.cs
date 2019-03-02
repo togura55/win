@@ -24,6 +24,7 @@ namespace WillDevicesSampleApp
 
             AppObjects.Instance.Publisher = new Publisher();
             AppObjects.Instance.Publisher.PublisherMessage += ReceivedMessage; // set the message delegate         publisher = AppObjects.Instance.Publisher;
+            AppObjects.Instance.Publisher.UpdateUi += ReceivedUpdateUi;
 
             AppObjects.Instance.WacomDevice = new WacomDevices();     // stored for using this app 
             AppObjects.Instance.WacomDevice.WacomDevicesMessage += ReceivedMessage; // set the message delegate
@@ -41,6 +42,9 @@ namespace WillDevicesSampleApp
             resourceLoader = ResourceLoader.GetForCurrentView();
             this.TextBlock_IPAddr.Text = resourceLoader.GetString("IDC_HostName");
             this.TextBlock_PortNumber.Text = resourceLoader.GetString("IDC_PortNumber");
+            this.Pbtn_Discard.Content = resourceLoader.GetString("IDC_Discard");
+            this.Pbtn_Suspend.Content = resourceLoader.GetString("IDC_Suspend");
+            this.Pbtn_Resume.Content = resourceLoader.GetString("IDC_Resume");
 
             var versionInfo = Windows.ApplicationModel.Package.Current.Id.Version;
             string version = string.Format(
@@ -84,18 +88,30 @@ namespace WillDevicesSampleApp
             {
                 this.Pbtn_Exec.Content = resourceLoader.GetString("IDC_Exec");
                 this.Pbtn_Discard.Visibility = Visibility.Collapsed;    // hide
+                
+                // for debug
+                this.Pbtn_Suspend.Visibility = Visibility.Collapsed;
+                this.Pbtn_Resume.Visibility = Visibility.Collapsed;
             }
             else if (pub.CurrentState == pub.STATE_ACTIVE)
             {
                 this.Pbtn_Exec.Content = resourceLoader.GetString("IDC_Stop");
-                this.Pbtn_Discard.Content = resourceLoader.GetString("IDC_Disconnect");
+
                 this.Pbtn_Discard.Visibility = Visibility.Visible;    // show
+
+                // for debug
+                this.Pbtn_Suspend.Visibility = Visibility.Visible;
+                this.Pbtn_Resume.Visibility = Visibility.Collapsed;
             }
             else if (pub.CurrentState == pub.STATE_IDLE)
             {
                 this.Pbtn_Exec.Content = resourceLoader.GetString("IDC_Exec");
-                this.Pbtn_Discard.Content = resourceLoader.GetString("IDC_Disconnect");
+
                 this.Pbtn_Discard.Visibility = Visibility.Visible;    // show
+
+                // for debug
+                this.Pbtn_Suspend.Visibility = Visibility.Collapsed;
+                this.Pbtn_Resume.Visibility = Visibility.Visible;
             }
         }
 
@@ -151,6 +167,7 @@ namespace WillDevicesSampleApp
 
             AppObjects.Instance.Publisher.Stop();
 
+            AppObjects.Instance.Publisher.UpdateUi -= ReceivedUpdateUi;
             AppObjects.Instance.Publisher.PublisherMessage -= ReceivedMessage;
             AppObjects.Instance.RemoteController.PublisherControl -= ReceivedPublisherControl;
             AppObjects.Instance.RemoteController.UpdateUi -= ReceivedUpdateUi;
@@ -205,6 +222,22 @@ namespace WillDevicesSampleApp
                 clientListBox.Items.Add(string.Format("Pbtn_Exec_Click: {0}", ex.Message));
             }
         }
+
+        // for debug
+        private void Pbtn_Discard_Click(object sender, RoutedEventArgs e)
+        {
+            StopPublisher();
+        }
+
+        private void Pbtn_Suspend_Click(object sender, RoutedEventArgs e)
+        {
+            SuspendPublisher();
+        }
+
+        private void Pbtn_Resume_Click(object sender, RoutedEventArgs e)
+        {
+            ResumePublisher();
+        }
         #endregion
 
         #region Delegate Completion Handlers
@@ -241,6 +274,9 @@ namespace WillDevicesSampleApp
             if (container.Values.ContainsKey("PortNumberString"))
                 AppObjects.Instance.Publisher.PortNumberString = container.Values["PortNumberString"].ToString();
         }
+
         #endregion
+
+
     }
 }

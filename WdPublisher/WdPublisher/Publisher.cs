@@ -38,7 +38,7 @@ namespace WillDevicesSampleApp
         public delegate void InitializationCompletedNotificationHandler(object sender, bool result);
 
         // Properties
-        public event MessageEventHandler PublisherMessage;
+        public event MessageEventHandler PublisherMessage, UpdateUi;
         public event InitializationCompletedNotificationHandler InitializationCompletedNotification;
 
         public Publisher()
@@ -68,7 +68,14 @@ namespace WillDevicesSampleApp
             });
         }
 
-//        private async Task InitCommandCommunication(string host, string port)
+        private async void UpdateUiEvent(string message)
+        {
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                this.UpdateUi?.Invoke(this, message);
+            });
+        }
+        //        private async Task InitCommandCommunication(string host, string port)
         private void InitCommandCommunication(string host, string port)
         {
             if (AppObjects.Instance.SocketService == null)
@@ -145,7 +152,6 @@ namespace WillDevicesSampleApp
             try
             {
                 MessageEvent("Start");
-                CurrentState = STATE_ACTIVE;
 
                 // Set task completion delegation 
                 WacomDevices wacomDevice = AppObjects.Instance.WacomDevice;
@@ -154,6 +160,8 @@ namespace WillDevicesSampleApp
 
                 // At first, try to detect a device
                 wacomDevice.StartScanAndConnect();
+
+                CurrentState = STATE_ACTIVE;
             }
             catch (Exception ex)
             {
@@ -166,7 +174,6 @@ namespace WillDevicesSampleApp
             try
             {
                 MessageEvent("Stop");
-                CurrentState = STATE_IDLE;
 
                 // let WacomDevices terminate data transmission
                 // ToDo: check if Realtime Ink is ongoing 
@@ -186,6 +193,8 @@ namespace WillDevicesSampleApp
                 // request Broker stop the communication
                 CommandResponseState = CMD_STOP_PUBLISHER;
                 this.SendCommandStrings(CMD_STOP_PUBLISHER);
+
+                CurrentState = STATE_IDLE;
             }
             catch (Exception ex)
             {
@@ -303,6 +312,8 @@ namespace WillDevicesSampleApp
                 }
                 else
                 {
+                    CurrentState = STATE_NEUTRAL;
+                    UpdateUiEvent(null);
                     MessageEvent("ScanAndConnect_Completed: Could not be detected devices.");
                 }
             }
@@ -318,10 +329,14 @@ namespace WillDevicesSampleApp
             {
                 if (result)  // socket was established
                 {
+                    CurrentState = STATE_ACTIVE;
+                    UpdateUiEvent(null);
                     MessageEvent("StartRealTimeInk_Completed: All pre-process were done.");
                 }
                 else
                 {
+                    CurrentState = STATE_NEUTRAL;
+                    UpdateUiEvent(null);
                     MessageEvent("StartRealTime_Completed: got false.");
                 }
             }
@@ -329,7 +344,6 @@ namespace WillDevicesSampleApp
             {
                 MessageEvent(string.Format("StartRealTimeInk_Completed: Exception: {0}", ex.Message));
             }
-
         }
 
         private void CommandSocketClient_Connect_Completed(object sender, SocketErrorEventArgs e)
@@ -338,6 +352,8 @@ namespace WillDevicesSampleApp
 
             if (e.Error != System.Net.Sockets.SocketError.Success)
             {
+                CurrentState = STATE_NEUTRAL;
+                UpdateUiEvent(null);
                 MessageEvent(string.Format("Command connection error: {0}", e.Error));
                 return;
             }

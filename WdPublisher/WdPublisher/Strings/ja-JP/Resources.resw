@@ -129,7 +129,13 @@
   <data name="IDC_PortNumber" xml:space="preserve">
     <value>ホストポート番号</value>
   </data>
+  <data name="IDC_Resume" xml:space="preserve">
+    <value>復帰</value>
+  </data>
   <data name="IDC_Stop" xml:space="preserve">
     <value>停止</value>
+  </data>
+  <data name="IDC_Suspend" xml:space="preserve">
+    <value>休止</value>
   </data>
 </root>
