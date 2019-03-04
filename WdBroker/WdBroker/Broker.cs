@@ -327,13 +327,15 @@ namespace WdBroker
                         break;
 
                     case TYPE_PUBLISHER:
-                        // Clear UI
+                        // Clear UI: ToDo: move to sub.Dispose
                         await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                         {
                             SubscriberAction?.Invoke(this, "Clear", index);
+                            SubscriberAction?.Invoke(this, "Dispose", index);
                         });
 
-                        App.Subs[index].Dispose(index);
+                        //                       App.Subs[index].Dispose(index);
+                        subs[index].Dispose(index);
 
                         App.Pubs[index].Stop();
                         break;

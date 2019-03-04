@@ -53,7 +53,7 @@ namespace WdBroker
             Attribute = null;
             StrokeBuilder = null;
 
-            CanvasStrokes.InkPresenter.StrokeContainer.Clear();
+ //           CanvasStrokes.InkPresenter.StrokeContainer.Clear();
             CanvasStrokes = null;
         }
 

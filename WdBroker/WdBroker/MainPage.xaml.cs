@@ -233,6 +233,10 @@ namespace WdBroker
                     case "Clear":
                         ClearCanvas(index);
                         break;
+
+                    case "Dispose":
+                        BorderList[index].BorderBrush = new SolidColorBrush(Windows.UI.Colors.LightGray);
+                        break;
                 }
             }
             catch (Exception ex)
@@ -366,57 +370,57 @@ namespace WdBroker
         }
 
         // for debug
-        private void DrawStroke(int x, int y, int index)
-        {
-            try
-            {
-                //                Publisher pub = App.Pubs[index];
+        //private void DrawStroke(int x, int y, int index)
+        //{
+        //    try
+        //    {
+        //        //                Publisher pub = App.Pubs[index];
 
-                //               int count = deviceRawDataList.Count;
+        //        //               int count = deviceRawDataList.Count;
 
-                //                int count = 5;
-                int r = 5;
-                int _x, _y;
+        //        //                int count = 5;
+        //        int r = 5;
+        //        int _x, _y;
 
-                InkPoint[] points = new InkPoint[5];
-                for (int i = 0; i < 5; i++)
-                {
-                    _x = x;
-                    _y = y;
-                    switch (i)
-                    {
-                        case 0:
-                        case 4:
-                            _y = y - r;
-                            break;
-                        case 1:
-                            _x = x - r;
-                            break;
-                        case 2:
-                            _y = y + r;
-                            break;
-                        case 3:
-                            _x = x + r;
-                            break;
-                    }
-                    points[i] = new InkPoint(new Windows.Foundation.Point(_x, _y), 1);
-                }
+        //        InkPoint[] points = new InkPoint[5];
+        //        for (int i = 0; i < 5; i++)
+        //        {
+        //            _x = x;
+        //            _y = y;
+        //            switch (i)
+        //            {
+        //                case 0:
+        //                case 4:
+        //                    _y = y - r;
+        //                    break;
+        //                case 1:
+        //                    _x = x - r;
+        //                    break;
+        //                case 2:
+        //                    _y = y + r;
+        //                    break;
+        //                case 3:
+        //                    _x = x + r;
+        //                    break;
+        //            }
+        //            points[i] = new InkPoint(new Windows.Foundation.Point(_x, _y), 1);
+        //        }
 
-                //await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () =>
-                //{
-                // Make a stroke by array of point
+        //        //await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () =>
+        //        //{
+        //        // Make a stroke by array of point
 
-                InkStroke s = App.Subs[index].StrokeBuilder.CreateStrokeFromInkPoints(
-                points, System.Numerics.Matrix3x2.Identity);
-                CanvasStrokesList[index].InkPresenter.StrokeContainer.AddStroke(s);
+        //        InkStroke s = App.Subs[index].StrokeBuilder.CreateStrokeFromInkPoints(
+        //        points, System.Numerics.Matrix3x2.Identity);
+        //        CanvasStrokesList[index].InkPresenter.StrokeContainer.AddStroke(s);
 
-                //});
-            }
-            catch (Exception ex)
-            {
-                ReceiveMessage(this, string.Format("DrawStroke: Exception: {0}", ex.Message));
-            }
-        }
+        //        //});
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ReceiveMessage(this, string.Format("DrawStroke: Exception: {0}", ex.Message));
+        //    }
+        //}
 
         private void ClearCanvas(int index)
         {
@@ -426,7 +430,7 @@ namespace WdBroker
                 //               DrawPoint drawPoints = DrawPointList.Last();
                 //               drawPoints.stop();
                 CanvasStrokesList[index].InkPresenter.StrokeContainer.Clear();
-                BorderList[index].Visibility = Visibility.Collapsed;
+//                BorderList[index].Visibility = Visibility.Collapsed;
                 //                DrawPointList.RemoveAt(DrawPointList.Count - 1);
             }
             catch (Exception ex)
