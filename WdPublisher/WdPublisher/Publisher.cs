@@ -194,7 +194,7 @@ namespace WillDevicesSampleApp
                 CommandResponseState = CMD_STOP_PUBLISHER;
                 this.SendCommandStrings(CMD_STOP_PUBLISHER);
 
-                CurrentState = STATE_IDLE;
+                CurrentState = STATE_NEUTRAL;
             }
             catch (Exception ex)
             {

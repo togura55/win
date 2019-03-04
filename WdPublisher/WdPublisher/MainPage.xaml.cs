@@ -42,9 +42,6 @@ namespace WillDevicesSampleApp
             resourceLoader = ResourceLoader.GetForCurrentView();
             this.TextBlock_IPAddr.Text = resourceLoader.GetString("IDC_HostName");
             this.TextBlock_PortNumber.Text = resourceLoader.GetString("IDC_PortNumber");
-            this.Pbtn_Discard.Content = resourceLoader.GetString("IDC_Discard");
-            this.Pbtn_Suspend.Content = resourceLoader.GetString("IDC_Suspend");
-            this.Pbtn_Resume.Content = resourceLoader.GetString("IDC_Resume");
 
             var versionInfo = Windows.ApplicationModel.Package.Current.Id.Version;
             string version = string.Format(
@@ -87,31 +84,19 @@ namespace WillDevicesSampleApp
             if (pub.CurrentState == pub.STATE_NEUTRAL)
             {
                 this.Pbtn_Exec.Content = resourceLoader.GetString("IDC_Exec");
-                this.Pbtn_Discard.Visibility = Visibility.Collapsed;    // hide
-                
-                // for debug
-                this.Pbtn_Suspend.Visibility = Visibility.Collapsed;
-                this.Pbtn_Resume.Visibility = Visibility.Collapsed;
+                this.Pbtn_Resume.Visibility = Visibility.Collapsed;    // hide
             }
             else if (pub.CurrentState == pub.STATE_ACTIVE)
             {
                 this.Pbtn_Exec.Content = resourceLoader.GetString("IDC_Stop");
-
-                this.Pbtn_Discard.Visibility = Visibility.Visible;    // show
-
-                // for debug
-                this.Pbtn_Suspend.Visibility = Visibility.Visible;
-                this.Pbtn_Resume.Visibility = Visibility.Collapsed;
+                this.Pbtn_Resume.Content = resourceLoader.GetString("IDC_Suspend");
+                this.Pbtn_Resume.Visibility = Visibility.Visible;    // show
             }
             else if (pub.CurrentState == pub.STATE_IDLE)
             {
-                this.Pbtn_Exec.Content = resourceLoader.GetString("IDC_Exec");
-
-                this.Pbtn_Discard.Visibility = Visibility.Visible;    // show
-
-                // for debug
-                this.Pbtn_Suspend.Visibility = Visibility.Collapsed;
-                this.Pbtn_Resume.Visibility = Visibility.Visible;
+                this.Pbtn_Exec.Content = resourceLoader.GetString("IDC_Stop");
+                this.Pbtn_Resume.Content = resourceLoader.GetString("IDC_Resume");
+                this.Pbtn_Resume.Visibility = Visibility.Visible;    // show
             }
         }
 
@@ -125,15 +110,23 @@ namespace WillDevicesSampleApp
         {
             switch (message)
             {
-                case "Discard":
+                //case "Discard":
+                //    StopPublisher();
+                //    break;
+
+                case "DeviceStart":
+                    RunPublisher();
+                    break;
+
+                case "DeviceStop":
                     StopPublisher();
                     break;
 
-                case "Suspend":
+                case "DeviceSuspend":
                     SuspendPublisher();
                     break;
 
-                case "Resume":
+                case "DeviceResume":
                     ResumePublisher();
                     break;
 
@@ -194,7 +187,7 @@ namespace WillDevicesSampleApp
         {
             // RemoteController以外、止めて破棄
             AppObjects.Instance.Publisher.Stop();
-            AppObjects.Instance.Publisher.Close();
+ //           AppObjects.Instance.Publisher.Close();
         }
 
         private void SuspendPublisher()
@@ -213,7 +206,17 @@ namespace WillDevicesSampleApp
 
             try
             {
-                RunPublisher();
+                Publisher pub = AppObjects.Instance.Publisher;
+
+                if (pub.CurrentState == pub.STATE_NEUTRAL)
+                {
+                    Pbtn_Exec.Content = resourceLoader.GetString("IDC_Stop");
+                }
+                else
+                {
+                    Pbtn_Exec.Content = resourceLoader.GetString("IDC_Exec");
+                }
+                RunPublisher();  // Start/Stop
 
                 SetUiState();
             }
@@ -221,12 +224,6 @@ namespace WillDevicesSampleApp
             {
                 clientListBox.Items.Add(string.Format("Pbtn_Exec_Click: {0}", ex.Message));
             }
-        }
-
-        // for debug
-        private void Pbtn_Discard_Click(object sender, RoutedEventArgs e)
-        {
-            StopPublisher();
         }
 
         private void Pbtn_Suspend_Click(object sender, RoutedEventArgs e)
@@ -247,13 +244,14 @@ namespace WillDevicesSampleApp
             {
                 if (result)
                 {
-                    clientListBox.Items.Add("PublisherInitialization_Completed: Go to StartRealTimeInk.");
+                    ReceivedMessage(this, "PublisherInitialization_Completed: Go to StartRealTimeInk.");
                     AppObjects.Instance.WacomDevice.StartRealTimeInk();
                 }
             }
             catch (Exception ex)
             {
-                clientListBox.Items.Add(string.Format("PublisherInitialization_Completed: Exception: {0}", ex.Message));
+                 ReceivedMessage(this, string.Format("PublisherInitialization_Completed: Exception: {0}", ex.Message));
+
             }
         }
         #endregion
