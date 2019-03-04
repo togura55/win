@@ -350,9 +350,10 @@ namespace WillDevicesSampleApp
         private const string CMD_GETCONFIG = "getconfig";
         private const string CMD_SETCONFIG = "setconfig";  // setconfig,aaa,bbb,ccc
         private const string CMD_GETVERSION = "getversion";
-        private const string CMD_START = "start";
-        private const string CMD_STOP = "stop";
-        private const string CMD_DISCARD = "discard";
+        private const string CMD_START = "start";       // Publisher state
+        private const string CMD_STOP = "stop";         // Publisher state
+        private const string CMD_SUSPEND = "suspend";   // Publisher state
+        private const string CMD_RESUME = "resume";     // Publisher state
         private const string CMD_RESTART = "restart";
         private const string CMD_POWEROFF = "poweroff";
 
@@ -413,7 +414,7 @@ namespace WillDevicesSampleApp
                 else
                 {
                     int i = 0;
- 
+
                     if (list[++i] != string.Empty)
                     {
                         // Set Device Name
@@ -422,7 +423,7 @@ namespace WillDevicesSampleApp
                         if (wacomDevice != null)
                         {
                             wacomDevice.Attribute.Name = list[i];
-                            
+
                             // ToDo: issue settings to the device
                         }
                     }
@@ -469,21 +470,81 @@ namespace WillDevicesSampleApp
             return responce;
         }
 
-        private async Task<string> ExecuteDiscard()
+        private async Task<string> ExecuteDeviceStart()
         {
             string responce = string.Empty;
             try
             {
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
-                    this.PublisherControl?.Invoke(this, "Discard");
+                    this.PublisherControl?.Invoke(this, "DeviceStart");
                 });
 
                 responce = RES_ACK;
             }
             catch (Exception ex)
             {
-                MessageEvent(string.Format("ExecuteDiscard: Exception: {0}", ex.Message));
+                MessageEvent(string.Format("ExecuteDeviceStart: Exception: {0}", ex.Message));
+            }
+
+            return responce;
+        }
+
+        private async Task<string> ExecuteDeviceStop()
+        {
+            string responce = string.Empty;
+            try
+            {
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    this.PublisherControl?.Invoke(this, "DeviceStop");
+                });
+
+                responce = RES_ACK;
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("ExecuteDeviceStop: Exception: {0}", ex.Message));
+            }
+
+            return responce;
+        }
+
+        private async Task<string> ExecuteDeviceSuspend()
+        {
+            string responce = string.Empty;
+            try
+            {
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    this.PublisherControl?.Invoke(this, "DeviceSuspend");
+                });
+
+                responce = RES_ACK;
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("ExecuteDeviceSuspend: Exception: {0}", ex.Message));
+            }
+
+            return responce;
+        }
+
+        private async Task<string> ExecuteDeviceResume()
+        {
+            string responce = string.Empty;
+            try
+            {
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    this.PublisherControl?.Invoke(this, "DeviceResume");
+                });
+
+                responce = RES_ACK;
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("ExecuteDeviceResume: Exception: {0}", ex.Message));
             }
 
             return responce;
@@ -541,13 +602,6 @@ namespace WillDevicesSampleApp
 
                 switch (command)
                 {
-                    case CMD_START:
-                    case CMD_STOP:
-                        // Check and Start Publisher
-                        SendResponce(
-                            await MessagePublisherControl(command) ? RES_ACK : RES_NAK);
-                        break;
-
                     case CMD_GETCONFIG:
                         SendResponce(ExecuteGetConfig());
                         break;
@@ -562,7 +616,18 @@ namespace WillDevicesSampleApp
                             string.IsNullOrEmpty(ver) ? RES_NAK : ver);
                         break;
 
-                    case CMD_DISCARD:
+                    case CMD_START:
+                        SendResponce(await ExecuteDeviceStart());
+                        break;
+                    case CMD_STOP:
+                        SendResponce(await ExecuteDeviceStop());
+                        break;
+                    case CMD_SUSPEND:
+                        SendResponce(await ExecuteDeviceSuspend());
+                        break;
+                    case CMD_RESUME:
+                        SendResponce(await ExecuteDeviceResume());
+                        break;
                     case CMD_RESTART:
                         SendResponce(
                             await MessagePublisherControl(command) ? RES_ACK : RES_NAK);

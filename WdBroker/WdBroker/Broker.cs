@@ -20,14 +20,21 @@ namespace WdBroker
         public delegate void ConnectPublisherEventHandler(object sender, int index);
         public delegate void DisconnectPublisherEventHandler(object sender, int index);
         public delegate void DrawingEventHandler(object sender, List<DeviceRawData> data, int index); // for drawing
+        public delegate void SubscriberEventHandler(object sender, string message, int index);
 
         // Properties
         public event BrokerEventHandler BrokerMessage;
         public event ConnectPublisherEventHandler AppConnectPublisher;
         public event DisconnectPublisherEventHandler AppDisconnectPublisher;
         public event DrawingEventHandler AppDrawing; // for drawing
+        public event SubscriberEventHandler SubscriberAction;
 
         // Definition of constants
+        private const int TYPE_BROKER = 0;
+        private const int TYPE_PUBLISHER = 1;
+        private const int TYPE_SUBSCRIBER = 2;
+        private const int TYPE_CONTROLLER = 3;
+
         private const uint MASK_ID = 0x00FF;
         private const uint MASK_STROKE = 0x0F00;
         private const uint MASK_COMMAND = 0xF000;
@@ -36,7 +43,9 @@ namespace WdBroker
         private const int CMD_SET_ATTRIBUTES = 2;
         private const int CMD_START_PUBLISHER = 3;
         private const int CMD_STOP_PUBLISHER = 4;
-        private const int CMD_DISPOSE_PUBLISHER = 5;
+        //        private const int CMD_DISPOSE_PUBLISHER = 5;
+        private const int CMD_SUSPEND_PUBLISHER = 5;
+        private const int CMD_RESUME_PUBLISHER = 6;
         private const string RES_ACK = "ack";
         private const string RES_NAK = "nak";
         static List<string> CommandList = new List<string> { "1", "2", "3", "4", "5" };  // Command word sent by Publisher
@@ -296,26 +305,46 @@ namespace WdBroker
             }
         }
 
-        public void Stop()
+        public async void Stop(int type, int index)
         {
             try
             {
-                // ---- For Data ----
-                App.Socket.StreamSocket_Stop();
+                switch (type)
+                {
+                    case TYPE_BROKER:
+                        // ---- For Data ----
+                        App.Socket.StreamSocket_Stop();
 
-                App.Socket.StreamSocketReceiveEvent -= DataPublisherReceiveEvent;
-                App.Socket.StreamSocketErrorEvent -= DataPublisherErrorEvent;
+                        App.Socket.StreamSocketReceiveEvent -= DataPublisherReceiveEvent;
+                        App.Socket.StreamSocketErrorEvent -= DataPublisherErrorEvent;
 
-                // ---- For Command -------
-                mServerSocket.Disonnect();
+                        // ---- For Command -------
+                        mServerSocket.Disonnect();
 
-                mServerSocket.AcceptComplete -= Server_AcceptComplete;
-                mServerSocket.ReceivePacketComplete -= Server_ReceivePacketComplete;
-                mServerSocket.SendPacketComplete -= Server_SendPacketComplete;
+                        mServerSocket.AcceptComplete -= Server_AcceptComplete;
+                        mServerSocket.ReceivePacketComplete -= Server_ReceivePacketComplete;
+                        mServerSocket.SendPacketComplete -= Server_SendPacketComplete;
+                        break;
+
+                    case TYPE_PUBLISHER:
+                        // Clear UI
+                        await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                        {
+                            SubscriberAction?.Invoke(this, "Clear", index);
+                        });
+
+                        App.Subs[index].Dispose(index);
+
+                        App.Pubs[index].Stop();
+                        break;
+
+                    case TYPE_SUBSCRIBER:
+                        break;
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("Broker.Stop: Exception: {0}", ex.Message));
+                throw new Exception(string.Format("Broker.Stop({0}, {1}): Exception: {2}", type, index, ex.Message));
             }
         }
         #endregion
@@ -433,8 +462,8 @@ namespace WdBroker
                                 pub.DeviceType = list[++i];
                                 pub.TransferMode = list[++i];
 
-                                pub.HostName = list[++i];
-                                pub.PortNumber = list[++i];
+//                                pub.HostName = list[++i];
+//                                pub.PortNumber = list[++i];
                                 pub.IpAddress = list[++i];
                                 pub.State = int.Parse(list[++i]);
 
@@ -468,15 +497,16 @@ namespace WdBroker
                                 res = RES_NAK;
                             else
                             {
-                                App.Pubs[index].Stop();
+                                this.Stop(TYPE_PUBLISHER, index);
+                                //                               App.Pubs[index].Stop();
                                 res = RES_ACK;
                             }
                             mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
                             MessageEvent(string.Format("Response to Publisher ID {0}: {1}", publisher_id, res));
                             break;
 
-                        case CMD_DISPOSE_PUBLISHER:
-                            MessageEvent(string.Format("CMD_DISPOSE_PUBLISHER received from ID: {0}", publisher_id));
+                        case CMD_SUSPEND_PUBLISHER:
+                            MessageEvent(string.Format("CMD_SUSPEND_PUBLISHER received from ID: {0}", publisher_id));
                             if ((index = FindPublisherId(publisher_id)) < 0)
                                 res = RES_NAK;
                             else
@@ -488,8 +518,18 @@ namespace WdBroker
                             MessageEvent(string.Format("Response to Publisher ID {0}: {1}", publisher_id, res));
                             break;
 
-                        //default:
-                        //    commandString = string.Empty;
+                        case CMD_RESUME_PUBLISHER:
+                            MessageEvent(string.Format("CMD_RESUME_PUBLISHER received from ID: {0}", publisher_id));
+                            if ((index = FindPublisherId(publisher_id)) < 0)
+                                res = RES_NAK;
+                            else
+                            {
+                                // ToDo: do something
+                                res = RES_ACK;
+                            }
+                            mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
+                            MessageEvent(string.Format("Response to Publisher ID {0}: {1}", publisher_id, res));
+                            break;
 
                         default:
                             break;

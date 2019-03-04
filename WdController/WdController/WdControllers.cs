@@ -27,6 +27,7 @@ namespace WdController
 
         string CommandState;
         public bool DeviceStarted;
+        public bool DeviceSuspended;
         string Width;
         string Height;
         string PointSize;
@@ -84,6 +85,7 @@ namespace WdController
             CommandState = CMD_NEUTRAL;
             DeviceState = PUBLISHER_STATE_NEUTRAL;
             DeviceStarted = false;
+            DeviceSuspended = false;
             Width = String.Empty;
             Height = String.Empty;
             PointSize = String.Empty;
@@ -124,14 +126,22 @@ namespace WdController
         private const string CMD_GETCONFIG = "getconfig";
         private const string CMD_SETCONFIG = "setconfig";  // setconfig,aaa,bbb,ccc
         private const string CMD_GETVERSION = "getversion";
-        private const string CMD_START = "start";
-        private const string CMD_STOP = "stop";
-        private const string CMD_DISCARD = "discard";
+        private const string CMD_START = "start";       // Publisher state
+        private const string CMD_STOP = "stop";         // Publisher state
+        private const string CMD_SUSPEND = "suspend";   // Publisher state
+        private const string CMD_RESUME = "resume";     // Publisher state
         private const string CMD_RESTART = "restart";
         private const string CMD_POWEROFF = "poweroff";
 
         private const string RES_ACK = "ack";
         private const string RES_NAK = "nak";
+
+
+        public async Task GetConfig()
+        {
+            CommandState = CMD_GETCONFIG;
+            await rfComm.SendCommand(CMD_GETCONFIG);
+        }
 
         public async Task SetConfig(string parameters)
         {
@@ -147,10 +157,10 @@ namespace WdController
             }
         }
 
-        public async Task GetConfig()
+        public async Task GetVersion()
         {
-            CommandState = CMD_GETCONFIG;
-            await rfComm.SendCommand(CMD_GETCONFIG);
+            CommandState = CMD_GETVERSION;
+            await rfComm.SendCommand(CMD_GETVERSION);
         }
 
         public async Task DeviceStart()
@@ -165,16 +175,16 @@ namespace WdController
             await rfComm.SendCommand(CMD_STOP);
         }
 
-        public async Task GetVersion()
+        public async Task DeviceSuspend()
         {
-            CommandState = CMD_GETVERSION;
-            await rfComm.SendCommand(CMD_GETVERSION);
+            CommandState = CMD_SUSPEND;
+            await rfComm.SendCommand(CMD_SUSPEND);
         }
 
-        public async Task DeviceDiscard()
+        public async Task DeviceResume()
         {
-            CommandState = CMD_DISCARD;
-            await rfComm.SendCommand(CMD_DISCARD);
+            CommandState = CMD_RESUME;
+            await rfComm.SendCommand(CMD_RESUME);
         }
 
         public async Task DeviceRestart()
@@ -212,16 +222,6 @@ namespace WdController
 
                 switch (CommandState)
                 {
-                    case CMD_START:
-                        DeviceState = message.Equals((string)RES_ACK) ?
-                            PUBLISHER_STATE_ACTIVE : PUBLISHER_STATE_NEUTRAL;
-                        break;
-
-                    case CMD_STOP:
-                        DeviceState = message.Equals((string)RES_ACK) ?
-                            PUBLISHER_STATE_IDLE : PUBLISHER_STATE_ACTIVE; ;
-                        break;
-
                     case CMD_GETCONFIG:
                         char sp = ','; // separater
                         string[] arr = message.Split(sp);
@@ -269,9 +269,24 @@ namespace WdController
                         DeviceVersionNumber = message;
                         break;
 
-                    case CMD_DISCARD:
+                    case CMD_START:
                         DeviceState = message.Equals((string)RES_ACK) ?
-                            PUBLISHER_STATE_NEUTRAL : DeviceState;
+                            PUBLISHER_STATE_ACTIVE : PUBLISHER_STATE_NEUTRAL;
+                        break;
+
+                    case CMD_STOP:
+                        DeviceState = message.Equals((string)RES_ACK) ?
+                            PUBLISHER_STATE_NEUTRAL : PUBLISHER_STATE_ACTIVE; ;
+                        break;
+
+                    case CMD_SUSPEND:
+                        DeviceState = message.Equals((string)RES_ACK) ?
+                            PUBLISHER_STATE_IDLE : PUBLISHER_STATE_ACTIVE; ;
+                        break;
+
+                    case CMD_RESUME:
+                        DeviceState = message.Equals((string)RES_ACK) ?
+                            PUBLISHER_STATE_ACTIVE : PUBLISHER_STATE_IDLE; ;
                         break;
 
                     case CMD_RESTART:

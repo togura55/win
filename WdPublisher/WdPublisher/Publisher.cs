@@ -55,7 +55,7 @@ namespace WillDevicesSampleApp
 
         private string GeneratePublisherAttributeStrings()
         {
-            string s = HostNameString + "," + PortNumberString + "," + ClientIpAddress + "," + CurrentState.ToString();
+            string s = ClientIpAddress + "," + CurrentState.ToString();
 
             return s;
         }

@@ -124,7 +124,7 @@ namespace WdController
             Pbtn_GetConfig.Content = resource.GetString("IDC_GetConfig");
             Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStart");
             Pbtn_GetVersion.Content = resource.GetString("IDC_GetVersion");
-            Pbtn_DeviceDiscard.Content = resource.GetString("IDC_DeviceDiscard");
+            Pbtn_DeviceSuspend.Content = resource.GetString("IDC_DeviceSuspend");
             Pbtn_DeviceRestart.Content = resource.GetString("IDC_DeviceRestart");
             Pbtn_DevicePoweroff.Content = resource.GetString("IDC_DevicePoweroff");
 
@@ -206,7 +206,7 @@ namespace WdController
                 Pbtn_GetConfig.IsEnabled = false;
                 Pbtn_GetVersion.IsEnabled = false;
                 Pbtn_DeviceStart.IsEnabled = false;
-                Pbtn_DeviceDiscard.IsEnabled = false;
+                Pbtn_DeviceSuspend.IsEnabled = false;
                 Pbtn_DeviceRestart.IsEnabled = false;
                 Pbtn_DevicePoweroff.IsEnabled = false;
 
@@ -223,7 +223,7 @@ namespace WdController
                 Pbtn_GetConfig.IsEnabled = true;
                 Pbtn_GetVersion.IsEnabled = true;
                 Pbtn_DeviceStart.IsEnabled = true;
-                Pbtn_DeviceDiscard.IsEnabled = true;
+                Pbtn_DeviceSuspend.IsEnabled = true;
                 Pbtn_DeviceRestart.IsEnabled = true;
                 Pbtn_DevicePoweroff.IsEnabled = true;
 
@@ -242,18 +242,18 @@ namespace WdController
             if (wdController.DeviceState == wdController.PUBLISHER_STATE_NEUTRAL)
             {
                 this.Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStart");
-                this.Pbtn_DeviceDiscard.Visibility = Visibility.Collapsed;    // hide
+                this.Pbtn_DeviceSuspend.Visibility = Visibility.Collapsed;    // hide
             }
             
             else if (wdController.DeviceState == wdController.PUBLISHER_STATE_ACTIVE)
             {
                 this.Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStop");
-                this.Pbtn_DeviceDiscard.Visibility = Visibility.Visible;    // show
+                this.Pbtn_DeviceSuspend.Visibility = Visibility.Visible;    // show
             }
             else if (wdController.DeviceState == wdController.PUBLISHER_STATE_IDLE)
             {
                 this.Pbtn_DeviceStart.Content = resource.GetString("IDC_DeviceStart");
-                this.Pbtn_DeviceDiscard.Visibility = Visibility.Visible;    // show
+                this.Pbtn_DeviceSuspend.Visibility = Visibility.Visible;    // show
             }
         }
 
@@ -557,9 +557,14 @@ namespace WdController
             wdController.DeviceStarted = !wdController.DeviceStarted;  // toggle state, ToDo: should be moved into the completion delegate.
         }
 
-        private void Pbtn_DeviceDiscard_Click(object sender, RoutedEventArgs e)
+        private async void Pbtn_DeviceSuspend_Click(object sender, RoutedEventArgs e)
         {
+            if (wdController.DeviceSuspended)
+                await wdController.DeviceResume();
+            else
+                await wdController.DeviceSuspend();
 
+            wdController.DeviceSuspended = !wdController.DeviceSuspended;  // toggle state
         }
 
         private async void Pbtn_GetVersion_Click(object sender, RoutedEventArgs e)
@@ -578,5 +583,7 @@ namespace WdController
         }
 
         #endregion
+
+
     }
 }

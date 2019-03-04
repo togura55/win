@@ -50,8 +50,8 @@
         <TextBlock x:Name="TextBlock_DeviceName" HorizontalAlignment="Left" Margin="772,134,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top" Height="21"/>
         <Button x:Name="Pbtn_GetConfig" Content="Button" HorizontalAlignment="Left" Margin="226,75,0,0" VerticalAlignment="Top" Width="142" Click="Pbtn_GetConfig_Click"/>
         <Button x:Name="Pbtn_DeviceStart" Content="Button" HorizontalAlignment="Left" Margin="227,144,0,0" VerticalAlignment="Top" Width="144" Click="Pbtn_DeviceStart_Click" Height="39"/>
-        <Button x:Name="Pbtn_DeviceDiscard" Content="Button" HorizontalAlignment="Left" Margin="228,204,0,0" VerticalAlignment="Top" Width="143" Click="Pbtn_DeviceDiscard_Click" Height="49"/>
-        <Button x:Name="Pbtn_GetVersion" Content="Button" HorizontalAlignment="Left" Margin="401,204,0,0" VerticalAlignment="Top" Width="144" Click="Pbtn_GetVersion_Click" Height="49"/>
+        <Button x:Name="Pbtn_DeviceSuspend" Content="Button" HorizontalAlignment="Left" Margin="227,217,0,0" VerticalAlignment="Top" Height="36" Width="144" Click="Pbtn_DeviceSuspend_Click"/>
+        <Button x:Name="Pbtn_GetVersion" Content="Button" HorizontalAlignment="Left" Margin="401,217,0,0" VerticalAlignment="Top" Width="144" Click="Pbtn_GetVersion_Click" Height="36"/>
         <Button x:Name="Pbtn_DevicePoweroff" Content="Button" HorizontalAlignment="Left" Margin="402,270,0,0" VerticalAlignment="Top" Height="44" Width="144" Click="Pbtn_DevicePoweroff_Click"/>
         <Button x:Name="Pbtn_DeviceRestart" Content="Button" HorizontalAlignment="Left" Margin="572,270,0,0" VerticalAlignment="Top" Width="144" Height="44" Click="Pbtn_DeviceRestart_Click"/>
         <TextBlock x:Name="TextBlock_DeviceVersion" HorizontalAlignment="Left" Margin="573,217,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>

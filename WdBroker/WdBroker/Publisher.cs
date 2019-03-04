@@ -34,8 +34,8 @@ namespace WdBroker
     {
         // sent by Publisher device
         public string Id;
-        public string HostName;
-        public string PortNumber;
+//        public string HostName;
+//        public string PortNumber;
         public string DeviceType;
         public string DeviceName;
         public Size DeviceSize; // Width,Height

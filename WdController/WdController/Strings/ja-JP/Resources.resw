@@ -123,20 +123,23 @@
   <data name="IDC_BleDisconnect" xml:space="preserve">
     <value>BLE解除</value>
   </data>
-  <data name="IDC_DeviceDiscard" xml:space="preserve">
-    <value>サーバー接続解除</value>
-  </data>
   <data name="IDC_DevicePoweroff" xml:space="preserve">
     <value>デバイス電源オフ</value>
   </data>
   <data name="IDC_DeviceRestart" xml:space="preserve">
     <value>デバイス再起動</value>
   </data>
+  <data name="IDC_DeviceResume" xml:space="preserve">
+    <value>デバイス再開</value>
+  </data>
   <data name="IDC_DeviceStart" xml:space="preserve">
     <value>デバイス開始</value>
   </data>
   <data name="IDC_DeviceStop" xml:space="preserve">
     <value>デバイス停止</value>
+  </data>
+  <data name="IDC_DeviceSuspend" xml:space="preserve">
+    <value>デバイス休止</value>
   </data>
   <data name="IDC_GetConfig" xml:space="preserve">
     <value>設定受信</value>

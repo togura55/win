@@ -54,6 +54,7 @@ namespace WdBroker
 
             App.Broker.BrokerMessage += ReceiveMessage;
             App.Broker.AppDrawing += ReceiveDrawing;  // for drawing
+            App.Broker.SubscriberAction += ReceiveSubscriberAction;
 
             RestoreSettings();
 
@@ -165,7 +166,7 @@ namespace WdBroker
         #region UI Control handlers 
         private async void Pbtn_Start_Click(object sender, RoutedEventArgs e)
         {
-            ListBox_Message.Items.Add(
+            ReceiveMessage(this, 
                 string.Format("{0} button was clicked.", resourceLoader.GetString(fStart ? "IDC_Start" : "IDC_Stop")));
 
             GetUiState();
@@ -179,7 +180,7 @@ namespace WdBroker
                 }
                 else
                 {
-                    App.Broker.Stop();
+                    App.Broker.Stop(0, 0);
                 }
 
                 fStart = fStart ? false : true;   // toggle if success
@@ -187,7 +188,7 @@ namespace WdBroker
             }
             catch (Exception ex)
             {
-                ListBox_Message.Items.Add(ex.Message);
+                ReceiveMessage(this, string.Format("Pbtn_Start_Click: Exception: {0}", ex.Message));
             }
         }
 
@@ -218,8 +219,26 @@ namespace WdBroker
                 App.Broker.AppDisconnectPublisher -= ReceiveAppDisconnectPublisher;
                 App.Broker.BrokerMessage -= ReceiveMessage;
                 App.Broker.AppDrawing -= ReceiveDrawing;  // for drawing
+                App.Broker.SubscriberAction -= ReceiveSubscriberAction;
             }
             App.AppMessage -= ReceiveMessage;
+        }
+
+        private void ReceiveSubscriberAction(object sender, string message, int index)
+        {
+            try
+            {
+                switch (message)
+                {
+                    case "Clear":
+                        ClearCanvas(index);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                ReceiveMessage(this, string.Format("ReceiveSubscriberMessage: Exception: {0}", ex.Message));
+            }
         }
 
         /// <summary>
@@ -229,9 +248,9 @@ namespace WdBroker
         /// <param name="index"></param>
         private void ReceiveAppConnectPublisher(object sender, int index)
         {
-            //            SetCanvasScaling(index);
+            SetCanvasScaling(index);
 
- //           BorderList[index].Visibility = Visibility.Visible;  // Visible the drawing area
+            //           BorderList[index].Visibility = Visibility.Visible;  // Visible the drawing area
             BorderList[index].BorderBrush = new SolidColorBrush(Windows.UI.Colors.Black);
 
             // Publisherが接続されたら、購読を希望しているSubscriberを紐づける
@@ -316,7 +335,7 @@ namespace WdBroker
             }
             catch (Exception ex)
             {
-                ListBox_Message.Items.Add(ex.Message);
+                ReceiveMessage(this, string.Format("SetCanvasScaling: Exception: {0}", ex.Message));
             }
         }
 
@@ -342,7 +361,7 @@ namespace WdBroker
             }
             catch (Exception ex)
             {
-                ListBox_Message.Items.Add(string.Format("DrawStroke: {0}", ex.Message));
+                ReceiveMessage(this, string.Format("DrawStroke: Exception: {0}", ex.Message));
             }
         }
 
@@ -395,10 +414,26 @@ namespace WdBroker
             }
             catch (Exception ex)
             {
-                ListBox_Message.Items.Add(string.Format("DrawStroke: {0}", ex.Message));
+                ReceiveMessage(this, string.Format("DrawStroke: Exception: {0}", ex.Message));
             }
         }
 
+        private void ClearCanvas(int index)
+        {
+            try
+            {
+
+                //               DrawPoint drawPoints = DrawPointList.Last();
+                //               drawPoints.stop();
+                CanvasStrokesList[index].InkPresenter.StrokeContainer.Clear();
+                BorderList[index].Visibility = Visibility.Collapsed;
+                //                DrawPointList.RemoveAt(DrawPointList.Count - 1);
+            }
+            catch (Exception ex)
+            {
+                ReceiveMessage(this, string.Format("ClearCanvas: Exception: {0}", ex.Message));
+            }
+        }
         #endregion
     }
 }
