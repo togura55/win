@@ -286,7 +286,8 @@ namespace WdBroker
             this.AcceptComplete?.Invoke(this, new SocketErrorEventArgs(e.SocketError));
 
             e.AcceptSocket = null;
-            mSocket.AcceptAsync(e);
+            if (mSocket != null)
+                mSocket.AcceptAsync(e);
         }
 
         /// <summary>

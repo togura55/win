@@ -38,7 +38,7 @@ namespace WdBroker
         }
 
         private InkStrokeBuilder m_inkStrokeBuilder = new InkStrokeBuilder();
-        private double mScale = 1;
+        private double mScale = 0.01; // ToDo: need to calcurate from actual dimensions
 
         private const uint MASK_COMMAND = 0xF000;
 

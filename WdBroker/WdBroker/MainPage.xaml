@@ -13,22 +13,22 @@
             <RowDefinition Height="233*"/>
             <RowDefinition Height="767*"/>
         </Grid.RowDefinitions>
-        <Border x:Name="Border_1" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="300" Margin="430,146,0,0" VerticalAlignment="Top" Width="218" Grid.RowSpan="2">
+        <Border x:Name="Border_1" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="297" Margin="430,146,0,0" VerticalAlignment="Top" Width="216" Grid.RowSpan="2">
             <InkCanvas x:Name="Canvas_Strokes_1" Margin="-12,-2,8,-2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         </Border>
-        <Border x:Name="Border_2" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="300" VerticalAlignment="Top" Margin="726,146,0,0" Width="218" Grid.RowSpan="2">
+        <Border x:Name="Border_2" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="297" VerticalAlignment="Top" Margin="726,146,0,0" Width="216" Grid.RowSpan="2">
             <InkCanvas x:Name="Canvas_Strokes_2" Margin="-1,-2,8,-2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         </Border>
-        <Border x:Name="Border_3" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="300" VerticalAlignment="Top" Margin="1017,146,0,0" Width="218"  Grid.RowSpan="2">
+        <Border x:Name="Border_3" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="297" VerticalAlignment="Top" Margin="1017,146,0,0" Width="216"  Grid.RowSpan="2">
             <InkCanvas x:Name="Canvas_Strokes_3" Margin="-1,-2,1,-2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         </Border>
-        <Border x:Name="Border_4" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="300" Margin="430,267,0,0" VerticalAlignment="Top" Width="218" Grid.Row="1">
+        <Border x:Name="Border_4" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="297" Margin="430,267,0,0" VerticalAlignment="Top" Width="216" Grid.Row="1">
             <InkCanvas x:Name="Canvas_Strokes_4" Margin="-1,-2,1,-2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         </Border>
-        <Border x:Name="Border_5" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="300" Margin="726,267,0,0" VerticalAlignment="Top" Width="218" Grid.Row="1">
+        <Border x:Name="Border_5" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="297" Margin="726,267,0,0" VerticalAlignment="Top" Width="216" Grid.Row="1">
             <InkCanvas x:Name="Canvas_Strokes_5" Margin="-1,-2,1,-2"/>
         </Border>
-        <Border x:Name="Border_6" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="300" Margin="1017,267,0,0" VerticalAlignment="Top" Width="218" Grid.Row="1">
+        <Border x:Name="Border_6" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" Height="297" Margin="1017,267,0,0" VerticalAlignment="Top" Width="216" Grid.Row="1">
             <InkCanvas x:Name="Canvas_Strokes_6" Margin="-1,-2,1,-2"/>
         </Border>
 
