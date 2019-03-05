@@ -206,19 +206,19 @@ namespace WillDevicesSampleApp
 
             try
             {
-                Publisher pub = AppObjects.Instance.Publisher;
+                //Publisher pub = AppObjects.Instance.Publisher;
 
-                if (pub.CurrentState == pub.STATE_NEUTRAL)
-                {
-                    Pbtn_Exec.Content = resourceLoader.GetString("IDC_Stop");
-                }
-                else
-                {
-                    Pbtn_Exec.Content = resourceLoader.GetString("IDC_Exec");
-                }
+                //if (pub.CurrentState == pub.STATE_NEUTRAL)
+                //{
+                //    Pbtn_Exec.Content = resourceLoader.GetString("IDC_Stop");
+                //}
+                //else
+                //{
+                //    Pbtn_Exec.Content = resourceLoader.GetString("IDC_Exec");
+                //}
                 RunPublisher();  // Start/Stop
 
-                SetUiState();
+                //SetUiState();
             }
             catch (Exception ex)
             {

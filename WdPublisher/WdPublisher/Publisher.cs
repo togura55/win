@@ -45,9 +45,8 @@ namespace WillDevicesSampleApp
         {
             CommandResponseState = CMD_NEUTRAL;
             PublisherId = 0;
-            HostNameString = "192.168.0.7";
+            HostNameString = "192.168.0.7"; // for temporary
             PortNumberString = "1337";
-            //            State = PUBLISHER_STATE_STOP;
             CurrentState = STATE_NEUTRAL;
             HostName hostName = NetworkInformation.GetHostNames().Where(q => q.Type == HostNameType.Ipv4).First();
             ClientIpAddress = hostName.ToString();
@@ -80,7 +79,7 @@ namespace WillDevicesSampleApp
         {
             if (AppObjects.Instance.SocketService == null)
             {
-                throw new Exception("SocketServices is not created yet.");
+                throw new Exception("InitCommandCommunication: Exception: SocketServices is not created yet.");
             }
 
             SocketServices socketService = AppObjects.Instance.SocketService;
@@ -143,7 +142,7 @@ namespace WillDevicesSampleApp
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("Close() Exception: {0}", ex.Message));
+                throw new Exception(string.Format("Close: Exception: {0}", ex.Message));
             }
         }
 
@@ -162,6 +161,8 @@ namespace WillDevicesSampleApp
                 wacomDevice.StartScanAndConnect();
 
                 CurrentState = STATE_ACTIVE;
+
+                UpdateUiEvent(null);    // Update UI 
             }
             catch (Exception ex)
             {
@@ -186,7 +187,6 @@ namespace WillDevicesSampleApp
                 wacomDevice.ScanAndConnectCompletedNotification -= ScanAndConnect_Completed;
                 wacomDevice.StartRealTimeInkCompletedNotification -= StartRealTimeInk_Completed;
 
-
                 if (AppObjects.Instance.Device != null)
                     AppObjects.Instance.Device.Close();
 
@@ -195,6 +195,8 @@ namespace WillDevicesSampleApp
                 this.SendCommandStrings(CMD_STOP_PUBLISHER);
 
                 CurrentState = STATE_NEUTRAL;
+
+                UpdateUiEvent(null);    // Update UI 
             }
             catch (Exception ex)
             {
@@ -258,15 +260,7 @@ namespace WillDevicesSampleApp
                     }
 
                     CommandResponseState = command;
-                    //var task = Task.Run(() =>
-                    //{
-                        socketService.SendToServer(System.Text.Encoding.UTF8.GetBytes(commandString));
-                    //});
-
-
-                    // Then, waiting for response string at CommandSocketClient_Response
-                    //                    await commandSocketClient.ResponseReceiveAsync();
-                    //                   commandSocketClient.ResponseReceive();
+                    socketService.SendToServer(System.Text.Encoding.UTF8.GetBytes(commandString));
                 }
                 else
                 {
@@ -275,7 +269,7 @@ namespace WillDevicesSampleApp
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("SendCommand Exception: {0}", ex.Message));
+                throw new Exception(string.Format("SendCommandStrings: Exception: {0}", ex.Message));
             }
         }
 
@@ -292,12 +286,11 @@ namespace WillDevicesSampleApp
                 writer.WriteBytes(ByteArray);
                 buffer = writer.DetachBuffer();
             }
-
             return buffer;
         }
 
         #region Delegate Completion Handlers
-//        private async void ScanAndConnect_Completed(object sender, bool result)
+        //        private async void ScanAndConnect_Completed(object sender, bool result)
         private void ScanAndConnect_Completed(object sender, bool result)
         {
             try
@@ -307,7 +300,7 @@ namespace WillDevicesSampleApp
                     MessageEvent("ScanAndConnect_Completed: Go Socket initialization");
 
                     // Second, initialize the command path to Broker
- //                   await InitCommandCommunication(HostNameString, PortNumberString);
+                    //                   await InitCommandCommunication(HostNameString, PortNumberString);
                     InitCommandCommunication(HostNameString, PortNumberString);
                 }
                 else
@@ -416,8 +409,6 @@ namespace WillDevicesSampleApp
                                 response, AppObjects.Instance.WacomDevice.PublisherAttribute));
 
                             this.CommandResponseState = CMD_REQUEST_PUBLISHER_CONNECTION;
-                            //await commandSocketClient.SendCommand(RES_ACK);
-                            //MessageEvent("Send ACK");
 
                             this.SendCommandStrings(CMD_SET_ATTRIBUTES);
                         }

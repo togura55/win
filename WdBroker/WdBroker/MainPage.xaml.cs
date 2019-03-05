@@ -87,6 +87,7 @@ namespace WdBroker
 
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
 
+            // ToDo: assign objects dynamically
             CanvasStrokesList = new List<InkCanvas> {
                 Canvas_Strokes_1,
                 Canvas_Strokes_2,
@@ -119,34 +120,34 @@ namespace WdBroker
             this.TextBox_FixedHostNameValue.Visibility = Visibility.Collapsed;
             this.TextBlock_HostNameValue.Visibility = Visibility.Collapsed;
 
-            // ToDo: get dynamic from Publisher
-            double deviceHeight = 29700;    // ToDo: get from Publishers
-            double deviceWidth = 21600;
+            //// ToDo: get dynamic from Publisher
+            //double deviceHeight = 29700;    // ToDo: get from Publishers
+            //double deviceWidth = 21600;
 
             // preparing for getting stroke raw data
             //m_deviceSize.Width = deviceWidth;
             //m_deviceSize.Height = deviceHeight;
 
-            // Calc coordination scale
-            double sx = Canvas_Strokes.Width / deviceWidth;
-            double sy = Canvas_Strokes.Height / deviceHeight;
+            //// Calc coordination scale
+            //double sx = Canvas_Strokes.Width / deviceWidth;
+            //double sy = Canvas_Strokes.Height / deviceHeight;
 
-            mScale = sx < sy ? sx : sy;
+            //mScale = sx < sy ? sx : sy;
 
-            int cw = (int)(deviceWidth * mScale);
-            int ch = (int)(deviceHeight * mScale);
+            //int cw = (int)(deviceWidth * mScale);
+            //int ch = (int)(deviceHeight * mScale);
 
-            // InkCanvas size settings for displaying
-            Canvas_Strokes.Width = cw;
-            Canvas_Strokes.Height = ch;
+            //// InkCanvas size settings for displaying
+            //Canvas_Strokes.Width = cw;
+            //Canvas_Strokes.Height = ch;
 
             foreach (Border b in BorderList)
             {
-//                b.Visibility = Visibility.Collapsed;
+                //                b.Visibility = Visibility.Collapsed;
                 b.BorderBrush = new SolidColorBrush(Windows.UI.Colors.LightGray);
             }
-            // using for debug
-            Border_debug.Visibility = Visibility.Collapsed;
+            //// using for debug
+            //Border_debug.Visibility = Visibility.Collapsed;
         }
 
         private void GetUiState()
@@ -166,7 +167,7 @@ namespace WdBroker
         #region UI Control handlers 
         private async void Pbtn_Start_Click(object sender, RoutedEventArgs e)
         {
-            ReceiveMessage(this, 
+            ReceiveMessage(this,
                 string.Format("{0} button was clicked.", resourceLoader.GetString(fStart ? "IDC_Start" : "IDC_Stop")));
 
             GetUiState();
@@ -196,8 +197,19 @@ namespace WdBroker
         {
             ListBox_Message.Items.Clear();
 
-            // ToDo Clear by Windows InkCanvas
-            //            CanvasClear(this.Canvas_Strokes);
+            try
+            {
+                int i = 0;
+                foreach (Subscriber s in App.Broker.subs)
+                {
+                    ClearCanvas(i);
+                    i++;
+                }
+            }
+            catch (Exception ex)
+            {
+                ReceiveMessage(this, string.Format("Pbtn_Clearlog_Click: Exception: {0}", ex.Message));
+            }
         }
 
         private void ShowStrokeRawData_Click(object sender, RoutedEventArgs e)
@@ -329,11 +341,14 @@ namespace WdBroker
             try
             {
                 Publisher pub = App.Pubs[index];
+                Subscriber sub = App.Broker.subs[index];
 
                 if (pub != null)
                 {
-                    double sx = Canvas_Strokes.ActualWidth / pub.DeviceSize.Width;
-                    double sy = Canvas_Strokes.ActualHeight / pub.DeviceSize.Height;
+                    //double sx = Canvas_Strokes.ActualWidth / pub.DeviceSize.Width;
+                    //double sy = Canvas_Strokes.ActualHeight / pub.DeviceSize.Height;
+                    double sx = sub.CanvasStrokes.ActualWidth / pub.DeviceSize.Width;
+                    double sy = sub.CanvasStrokes.ActualHeight / pub.DeviceSize.Height;
                     pub.ViewScale = Math.Min(sx, sy);
                 }
             }
@@ -430,7 +445,7 @@ namespace WdBroker
                 //               DrawPoint drawPoints = DrawPointList.Last();
                 //               drawPoints.stop();
                 CanvasStrokesList[index].InkPresenter.StrokeContainer.Clear();
-//                BorderList[index].Visibility = Visibility.Collapsed;
+                //                BorderList[index].Visibility = Visibility.Collapsed;
                 //                DrawPointList.RemoveAt(DrawPointList.Count - 1);
             }
             catch (Exception ex)

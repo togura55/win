@@ -84,7 +84,8 @@ namespace WdBroker
 
         private async void DrawingEvent(List<DeviceRawData> data, int index)
         {
-            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+ //           await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
             {
                 AppDrawing?.Invoke(this, data, index);
             });
@@ -189,7 +190,7 @@ namespace WdBroker
                         if (!App.Pubs.Exists(pubs => pubs.Id == pub_id.ToString()))
                         {
                             // Error
-                            throw new Exception(string.Format("DataPublisherEvent(): Exception: A publisher includes unknown Publisher ID: {0}",
+                            throw new Exception(string.Format("DataPublisherEvent: Exception: A publisher includes unknown Publisher ID: {0}",
                                 pub_id.ToString()));
                         }
                         else  // Publisher existed
