@@ -26,11 +26,11 @@ namespace WillDevicesSampleApp
             AppObjects.Instance.Publisher.PublisherMessage += ReceivedMessage; // set the message delegate         publisher = AppObjects.Instance.Publisher;
             AppObjects.Instance.Publisher.UpdateUi += ReceivedUpdateUi;
 
-            AppObjects.Instance.WacomDevice = new WacomDevices();     // stored for using this app 
-            AppObjects.Instance.WacomDevice.WacomDevicesMessage += ReceivedMessage; // set the message delegate
+            //AppObjects.Instance.WacomDevice = new WacomDevices();     // stored for using this app 
+            //AppObjects.Instance.WacomDevice.WacomDevicesMessage += ReceivedMessage; // set the message delegate
 
-            AppObjects.Instance.SocketService = new SocketServices();
-            AppObjects.Instance.SocketService.SocketMessage += ReceivedMessage; // 
+            //AppObjects.Instance.SocketService = new SocketServices();
+            //AppObjects.Instance.SocketService.SocketMessage += ReceivedMessage; // 
 
             AppObjects.Instance.RemoteController = new RemoteControllers();
             AppObjects.Instance.RemoteController.RCMessage += ReceivedMessage; // 
@@ -173,6 +173,12 @@ namespace WillDevicesSampleApp
             if (pub.CurrentState == pub.STATE_NEUTRAL ||
                 pub.CurrentState == pub.STATE_IDLE)
             {
+                AppObjects.Instance.WacomDevice = new WacomDevices();     // stored for using this app 
+                AppObjects.Instance.WacomDevice.WacomDevicesMessage += ReceivedMessage; // set the message delegate
+
+                AppObjects.Instance.SocketService = new SocketServices();
+                AppObjects.Instance.SocketService.SocketMessage += ReceivedMessage; // 
+
                 pub.InitializationCompletedNotification += PublisherInitialization_Completed;
                 pub.Start();
             }
@@ -180,6 +186,14 @@ namespace WillDevicesSampleApp
             {
                 pub.Stop();
                 pub.InitializationCompletedNotification -= PublisherInitialization_Completed;
+
+                AppObjects.Instance.SocketService.SocketMessage -= ReceivedMessage; // 
+                AppObjects.Instance.SocketService.Dispose();
+                AppObjects.Instance.SocketService = null;
+
+                AppObjects.Instance.WacomDevice.WacomDevicesMessage -= ReceivedMessage; // set the message delegate
+//               AppObjects.Instance.WacomDevice.Dispose(); 
+                AppObjects.Instance.WacomDevice = null;
             }
         }
 
