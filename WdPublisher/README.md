@@ -16,8 +16,8 @@ xxx
 ## Author(s)
 * Tsuyoshi Ogura (togura55@gmail.com)  
 ## ToDo/Known Issues
-*   
-*   
+*   The sequences is stopped at "StartScanAndConnect" by operating [Start]-[Stop]-[Start]  
+*   Not be functional by clicking [Suspend] button  
 ## History
 * 1.0.10 
  - Support communicating with WdController
