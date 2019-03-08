@@ -38,7 +38,7 @@ namespace WillDevicesSampleApp
         public delegate void InitializationCompletedNotificationHandler(object sender, bool result);
 
         // Properties
-        public event MessageEventHandler PublisherMessage, UpdateUi;
+        public event MessageEventHandler PublisherMessage, UpdateUi, PublisherControl;
         public event InitializationCompletedNotificationHandler InitializationCompletedNotification;
 
         public Publisher()
@@ -122,8 +122,8 @@ namespace WillDevicesSampleApp
                 MessageEvent("Close");
                 CurrentState = STATE_NEUTRAL;
 
-                CommandResponseState = CMD_DISCARD_PUBLISHER;
-                this.SendCommandStrings(CMD_DISCARD_PUBLISHER);
+                CommandResponseState = CMD_STOP_PUBLISHER;
+                this.SendCommandStrings(CMD_STOP_PUBLISHER);
 
                 if (AppObjects.Instance.SocketService != null)
                 {
@@ -166,7 +166,7 @@ namespace WillDevicesSampleApp
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("Start: Exception: {0}", ex.Message));
+                MessageEvent(string.Format("Start: Exception: {0}", ex.Message));
             }
         }
 
@@ -200,7 +200,7 @@ namespace WillDevicesSampleApp
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("Stop: Exception: {0}", ex.Message));
+                MessageEvent(string.Format("Stop: Exception: {0}", ex.Message));
             }
         }
         #endregion
@@ -210,9 +210,9 @@ namespace WillDevicesSampleApp
         const float CMD_SET_ATTRIBUTES = 0x2000;
         const float CMD_START_PUBLISHER = 0x3000;
         const float CMD_STOP_PUBLISHER = 0x4000;
-        const float CMD_DISCARD_PUBLISHER = 0x5000;
-        const float CMD_RESTART_PUBLISHER = 0x6000;
-        const float CMD_POWEROFF_PUBLISHER = 0x7000;
+//        const float CMD_DISCARD_PUBLISHER = 0x5000;
+        const float CMD_SUSPEND_PUBLISHER = 0x5000;
+        const float CMD_RESUME_PUBLISHER = 0x6000;
 
         const string RES_ACK = "ack";
         const string RES_NAK = "nak";
@@ -250,8 +250,12 @@ namespace WillDevicesSampleApp
                             commandString = string.Format("{0},{1}", PublisherId, 4);
                             break;
 
-                        case CMD_DISCARD_PUBLISHER:
+                        case CMD_SUSPEND_PUBLISHER:
                             commandString = string.Format("{0},{1}", PublisherId, 5);
+                            break;
+
+                        case CMD_RESUME_PUBLISHER:
+                            commandString = string.Format("{0},{1}", PublisherId, 6);
                             break;
 
                         default:
@@ -461,6 +465,10 @@ namespace WillDevicesSampleApp
                             case RES_ACK:
                                 MessageEvent(msg);
                                 this.CommandResponseState = CMD_NEUTRAL;
+                                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                                {
+                                    this.PublisherControl?.Invoke(this, "SendStopToBrokerComplete");
+                                });
                                 break;
 
                             case RES_NAK:
@@ -471,9 +479,9 @@ namespace WillDevicesSampleApp
                         }
                         break;
 
-                    case CMD_DISCARD_PUBLISHER:
+                    case CMD_SUSPEND_PUBLISHER:
                         // ACK/NAK
-                        msg = string.Format("CMD_DISPOSE_PUBLISHER returns {0}", response);
+                        msg = string.Format("CMD_SUSPEND_PUBLISHER returns {0}", response);
                         switch (response)
                         {
                             case RES_ACK:
@@ -489,6 +497,23 @@ namespace WillDevicesSampleApp
                         }
                         break;
 
+                    case CMD_RESUME_PUBLISHER:
+                        // ACK/NAK
+                        msg = string.Format("CMD_SUSPEND_PUBLISHER returns {0}", response);
+                        switch (response)
+                        {
+                            case RES_ACK:
+                                MessageEvent(msg);
+                                this.CommandResponseState = CMD_NEUTRAL;
+                                break;
+
+                            case RES_NAK:
+                                throw new Exception(msg);
+
+                            default:
+                                throw new Exception(string.Format("Unknown response: {0}", response));
+                        }
+                        break;
                     default:
                         throw new Exception(string.Format("Unknown CommandResponseState: {0}", CommandResponseState));
                 }

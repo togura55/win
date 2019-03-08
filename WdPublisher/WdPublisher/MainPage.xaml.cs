@@ -25,6 +25,7 @@ namespace WillDevicesSampleApp
             AppObjects.Instance.Publisher = new Publisher();
             AppObjects.Instance.Publisher.PublisherMessage += ReceivedMessage; // set the message delegate         publisher = AppObjects.Instance.Publisher;
             AppObjects.Instance.Publisher.UpdateUi += ReceivedUpdateUi;
+            AppObjects.Instance.Publisher.PublisherControl += ReceivedPublisherControl;
 
             //AppObjects.Instance.WacomDevice = new WacomDevices();     // stored for using this app 
             //AppObjects.Instance.WacomDevice.WacomDevicesMessage += ReceivedMessage; // set the message delegate
@@ -118,7 +119,7 @@ namespace WillDevicesSampleApp
                     RunPublisher();
                     break;
 
-                case "DeviceStop":
+                case "DeviceStop":  // call from RemoteController
                     StopPublisher();
                     break;
 
@@ -132,6 +133,19 @@ namespace WillDevicesSampleApp
 
                 case "RegisterBackgroundWatcher":
                     StartRemoteControllerTask();
+                    break;
+
+                    // ToDo: move to Publisher ?
+                case "SendStopToBrokerComplete":
+                    AppObjects.Instance.Publisher.InitializationCompletedNotification -= PublisherInitialization_Completed;
+
+                    AppObjects.Instance.SocketService.SocketMessage -= ReceivedMessage; // 
+                    AppObjects.Instance.SocketService.Dispose();
+                    AppObjects.Instance.SocketService = null;
+
+                    AppObjects.Instance.WacomDevice.WacomDevicesMessage -= ReceivedMessage; // set the message delegate
+                                                                                            //               AppObjects.Instance.WacomDevice.Dispose(); 
+                    AppObjects.Instance.WacomDevice = null;
                     break;
 
                 default:
@@ -160,6 +174,7 @@ namespace WillDevicesSampleApp
 
             AppObjects.Instance.Publisher.Stop();
 
+            AppObjects.Instance.Publisher.PublisherControl -= ReceivedPublisherControl;
             AppObjects.Instance.Publisher.UpdateUi -= ReceivedUpdateUi;
             AppObjects.Instance.Publisher.PublisherMessage -= ReceivedMessage;
             AppObjects.Instance.RemoteController.PublisherControl -= ReceivedPublisherControl;
@@ -185,15 +200,6 @@ namespace WillDevicesSampleApp
             else
             {
                 pub.Stop();
-                pub.InitializationCompletedNotification -= PublisherInitialization_Completed;
-
-                AppObjects.Instance.SocketService.SocketMessage -= ReceivedMessage; // 
-                AppObjects.Instance.SocketService.Dispose();
-                AppObjects.Instance.SocketService = null;
-
-                AppObjects.Instance.WacomDevice.WacomDevicesMessage -= ReceivedMessage; // set the message delegate
-//               AppObjects.Instance.WacomDevice.Dispose(); 
-                AppObjects.Instance.WacomDevice = null;
             }
         }
 
