@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.UI.Input.Inking;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 
 namespace WdBroker
 {
@@ -14,7 +15,9 @@ namespace WdBroker
         public InkDrawingAttributes Attribute = null;
         public InkStrokeBuilder StrokeBuilder = null;
         public InkCanvas CanvasStrokes = null;
+        public Border BorderStrokes = null;
         public double PenSize;
+        public int SN; // sequential number
 
         public Subscriber()
         {
@@ -33,14 +36,16 @@ namespace WdBroker
             // -----
         }
 
-        public void Create(int index)
+        public void Create()
         {
-            // 描画属性を作成する
-            //            InkDrawingAttributes attributes = new InkDrawingAttributes();
-            Attribute.Size = new Size(PenSize, PenSize);          // ペンのサイズ
-            Attribute.IgnorePressure = false;          // ペンの圧力を使用するかどうか
+
+            BorderStrokes.BorderBrush = new SolidColorBrush(Windows.UI.Colors.Black);
+
+            // Create and set canvas attribute
+            Attribute.Size = new Size(PenSize, PenSize);          // pen size
+            Attribute.IgnorePressure = false;          // whether using pen pressure value or not
             Attribute.FitToCurve = false;
-            Attribute.Color = UIColors[index];
+            Attribute.Color = UIColors[SN];
 
             StrokeBuilder.SetDefaultDrawingAttributes(Attribute);
 
@@ -53,8 +58,8 @@ namespace WdBroker
             Attribute = null;
             StrokeBuilder = null;
 
- //           CanvasStrokes.InkPresenter.StrokeContainer.Clear();
             CanvasStrokes = null;
+            BorderStrokes = null;
         }
 
         // A list of color table

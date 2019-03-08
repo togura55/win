@@ -328,17 +328,26 @@ namespace WdBroker
                         break;
 
                     case TYPE_PUBLISHER:
-                        // Clear UI: ToDo: move to sub.Dispose
-                        await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                        {
-                            SubscriberAction?.Invoke(this, "Clear", index);
-                            SubscriberAction?.Invoke(this, "Dispose", index);
-                        });
+                        //// Clear UI: ToDo: move to sub.Dispose
+                        //await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                        //{
+                        //    SubscriberAction?.Invoke(this, "Clear", index);
+                        //    SubscriberAction?.Invoke(this, "Dispose", index);
+                        //});
 
-                        //                       App.Subs[index].Dispose(index);
-                        subs[index].Dispose(index);
+                        //subs[index].Dispose(index);
+                        ////int i = 0;
+                        ////foreach (Subscriber s in subs.ToArray())    //    エラーにならないんですよー、これが
+                        ////{
+                        ////    if (要らないモンみーつけた)
+                        ////    {
+                        ////        subs.Remove(s);
+                        ////    }
+                        ////    i++;
+                        ////}
+                        //App.Pubs[index].Stop();
 
-                        App.Pubs[index].Stop();
+                        DisconnectPublisherEvent(index);
                         break;
 
                     case TYPE_SUBSCRIBER:
@@ -465,8 +474,6 @@ namespace WdBroker
                                 pub.DeviceType = list[++i];
                                 pub.TransferMode = list[++i];
 
-//                                pub.HostName = list[++i];
-//                                pub.PortNumber = list[++i];
                                 pub.IpAddress = list[++i];
                                 pub.State = int.Parse(list[++i]);
 
@@ -541,7 +548,6 @@ namespace WdBroker
                 else
                 {
                     // invalid command word
-                    //                    App.Socket.SendCommandResponseAsync(args, RES_NAK);
                     res = RES_ACK;
                     mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
                     MessageEvent(string.Format("Response to Publisher: {0}", res));

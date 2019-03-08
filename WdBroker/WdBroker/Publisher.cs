@@ -34,8 +34,6 @@ namespace WdBroker
     {
         // sent by Publisher device
         public string Id;
-//        public string HostName;
-//        public string PortNumber;
         public string DeviceType;
         public string DeviceName;
         public Size DeviceSize; // Width,Height
@@ -52,7 +50,6 @@ namespace WdBroker
         // Publisher attributes depend on the running environment
         public string IpAddress;
         public int State;
-        public int Index;
 
         public Publisher()
         {

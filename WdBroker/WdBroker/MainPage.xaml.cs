@@ -264,21 +264,52 @@ namespace WdBroker
         /// <param name="index"></param>
         private void ReceiveAppConnectPublisher(object sender, int index)
         {
+            try
+            {
+                // Publisherが接続されたら、購読を希望しているSubscriberを紐づける
+                // 本来ならSubscriberからのリクエストに応じて、Subscriber向けのコネクタ等を
+                // 準備する。
+                // ここでは便宜的に、Publisherに対応するひとつのSubscriberをこのアプリ内に
+                // 持つことにする
+                Subscriber sub = new Subscriber();
 
+                InkCanvas inkCanvas = null;
+                bool flag = false;
+                foreach (InkCanvas ic in CanvasStrokesList)
+                {
+                    foreach (Subscriber s in App.Broker.subs)
+                    {
+                        if (ic == s.CanvasStrokes)
+                        {
+                            flag = true;
+                            break;
+                        }
+                    }
+                    if (!flag)  // 無かった
+                    {
+                        inkCanvas = ic;  // このCanvasStrokesList値を割り当てる
+                        break;
+                    }
+                    flag = false;
+                }
+                if (inkCanvas == null)
+                {
+                    throw new Exception("No spaces for assigning Subscriber any more.");
+                }
 
-            // Publisherが接続されたら、購読を希望しているSubscriberを紐づける
-            // 本来ならSubscriberからのリクエストに応じて、Subscriber向けのコネクタ等を
-            // 準備する。
-            // ここでは便宜的に、Publisherに対応するひとつのSubscriberをこのアプリ内に
-            // 持つことにする
-            Subscriber sub = new Subscriber();
-            sub.CanvasStrokes = CanvasStrokesList[index];
-            sub.Create(index);
-            App.Broker.subs.Add(sub);
+                //  sub.CanvasStrokes = CanvasStrokesList[index];
+                sub.CanvasStrokes = inkCanvas;
+                int n = CanvasStrokesList.IndexOf(inkCanvas);
+                sub.BorderStrokes = BorderList[n];
+                sub.Create();
+                App.Broker.subs.Add(sub);
 
-
-            SetCanvasScaling(index);
-            BorderList[index].BorderBrush = new SolidColorBrush(Windows.UI.Colors.Black);
+                SetCanvasScaling(n);
+            }
+            catch (Exception ex)
+            {
+                ReceiveMessage(this, string.Format("ReceiveAppConnectPublisher: Exception: {0}", ex.Message));
+            }
         }
 
         private void ReceiveAppDisconnectPublisher(object sender, int index)
@@ -287,7 +318,6 @@ namespace WdBroker
             sub.Dispose(index);
             App.Broker.subs.RemoveAt(index);
 
-            //           BorderList[index].Visibility = Visibility.Collapsed;
             CanvasStrokesList[index].InkPresenter.StrokeContainer.Clear();
             BorderList[index].BorderBrush = new SolidColorBrush(Windows.UI.Colors.Black);
         }
@@ -316,21 +346,6 @@ namespace WdBroker
         #endregion
 
         #region Drawing
-        //private void CanvasClear(Canvas canvas)
-        //{
-        //    try
-        //    {
-        //        foreach (UIElement ui in canvas.Children)
-        //        {
-        //            canvas.Children.Remove(ui);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ListBox_Message.Items.Add(ex.Message);
-        //    }
-        //}
-
         // Raw data event handler sent by SocketServer object
         private void ReceiveDrawing(object sender, List<DeviceRawData> data_list, int index)
         {
@@ -385,59 +400,6 @@ namespace WdBroker
                 ReceiveMessage(this, string.Format("DrawStroke: Exception: {0}", ex.Message));
             }
         }
-
-        // for debug
-        //private void DrawStroke(int x, int y, int index)
-        //{
-        //    try
-        //    {
-        //        //                Publisher pub = App.Pubs[index];
-
-        //        //               int count = deviceRawDataList.Count;
-
-        //        //                int count = 5;
-        //        int r = 5;
-        //        int _x, _y;
-
-        //        InkPoint[] points = new InkPoint[5];
-        //        for (int i = 0; i < 5; i++)
-        //        {
-        //            _x = x;
-        //            _y = y;
-        //            switch (i)
-        //            {
-        //                case 0:
-        //                case 4:
-        //                    _y = y - r;
-        //                    break;
-        //                case 1:
-        //                    _x = x - r;
-        //                    break;
-        //                case 2:
-        //                    _y = y + r;
-        //                    break;
-        //                case 3:
-        //                    _x = x + r;
-        //                    break;
-        //            }
-        //            points[i] = new InkPoint(new Windows.Foundation.Point(_x, _y), 1);
-        //        }
-
-        //        //await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () =>
-        //        //{
-        //        // Make a stroke by array of point
-
-        //        InkStroke s = App.Subs[index].StrokeBuilder.CreateStrokeFromInkPoints(
-        //        points, System.Numerics.Matrix3x2.Identity);
-        //        CanvasStrokesList[index].InkPresenter.StrokeContainer.AddStroke(s);
-
-        //        //});
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ReceiveMessage(this, string.Format("DrawStroke: Exception: {0}", ex.Message));
-        //    }
-        //}
 
         private void ClearCanvas(int index)
         {
