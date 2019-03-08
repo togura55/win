@@ -264,19 +264,21 @@ namespace WdBroker
         /// <param name="index"></param>
         private void ReceiveAppConnectPublisher(object sender, int index)
         {
-            SetCanvasScaling(index);
 
-            //           BorderList[index].Visibility = Visibility.Visible;  // Visible the drawing area
-            BorderList[index].BorderBrush = new SolidColorBrush(Windows.UI.Colors.Black);
 
             // Publisherが接続されたら、購読を希望しているSubscriberを紐づける
             // 本来ならSubscriberからのリクエストに応じて、Subscriber向けのコネクタ等を
             // 準備する。
-            // ここでは便宜的に、ひとつのSubscriberをこのアプリ内に持つことにする
+            // ここでは便宜的に、Publisherに対応するひとつのSubscriberをこのアプリ内に
+            // 持つことにする
             Subscriber sub = new Subscriber();
             sub.CanvasStrokes = CanvasStrokesList[index];
             sub.Create(index);
             App.Broker.subs.Add(sub);
+
+
+            SetCanvasScaling(index);
+            BorderList[index].BorderBrush = new SolidColorBrush(Windows.UI.Colors.Black);
         }
 
         private void ReceiveAppDisconnectPublisher(object sender, int index)
