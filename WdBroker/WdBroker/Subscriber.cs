@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Windows.UI.Core;
 using Windows.UI.Input.Inking;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -17,50 +18,64 @@ namespace WdBroker
         public InkCanvas CanvasStrokes = null;
         public Border BorderStrokes = null;
         public double PenSize;
-        public int SN; // sequential number
+        public int SeqNumber; // sequential number
 
-        public Subscriber()
+        //List<InkCanvas> CanvasStrokesList;
+        //List<Border> BorderList;
+
+        // Delegate event handlers
+        public delegate void SubscriberEventHandler(object sender, string message, int index);
+
+        // Properties for events
+        public event SubscriberEventHandler SubscriberAction;
+
+
+public Subscriber()
         {
             PenSize = 2;
 
             Attribute = new InkDrawingAttributes();
             StrokeBuilder = new InkStrokeBuilder();
-
-            //DrawPoint drawPoints = new DrawPoint();
-            //drawPoints.DrawPointAction += ReceivedAction; // set the action message delegate
-            //drawPoints.index = Count;
-            //            DrawPointList.Add(drawPoints);
-
-            //            CanvasStrokesList[Count].InkPresenter.InputDeviceTypes = Windows.UI.Core.CoreInputDeviceTypes.Mouse | Windows.UI.Core.CoreInputDeviceTypes.Pen;
- //           Count++;
-            // -----
         }
 
+        private async void SubscriberActionEvent(string message, int index)
+        {
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                SubscriberAction?.Invoke(this, message, index);
+            });
+        }
+
+        #region Services
         public void Create()
         {
-
-            BorderStrokes.BorderBrush = new SolidColorBrush(Windows.UI.Colors.Black);
-
             // Create and set canvas attribute
             Attribute.Size = new Size(PenSize, PenSize);          // pen size
             Attribute.IgnorePressure = false;          // whether using pen pressure value or not
             Attribute.FitToCurve = false;
-            Attribute.Color = UIColors[SN];
+            Attribute.Color = UIColors[SeqNumber];
 
             StrokeBuilder.SetDefaultDrawingAttributes(Attribute);
 
             if (CanvasStrokes != null)
                 CanvasStrokes.InkPresenter.UpdateDefaultDrawingAttributes(Attribute);  // set UI attributes
+
+            SubscriberActionEvent("Create", SeqNumber);  // UI
+
         }
 
-        public void Dispose(int index)
+        public void Dispose()
         {
+            // UI 
+            SubscriberActionEvent("Dispose", SeqNumber);  // UI
+
             Attribute = null;
             StrokeBuilder = null;
 
             CanvasStrokes = null;
             BorderStrokes = null;
         }
+        #endregion
 
         // A list of color table
         List<Windows.UI.Color> UIColors = new List<Windows.UI.Color>() {

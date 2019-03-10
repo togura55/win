@@ -18,14 +18,14 @@ namespace WdBroker
         // Delegate event handlers
         public delegate void BrokerEventHandler(object sender, string message);
         public delegate void ConnectPublisherEventHandler(object sender, int index);
-        public delegate void DisconnectPublisherEventHandler(object sender, int index);
+//        public delegate void DisconnectPublisherEventHandler(object sender, int index);
         public delegate void DrawingEventHandler(object sender, List<DeviceRawData> data, int index); // for drawing
         public delegate void SubscriberEventHandler(object sender, string message, int index);
 
         // Properties
         public event BrokerEventHandler BrokerMessage;
         public event ConnectPublisherEventHandler AppConnectPublisher;
-        public event DisconnectPublisherEventHandler AppDisconnectPublisher;
+//        public event DisconnectPublisherEventHandler AppDisconnectPublisher;
         public event DrawingEventHandler AppDrawing; // for drawing
         public event SubscriberEventHandler SubscriberAction;
 
@@ -74,13 +74,13 @@ namespace WdBroker
             });
         }
 
-        private async void DisconnectPublisherEvent(int index)
-        {
-            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                AppDisconnectPublisher?.Invoke(this, index);
-            });
-        }
+        //private async void DisconnectPublisherEvent(int index)
+        //{
+        //    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+        //    {
+        //        AppDisconnectPublisher?.Invoke(this, index);
+        //    });
+        //}
 
         private async void DrawingEvent(List<DeviceRawData> data, int index)
         {
@@ -217,7 +217,6 @@ namespace WdBroker
                                 int s = App.Pubs[pi].Strokes.Count - 1;
                                 App.Pubs[pi].Strokes[s].DeviceRawDataList.Add(drd);
                             }
-                            //                           DrawingEvent(drd, pi);  // for drawing
                         }
                     }
                     index++;
@@ -251,7 +250,7 @@ namespace WdBroker
                         {
                             if (App.Pubs[i].IpAddress == hostNameString)
                             {
-                                index = i;
+                                index = i;  // ToDo: listのindexじゃなくてPub.idで管理すべき
                                 break;
                             }
                         }
@@ -261,8 +260,9 @@ namespace WdBroker
                         }
                         else
                         {
-                            DisconnectPublisherEvent(index);
-                            App.Pubs[index].Dispose();
+                            this.Stop(TYPE_PUBLISHER, index);
+//                            DisconnectPublisherEvent(index);
+//                            App.Pubs[index].Dispose();
                         }
                         break;
 
@@ -276,10 +276,19 @@ namespace WdBroker
                 MessageEvent(string.Format("DataPublisherErrorEvent: Exception: {0}", ex.Message));
             }
         }
-        #endregion
 
-        #region Services
-        public async Task Start(HostName hostName, string portNumber)
+        private async void SubscriberBridgeAction(object sender, string message, int index)
+        {
+            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+               SubscriberAction?.Invoke(this, message, index);
+            });
+        }
+
+            #endregion
+
+            #region Services
+            public async Task Start(HostName hostName, string portNumber)
         {
             try
             {
@@ -306,7 +315,7 @@ namespace WdBroker
             }
         }
 
-        public async void Stop(int type, int index)
+        public void Stop(int type, int index)
         {
             try
             {
@@ -328,26 +337,15 @@ namespace WdBroker
                         break;
 
                     case TYPE_PUBLISHER:
-                        //// Clear UI: ToDo: move to sub.Dispose
-                        //await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                        //{
-                        //    SubscriberAction?.Invoke(this, "Clear", index);
-                        //    SubscriberAction?.Invoke(this, "Dispose", index);
-                        //});
+                        // 1. Subに通知
+                        this.subs[index].Dispose();
+                        this.subs.RemoveAt(index);
 
-                        //subs[index].Dispose(index);
-                        ////int i = 0;
-                        ////foreach (Subscriber s in subs.ToArray())    //    エラーにならないんですよー、これが
-                        ////{
-                        ////    if (要らないモンみーつけた)
-                        ////    {
-                        ////        subs.Remove(s);
-                        ////    }
-                        ////    i++;
-                        ////}
-                        //App.Pubs[index].Stop();
+                        // 2. pub objectの破棄
+                        App.Pubs[index].Stop();
+                        App.Pubs.RemoveAt(index);
 
-                        DisconnectPublisherEvent(index);
+//                     this.DisconnectPublisherEvent(index);
                         break;
 
                     case TYPE_SUBSCRIBER:
@@ -360,6 +358,11 @@ namespace WdBroker
             }
         }
         #endregion
+
+        private void StartPublisher()
+        {
+
+        }
 
         private int FindPublisherId(string id)
         {
@@ -418,7 +421,6 @@ namespace WdBroker
 
                             //// Do the publisher 1st contact process
                             //// 1. Create a new instance
-                            //                          Publisher publisher = new Publisher();
                             App.Pubs.Add(new Publisher());
 
                             // ToDo: rewrite GeneratePublisherId for identical ID strings
@@ -452,6 +454,42 @@ namespace WdBroker
                             res = id_new.ToString();
                             mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
                             MessageEvent(string.Format("Assigned and sent Publisher ID: {0}", res));
+
+                            // 5. Create a Subscriber for handling this Publisher
+                            // ToDo: should be implemented this at the per request by Sunscriber
+                            
+
+
+                            int seq_number = -1;
+                            bool flag = false;
+                            //                           foreach (InkCanvas ic in CanvasStrokesList)
+
+                            for (int i=0; i<6; i++)
+                            {
+                                foreach (Subscriber s in App.Broker.subs)
+                                {
+                                    if (i == s.SeqNumber)
+                                    {
+                                        flag = true;
+                                        break;
+                                    }
+                                }
+                                if (!flag)  // 無かった
+                                {
+                                    seq_number = i;  // assign this Sequential Number
+                                    break;
+                                }
+                                flag = false;
+                            }
+                            if (seq_number < 0)
+                            {
+                                throw new Exception("No spaces for assigning Subscriber any more.");
+                            }
+
+                            subs.Add(new Subscriber());
+                            subs[subs.Count-1].SeqNumber = seq_number;
+                            subs[subs.Count - 1].SubscriberAction += SubscriberBridgeAction;
+                            subs[subs.Count - 1].Create();
 
                             break;
 
