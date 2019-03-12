@@ -18,14 +18,12 @@ namespace WdBroker
         // Delegate event handlers
         public delegate void BrokerEventHandler(object sender, string message);
         public delegate void ConnectPublisherEventHandler(object sender, int index);
-//        public delegate void DisconnectPublisherEventHandler(object sender, int index);
         public delegate void DrawingEventHandler(object sender, List<DeviceRawData> data, int index); // for drawing
         public delegate void SubscriberEventHandler(object sender, string message, int index);
 
         // Properties
         public event BrokerEventHandler BrokerMessage;
         public event ConnectPublisherEventHandler AppConnectPublisher;
-//        public event DisconnectPublisherEventHandler AppDisconnectPublisher;
         public event DrawingEventHandler AppDrawing; // for drawing
         public event SubscriberEventHandler SubscriberAction;
 
@@ -43,12 +41,11 @@ namespace WdBroker
         private const int CMD_SET_ATTRIBUTES = 2;
         private const int CMD_START_PUBLISHER = 3;
         private const int CMD_STOP_PUBLISHER = 4;
-        //        private const int CMD_DISPOSE_PUBLISHER = 5;
         private const int CMD_SUSPEND_PUBLISHER = 5;
         private const int CMD_RESUME_PUBLISHER = 6;
         private const string RES_ACK = "ack";
         private const string RES_NAK = "nak";
-        static List<string> CommandList = new List<string> { "1", "2", "3", "4", "5" };  // Command word sent by Publisher
+        static List<string> CommandList = new List<string> { "1", "2", "3", "4", "5", "6" };  // Command word sent by Publisher
 
 
         public Broker()
@@ -74,17 +71,8 @@ namespace WdBroker
             });
         }
 
-        //private async void DisconnectPublisherEvent(int index)
-        //{
-        //    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-        //    {
-        //        AppDisconnectPublisher?.Invoke(this, index);
-        //    });
-        //}
-
         private async void DrawingEvent(List<DeviceRawData> data, int index)
         {
- //           await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
             {
                 AppDrawing?.Invoke(this, data, index);
@@ -256,7 +244,8 @@ namespace WdBroker
                         }
                         if (index < 0)
                         {
-                            throw new Exception(string.Format("No match HostName: {0} in Pubs.", hostNameString));
+//                            throw new Exception(string.Format("No match HostName: {0} in Pubs.", hostNameString));
+                            MessageEvent(string.Format("Publisher of {0} was already disposed.", hostNameString));
                         }
                         else
                         {
