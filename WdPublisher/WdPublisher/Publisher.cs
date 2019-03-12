@@ -210,7 +210,6 @@ namespace WillDevicesSampleApp
         const float CMD_SET_ATTRIBUTES = 0x2000;
         const float CMD_START_PUBLISHER = 0x3000;
         const float CMD_STOP_PUBLISHER = 0x4000;
-//        const float CMD_DISCARD_PUBLISHER = 0x5000;
         const float CMD_SUSPEND_PUBLISHER = 0x5000;
         const float CMD_RESUME_PUBLISHER = 0x6000;
 

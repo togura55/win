@@ -24,7 +24,6 @@ namespace WillDevicesSampleApp
 
         private const float micrometerToDip = 96.0f / 25400.0f;
         private CancellationTokenSource m_cts = new CancellationTokenSource();
-//        private bool m_addNewStrokeToModel = true;
         private static readonly float maxP = 1.402218f;
         private static readonly float pFactor = 1.0f / (maxP - 1.0f);
         int PointCount;
@@ -106,7 +105,7 @@ namespace WillDevicesSampleApp
             m_watcherUSB.DeviceAdded += OnDeviceAdded;
             m_watcherUSB.DeviceRemoved += OnDeviceRemoved;
             m_watcherUSB.WatcherStopped += OnUsbWatcherStopped;
-            m_watcherUSB.EnumerationCompleted += OnUsbEnumerationCompleted;
+     //       m_watcherUSB.EnumerationCompleted += OnUsbEnumerationCompleted;
 
             //Application.Current.Suspending += OnAppSuspending;
             //Application.Current.Resuming += OnAppResuming;
@@ -135,10 +134,11 @@ namespace WillDevicesSampleApp
 
             device.Disconnected += OnDeviceDisconnected;
             device.DeviceStatusChanged += OnDeviceStatusChanged;
-            device.PairingModeEnabledCallback = OnPairingModeEnabledAsync;
+//            device.PairingModeEnabledCallback = OnPairingModeEnabledAsync;
 
             IRealTimeInkService service = device.GetService(InkDeviceService.RealTimeInk) as IRealTimeInkService;
-            if (service == null)
+            if(service == null)
+//            if (!(device.GetService(InkDeviceService.RealTimeInk) is IRealTimeInkService service))
             {
                 await MessageEvent("StartRealTimeInk: The Real-time Ink service is not supported on this device");
                 return;
@@ -149,7 +149,7 @@ namespace WillDevicesSampleApp
             service.StrokeUpdated += Service_MiddleStroke;
             service.StrokeEnded += Service_EndStroke;
 
-            service.HoverPointReceived += OnHoverPointReceived;
+//            service.HoverPointReceived += OnHoverPointReceived;
             /////////////////////////////////////////////////////////////
 
             //textBlockPrompt.Text = AppObjects.GetStringForDeviceStatus(device.DeviceStatus);
@@ -198,6 +198,9 @@ namespace WillDevicesSampleApp
         {
             try
             {
+                // for debug
+                await MessageEvent("BeginStroke");
+
                 m_StrokeOrder = 1;
 
                 //m_addNewStrokeToModel = true;
@@ -484,7 +487,7 @@ namespace WillDevicesSampleApp
 
             if (m_connectingDeviceInfo != null)
             {
-                await MessageEvent(string.Format("ConnectInkDevice(): Initializing connection with device: {0}", m_connectingDeviceInfo.DeviceName));
+                await MessageEvent(string.Format("ConnectInkDevice: Initializing connection with device: {0}", m_connectingDeviceInfo.DeviceName));
 
                 switch (m_connectingDeviceInfo.TransportProtocol)
                 {
@@ -599,10 +602,10 @@ namespace WillDevicesSampleApp
             if (m_deviceInfos.Count == 0)
             {
                 await MessageEvent("OnUsbEnumerationCompleted: No devices were enumarated.");
-                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                {
-                    this.ScanAndConnectCompletedNotification?.Invoke(this, false);
-                });
+                //await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                //{
+                //    this.ScanAndConnectCompletedNotification?.Invoke(this, false);
+                //});
             }
         }
 

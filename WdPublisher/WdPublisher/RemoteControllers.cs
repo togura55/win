@@ -24,9 +24,9 @@ namespace WillDevicesSampleApp
         private RfcommConnectionTrigger trigger;
         // A name is given to the task in order for it to be identifiable across context. 
         //         private string taskName = "Scenario3_BackgroundTask";
-        private string taskName = "WdPublisher_BackgroundTask";  // Equivalent with the assembly name of Tasks
+        private readonly string taskName = "WdPublisher_BackgroundTask";  // Equivalent with the assembly name of Tasks
         // Entry point for the background task. 
-        private string taskEntryPoint = "BackgroundTasks.RfcommServerTask";
+        private readonly string taskEntryPoint = "BackgroundTasks.RfcommServerTask";
 
 
         // Define the raw bytes that are converted into SDP record
@@ -153,8 +153,10 @@ namespace WillDevicesSampleApp
                 // Applications registering for background trigger must request for permission.
                 BackgroundAccessStatus backgroundAccessStatus = await BackgroundExecutionManager.RequestAccessAsync();
 
-                var builder = new BackgroundTaskBuilder();
-                builder.TaskEntryPoint = taskEntryPoint;
+                var builder = new BackgroundTaskBuilder
+                {
+                    TaskEntryPoint = taskEntryPoint
+                };
                 builder.SetTrigger(trigger);
                 builder.Name = taskName;
 
