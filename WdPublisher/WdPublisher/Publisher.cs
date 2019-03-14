@@ -303,7 +303,6 @@ namespace WillDevicesSampleApp
                     MessageEvent("ScanAndConnect_Completed: Go Socket initialization");
 
                     // Second, initialize the command path to Broker
-                    //                   await InitCommandCommunication(HostNameString, PortNumberString);
                     InitCommandCommunication(HostNameString, PortNumberString);
                 }
                 else

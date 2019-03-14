@@ -338,10 +338,7 @@ namespace WillDevicesSampleApp
                 // Save the current message to local settings so the background task can pick it up. 
                 ApplicationData.Current.LocalSettings.Values["SendMessage"] = response;
 
-                // Clear the messageTextBox for a new message
-                //                MessageTextBox.Text = "";
-                //                ConversationListBox.Items.Add("Sent: " + message);
-                MessageEvent("Sent: " + response);
+                 MessageEvent("Sent: " + response);
             }
             else
             {
@@ -361,7 +358,6 @@ namespace WillDevicesSampleApp
 
         private const string RES_ACK = "ack";
         private const string RES_NAK = "nak";
-        //        static List<string> CommandList = new List<string> { "1", "2", "3", "4", "5" };  // Command word sent by Publisher
 
         private string ExecuteGetConfig()
         {
@@ -399,7 +395,6 @@ namespace WillDevicesSampleApp
             string responce = string.Empty;
             try
             {
-                //WacomDevices.DeviceAttributes DevAttr = AppObjects.Instance.WacomDevice.Attribute;
                 Publisher pub = AppObjects.Instance.Publisher;
 
                 char sp = ','; // separater

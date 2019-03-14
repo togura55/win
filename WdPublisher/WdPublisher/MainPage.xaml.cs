@@ -27,12 +27,6 @@ namespace WillDevicesSampleApp
             AppObjects.Instance.Publisher.UpdateUi += ReceivedUpdateUi;
             AppObjects.Instance.Publisher.PublisherControl += ReceivedPublisherControl;
 
-            //AppObjects.Instance.WacomDevice = new WacomDevices();     // stored for using this app 
-            //AppObjects.Instance.WacomDevice.WacomDevicesMessage += ReceivedMessage; // set the message delegate
-
-            //AppObjects.Instance.SocketService = new SocketServices();
-            //AppObjects.Instance.SocketService.SocketMessage += ReceivedMessage; // 
-
             AppObjects.Instance.RemoteController = new RemoteControllers();
             AppObjects.Instance.RemoteController.RCMessage += ReceivedMessage; // 
             AppObjects.Instance.RemoteController.UpdateUi += ReceivedUpdateUi;
@@ -205,9 +199,8 @@ namespace WillDevicesSampleApp
 
         private void StopPublisher()
         {
-            // RemoteController以外、止めて破棄
+            // Stop and dispose all w/o RemoteController
             AppObjects.Instance.Publisher.Stop();
- //           AppObjects.Instance.Publisher.Close();
         }
 
         private void SuspendPublisher()
@@ -224,26 +217,7 @@ namespace WillDevicesSampleApp
         {
             GetUiState();
 
-            try
-            {
-                //Publisher pub = AppObjects.Instance.Publisher;
-
-                //if (pub.CurrentState == pub.STATE_NEUTRAL)
-                //{
-                //    Pbtn_Exec.Content = resourceLoader.GetString("IDC_Stop");
-                //}
-                //else
-                //{
-                //    Pbtn_Exec.Content = resourceLoader.GetString("IDC_Exec");
-                //}
-                RunPublisher();  // Start/Stop
-
-                //SetUiState();
-            }
-            catch (Exception ex)
-            {
-                clientListBox.Items.Add(string.Format("Pbtn_Exec_Click: {0}", ex.Message));
-            }
+            RunPublisher();  // Start/Stop
         }
 
         private void Pbtn_Suspend_Click(object sender, RoutedEventArgs e)
@@ -258,20 +232,22 @@ namespace WillDevicesSampleApp
         #endregion
 
         #region Delegate Completion Handlers
-        private void PublisherInitialization_Completed(object sender, bool result)
+        private async void PublisherInitialization_Completed(object sender, bool result)
         {
             try
             {
                 if (result)
                 {
-                    ReceivedMessage(this, "PublisherInitialization_Completed: Go to StartRealTimeInk.");
+                    int msDelay = 1000;
+                    ReceivedMessage(this, 
+                        string.Format("PublisherInitialization_Completed: Go to StartRealTimeInk after {0}ms delay.", msDelay));
+                    await Task.Delay(msDelay);
                     AppObjects.Instance.WacomDevice.StartRealTimeInk();
                 }
             }
             catch (Exception ex)
             {
                  ReceivedMessage(this, string.Format("PublisherInitialization_Completed: Exception: {0}", ex.Message));
-
             }
         }
         #endregion
