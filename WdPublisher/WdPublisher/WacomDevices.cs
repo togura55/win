@@ -159,7 +159,8 @@ namespace WillDevicesSampleApp
                 bool start_flag = false;
                 if (!service.IsStarted)
                 {
-                    await service.StartAsync(false, m_cts.Token);
+//                    await service.StartAsync(false, m_cts.Token);
+                    await service.StartAsync(true, m_cts.Token);
                     start_flag = true;
                 }
 

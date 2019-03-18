@@ -155,7 +155,7 @@ namespace WillDevicesSampleApp
         private void ReceivedMessage(object sender, string message)
         {
             clientListBox.Items.Add(message);
-            clientListBox.ScrollIntoView(message);    // scroll to the bottom
+            clientListBox.ScrollIntoView(clientListBox.Items[clientListBox.Items.Count - 1]);    // scroll to the bottom
         }
 
         void App_Suspending(Object sender, Windows.ApplicationModel.SuspendingEventArgs s)
@@ -163,16 +163,22 @@ namespace WillDevicesSampleApp
             GetUiState();
             StoreSettings();
 
-            AppObjects.Instance.WacomDevice.WacomDevicesMessage -= ReceivedMessage;
-            AppObjects.Instance.SocketService.SocketMessage -= ReceivedMessage;
-
-            AppObjects.Instance.Publisher.Stop();
-
-            AppObjects.Instance.Publisher.PublisherControl -= ReceivedPublisherControl;
-            AppObjects.Instance.Publisher.UpdateUi -= ReceivedUpdateUi;
-            AppObjects.Instance.Publisher.PublisherMessage -= ReceivedMessage;
-            AppObjects.Instance.RemoteController.PublisherControl -= ReceivedPublisherControl;
-            AppObjects.Instance.RemoteController.UpdateUi -= ReceivedUpdateUi;
+            if (AppObjects.Instance.WacomDevice != null)
+                AppObjects.Instance.WacomDevice.WacomDevicesMessage -= ReceivedMessage;
+            if (AppObjects.Instance.SocketService != null)
+                AppObjects.Instance.SocketService.SocketMessage -= ReceivedMessage;
+            if (AppObjects.Instance.Publisher != null)
+            {
+                AppObjects.Instance.Publisher.Stop();
+                AppObjects.Instance.Publisher.PublisherControl -= ReceivedPublisherControl;
+                AppObjects.Instance.Publisher.UpdateUi -= ReceivedUpdateUi;
+                AppObjects.Instance.Publisher.PublisherMessage -= ReceivedMessage;
+            }
+            if (AppObjects.Instance.RemoteController != null)
+            {
+                AppObjects.Instance.RemoteController.PublisherControl -= ReceivedPublisherControl;
+                AppObjects.Instance.RemoteController.UpdateUi -= ReceivedUpdateUi;
+            }
         }
 
         private void RunPublisher()
