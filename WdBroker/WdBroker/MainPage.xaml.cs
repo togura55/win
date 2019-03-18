@@ -147,7 +147,7 @@ namespace WdBroker
         private void ReceiveMessage(object sender, string message)
         {
             ListBox_Message.Items.Add(message);
-            ListBox_Message.ScrollIntoView(message);    // scroll to bottom
+            ListBox_Message.ScrollIntoView(ListBox_Message.Items.Count-1);    // scroll to bottom
         }
 
         #region UI Control handlers 
