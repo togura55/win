@@ -16,6 +16,7 @@
         <TextBlock x:Name="TextBlock_IPAddr" HorizontalAlignment="Left" Margin="124,44,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <TextBox x:Name="TextBox_PortNumber" HorizontalAlignment="Left" Margin="227,84,0,0" Text="TextBox" VerticalAlignment="Top" Width="139"/>
         <TextBlock x:Name="TextBlock_PortNumber" HorizontalAlignment="Left" Margin="124,90,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
+        <CheckBox x:Name="CB_Debug" Content="CheckBox" HorizontalAlignment="Left" Margin="279,144,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Page>

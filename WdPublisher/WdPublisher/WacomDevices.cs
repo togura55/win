@@ -207,7 +207,10 @@ namespace WillDevicesSampleApp
                 //m_addNewStrokeToModel = true;
                 StrokeCount++;
 
-                if (AppObjects.Instance.SocketService != null)
+                // For debug
+                if (!AppObjects.Instance.Publisher.Debug)
+                    // End For debug
+                    if (AppObjects.Instance.SocketService != null)
                     AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(null, m_StrokeOrder));
             }
             catch (Exception ex)
@@ -224,6 +227,10 @@ namespace WillDevicesSampleApp
                 m_StrokeOrder = 0;
 
                 var pathPart = e.PathPart;
+
+                // For debug
+                if (!AppObjects.Instance.Publisher.Debug)
+                // End For debug
                 if (AppObjects.Instance.SocketService != null)
                     AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(pathPart, m_StrokeOrder));
 
@@ -249,7 +256,10 @@ namespace WillDevicesSampleApp
  //               m_addNewStrokeToModel = true;
 
                 var pathPart = e.PathPart;
-                if (AppObjects.Instance.SocketService != null)
+                // For debug
+                if (!AppObjects.Instance.Publisher.Debug)
+                // End For debug
+                    if (AppObjects.Instance.SocketService != null)
                     AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(pathPart, m_StrokeOrder));
             }
             catch (Exception ex)

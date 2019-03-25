@@ -32,7 +32,7 @@ namespace WillDevicesSampleApp
             AppObjects.Instance.RemoteController.UpdateUi += ReceivedUpdateUi;
             AppObjects.Instance.RemoteController.PublisherControl += ReceivedPublisherControl;
 
-            RestoreSettings();
+            RestoreSettings();  // read stored setting values
 
             resourceLoader = ResourceLoader.GetForCurrentView();
             this.TextBlock_IPAddr.Text = resourceLoader.GetString("IDC_HostName");
@@ -66,6 +66,7 @@ namespace WillDevicesSampleApp
         {
             AppObjects.Instance.Publisher.HostNameString = this.TextBox_HostName.Text;
             AppObjects.Instance.Publisher.PortNumberString = this.TextBox_PortNumber.Text;
+            AppObjects.Instance.Publisher.Debug = (bool)this.CB_Debug.IsChecked;
         }
 
         private void SetUiState()
@@ -74,6 +75,9 @@ namespace WillDevicesSampleApp
 
             this.TextBox_HostName.Text = pub.HostNameString;
             this.TextBox_PortNumber.Text = pub.PortNumberString;
+
+            this.CB_Debug.Content = resourceLoader.GetString("IDC_Debug");
+            this.CB_Debug.IsChecked = pub.Debug;
 
             // swich UI correspond to the current state of Publisher
             if (pub.CurrentState == pub.STATE_NEUTRAL)
@@ -264,6 +268,7 @@ namespace WillDevicesSampleApp
             ApplicationDataContainer container = ApplicationData.Current.LocalSettings;
             container.Values["HostNameString"] = AppObjects.Instance.Publisher.HostNameString;
             container.Values["PortNumberString"] = AppObjects.Instance.Publisher.PortNumberString;
+            container.Values["Debug"] = AppObjects.Instance.Publisher.Debug;
         }
 
         private void RestoreSettings()
@@ -273,6 +278,8 @@ namespace WillDevicesSampleApp
                 AppObjects.Instance.Publisher.HostNameString = container.Values["HostNameString"].ToString();
             if (container.Values.ContainsKey("PortNumberString"))
                 AppObjects.Instance.Publisher.PortNumberString = container.Values["PortNumberString"].ToString();
+            if (container.Values.ContainsKey("Debug"))   
+                AppObjects.Instance.Publisher.Debug = Convert.ToBoolean(container.Values["Debug"].ToString());
         }
 
         #endregion

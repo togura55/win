@@ -17,6 +17,7 @@ namespace WillDevicesSampleApp
 {
     public class Publisher
     {
+        public bool Debug;
         public Socket mSocket = null;
 
         public SocketServices dataSocketClient = null;
@@ -43,6 +44,7 @@ namespace WillDevicesSampleApp
 
         public Publisher()
         {
+            Debug = false;
             CommandResponseState = CMD_NEUTRAL;
             PublisherId = 0;
             HostNameString = "192.168.0.7"; // for temporary
@@ -302,8 +304,18 @@ namespace WillDevicesSampleApp
                 {
                     MessageEvent("ScanAndConnect_Completed: Go Socket initialization");
 
-                    // Second, initialize the command path to Broker
-                    InitCommandCommunication(HostNameString, PortNumberString);
+                    // For debug
+                    if (!Debug)
+                    {
+                        // Second, initialize the command path to Broker
+                        InitCommandCommunication(HostNameString, PortNumberString);
+                    }
+                    else
+                    {
+                       MessageEvent(string.Format("PublisherInitialization_Completed: Go to StartRealTimeInk after {0}ms delay.", 0));
+                        AppObjects.Instance.WacomDevice.StartRealTimeInk();
+                    }
+                    // End For debug
                 }
                 else
                 {
