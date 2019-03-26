@@ -102,6 +102,7 @@ namespace WillDevicesSampleApp
 			switch (deviceStatus)
 			{
 				case DeviceStatus.Idle:
+                    text = "Idling...";
 					break;
 
 				case DeviceStatus.Reconnecting:
@@ -163,7 +164,13 @@ namespace WillDevicesSampleApp
             set;
         }
 
-        public SocketServices SocketService
+        public SocketServices CommandSocketService
+        {
+            get;
+            set;
+        }
+
+        public SocketServices DataSocketService
         {
             get;
             set;

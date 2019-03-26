@@ -23,13 +23,13 @@ namespace WillDevicesSampleApp
         private const uint MASK_COMMAND = 0xF000;
 
         private const float micrometerToDip = 96.0f / 25400.0f;
-        private CancellationTokenSource m_cts = new CancellationTokenSource();
+        private CancellationTokenSource m_cts;
         private static readonly float maxP = 1.402218f;
         private static readonly float pFactor = 1.0f / (maxP - 1.0f);
         int PointCount;
         int StrokeCount;
         ////        public InkTransfer inkTransfer;
-        int m_StrokeOrder = 1; // 1: start, 0: intermediate, 2: end
+        int m_StrokeOrder; // 1: start, 0: intermediate, 2: end
 
         public delegate void MessageEventHandler(object sender, string message);
         public delegate void ScanAndConnectCompletedNotificationHandler(object sender, bool result);
@@ -41,6 +41,10 @@ namespace WillDevicesSampleApp
 
         public float PublisherAttribute;
 
+        InkDeviceWatcherUSB m_watcherUSB;
+        InkDeviceInfo m_connectingDeviceInfo;
+        ObservableCollection<InkDeviceInfo> m_deviceInfos;
+
         #region Realtime Ink Raw Data Collection
         public ObservableCollection<StrokeRawData> StrokeRawDataInfos
         {
@@ -49,7 +53,7 @@ namespace WillDevicesSampleApp
                 return m_StrokeRawData;
             }
         }
-        public ObservableCollection<StrokeRawData> m_StrokeRawData = new ObservableCollection<StrokeRawData>();
+        public ObservableCollection<StrokeRawData> m_StrokeRawData;
         public class StrokeRawData
         {
             public string PointCount { get; set; }
@@ -72,18 +76,25 @@ namespace WillDevicesSampleApp
         #region Device attribute definition and object sharing between Publisher and Broker
         public class DeviceAttributes
         {
-            public string Width = string.Empty;
-            public string Height = string.Empty;
-            public string PointSize = string.Empty;
-            public string Name = string.Empty;
-            public string ESN = string.Empty;
-            public string Battery = string.Empty;
-            public string DeviceType = string.Empty;
-            public string TransferMode = string.Empty;
+            public string Width;
+            public string Height;
+            public string PointSize;
+            public string Name;
+            public string ESN;
+            public string Battery;
+            public string DeviceType;
+            public string TransferMode;
 
             public DeviceAttributes()
             {
-
+                Width = string.Empty;
+                Height = string.Empty;
+                PointSize = string.Empty;
+                Name = string.Empty;
+                ESN = string.Empty;
+                Battery = string.Empty;
+                DeviceType = string.Empty;
+                TransferMode = string.Empty;
             }
 
             public string GenerateStrings()
@@ -96,21 +107,30 @@ namespace WillDevicesSampleApp
                 return s;
             }
         }
-        public DeviceAttributes Attribute = new DeviceAttributes();
+        public DeviceAttributes Attribute;
         #endregion
 
         public WacomDevices()
         {
+            PublisherAttribute = 0;
+            PointCount = 0;
+            StrokeCount = 0;
+            m_StrokeOrder = 1; // 1: start, 0: intermediate, 2: end
+            m_cts = new CancellationTokenSource();
+            WacomDevicesMessage = null;
+            ScanAndConnectCompletedNotification = null;
+            StartRealTimeInkCompletedNotification = null;
+
             m_watcherUSB = new InkDeviceWatcherUSB();
             m_watcherUSB.DeviceAdded += OnDeviceAdded;
             m_watcherUSB.DeviceRemoved += OnDeviceRemoved;
             m_watcherUSB.WatcherStopped += OnUsbWatcherStopped;
-     //       m_watcherUSB.EnumerationCompleted += OnUsbEnumerationCompleted;
+            //       m_watcherUSB.EnumerationCompleted += OnUsbEnumerationCompleted;
+            m_connectingDeviceInfo = null;
+            m_deviceInfos = new ObservableCollection<InkDeviceInfo>();
+            m_StrokeRawData = new ObservableCollection<StrokeRawData>();
 
-            //Application.Current.Suspending += OnAppSuspending;
-            //Application.Current.Resuming += OnAppResuming;
-
-            //SystemNavigationManager.GetForCurrentView().BackRequested += ScanAndConnectPage_BackRequested;
+            Attribute = new DeviceAttributes();
         }
 
         private async Task MessageEvent(string message)
@@ -138,24 +158,27 @@ namespace WillDevicesSampleApp
 
             IRealTimeInkService service = device.GetService(InkDeviceService.RealTimeInk) as IRealTimeInkService;
             if(service == null)
-//            if (!(device.GetService(InkDeviceService.RealTimeInk) is IRealTimeInkService service))
             {
                 await MessageEvent("StartRealTimeInk: The Real-time Ink service is not supported on this device");
                 return;
             }
 
-            //// Register private events for getting stroke data /////
-            service.StrokeStarted += Service_BeginStroke;
-            service.StrokeUpdated += Service_MiddleStroke;
-            service.StrokeEnded += Service_EndStroke;
-
-//            service.HoverPointReceived += OnHoverPointReceived;
-            /////////////////////////////////////////////////////////////
-
-            //textBlockPrompt.Text = AppObjects.GetStringForDeviceStatus(device.DeviceStatus);
-
             try
             {
+                //uint width = (uint)await device.GetPropertyAsync("Width", m_cts.Token);
+                //uint height = (uint)await device.GetPropertyAsync("Height", m_cts.Token);
+                //uint ptSize = (uint)await device.GetPropertyAsync("PointSize", m_cts.Token);
+
+                //// Register private events for getting stroke data /////
+                service.StrokeStarted += Service_BeginStroke;
+                //service.StrokeUpdated += Service_MiddleStroke;
+                //service.StrokeEnded += Service_EndStroke;
+
+                //            service.HoverPointReceived += OnHoverPointReceived;
+                /////////////////////////////////////////////////////////////
+
+                await MessageEvent(string.Format("StartRealTimeInk: {0}", AppObjects.GetStringForDeviceStatus(device.DeviceStatus)));
+
                 bool start_flag = false;
                 if (!service.IsStarted)
                 {
@@ -195,32 +218,43 @@ namespace WillDevicesSampleApp
 
         #region Stroke event handlers
 //        private async void Service_BeginStroke(object sender, StrokeStartedEventArgs e)
-        private async void Service_BeginStroke(object sender, StrokeStartedEventArgs e)
+        private void Service_BeginStroke(object sender, StrokeStartedEventArgs e)
         {
             try
             {
-                // for debug
-                await MessageEvent("BeginStroke");
-
                 m_StrokeOrder = 1;
 
                 //m_addNewStrokeToModel = true;
                 StrokeCount++;
 
-                // For debug
-                if (!AppObjects.Instance.Publisher.Debug)
-                    // End For debug
-                    if (AppObjects.Instance.SocketService != null)
-                    AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(null, m_StrokeOrder));
+                // for debug
+                //                MessageEvent("BeginStroke");
+
+                //await Task.Run(() => 
+                //{
+                //    this.WacomDevicesMessage?.Invoke(this, "BeginStroke");
+                //});
+
+
+                var ignore = CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    this.WacomDevicesMessage?.Invoke(this, "BeginStroke");
+                });
+
+                //// For debug
+                //if (!AppObjects.Instance.Publisher.Debug)
+                //    // End For debug
+                //    if (AppObjects.Instance.SocketService != null)
+                //    AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(null, m_StrokeOrder));
             }
             catch (Exception ex)
             {
-                await MessageEvent(string.Format("Service_BeginStroke: Exception: {0}", ex.Message));
+//                await MessageEvent(string.Format("Service_BeginStroke: Exception: {0}", ex.Message));
             }
         }
 
 //        private async void Service_MiddleStroke(object sender, StrokeUpdatedEventArgs e)
-        private async void Service_MiddleStroke(object sender, StrokeUpdatedEventArgs e)
+        private async Task Service_MiddleStroke(object sender, StrokeUpdatedEventArgs e)
         {
             try
             {
@@ -231,8 +265,8 @@ namespace WillDevicesSampleApp
                 // For debug
                 if (!AppObjects.Instance.Publisher.Debug)
                 // End For debug
-                if (AppObjects.Instance.SocketService != null)
-                    AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(pathPart, m_StrokeOrder));
+                if (AppObjects.Instance.DataSocketService != null)
+                    AppObjects.Instance.DataSocketService.StreamSocket_SendData(CreateBuffer(pathPart, m_StrokeOrder));
 
                 //var point = new StylusPoint(x * m_scale, y * m_scale, w);
                 //if (m_addNewStrokeToModel)
@@ -248,7 +282,7 @@ namespace WillDevicesSampleApp
         }
 
 //        private async void Service_EndStroke(object sender, StrokeEndedEventArgs e)
-        private async void Service_EndStroke(object sender, StrokeEndedEventArgs e)
+        private async Task Service_EndStroke(object sender, StrokeEndedEventArgs e)
         {
             try
             {
@@ -259,8 +293,8 @@ namespace WillDevicesSampleApp
                 // For debug
                 if (!AppObjects.Instance.Publisher.Debug)
                 // End For debug
-                    if (AppObjects.Instance.SocketService != null)
-                    AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(pathPart, m_StrokeOrder));
+                    if (AppObjects.Instance.DataSocketService != null)
+                    AppObjects.Instance.DataSocketService.StreamSocket_SendData(CreateBuffer(pathPart, m_StrokeOrder));
             }
             catch (Exception ex)
             {
@@ -279,8 +313,8 @@ namespace WillDevicesSampleApp
 
             try
             {
-                f = ((uint)AppObjects.Instance.WacomDevice.PublisherAttribute & ~MASK_STROKE) | ((uint)strokeOrder << 8);
-                AppObjects.Instance.WacomDevice.PublisherAttribute = f;
+                f = ((uint)this.PublisherAttribute & ~MASK_STROKE) | ((uint)strokeOrder << 8);
+                this.PublisherAttribute = f;
 
                 if (pathPart == null) // BeginStroke
                 {
@@ -410,9 +444,6 @@ namespace WillDevicesSampleApp
 
         #endregion
         #region ScanAndConnect
-        InkDeviceWatcherUSB m_watcherUSB;
-        InkDeviceInfo m_connectingDeviceInfo;
-        ObservableCollection<InkDeviceInfo> m_deviceInfos = new ObservableCollection<InkDeviceInfo>();
 
         public ObservableCollection<InkDeviceInfo> DeviceInfos
         {

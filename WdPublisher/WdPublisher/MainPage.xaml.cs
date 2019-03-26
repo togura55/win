@@ -14,9 +14,9 @@ namespace WillDevicesSampleApp
 {
     public sealed partial class MainPage : Page
     {
-        CancellationTokenSource m_cts = new CancellationTokenSource();
+//        CancellationTokenSource m_cts = new CancellationTokenSource();
 
-        ResourceLoader resourceLoader = null;
+        ResourceLoader resourceLoader;
 
         public MainPage()
         {
@@ -27,10 +27,15 @@ namespace WillDevicesSampleApp
             AppObjects.Instance.Publisher.UpdateUi += ReceivedUpdateUi;
             AppObjects.Instance.Publisher.PublisherControl += ReceivedPublisherControl;
 
-            AppObjects.Instance.RemoteController = new RemoteControllers();
+            // For debug
+            if (!AppObjects.Instance.Publisher.Debug)
+            // End for debug
+            { 
+                AppObjects.Instance.RemoteController = new RemoteControllers();
             AppObjects.Instance.RemoteController.RCMessage += ReceivedMessage; // 
             AppObjects.Instance.RemoteController.UpdateUi += ReceivedUpdateUi;
             AppObjects.Instance.RemoteController.PublisherControl += ReceivedPublisherControl;
+            }
 
             RestoreSettings();  // read stored setting values
 
@@ -50,7 +55,10 @@ namespace WillDevicesSampleApp
 
             Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
 
-            StartRemoteControllerTask();
+            // For debug
+            if (!AppObjects.Instance.Publisher.Debug)
+                // End for debug
+                StartRemoteControllerTask();
         }
 
         private void StartRemoteControllerTask()
@@ -137,9 +145,13 @@ namespace WillDevicesSampleApp
                 case "SendStopToBrokerComplete":
                     AppObjects.Instance.Publisher.InitializationCompletedNotification -= PublisherInitialization_Completed;
 
-                    AppObjects.Instance.SocketService.SocketMessage -= ReceivedMessage; // 
-                    AppObjects.Instance.SocketService.Dispose();
-                    AppObjects.Instance.SocketService = null;
+                    AppObjects.Instance.DataSocketService.SocketMessage -= ReceivedMessage; // 
+                    AppObjects.Instance.DataSocketService.Dispose();
+                    AppObjects.Instance.DataSocketService = null;
+
+                    AppObjects.Instance.CommandSocketService.SocketMessage -= ReceivedMessage; // 
+                    AppObjects.Instance.CommandSocketService.Dispose();
+                    AppObjects.Instance.CommandSocketService = null;
 
                     AppObjects.Instance.WacomDevice.WacomDevicesMessage -= ReceivedMessage; // set the message delegate
                                                                                             //               AppObjects.Instance.WacomDevice.Dispose(); 
@@ -169,8 +181,10 @@ namespace WillDevicesSampleApp
 
             if (AppObjects.Instance.WacomDevice != null)
                 AppObjects.Instance.WacomDevice.WacomDevicesMessage -= ReceivedMessage;
-            if (AppObjects.Instance.SocketService != null)
-                AppObjects.Instance.SocketService.SocketMessage -= ReceivedMessage;
+            if (AppObjects.Instance.CommandSocketService != null)
+                AppObjects.Instance.CommandSocketService.SocketMessage -= ReceivedMessage;
+            if (AppObjects.Instance.DataSocketService != null)
+                AppObjects.Instance.DataSocketService.SocketMessage -= ReceivedMessage;
             if (AppObjects.Instance.Publisher != null)
             {
                 AppObjects.Instance.Publisher.Stop();
@@ -195,8 +209,11 @@ namespace WillDevicesSampleApp
                 AppObjects.Instance.WacomDevice = new WacomDevices();     // stored for using this app 
                 AppObjects.Instance.WacomDevice.WacomDevicesMessage += ReceivedMessage; // set the message delegate
 
-                AppObjects.Instance.SocketService = new SocketServices();
-                AppObjects.Instance.SocketService.SocketMessage += ReceivedMessage; // 
+                AppObjects.Instance.CommandSocketService = new SocketServices();
+                AppObjects.Instance.CommandSocketService.SocketMessage += ReceivedMessage; // 
+
+                AppObjects.Instance.DataSocketService = new SocketServices();
+                AppObjects.Instance.DataSocketService.SocketMessage += ReceivedMessage; // 
 
                 pub.InitializationCompletedNotification += PublisherInitialization_Completed;
                 pub.Start();

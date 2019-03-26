@@ -18,16 +18,13 @@ namespace WillDevicesSampleApp
     public class Publisher
     {
         public bool Debug;
-        public Socket mSocket = null;
-
-        public SocketServices dataSocketClient = null;
 
         float CommandResponseState;
         float PublisherId;
 
-        public string HostNameString = string.Empty;
-        public string PortNumberString = string.Empty;
-        public string ClientIpAddress = string.Empty;
+        public string HostNameString;
+        public string PortNumberString;
+        public string ClientIpAddress;
         public int CurrentState;  // State of Publisher 
 
         public readonly int STATE_NEUTRAL = 0;
@@ -50,10 +47,15 @@ namespace WillDevicesSampleApp
             HostNameString = "192.168.0.7"; // for temporary
             PortNumberString = "1337";
             CurrentState = STATE_NEUTRAL;
-            HostName hostName = NetworkInformation.GetHostNames().Where(q => q.Type == HostNameType.Ipv4).First();
-            ClientIpAddress = hostName.ToString();
+            ClientIpAddress = GetIpAddress();
         }
 
+        private string GetIpAddress()
+        {
+            HostName hostName = NetworkInformation.GetHostNames().Where(q => q.Type == HostNameType.Ipv4).First();
+
+            return hostName.ToString();
+        }
         private string GeneratePublisherAttributeStrings()
         {
             string s = ClientIpAddress + "," + CurrentState.ToString();
@@ -79,12 +81,12 @@ namespace WillDevicesSampleApp
         //        private async Task InitCommandCommunication(string host, string port)
         private void InitCommandCommunication(string host, string port)
         {
-            if (AppObjects.Instance.SocketService == null)
+            if (AppObjects.Instance.CommandSocketService == null)
             {
                 throw new Exception("InitCommandCommunication: Exception: SocketServices is not created yet.");
             }
 
-            SocketServices socketService = AppObjects.Instance.SocketService;
+            SocketServices socketService = AppObjects.Instance.CommandSocketService;
 
             try
             {
@@ -106,9 +108,9 @@ namespace WillDevicesSampleApp
             try
             {
                 string port = (int.Parse(base_port) + 1).ToString();
-                dataSocketClient = AppObjects.Instance.SocketService;    // share with WacomDevices
-                dataSocketClient.SocketClientConnectCompletedNotification += DataSocketClient_Connect_Completed;
-                await dataSocketClient.StreamSocket_Connect(host, port);
+                SocketServices socketClient = AppObjects.Instance.DataSocketService;    // share with WacomDevices
+                socketClient.SocketClientConnectCompletedNotification += DataSocketClient_Connect_Completed;
+                await socketClient.StreamSocket_Connect(host, port);
             }
             catch (Exception ex)
             {
@@ -127,19 +129,20 @@ namespace WillDevicesSampleApp
                 CommandResponseState = CMD_STOP_PUBLISHER;
                 this.SendCommandStrings(CMD_STOP_PUBLISHER);
 
-                if (AppObjects.Instance.SocketService != null)
+                if (AppObjects.Instance.CommandSocketService != null)
                 {
-                    SocketServices socketService = AppObjects.Instance.SocketService;
+                    SocketServices socketService = AppObjects.Instance.CommandSocketService;
                     socketService.ConnectComplete -= CommandSocketClient_Connect_Completed; // Client_ConnectComplete;
                     socketService.ReceivePacketComplete -= CommandSocketClient_Response; //  Client_ReceivePacketComplete;
                     socketService.SendPacketComplete -= CommandSocketClient_SendPacket_Completed;
                 }
 
-                if (dataSocketClient != null)
+                if (AppObjects.Instance.CommandSocketService != null)
                 {
-                    dataSocketClient.Disonnect();
-                    dataSocketClient.SocketClientConnectCompletedNotification -= DataSocketClient_Connect_Completed;
-                    dataSocketClient = null;
+                    SocketServices socketService = AppObjects.Instance.DataSocketService;
+                    socketService.Disonnect();
+                    socketService.SocketClientConnectCompletedNotification -= DataSocketClient_Connect_Completed;
+                    socketService = null;
                 }
             }
             catch (Exception ex)
@@ -222,7 +225,7 @@ namespace WillDevicesSampleApp
         {
             try
             {
-                SocketServices socketService = AppObjects.Instance.SocketService;
+                SocketServices socketService = AppObjects.Instance.CommandSocketService;
 
                 // send command packets
                 if (socketService != null)
@@ -302,17 +305,20 @@ namespace WillDevicesSampleApp
             {
                 if (result || AppObjects.Instance.Device != null)
                 {
-                    MessageEvent("ScanAndConnect_Completed: Go Socket initialization");
-
                     // For debug
                     if (!Debug)
                     {
+                        MessageEvent("ScanAndConnect_Completed: Go Socket initialization");
+
                         // Second, initialize the command path to Broker
                         InitCommandCommunication(HostNameString, PortNumberString);
                     }
                     else
                     {
-                       MessageEvent(string.Format("PublisherInitialization_Completed: Go to StartRealTimeInk after {0}ms delay.", 0));
+                        int msDelay = 0;
+                        MessageEvent(string.Format("ScanAndConnect_Completed: Go to StartRealTimeInk after {0} ms delay.", msDelay));
+ //                       await Task.Delay(msDelay);
+
                         AppObjects.Instance.WacomDevice.StartRealTimeInk();
                     }
                     // End For debug
