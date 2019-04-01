@@ -355,6 +355,8 @@ namespace WillDevicesSampleApp
         private const string CMD_RESUME = "resume";     // Publisher state
         private const string CMD_RESTART = "restart";
         private const string CMD_POWEROFF = "poweroff";
+        private const string CMD_GETBARCODE = "getbarcode";
+
 
         private const string RES_ACK = "ack";
         private const string RES_NAK = "nak";
@@ -377,6 +379,7 @@ namespace WillDevicesSampleApp
                     devAttr.Battery + sep +
                     devAttr.DeviceType + sep +
                     devAttr.TransferMode + sep +
+                    devAttr.Barcode + sep +
                     pub.HostNameString + sep +
                     pub.PortNumberString + sep +
                     pub.CurrentState.ToString() + sep +
@@ -578,6 +581,21 @@ namespace WillDevicesSampleApp
             }
         }
 
+        private string GetBarcode()
+        {
+            string responce = string.Empty;
+            try
+            {
+                responce = AppObjects.Instance.WacomDevice.Attribute.Barcode;
+             }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("GetBarcode: Exception: {0}", ex.Message));
+            }
+
+            return responce;
+        }
+
         private async void ConfigCommandsDispatcher(string message)
         {
             try
@@ -633,6 +651,12 @@ namespace WillDevicesSampleApp
                     case CMD_POWEROFF:
                         SendResponce(RES_ACK);
                         ExecutePoweroff();
+                        break;
+
+                    case CMD_GETBARCODE:
+                        string barcode = GetBarcode();
+                        SendResponce(
+                            string.IsNullOrEmpty(barcode) ? RES_NAK : barcode);
                         break;
 
                     default:

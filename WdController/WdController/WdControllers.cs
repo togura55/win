@@ -36,11 +36,14 @@ namespace WdController
         string Battery;
         string DeviceType;
         string TransferMode;
+        string Barcode;
         public string ServerIpAddress;
         public string ServerPortNumberBase;
         public int DeviceState;
         public string ClientIpAddress;
         public string DeviceVersionNumber;
+
+        public string Logs;
 
         public DeviceWatcher deviceWatcher = null;
 
@@ -132,6 +135,9 @@ namespace WdController
         private const string CMD_RESUME = "resume";     // Publisher state
         private const string CMD_RESTART = "restart";
         private const string CMD_POWEROFF = "poweroff";
+        private const string CMD_GETLOGS = "getlogs";
+        private const string CMD_GETBARCODE = "getbarcode";
+
 
         private const string RES_ACK = "ack";
         private const string RES_NAK = "nak";
@@ -229,7 +235,7 @@ namespace WdController
                         list.AddRange(arr);
 
                         // decode
-                        if (list.Count < 12)   // ToDo: should be set by enum
+                        if (list.Count < 13)   // ToDo: should be set by enum
                         {
                             // error, resend?
                             throw new Exception("GetConfig returns the smaller number of parameters.");
@@ -246,6 +252,7 @@ namespace WdController
                             Battery = list[++i];
                             DeviceType = list[++i];
                             TransferMode = list[++i];
+                            Barcode = list[++i];
                             ServerIpAddress = list[++i];
                             ServerPortNumberBase = list[++i];
                             DeviceState = int.Parse(list[++i]);
@@ -299,6 +306,45 @@ namespace WdController
                             PUBLISHER_STATE_NEUTRAL : DeviceState;
                         break;
 
+                    case CMD_GETLOGS:
+                        char sp = ','; // separater
+                        string[] arr = message.Split(sp);
+                        var list = new List<string>();
+                        list.AddRange(arr);
+
+                        // decode
+                        if (list.Count < 1)   // ToDo: should be set by enum
+                        {
+                            // error, resend?
+                            throw new Exception("GetLogs returns the smaller number of parameters.");
+                        }
+                        else
+                        {
+                            int i = -1;
+
+                            Logs = list[++i];
+                        }
+                        break;
+
+                    case CMD_GETBARCODE:
+                        char sp = ','; // separater
+                        string[] arr = message.Split(sp);
+                        var list = new List<string>();
+                        list.AddRange(arr);
+
+                        // decode
+                        if (list.Count < 1)   // ToDo: should be set by enum
+                        {
+                            // error, resend?
+                            throw new Exception("GetBarcode returns the smaller number of parameters.");
+                        }
+                        else
+                        {
+                            int i = -1;
+
+                            Barcode = list[++i];
+                        }
+                        break;
                     default:
                         break;
                 }

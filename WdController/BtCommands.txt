@@ -8,6 +8,7 @@ GetConfig
 Å@Battery
    DeviceType
    TransferMode
+   Barcode
    Server IP Address
    Server Port Number Base
    Client IP Address 
@@ -22,6 +23,7 @@ SetConfig
 Å@(Battery)
    (DeviceType)
    (TransferMode)
+   (Barcode)
    Server IP Address
    Server Port Number Base
    (Client IP Address)
@@ -38,3 +40,7 @@ Discard
 Restart
 
 Poweroff
+
+GetBarcode
+
+GetLogs

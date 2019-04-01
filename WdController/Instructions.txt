@@ -33,6 +33,8 @@ Windows UWP application for configuring WdPublisher settings through the Bluetoo
 - Start
 - Stop
 - Restart
+- Poweroff
+- GetLogs
 
 <Environment>
 - PC with Bluetooth LE 4.2

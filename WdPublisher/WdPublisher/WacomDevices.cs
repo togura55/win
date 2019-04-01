@@ -84,6 +84,7 @@ namespace WillDevicesSampleApp
             public string Battery;
             public string DeviceType;
             public string TransferMode;
+            public string Barcode;
 
             public DeviceAttributes()
             {
@@ -95,6 +96,7 @@ namespace WillDevicesSampleApp
                 Battery = string.Empty;
                 DeviceType = string.Empty;
                 TransferMode = string.Empty;
+                Barcode = string.Empty;
             }
 
             public string GenerateStrings()
@@ -102,7 +104,8 @@ namespace WillDevicesSampleApp
                 string s = string.Empty;
 
                 s = Width + "," + Height + "," + PointSize + "," + Name + "," +
-                    ESN + "," + Battery + "," + DeviceType + "," + TransferMode;
+                    ESN + "," + Battery + "," + DeviceType + "," + TransferMode +
+                    "," + Barcode;
 
                 return s;
             }

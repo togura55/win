@@ -217,6 +217,7 @@ namespace WillDevicesSampleApp
         const float CMD_STOP_PUBLISHER = 0x4000;
         const float CMD_SUSPEND_PUBLISHER = 0x5000;
         const float CMD_RESUME_PUBLISHER = 0x6000;
+        const float CMD_SET_BARCODE = 0x7000;
 
         const string RES_ACK = "ack";
         const string RES_NAK = "nak";
@@ -260,6 +261,11 @@ namespace WillDevicesSampleApp
 
                         case CMD_RESUME_PUBLISHER:
                             commandString = string.Format("{0},{1}", PublisherId, 6);
+                            break;
+
+                        case CMD_SET_BARCODE:
+                            commandString = string.Format("{0},{1},{2}", PublisherId, 7,
+                                AppObjects.Instance.WacomDevice.Attribute.Barcode);
                             break;
 
                         default:

@@ -56,6 +56,7 @@ z: Z座標バイト：８ byte
 　Battery
    DeviceType
    TransferMode
+   Barcode
 レスポンス：ACK/NAK
 
 -----------------------
@@ -71,9 +72,21 @@ z: Z座標バイト：８ byte
 レスポンス：ACK/NAK
 
 -----------------------
-コマンド名：DisposePublisher
+コマンド名：SuspendPublisher
 コマンドバイト：5
 データ：（なし）
+レスポンス：ACK/NAK
+
+-----------------------
+コマンド名：ResumePublisher
+コマンドバイト：6
+データ：（なし）
+レスポンス：ACK/NAK
+
+-----------------------
+コマンド名：SetBarcode
+コマンドバイト：7
+データ：バーコード文字列
 レスポンス：ACK/NAK
 
 ===========================
@@ -85,7 +98,7 @@ Request Connection
 message = 0,1,token
 
 SetAttributes
-message = 0,2,2345,3423,1,PHU-111 Clipboard,SN4536875,20,PHU-111,Live
+message = 0,2,2345,3423,1,PHU-111 Clipboard,SN4536875,20,PHU-111,Live,,
 
 StartPublisher
 message = PublisherID,3
@@ -95,3 +108,6 @@ message = PublisherID,4
 
 DisposePublisher
 message = PublisherID,5
+
+SetBarcode
+message = PublisherID,6,123456789
