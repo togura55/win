@@ -45,7 +45,8 @@
         <!--<Border x:Name="Border_debug" BorderThickness="2" BorderBrush="Black" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="585,84,0,0" Width="432" Height="594" Grid.RowSpan="2">
             <InkCanvas x:Name="Canvas_Strokes" Height="594" Width="432"/>
         </Border>-->
-        <CheckBox x:Name="CB_ShowStrokeRawData" Content="CheckBox" HorizontalAlignment="Left" Margin="269,201,0,0" VerticalAlignment="Top"
-                  Click="ShowStrokeRawData_Click" Grid.RowSpan="2"/>
+        <CheckBox x:Name="CB_ShowStrokeRawData" Content="CheckBox" HorizontalAlignment="Left" Margin="269,155,0,0" VerticalAlignment="Top"
+                  Click="ShowStrokeRawData_Click"/>
+        <Button x:Name="Pbtn_SaveLog" Content="Button" HorizontalAlignment="Left" Margin="277,201,0,0" VerticalAlignment="Top" Grid.RowSpan="2" Click="Pbtn_SaveLog_Click"/>
     </Grid>
 </Page>

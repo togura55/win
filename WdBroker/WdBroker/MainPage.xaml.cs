@@ -11,6 +11,8 @@ using Windows.UI.Xaml.Shapes;
 using Windows.UI.Input.Inking;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml.Media;
+using Windows.Storage.Streams;
+using Windows.UI.Popups;
 
 namespace WdBroker
 {
@@ -118,6 +120,8 @@ namespace WdBroker
             this.Pbtn_Start.Content = resourceLoader.GetString(fStart ? "IDC_Start" : "IDC_Stop");
             this.TextBox_PortNumberValue.Text = PortNumberString;
             this.Pbtn_Clearlog.Content = resourceLoader.GetString("IDC_Clearlog");
+            this.Pbtn_SaveLog.Content = resourceLoader.GetString("IDC_Savelog");
+            
             this.CB_ShowStrokeRawData.Content = resourceLoader.GetString("IDC_ShowStrokeRawData");
 
             this.TextBox_FixedHostNameValue.Visibility = Visibility.Collapsed;
@@ -197,6 +201,54 @@ namespace WdBroker
                 ReceiveMessage(this, string.Format("Pbtn_Clearlog_Click: Exception: {0}", ex.Message));
             }
         }
+
+        private async void Pbtn_SaveLog_Click(object sender, RoutedEventArgs e)
+        {
+            string contents = string.Empty;
+
+            foreach (var item in ListBox_Message.Items)
+            {
+                contents += (item as String) + "\r\n";
+            }
+
+            try
+            {
+                var filePicker = new Windows.Storage.Pickers.FileSavePicker();
+                filePicker.FileTypeChoices.Add(resourceLoader.GetString("IDC_TextFile"), new string[] { ".txt" });
+                filePicker.SuggestedFileName = "log";
+
+                // 単一ファイルの選択
+                var file = await filePicker.PickSaveFileAsync();
+                if (file != null)
+                {
+                    await Windows.Storage.FileIO.WriteTextAsync(file, contents);
+                }
+            }
+            catch (Exception ex)
+            {
+                ReceiveMessage(this, string.Format("Pbtn_SaveLog_Click: Exception: {0}", ex.Message));
+            }
+        }
+
+//        private string logBuffer;
+//        private async void log_Save()
+//        {
+//            StorageFolder folder = KnownFolders.DocumentsLibrary;
+//            StorageFile outfile = await folder.CreateFileAsync(DateTime.Now.ToString("yyyyMMddHHmmss") + "_log.txt", CreationCollisionOption.GenerateUniqueName);
+
+////            Debug.WriteLine("[Info]: Saved " + outfile.Path);
+//            var out_stream = await outfile.OpenAsync(FileAccessMode.ReadWrite);
+
+//            DataWriter dataWriter = new DataWriter(out_stream.GetOutputStreamAt(0));
+
+//            dataWriter.WriteString(logBuffer);
+
+//            await dataWriter.StoreAsync();
+//            await dataWriter.FlushAsync();
+
+//            dataWriter.DetachStream();
+//        }
+
 
         private void ShowStrokeRawData_Click(object sender, RoutedEventArgs e)
         {
@@ -492,5 +544,7 @@ namespace WdBroker
             Windows.UI.Colors.Yellow,
             Windows.UI.Colors.YellowGreen
             };
+
+
     }
 }

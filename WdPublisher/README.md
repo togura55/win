@@ -16,9 +16,13 @@ xxx
 ## Author(s)
 * Tsuyoshi Ogura (togura55@gmail.com)  
 ## ToDo/Known Issues
-*   The sequences is stopped at "StartScanAndConnect" by operating [Start]-[Stop]-[Start]  
 *   Not be functional by clicking [Suspend] button  
 ## History
+* 1.1.x - Export log file
+* 1.0.15
+  - Stable version for the demo use, with WdBroker 1.0.9 and WdController 1.0.2
+  - debug option for executing stand-alone mode (non-IP, non-BT)
+  - Since this version of program was based on the debug build, need to be pre-installed packages of Dependencies\x86\Microsoft.VCLibs.x86.Debug.14.00.appx
 * 1.0.10 
  - Support communicating with WdController
  - Confirmed to be run on the Intel Stick environment

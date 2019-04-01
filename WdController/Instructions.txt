@@ -44,7 +44,4 @@ Windows UWP application for configuring WdPublisher settings through the Bluetoo
 - 
 
 <History>
-* 1.0.1 
- - Support WdPublisher 1.0.10
-* 1.0.0
- - 1st release
+see README.md

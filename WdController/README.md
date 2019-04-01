@@ -20,6 +20,8 @@ xxx
 *   
 ## History
 * 1.0.1 
+ - Support WdPublisher 1.0.15
+* 1.0.1 
  - Support WdPublisher 1.0.10
 * 1.0.0
  - 1st release

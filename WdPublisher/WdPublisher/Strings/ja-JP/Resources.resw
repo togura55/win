@@ -132,10 +132,16 @@
   <data name="IDC_Resume" xml:space="preserve">
     <value>復帰</value>
   </data>
+  <data name="IDC_SaveLog" xml:space="preserve">
+    <value>ログ保存</value>
+  </data>
   <data name="IDC_Stop" xml:space="preserve">
     <value>停止</value>
   </data>
   <data name="IDC_Suspend" xml:space="preserve">
     <value>休止</value>
+  </data>
+  <data name="IDC_TextFile" xml:space="preserve">
+    <value>テキストファイル</value>
   </data>
 </root>

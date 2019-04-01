@@ -87,6 +87,8 @@ namespace WillDevicesSampleApp
             this.CB_Debug.Content = resourceLoader.GetString("IDC_Debug");
             this.CB_Debug.IsChecked = pub.Debug;
 
+            this.Pbtn_SaveLog.Content = resourceLoader.GetString("IDC_SaveLog");
+
             // swich UI correspond to the current state of Publisher
             if (pub.CurrentState == pub.STATE_NEUTRAL)
             {
@@ -256,6 +258,34 @@ namespace WillDevicesSampleApp
         {
             ResumePublisher();
         }
+
+        private async void Pbtn_SaveLog_Click(object sender, RoutedEventArgs e)
+        {
+            string contents = string.Empty;
+
+            foreach (var item in clientListBox.Items)
+            {
+                contents += (item as String) + "\r\n";
+            }
+
+            try
+            {
+                var filePicker = new Windows.Storage.Pickers.FileSavePicker();
+                filePicker.FileTypeChoices.Add(resourceLoader.GetString("IDC_TextFile"), new string[] { ".txt" });
+                filePicker.SuggestedFileName = "log";
+
+                // 単一ファイルの選択
+                var file = await filePicker.PickSaveFileAsync();
+                if (file != null)
+                {
+                    await Windows.Storage.FileIO.WriteTextAsync(file, contents);
+                }
+            }
+            catch (Exception ex)
+            {
+                ReceivedMessage(this, string.Format("Pbtn_SaveLog_Click: Exception: {0}", ex.Message));
+            }
+        }
         #endregion
 
         #region Delegate Completion Handlers
@@ -300,7 +330,5 @@ namespace WillDevicesSampleApp
         }
 
         #endregion
-
-
     }
 }
