@@ -230,25 +230,6 @@ namespace WdBroker
             }
         }
 
-//        private string logBuffer;
-//        private async void log_Save()
-//        {
-//            StorageFolder folder = KnownFolders.DocumentsLibrary;
-//            StorageFile outfile = await folder.CreateFileAsync(DateTime.Now.ToString("yyyyMMddHHmmss") + "_log.txt", CreationCollisionOption.GenerateUniqueName);
-
-////            Debug.WriteLine("[Info]: Saved " + outfile.Path);
-//            var out_stream = await outfile.OpenAsync(FileAccessMode.ReadWrite);
-
-//            DataWriter dataWriter = new DataWriter(out_stream.GetOutputStreamAt(0));
-
-//            dataWriter.WriteString(logBuffer);
-
-//            await dataWriter.StoreAsync();
-//            await dataWriter.FlushAsync();
-
-//            dataWriter.DetachStream();
-//        }
-
 
         private void ShowStrokeRawData_Click(object sender, RoutedEventArgs e)
         {

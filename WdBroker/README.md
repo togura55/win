@@ -15,7 +15,9 @@ xxx
 ## ToDo/Known Issues
 * Implement registering Subscribers     
 ## History
-* 1.1.x - Export log file
+* 1.1.x  
+- Export log file  
+- Handling event of the device's barcode scan  
 * 1.0.9 - Stable version for using demo, support with WdPublisher 1.0.15
 * 1.0.7 - Support WdPublisher 1.0.10
 * 1.0.6 - Implemented command/response scheme

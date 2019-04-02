@@ -161,6 +161,7 @@ namespace WillDevicesSampleApp
                 WacomDevices wacomDevice = AppObjects.Instance.WacomDevice;
                 wacomDevice.ScanAndConnectCompletedNotification += ScanAndConnect_Completed;
                 wacomDevice.StartRealTimeInkCompletedNotification += StartRealTimeInk_Completed;
+                wacomDevice.DeviceEventNotification += ReceivedDeviceEvent;
 
                 // At first, try to detect a device
                 wacomDevice.StartScanAndConnect();
@@ -364,6 +365,42 @@ namespace WillDevicesSampleApp
                 MessageEvent(string.Format("StartRealTimeInk_Completed: Exception: {0}", ex.Message));
             }
         }
+
+        private void ReceivedDeviceEvent(object sender, string message)
+        {
+            try
+            {
+                switch(message)
+                {
+                    case "BarCodeScanned":
+                        if (CurrentState == STATE_ACTIVE)
+                        {
+                            // Send to Broker
+                            this.SendCommandStrings(CMD_SET_BARCODE);
+                        }
+                        else
+                        {
+                            MessageEvent(string.Format("ReceivedDeviceEvent: Current state is inactive: {0}", message));
+                        }
+
+                        if (AppObjects.Instance.RemoteController != null) // ToDo: verify if BT controller is already connected
+                        {
+                            AppObjects.Instance.RemoteController.NotifyEvent(
+                                "UpdateBarCode", 
+                                AppObjects.Instance.WacomDevice.Attribute.Barcode);
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("ReceivedDeviceEvent: Exception: {0}", ex.Message));
+            }
+        }
+
 
         private void CommandSocketClient_Connect_Completed(object sender, SocketErrorEventArgs e)
         {

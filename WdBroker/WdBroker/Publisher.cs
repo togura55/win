@@ -41,7 +41,8 @@ namespace WdBroker
         public string SerialNumber;
         public string TransferMode;
         public float Battery;
-        public float Barcode;
+        public string FirmwareVersion;
+        public string Barcode;
         public List<Stroke> Strokes;
         public DeviceRawData PrevRawData;
         public bool StartState;

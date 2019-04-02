@@ -19,6 +19,10 @@ xxx
 ## ToDo/Known Issues
 *   
 ## History
+* 1.1.x  
+- Support getting the WdPublisher's log  
+- Handling event of the device's barcode scan  
+- Support getting device's firmware verison  
 * 1.0.1 
  - Support WdPublisher 1.0.15
 * 1.0.1 

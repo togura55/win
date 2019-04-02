@@ -35,7 +35,9 @@ Start
 
 Stop
 
-Discard
+Suspend
+
+Resume
 
 Restart
 

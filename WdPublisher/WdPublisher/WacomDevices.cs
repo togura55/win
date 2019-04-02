@@ -34,10 +34,12 @@ namespace WillDevicesSampleApp
         public delegate void MessageEventHandler(object sender, string message);
         public delegate void ScanAndConnectCompletedNotificationHandler(object sender, bool result);
         public delegate void StartRealTimeInkCompletedNotificationHandler(object sender, bool result);
+        public delegate void DeviceEventNotificationNotificationHandler(object sender, string message);
         // Properties
         public event MessageEventHandler WacomDevicesMessage;
         public event ScanAndConnectCompletedNotificationHandler ScanAndConnectCompletedNotification;
         public event StartRealTimeInkCompletedNotificationHandler StartRealTimeInkCompletedNotification;
+        public event DeviceEventNotificationNotificationHandler DeviceEventNotification;
 
         public float PublisherAttribute;
 
@@ -82,6 +84,7 @@ namespace WillDevicesSampleApp
             public string Name;
             public string ESN;
             public string Battery;
+            public string FirmwareVersion;
             public string DeviceType;
             public string TransferMode;
             public string Barcode;
@@ -94,6 +97,7 @@ namespace WillDevicesSampleApp
                 Name = string.Empty;
                 ESN = string.Empty;
                 Battery = string.Empty;
+                FirmwareVersion = string.Empty;
                 DeviceType = string.Empty;
                 TransferMode = string.Empty;
                 Barcode = string.Empty;
@@ -104,8 +108,8 @@ namespace WillDevicesSampleApp
                 string s = string.Empty;
 
                 s = Width + "," + Height + "," + PointSize + "," + Name + "," +
-                    ESN + "," + Battery + "," + DeviceType + "," + TransferMode +
-                    "," + Barcode;
+                    ESN + "," + Battery + "," + FirmwareVersion + "," + 
+                    DeviceType + "," + TransferMode + "," + Barcode;
 
                 return s;
             }
@@ -129,6 +133,7 @@ namespace WillDevicesSampleApp
             m_watcherUSB.DeviceRemoved += OnDeviceRemoved;
             m_watcherUSB.WatcherStopped += OnUsbWatcherStopped;
             //       m_watcherUSB.EnumerationCompleted += OnUsbEnumerationCompleted;
+
             m_connectingDeviceInfo = null;
             m_deviceInfos = new ObservableCollection<InkDeviceInfo>();
             m_StrokeRawData = new ObservableCollection<StrokeRawData>();
@@ -157,7 +162,8 @@ namespace WillDevicesSampleApp
 
             device.Disconnected += OnDeviceDisconnected;
             device.DeviceStatusChanged += OnDeviceStatusChanged;
-//            device.PairingModeEnabledCallback = OnPairingModeEnabledAsync;
+            //            device.PairingModeEnabledCallback = OnPairingModeEnabledAsync;
+            device.BarCodeScanned += OnBarCodeScanned;
 
             IRealTimeInkService service = device.GetService(InkDeviceService.RealTimeInk) as IRealTimeInkService;
             if(service == null)
@@ -245,10 +251,10 @@ namespace WillDevicesSampleApp
                 });
 
                 //// For debug
-                //if (!AppObjects.Instance.Publisher.Debug)
-                //    // End For debug
-                //    if (AppObjects.Instance.SocketService != null)
-                //    AppObjects.Instance.SocketService.StreamSocket_SendData(CreateBuffer(null, m_StrokeOrder));
+                if (!AppObjects.Instance.Publisher.Debug)
+                    // End For debug
+                    if (AppObjects.Instance.DataSocketService != null)
+                        AppObjects.Instance.DataSocketService.StreamSocket_SendData(CreateBuffer(null, m_StrokeOrder));
             }
             catch (Exception ex)
             {
@@ -374,6 +380,24 @@ namespace WillDevicesSampleApp
             return buffer;
         }
 
+        private async void OnBarCodeScanned(object sender, BarcodeScannedEventArgs e)
+        {
+            try
+            {
+                this.Attribute.Barcode = Encoding.ASCII.GetString(e.BarcodeData);
+                await MessageEvent(string.Format("OnBarCodeScanned: {0}", this.Attribute.Barcode));
+
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    this.DeviceEventNotification?.Invoke(this, "BarCodeScanned");
+                });
+            }
+            catch (Exception ex)
+            {
+                await MessageEvent(string.Format("OnBarCodeScanned: Exception: {0}", ex.Message));
+            }
+        }
+
         private void OnHoverPointReceived(object sender, HoverPointReceivedEventArgs e)
         {
             string hoverPointCoords = string.Empty;
@@ -395,9 +419,9 @@ namespace WillDevicesSampleApp
 
         private void OnDeviceStatusChanged(object sender, DeviceStatusChangedEventArgs e)
         {
-            //var ignore = this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+            //var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             //{
-            switch (e.Status)
+                switch (e.Status)
             {
                 case DeviceStatus.NotAuthorizedConnectionNotConfirmed:
                     //await new MessageDialog(AppObjects.GetStringForDeviceStatus(e.Status)).ShowAsync();
@@ -474,11 +498,16 @@ namespace WillDevicesSampleApp
         //       public void StopScanAndConnect(object sender, RoutedEventArgs e)
         public async void StopScanAndConnect()
         {
+            IDigitalInkDevice device = AppObjects.Instance.Device;
+
             await MessageEvent("StopScanAndConnect");
 
-            if (AppObjects.Instance.Device != null)
+            if (device != null)
             {
-                AppObjects.Instance.Device.DeviceStatusChanged -= OnDeviceStatusChanged_ScanAndConnect;
+                device.Disconnected -= OnDeviceDisconnected;
+                //                device.DeviceStatusChanged -= OnDeviceStatusChanged_ScanAndConnect;
+                device.DeviceStatusChanged -= OnDeviceStatusChanged;
+                device.BarCodeScanned -= OnBarCodeScanned;
             }
 
             StopWatchers();
@@ -557,7 +586,8 @@ namespace WillDevicesSampleApp
                     AppObjects.Instance.AppId,
                     true,
                     false,
-                    OnDeviceStatusChanged_ScanAndConnect).Result;
+//                    OnDeviceStatusChanged_ScanAndConnect).Result;
+                OnDeviceStatusChanged).Result;
 
             }
             catch (Exception ex)
@@ -610,37 +640,38 @@ namespace WillDevicesSampleApp
             Attribute.Name = (string)await device.GetPropertyAsync(SmartPadProperties.DeviceName, m_cts.Token);
             Attribute.ESN = (string)await device.GetPropertyAsync(SmartPadProperties.SerialNumber, m_cts.Token);
             Attribute.Battery = ((int)await device.GetPropertyAsync(SmartPadProperties.BatteryLevel, m_cts.Token)).ToString();
+            Attribute.FirmwareVersion = ((int)await device.GetPropertyAsync(SmartPadProperties.FirmwareVersion, m_cts.Token)).ToString();
             Attribute.TransferMode = "LiveMode";
             Attribute.DeviceType = "PHU-111";
         }
 
-        private void OnDeviceStatusChanged_ScanAndConnect(object sender, DeviceStatusChangedEventArgs e)
-        {
-            if (!(sender is IDigitalInkDevice device))
-                return;
+        //private void OnDeviceStatusChanged_ScanAndConnect(object sender, DeviceStatusChangedEventArgs e)
+        //{
+        //    if (!(sender is IDigitalInkDevice device))
+        //        return;
 
-            //TextBlock textBlock = null;
+        //    //TextBlock textBlock = null;
 
-            switch (device.TransportProtocol)
-            {
-                case TransportProtocol.BLE:
-                    //textBlock = tbBle;
-                    break;
+        //    switch (device.TransportProtocol)
+        //    {
+        //        case TransportProtocol.BLE:
+        //            //textBlock = tbBle;
+        //            break;
 
-                case TransportProtocol.USB:
-                    //textBlock = tbUsb;
-                    break;
+        //        case TransportProtocol.USB:
+        //            //textBlock = tbUsb;
+        //            break;
 
-                case TransportProtocol.BTC:
-                    //textBlock = tbBtc;
-                    break;
-            }
+        //        case TransportProtocol.BTC:
+        //            //textBlock = tbBtc;
+        //            break;
+        //    }
 
-            //         var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            //{
-            //	textBlock.Text = AppObjects.GetStringForDeviceStatus(e.Status);
-            //});
-        }
+        //    //         var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+        //    //{
+        //    //	textBlock.Text = AppObjects.GetStringForDeviceStatus(e.Status);
+        //    //});
+        //}
 
         private async void OnUsbEnumerationCompleted(object sender, object e)
         {

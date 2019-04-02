@@ -160,6 +160,10 @@ namespace WillDevicesSampleApp
                     AppObjects.Instance.WacomDevice = null;
                     break;
 
+                case "GetLogs":
+                    AppObjects.Instance.RemoteController.NotifyEvent("SendLogs", GetLogs());
+                    break;
+
                 default:
                     break;
             }
@@ -259,14 +263,28 @@ namespace WillDevicesSampleApp
             ResumePublisher();
         }
 
+        private string GetLogs(int num = 0)
+        {
+            string log = string.Empty;
+            int count = 0;
+    
+            if (num <= clientListBox.Items.Count - 1)
+            {
+                foreach (var item in clientListBox.Items)
+                {
+                    if (clientListBox.Items.Count - 1 - count > 0)
+                    {
+                        log += (item as String) + "\r\n";
+                    }
+                    count++;
+                }
+            }
+
+            return log;
+        }
         private async void Pbtn_SaveLog_Click(object sender, RoutedEventArgs e)
         {
-            string contents = string.Empty;
-
-            foreach (var item in clientListBox.Items)
-            {
-                contents += (item as String) + "\r\n";
-            }
+            string contents = GetLogs();
 
             try
             {

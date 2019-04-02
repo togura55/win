@@ -18,7 +18,10 @@ xxx
 ## ToDo/Known Issues
 *   Not be functional by clicking [Suspend] button  
 ## History
-* 1.1.x - Export log file
+* 1.1.x  
+- Export log file  
+- Handling event of the device's barcode scan  
+- Support getting device's firmware version  
 * 1.0.15
   - Stable version for the demo use, with WdBroker 1.0.9 and WdController 1.0.2
   - debug option for executing stand-alone mode (non-IP, non-BT)

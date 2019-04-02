@@ -17,13 +17,13 @@ namespace WdBroker
 
         // Delegate event handlers
         public delegate void BrokerEventHandler(object sender, string message);
-        public delegate void ConnectPublisherEventHandler(object sender, int index);
+//        public delegate void ConnectPublisherEventHandler(object sender, int index);
         public delegate void DrawingEventHandler(object sender, List<DeviceRawData> data, int index); // for drawing
         public delegate void SubscriberEventHandler(object sender, string message, int index);
 
         // Properties
         public event BrokerEventHandler BrokerMessage;
-        public event ConnectPublisherEventHandler AppConnectPublisher;
+//        public event ConnectPublisherEventHandler AppConnectPublisher;
         public event DrawingEventHandler AppDrawing; // for drawing
         public event SubscriberEventHandler SubscriberAction;
 
@@ -43,9 +43,10 @@ namespace WdBroker
         private const int CMD_STOP_PUBLISHER = 4;
         private const int CMD_SUSPEND_PUBLISHER = 5;
         private const int CMD_RESUME_PUBLISHER = 6;
+        private const int CMD_SET_BARCODE = 7;
         private const string RES_ACK = "ack";
         private const string RES_NAK = "nak";
-        static List<string> CommandList = new List<string> { "1", "2", "3", "4", "5", "6" };  // Command word sent by Publisher
+        static List<string> CommandList = new List<string> { "1", "2", "3", "4", "5", "6", "7" };  // Command word sent by Publisher
 
 
         public Broker()
@@ -63,13 +64,13 @@ namespace WdBroker
             });
         }
 
-        private async void ConnectPublisherEvent(int index)
-        {
-            await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-            {
-                AppConnectPublisher?.Invoke(this, index);
-            });
-        }
+        //private async void ConnectPublisherEvent(int index)
+        //{
+        //    await Windows.ApplicationModel.Core.CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+        //    {
+        //        AppConnectPublisher?.Invoke(this, index);
+        //    });
+        //}
 
         private async void DrawingEvent(List<DeviceRawData> data, int index)
         {
@@ -498,15 +499,16 @@ namespace WdBroker
                                 pub.DeviceName = list[++i];
                                 pub.SerialNumber = list[++i];
                                 pub.Battery = float.Parse(list[++i]);
+                                pub.FirmwareVersion = list[++i];    // added 1.1
                                 pub.DeviceType = list[++i];
                                 pub.TransferMode = list[++i];
-
+                                pub.Barcode = list[++i];        // added 1.1
                                 pub.IpAddress = list[++i];
                                 pub.State = int.Parse(list[++i]);
 
                                 // ToDo: What shoud we do when the Publisher request to change the attribute?
-                                ConnectPublisherEvent(App.Pubs.Count - 1);  // Notify to caller 
-                                MessageEvent(string.Format("Notify: Publisher is connected ID={0}", pub.Id));
+//                                ConnectPublisherEvent(App.Pubs.Count - 1);  // Notify to caller 
+//                                MessageEvent(string.Format("Notify: Publisher is connected ID={0}", pub.Id));
 
                                 res = RES_ACK;
                             }
@@ -566,6 +568,24 @@ namespace WdBroker
                             }
                             mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
                             MessageEvent(string.Format("Response to Publisher ID {0}: {1}", publisher_id, res));
+                            break;
+
+                        case CMD_SET_BARCODE:
+                            MessageEvent(string.Format("CMD_SET_BARCODE received from ID: {0}", publisher_id));
+                            if ((index = FindPublisherId(publisher_id)) < 0)
+                                res = RES_NAK;
+                            else
+                            {
+                                int i = 1;  // skip 0,1
+                                Publisher pub = App.Pubs[index];
+
+                                pub.Barcode = list[++i];        // added 1.1
+
+                                res = RES_ACK;
+                            }
+                            mServerSocket.SendToClient(System.Text.Encoding.UTF8.GetBytes(res));
+                            MessageEvent(string.Format("Response to Publisher ID {0}: {1}", publisher_id, res));
+
                             break;
 
                         default:

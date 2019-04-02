@@ -61,6 +61,7 @@ namespace WillDevicesSampleApp
         public event MessageEventHandler RCMessage;
         public event MessageEventHandler UpdateUi, PublisherControl;
 
+        // Wrappers for message events 
         private async void MessageEvent(string message)
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -98,6 +99,7 @@ namespace WillDevicesSampleApp
             return responce;
         }
 
+
         // A pointer back to the main page.  This is needed if you want to call methods in MainPage such
         // as NotifyUser()
         //            MainPage rootPage = MainPage.Current;
@@ -113,6 +115,7 @@ namespace WillDevicesSampleApp
             trigger.InboundConnection.SdpRecord = sdpRecordBlob.AsBuffer();
         }
 
+        #region Services
         //        protected override void OnNavigatedTo(NavigationEventArgs e)
         public void RegisterBackgroundTask()
         {
@@ -182,18 +185,36 @@ namespace WillDevicesSampleApp
             }
         }
 
-        //private void SendButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    SendMessage();
-        //}
+        public void StopListen()
+        {
+            // ToDo: implements
+        }
 
-        //public void KeyboardKey_Pressed(object sender, KeyRoutedEventArgs e)
-        //{
-        //    if (e.Key == Windows.System.VirtualKey.Enter)
-        //    {
-        //        SendMessage();
-        //    }
-        //}
+        public void NotifyEvent(string message, string contents)
+        {
+            try
+            {
+                switch (message)
+                {
+                    case "UpdateBarCode":
+                        SendResponce(string.IsNullOrEmpty(message) ? RES_NAK : message);
+                        break;
+
+                    case "SendLogs":
+                        SendResponce(string.IsNullOrEmpty(message) ? RES_NAK : message);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("NotifyEventToRemoteController: Exception: {0}", ex.Message));
+            }
+        }
+        #endregion
+
 
         /// <summary>
         /// Sends the current message in MessageTextBox.  Also makes sure the text is not empty and updates the conversation list.  
@@ -356,7 +377,7 @@ namespace WillDevicesSampleApp
         private const string CMD_RESTART = "restart";
         private const string CMD_POWEROFF = "poweroff";
         private const string CMD_GETBARCODE = "getbarcode";
-
+        private const string CMD_GETLOGS = "getlogs";
 
         private const string RES_ACK = "ack";
         private const string RES_NAK = "nak";
@@ -377,9 +398,10 @@ namespace WillDevicesSampleApp
                     devAttr.Name + sep +
                     devAttr.ESN + sep +
                     devAttr.Battery + sep +
+                    devAttr.FirmwareVersion + sep +  // added 1.1
                     devAttr.DeviceType + sep +
                     devAttr.TransferMode + sep +
-                    devAttr.Barcode + sep +
+                    devAttr.Barcode + sep +  // added 1.1
                     pub.HostNameString + sep +
                     pub.PortNumberString + sep +
                     pub.CurrentState.ToString() + sep +
@@ -596,6 +618,26 @@ namespace WillDevicesSampleApp
             return responce;
         }
 
+        private async void GetLogs()
+        {
+//            string responce = string.Empty;
+            try
+            {
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    this.PublisherControl?.Invoke(this, "GetLogs");
+                });
+
+                //                responce = AppObjects.Instance.WacomDevice.Attribute.Barcode;
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("GetLogs: Exception: {0}", ex.Message));
+            }
+
+//            return responce;
+        }
+
         private async void ConfigCommandsDispatcher(string message)
         {
             try
@@ -657,6 +699,11 @@ namespace WillDevicesSampleApp
                         string barcode = GetBarcode();
                         SendResponce(
                             string.IsNullOrEmpty(barcode) ? RES_NAK : barcode);
+                        break;
+                    case CMD_GETLOGS:
+                        GetLogs();
+                        //SendResponce(
+                        //    string.IsNullOrEmpty(logs) ? RES_NAK : logs);
                         break;
 
                     default:
