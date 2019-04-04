@@ -569,7 +569,14 @@ namespace WdController
 
         private async void Pbtn_GetVersion_Click(object sender, RoutedEventArgs e)
         {
-            await wdController.GetVersion();
+            try
+            {
+                await wdController.GetVersion();
+            }
+            catch (Exception ex)
+            {
+                ReceivedMessage(this, string.Format("Pbtn_GetVersion_Click: Exception: {0}", ex.Message));
+            }
         }
 
         private async void Pbtn_DevicePoweroff_Click(object sender, RoutedEventArgs e)
@@ -583,7 +590,5 @@ namespace WdController
         }
 
         #endregion
-
-
     }
 }
