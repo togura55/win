@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.AppService;
+using Windows.ApplicationModel.Background;
+using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -12,6 +16,8 @@ namespace WillDevicesSampleApp
 	/// </summary>
 	sealed partial class App : Application
     {
+        public static new App Current => (App)Application.Current;
+
         static readonly string license = "eyJhbGciOiJSUzUxMiJ9.eyJpc3MiOiJsbXMiLCJhdWQiOiJ3ZXMiLCJleHAiOjE1Nzc4MzY4MDAsImlhdCI6MTQ5MzkwMzM1NCwic3ViIjoiMCIsInJpZ2h0cyI6WyJDRExfQUNDRVNTIiwiQ0RMX0xJVkVfU1RSRUFNSU5HIl0sImdpdmVuX25hbWUiOiJXYWNvbSIsImZhbWlseV9uYW1lIjoiV2Fjb20iLCJlbWFpbCI6IndpbGxkZXZlbG9wZXJzQHdhY29tLmNvbSIsInR5cGUiOiJldmFsIiwibGljX25hbWUiOiJXaWxsRGV2aWNlc0RlbW9BcHAgbGljZW5zZSIsImxpY191aWQiOiI4ODFiM2UxYTNiOGZiNTBmN2Y3ODY3NTc1NmQ1MmU3MGNkNTdmNmFjY2UyMzIyMzFiYWY0MDg3MjQ1YTMzYzQ2IiwiYXBwc193aW5kb3dzIjpbImM4MDE0YWNjLTRlZDUtNDZkMS1hMjFkLWUyNmUzOWJjNDU1YSJdfQ.FYT2OdHHlUJAOHoUFqm65OYc4R8gbZ1gs5eTMZRDjyculv_xbkwjDg1zy_sv-GxKHZqzCHVgXZagTe5IVC1VC_f3k0MPGxbpUf4jltGq7JtQJC153GBf0H3aQ-e4bzWv8_2Uuuf4s1zEcdSzPVx1Moh5sy_zcJvfPkToa6H-ZpWcZ5AxNLoaDoo9n1Daq5rTEh2hLzsgMtBIddrRCMpgMkokKj9JI3DleUSPxacjLYa4O5CqrUYcSN9UA9KCz6iqA2j5_esbGWoGHWPzTLwKPTWzjqTlA2s97JqUaKGD1tIcywJsOQaMB6KBHG4kDRjtYp8qT_6RyOVvw_ihi8xtzQ";
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -102,5 +108,63 @@ namespace WillDevicesSampleApp
 
 			deferral.Complete();
 		}
-	}
+
+        // ---------- for connection to Brodge WFP ------ 
+        public async Task SendNowAsync(string mode)
+        {
+            if (_appServiceConnection == null)
+            {
+                return;
+            }
+
+            await _appServiceConnection.SendMessageAsync(new ValueSet
+            {
+//                ["Now"] = DateTime.Now.ToString(),
+                ["Now"] = mode,
+            });
+        }
+
+        private AppServiceConnection _appServiceConnection;
+        private BackgroundTaskDeferral _appServiceDeferral;
+
+        protected override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
+        {
+            base.OnBackgroundActivated(args);
+
+            if (args.TaskInstance.TriggerDetails is AppServiceTriggerDetails appService)
+            {
+                _appServiceDeferral = args.TaskInstance.GetDeferral();
+                args.TaskInstance.Canceled += TaskInstance_Canceled;
+                _appServiceConnection = appService.AppServiceConnection;
+                _appServiceConnection.RequestReceived += AppServiceConnection_RequestReceived;
+                _appServiceConnection.ServiceClosed += AppServiceConnection_ServiceClosed;
+            }
+        }
+
+        private void AppServiceConnection_ServiceClosed(AppServiceConnection sender, AppServiceClosedEventArgs args)
+        {
+            _appServiceDeferral?.Complete();
+        }
+
+        private async void AppServiceConnection_RequestReceived(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
+        {
+            var d = args.GetDeferral();
+
+            var message = args.Request.Message;
+            var input = message["Input"] as string;
+
+//            await MainPage.Current?.SetTextAsync(input);
+            await args.Request.SendResponseAsync(new ValueSet
+            {
+                ["Result"] = $"Accept: {DateTime.Now}"
+            });
+            d.Complete();
+        }
+
+        private void TaskInstance_Canceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
+        {
+            _appServiceDeferral?.Complete();
+        }
+
+    }
 }

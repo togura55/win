@@ -9,18 +9,24 @@ using Windows.UI.Xaml.Controls;
 using Windows.Storage;
 using Windows.ApplicationModel.Resources;
 using Windows.UI.ViewManagement;
+using Windows.ApplicationModel;
 
 namespace WillDevicesSampleApp
 {
     public sealed partial class MainPage : Page
     {
-//        CancellationTokenSource m_cts = new CancellationTokenSource();
+        //        CancellationTokenSource m_cts = new CancellationTokenSource();
 
         ResourceLoader resourceLoader;
+        public static MainPage Current { get; private set; }
 
         public MainPage()
         {
             this.InitializeComponent();
+            Current = this;
+
+            this.Loaded += MainPage_Loaded;
+            Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
 
             AppObjects.Instance.Publisher = new Publisher();
             AppObjects.Instance.Publisher.PublisherMessage += ReceivedMessage; // set the message delegate         publisher = AppObjects.Instance.Publisher;
@@ -30,35 +36,34 @@ namespace WillDevicesSampleApp
             // For debug
             if (!AppObjects.Instance.Publisher.Debug)
             // End for debug
-            { 
+            {
                 AppObjects.Instance.RemoteController = new RemoteControllers();
-            AppObjects.Instance.RemoteController.RCMessage += ReceivedMessage; // 
-            AppObjects.Instance.RemoteController.UpdateUi += ReceivedUpdateUi;
-            AppObjects.Instance.RemoteController.PublisherControl += ReceivedPublisherControl;
+                AppObjects.Instance.RemoteController.RCMessage += ReceivedMessage; // 
+                AppObjects.Instance.RemoteController.UpdateUi += ReceivedUpdateUi;
+                AppObjects.Instance.RemoteController.PublisherControl += ReceivedPublisherControl;
             }
-
-            RestoreSettings();  // read stored setting values
-
-            resourceLoader = ResourceLoader.GetForCurrentView();
-            this.TextBlock_IPAddr.Text = resourceLoader.GetString("IDC_HostName");
-            this.TextBlock_PortNumber.Text = resourceLoader.GetString("IDC_PortNumber");
-
-            var versionInfo = Windows.ApplicationModel.Package.Current.Id.Version;
-            string version = string.Format(
-                               "{0}.{1}.{2}.{3}",
-                               versionInfo.Major, versionInfo.Minor,
-                               versionInfo.Build, versionInfo.Revision);
-            ApplicationView appView = ApplicationView.GetForCurrentView();
-            appView.Title = version;
-
-            SetUiState();
-
-            Application.Current.Suspending += new SuspendingEventHandler(App_Suspending);
 
             // For debug
             if (!AppObjects.Instance.Publisher.Debug)
-                // End for debug
+            // End for debug
+            {
+                LaunchBridgeAppAsync();
+
                 StartRemoteControllerTask();
+            }
+        }
+
+        private async void LaunchBridgeAppAsync()
+        {
+            try
+            {
+                ReceivedMessage(this, "Launch WdPBridge WPF app.");
+                await FullTrustProcessLauncher.LaunchFullTrustProcessForCurrentAppAsync();
+            }
+            catch (Exception ex)
+            {
+                ReceivedMessage(this, string.Format("LaunchBridgeAppAsync: Exception: {0}", ex.Message));
+            }
         }
 
         private void StartRemoteControllerTask()
@@ -110,6 +115,25 @@ namespace WillDevicesSampleApp
         }
 
         #region Event Handlers of MainPage
+        private void MainPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            RestoreSettings();  // read stored setting values
+
+            resourceLoader = ResourceLoader.GetForCurrentView();
+            this.TextBlock_IPAddr.Text = resourceLoader.GetString("IDC_HostName");
+            this.TextBlock_PortNumber.Text = resourceLoader.GetString("IDC_PortNumber");
+
+            var versionInfo = Windows.ApplicationModel.Package.Current.Id.Version;
+            string version = string.Format(
+                               "{0}.{1}.{2}.{3}",
+                               versionInfo.Major, versionInfo.Minor,
+                               versionInfo.Build, versionInfo.Revision);
+            ApplicationView appView = ApplicationView.GetForCurrentView();
+            appView.Title = version;
+
+            SetUiState();
+        }
+
         private void ReceivedUpdateUi(object sender, string message)
         {
             SetUiState();
@@ -143,7 +167,7 @@ namespace WillDevicesSampleApp
                     StartRemoteControllerTask();
                     break;
 
-                    // ToDo: move to Publisher ?
+                // ToDo: move to Publisher ?
                 case "SendStopToBrokerComplete":
                     AppObjects.Instance.Publisher.InitializationCompletedNotification -= PublisherInitialization_Completed;
 
@@ -161,7 +185,7 @@ namespace WillDevicesSampleApp
                     break;
 
                 case "GetLogs":
-                    AppObjects.Instance.RemoteController.NotifyEvent("SendLogs", GetLogs());
+                    AppObjects.Instance.RemoteController.NotifyEvent("SendLogs", GetLogs(clientListBox.Items));
                     break;
 
                 default:
@@ -263,28 +287,14 @@ namespace WillDevicesSampleApp
             ResumePublisher();
         }
 
-        private string GetLogs(int num = 0)
+        private async void Pbtn_Test_Click(object sender, RoutedEventArgs e)
         {
-            string log = string.Empty;
-            int count = 0;
-    
-            if (num <= clientListBox.Items.Count - 1)
-            {
-                foreach (var item in clientListBox.Items)
-                {
-                    if (clientListBox.Items.Count - 1 - count > 0)
-                    {
-                        log += (item as String) + "\r\n";
-                    }
-                    count++;
-                }
-            }
-
-            return log;
+            await App.Current.SendNowAsync("shutdown");
         }
+
         private async void Pbtn_SaveLog_Click(object sender, RoutedEventArgs e)
         {
-            string contents = GetLogs();
+            string contents = GetLogs(clientListBox.Items);
 
             try
             {
@@ -304,6 +314,41 @@ namespace WillDevicesSampleApp
                 ReceivedMessage(this, string.Format("Pbtn_SaveLog_Click: Exception: {0}", ex.Message));
             }
         }
+       
+        /// <summary>
+        /// Extract log items from a ListBox collection
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="num"> 0: all </param>
+        /// <param name="reverse">false: list in reverse</param>
+        /// <returns>strings of logs with CR-LF</returns>
+        private string GetLogs(ItemCollection items, int num = 0, bool reverse = false)
+        {
+            string log = string.Empty;
+
+            if (reverse)
+            {
+                // seek in reverse
+                for (int i = items.Count; i-- >= num;)
+                {
+                    log += (items[i] as String) + "\r\n";
+                }
+            }
+            else
+            {
+                int count = 0;
+                foreach (var item in items)
+                {
+                    if ((num == 0) || (count >= items.Count - num))
+                    {
+                        log += (item as String) + "\r\n";
+                    }
+                    count++;
+                }
+            }
+
+            return log;
+        }
         #endregion
 
         #region Delegate Completion Handlers
@@ -314,7 +359,7 @@ namespace WillDevicesSampleApp
                 if (result)
                 {
                     int msDelay = 1000;
-                    ReceivedMessage(this, 
+                    ReceivedMessage(this,
                         string.Format("PublisherInitialization_Completed: Go to StartRealTimeInk after {0}ms delay.", msDelay));
                     await Task.Delay(msDelay);
                     AppObjects.Instance.WacomDevice.StartRealTimeInk();
@@ -322,7 +367,7 @@ namespace WillDevicesSampleApp
             }
             catch (Exception ex)
             {
-                 ReceivedMessage(this, string.Format("PublisherInitialization_Completed: Exception: {0}", ex.Message));
+                ReceivedMessage(this, string.Format("PublisherInitialization_Completed: Exception: {0}", ex.Message));
             }
         }
         #endregion
@@ -343,10 +388,12 @@ namespace WillDevicesSampleApp
                 AppObjects.Instance.Publisher.HostNameString = container.Values["HostNameString"].ToString();
             if (container.Values.ContainsKey("PortNumberString"))
                 AppObjects.Instance.Publisher.PortNumberString = container.Values["PortNumberString"].ToString();
-            if (container.Values.ContainsKey("Debug"))   
+            if (container.Values.ContainsKey("Debug"))
                 AppObjects.Instance.Publisher.Debug = Convert.ToBoolean(container.Values["Debug"].ToString());
         }
 
         #endregion
+
+
     }
 }

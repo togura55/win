@@ -204,12 +204,7 @@ namespace WdBroker
 
         private async void Pbtn_SaveLog_Click(object sender, RoutedEventArgs e)
         {
-            string contents = string.Empty;
-
-            foreach (var item in ListBox_Message.Items)
-            {
-                contents += (item as String) + "\r\n";
-            }
+            string contents = GetLogs(ListBox_Message.Items);
 
             try
             {
@@ -230,6 +225,40 @@ namespace WdBroker
             }
         }
 
+        /// <summary>
+        /// Extract log items from a ListBox collection
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="num"> 0: all </param>
+        /// <param name="reverse">false: list in reverse</param>
+        /// <returns>strings of logs with CR-LF</returns>
+        private string GetLogs(ItemCollection items, int num = 0, bool reverse = false)
+        {
+            string log = string.Empty;
+
+            if (reverse)
+            {
+                // seek in reverse
+                for (int i = items.Count; i-- >= num;)
+                {
+                    log += (items[i] as String) + "\r\n";
+                }
+            }
+            else
+            {
+                int count = 0;
+                foreach (var item in items)
+                {
+                    if ((num == 0) || (count >= items.Count - num))
+                    {
+                        log += (item as String) + "\r\n";
+                    }
+                    count++;
+                }
+            }
+
+            return log;
+        }
 
         private void ShowStrokeRawData_Click(object sender, RoutedEventArgs e)
         {

@@ -161,18 +161,18 @@
     </SDKReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Tasks\Tasks.csproj">
-      <Project>{8f2014f0-8b97-5ce7-b638-edaa9709d073}</Project>
-      <Name>Tasks</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="FAKE">
       <Version>4.44.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>5.1.0</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Tasks\Tasks.csproj">
+      <Project>{8f2014f0-8b97-5ce7-b638-edaa9709d073}</Project>
+      <Name>Tasks</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

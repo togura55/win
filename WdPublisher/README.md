@@ -18,7 +18,8 @@ xxx
 ## ToDo/Known Issues
 *   Not be functional by clicking [Suspend] button  
 ## History
-* 1.1.x  
+* 1.1.0
+- Support Shutdown/Reboot features by intercommunication with WdBridge.WPF   
 - Export log file  
 - Handling event of the device's barcode scan  
 - Support getting device's firmware version  

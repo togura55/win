@@ -1,4 +1,0 @@
-
-In case of using Intel Stick, you may want to run WdPublisher application automatically after booting the stick PC up. The configuration shows in below, 
-- Login W10 w/o password: Cofigure by 'netplwiz'
-- Setting up the autorun for WdPublisher: Run 'shell:startup' and 'shell:appsfolder' by Win-R, and then drag&drop an app icon to the startup folder.

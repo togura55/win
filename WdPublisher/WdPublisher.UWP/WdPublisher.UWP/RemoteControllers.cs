@@ -61,7 +61,24 @@ namespace WillDevicesSampleApp
         public event MessageEventHandler RCMessage;
         public event MessageEventHandler UpdateUi, PublisherControl;
 
-        // Wrappers for message events 
+
+
+        // A pointer back to the main page.  This is needed if you want to call methods in MainPage such
+        // as NotifyUser()
+        //            MainPage rootPage = MainPage.Current;
+        public RemoteControllers()
+        {
+            //                this.InitializeComponent();
+            trigger = new RfcommConnectionTrigger();
+
+            // Local service Id is the only mandatory field that should be used to filter a known service UUID.  
+            trigger.InboundConnection.LocalServiceId = RfcommServiceId.FromUuid(Constants.RfcommChatServiceUuid);
+
+            // The SDP record is nice in order to populate optional name and description fields
+            trigger.InboundConnection.SdpRecord = sdpRecordBlob.AsBuffer();
+        }
+
+        #region  Wrappers for message events 
         private async void MessageEvent(string message)
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -69,13 +86,15 @@ namespace WillDevicesSampleApp
                 this.RCMessage?.Invoke(this, message);
             });
         }
+
         private async void MessageUpdateUi()
         {
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                    {
-                        this.UpdateUi?.Invoke(this, null);
-                    });
+            {
+                this.UpdateUi?.Invoke(this, null);
+            });
         }
+
         private async Task<bool> MessagePublisherControl(string message)
         {
             bool responce = true;
@@ -98,23 +117,8 @@ namespace WillDevicesSampleApp
 
             return responce;
         }
-
-
-        // A pointer back to the main page.  This is needed if you want to call methods in MainPage such
-        // as NotifyUser()
-        //            MainPage rootPage = MainPage.Current;
-        public RemoteControllers()
-        {
-            //                this.InitializeComponent();
-            trigger = new RfcommConnectionTrigger();
-
-            // Local service Id is the only mandatory field that should be used to filter a known service UUID.  
-            trigger.InboundConnection.LocalServiceId = RfcommServiceId.FromUuid(Constants.RfcommChatServiceUuid);
-
-            // The SDP record is nice in order to populate optional name and description fields
-            trigger.InboundConnection.SdpRecord = sdpRecordBlob.AsBuffer();
-        }
-
+        #endregion
+        
         #region Services
         //        protected override void OnNavigatedTo(NavigationEventArgs e)
         public void RegisterBackgroundTask()
@@ -214,7 +218,6 @@ namespace WillDevicesSampleApp
             }
         }
         #endregion
-
 
         /// <summary>
         /// Sends the current message in MessageTextBox.  Also makes sure the text is not empty and updates the conversation list.  
@@ -572,12 +575,12 @@ namespace WillDevicesSampleApp
             return responce;
         }
 
-        private string ExecuteRestart()
+        private async Task<string> ExecuteRestart()
         {
             string responce = string.Empty;
             try
             {
-
+                await App.Current.SendNowAsync("restart");
                 responce = RES_ACK;
             }
             catch (Exception ex)
@@ -588,19 +591,20 @@ namespace WillDevicesSampleApp
             return responce;
         }
 
-        private async void ExecutePoweroff()
+        private async Task<string> ExecutePoweroff()
         {
+            string responce = string.Empty;
             try
             {
-                if (ApiInformation.IsApiContractPresent("Windows.ApplicationModel.FullTrustAppContract", 1, 0))
-                {
-                    await FullTrustProcessLauncher.LaunchFullTrustProcessForCurrentAppAsync();
-                }
+                await App.Current.SendNowAsync("shutdown");
+                responce = RES_ACK;
             }
             catch (Exception ex)
             {
                 MessageEvent(string.Format("ExecutePoweroff: Exception: {0}", ex.Message));
             }
+
+            return responce;
         }
 
         private string GetBarcode()
@@ -686,13 +690,11 @@ namespace WillDevicesSampleApp
                         SendResponce(await ExecuteDeviceResume());
                         break;
                     case CMD_RESTART:
-                        SendResponce(
-                            await MessagePublisherControl(command) ? RES_ACK : RES_NAK);
+                        SendResponce(await ExecuteRestart());
                         break;
 
                     case CMD_POWEROFF:
-                        SendResponce(RES_ACK);
-                        ExecutePoweroff();
+                        SendResponce(await ExecutePoweroff());
                         break;
 
                     case CMD_GETBARCODE:

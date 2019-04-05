@@ -1,24 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="c8014acc-4ed5-46d1-a21d-e26e39ba455a" Publisher="CN=Milen" Version="1.1.16.0" />
-  <mp:PhoneIdentity PhoneProductId="c8014acc-4ed5-46d1-a21d-e26e39bc455a" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3" IgnorableNamespaces="uap mp rescap uap3">
+  <Identity Name="06872014-9f5a-4183-b6f9-a3c794f16257" Publisher="CN=togur" Version="1.1.0.0" />
   <Properties>
     <DisplayName>WdPublisher</DisplayName>
-    <PublisherDisplayName>togura</PublisherDisplayName>
-    <Logo>Assets\StoreLogo.png</Logo>
+    <PublisherDisplayName>tsuyoshi.ogura</PublisherDisplayName>
+    <Logo>Images\StoreLogo.png</Logo>
   </Properties>
   <Dependencies>
     <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.14393.0" MaxVersionTested="10.0.14393.0" />
   </Dependencies>
   <Resources>
     <Resource Language="x-generate" />
   </Resources>
   <Applications>
-    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="WillDevicesSampleApp.App">
-      <uap:VisualElements DisplayName="WdPublisher" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="WILL Devices Publisher" BackgroundColor="transparent">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png">
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="$targetentrypoint$">
+      <uap:VisualElements DisplayName="WdPublisher" Description="WdPublisher" BackgroundColor="transparent" Square150x150Logo="Images\Square150x150Logo.png" Square44x44Logo="Images\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Images\Wide310x150Logo.png">
         </uap:DefaultTile>
-        <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>
         <Extension Category="windows.backgroundTasks" EntryPoint="BackgroundTasks.RfcommServerTask">
@@ -26,44 +25,18 @@
             <Task Type="bluetooth" />
           </BackgroundTasks>
         </Extension>
+        <uap:Extension Category="windows.appService">
+          <uap:AppService Name="InProcessAppService" />
+        </uap:Extension>
+        <desktop:Extension Category="windows.fullTrustProcess" Executable="WdPBridge.WPF\WdPBridge.WPF.exe" /> 
       </Extensions>
     </Application>
   </Applications>
   <Capabilities>
     <Capability Name="internetClient" />
-    <Capability Name="privateNetworkClientServer" />
     <Capability Name="internetClientServer" />
+    <Capability Name="privateNetworkClientServer" />
+    <rescap:Capability Name="runFullTrust" />
     <DeviceCapability Name="bluetooth" />
-    <DeviceCapability Name="bluetooth.genericAttributeProfile">
-      <Device Id="any">
-        <Function Type="serviceId:00001523-1212-efde-1523-785feabcd123" />
-        <Function Type="serviceId:ffee0001-bbaa-9988-7766-554433221100" />
-        <Function Type="serviceId:0000180f-0000-1000-8000-00805f9b34fb" />
-        <Function Type="serviceId:0000180a-0000-1000-8000-00805f9b34fb" />
-        <Function Type="serviceId:6e400001-b5a3-f393-e0a9-e50e24dcca9e" />
-      </Device>
-    </DeviceCapability>
-    <DeviceCapability Name="bluetooth.rfcomm">
-      <Device Id="any">
-        <Function Type="name:serialPort" />
-      </Device>
-    </DeviceCapability>
-    <DeviceCapability Name="usb">
-      <!-- Viper M -->
-      <Device Id="vidpid:056A 0357">
-        <Function Type="classId:ff * *" />
-      </Device>
-      <!-- Viper L -->
-      <Device Id="vidpid:056A 0358">
-        <Function Type="classId:ff * *" />
-      </Device>
-      <!-- Barbera -->
-      <Device Id="vidpid:056A 035C">
-        <Function Type="classId:ff * *" />
-      </Device>
-      <Device Id="any">
-        <Function Type="winUsbId:72B0FDFE-53C5-46CE-AFEF-5B3558E3AFB4" />
-      </Device>
-    </DeviceCapability>
   </Capabilities>
 </Package>
