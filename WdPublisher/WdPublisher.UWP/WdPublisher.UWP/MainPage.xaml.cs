@@ -184,9 +184,9 @@ namespace WillDevicesSampleApp
                     AppObjects.Instance.WacomDevice = null;
                     break;
 
-                case "GetLogs":
-                    AppObjects.Instance.RemoteController.NotifyEvent("SendLogs", GetLogs(clientListBox.Items));
-                    break;
+                //case "GetLogs":
+                //    AppObjects.Instance.RemoteController.NotifyEvent("SendLogs", GetLogsItems(clientListBox.Items));
+                //    break;
 
                 default:
                     break;
@@ -294,7 +294,7 @@ namespace WillDevicesSampleApp
 
         private async void Pbtn_SaveLog_Click(object sender, RoutedEventArgs e)
         {
-            string contents = GetLogs(clientListBox.Items);
+            string contents = GetLogsItems(clientListBox.Items);
 
             try
             {
@@ -314,7 +314,7 @@ namespace WillDevicesSampleApp
                 ReceivedMessage(this, string.Format("Pbtn_SaveLog_Click: Exception: {0}", ex.Message));
             }
         }
-       
+
         /// <summary>
         /// Extract log items from a ListBox collection
         /// </summary>
@@ -322,7 +322,7 @@ namespace WillDevicesSampleApp
         /// <param name="num"> 0: all </param>
         /// <param name="reverse">false: list in reverse</param>
         /// <returns>strings of logs with CR-LF</returns>
-        private string GetLogs(ItemCollection items, int num = 0, bool reverse = false)
+        private string GetLogsItems(ItemCollection items, int num = 0, bool reverse = false)
         {
             string log = string.Empty;
 
@@ -348,6 +348,11 @@ namespace WillDevicesSampleApp
             }
 
             return log;
+        }
+        
+        public string GetLogs(int num = 0, bool reverse = false)
+        {
+            return GetLogsItems(clientListBox.Items);
         }
         #endregion
 

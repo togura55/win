@@ -157,6 +157,17 @@ namespace WillDevicesSampleApp
             }
             else
             {
+                // すでに登録してあるバックグラウンドタスクをいったん削除
+                if (BackgroundTaskRegistration.AllTasks.Count > 0)
+                {
+                    // すべてのバックグラウンドタスクを取得
+                    foreach (var task in BackgroundTaskRegistration.AllTasks)
+                    {
+                        // タスクの削除
+                        task.Value.Unregister(true);
+                    }
+                }
+
                 // Applications registering for background trigger must request for permission.
                 BackgroundAccessStatus backgroundAccessStatus = await BackgroundExecutionManager.RequestAccessAsync();
 
@@ -201,12 +212,12 @@ namespace WillDevicesSampleApp
                 switch (message)
                 {
                     case "UpdateBarCode":
-                        SendResponce(string.IsNullOrEmpty(message) ? RES_NAK : message);
+                        SendResponce(string.IsNullOrEmpty(message) ? RES_NAK : contents);
                         break;
 
-                    case "SendLogs":
-                        SendResponce(string.IsNullOrEmpty(message) ? RES_NAK : message);
-                        break;
+                    //case "SendLogs":
+                    //    SendResponce(string.IsNullOrEmpty(message) ? RES_NAK : contents);
+                    //    break;
 
                     default:
                         break;
@@ -622,24 +633,25 @@ namespace WillDevicesSampleApp
             return responce;
         }
 
-        private async void GetLogs()
+        private async Task<string> GetLogs()
         {
-//            string responce = string.Empty;
+            string responce = string.Empty;
             try
             {
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
-                    this.PublisherControl?.Invoke(this, "GetLogs");
+ //                   this.PublisherControl?.Invoke(this, "GetLogs");
+
+                    responce = MainPage.Current.GetLogs();
                 });
 
-                //                responce = AppObjects.Instance.WacomDevice.Attribute.Barcode;
             }
             catch (Exception ex)
             {
                 MessageEvent(string.Format("GetLogs: Exception: {0}", ex.Message));
             }
 
-//            return responce;
+            return responce;
         }
 
         private async void ConfigCommandsDispatcher(string message)
@@ -703,9 +715,10 @@ namespace WillDevicesSampleApp
                             string.IsNullOrEmpty(barcode) ? RES_NAK : barcode);
                         break;
                     case CMD_GETLOGS:
-                        GetLogs();
-                        //SendResponce(
-                        //    string.IsNullOrEmpty(logs) ? RES_NAK : logs);
+                        //                        GetLogs();
+                        string logs = await GetLogs();
+                        SendResponce(
+                            string.IsNullOrEmpty(logs) ? RES_NAK : logs);
                         break;
 
                     default:
