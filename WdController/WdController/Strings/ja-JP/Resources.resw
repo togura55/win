@@ -144,6 +144,9 @@
   <data name="IDC_GetConfig" xml:space="preserve">
     <value>設定受信</value>
   </data>
+  <data name="IDC_GetLogs" xml:space="preserve">
+    <value>ログ取得</value>
+  </data>
   <data name="IDC_GetVersion" xml:space="preserve">
     <value>バージョン取得</value>
   </data>

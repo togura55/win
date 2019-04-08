@@ -127,6 +127,7 @@ namespace WdController
             Pbtn_DeviceSuspend.Content = resource.GetString("IDC_DeviceSuspend");
             Pbtn_DeviceRestart.Content = resource.GetString("IDC_DeviceRestart");
             Pbtn_DevicePoweroff.Content = resource.GetString("IDC_DevicePoweroff");
+            Pbtn_GetLogs.Content = resource.GetString("IDC_GetLogs");
 
             TextBlock_PublisherDeviceName.Text = resource.GetString("IDC_PublisherDeviceName");
             TextBlock_IP.Text = resource.GetString("IDC_IP");
@@ -209,6 +210,7 @@ namespace WdController
                 Pbtn_DeviceSuspend.IsEnabled = false;
                 Pbtn_DeviceRestart.IsEnabled = false;
                 Pbtn_DevicePoweroff.IsEnabled = false;
+                Pbtn_GetLogs.IsEnabled = false;
 
                 TextBox_Name.IsEnabled = false;
                 TextBox_IP.IsEnabled = false;
@@ -226,6 +228,7 @@ namespace WdController
                 Pbtn_DeviceSuspend.IsEnabled = true;
                 Pbtn_DeviceRestart.IsEnabled = true;
                 Pbtn_DevicePoweroff.IsEnabled = true;
+                Pbtn_GetLogs.IsEnabled = true;
 
                 TextBox_Name.IsEnabled = true;
                 TextBox_IP.IsEnabled = true;
@@ -589,6 +592,12 @@ namespace WdController
             await wdController.DeviceRestart();
         }
 
+        private async void Pbtn_GetLogs_Click(object sender, RoutedEventArgs e)
+        {
+            await wdController.GetLogs();
+        }
         #endregion
+
+
     }
 }
