@@ -446,7 +446,7 @@ namespace WdBroker
                             MessageEvent(string.Format("Assigned and sent Publisher ID: {0}", res));
 
                             // 5. Create a Subscriber for handling this Publisher
-                            // ToDo: should be implemented this at the per request by Sunscriber
+                            // ToDo: should be implemented this at the per request by Subscriber
                             
 
 

@@ -132,6 +132,8 @@ namespace WillDevicesSampleApp
             appView.Title = version;
 
             SetUiState();
+
+            this.Pbtn_Test.Visibility = Visibility.Collapsed;    // hide
         }
 
         private void ReceivedUpdateUi(object sender, string message)

@@ -84,6 +84,7 @@ namespace WdPBridge.WPF
                 //                logTextBlock.Text = (string)args.Request.Message["Now"];
                 string s = (string)args.Request.Message["Now"];
 
+                bool quit_flag = false;
                 int mode = MODE_SHUTDOWN;
                 switch (s)
                 {
@@ -95,11 +96,20 @@ namespace WdPBridge.WPF
                         mode = MODE_REBOOT;
                         break;
 
+                    case "quit":
+                        quit_flag = true;
+                        break;
+
                     default:
                         break;
                 }
 
-                Run(mode, 0);
+                if (!quit_flag)
+                    Run(mode, 0);
+                else
+                {
+                    Application.Current.Shutdown();
+                }
             }
 
             if (Dispatcher.CheckAccess())

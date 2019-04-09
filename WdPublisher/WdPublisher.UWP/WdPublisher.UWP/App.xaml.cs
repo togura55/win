@@ -96,20 +96,24 @@ namespace WillDevicesSampleApp
         /// </summary>
         /// <param name="sender">The source of the suspend request.</param>
         /// <param name="e">Details about the suspend request.</param>
-        private void OnSuspending(object sender, SuspendingEventArgs e)
+        private async void OnSuspending(object sender, SuspendingEventArgs e)
         {
+            //TODO: Save application state and stop any background activity
+            if (AppObjects.Instance.Device != null)
+            {
+                AppObjects.Instance.Device.Dispose();
+                AppObjects.Instance.Device = null;
+            }
+
+            if (_appServiceConnection != null)
+                await SendNowAsync("quit");
+
             var deferral = e.SuspendingOperation.GetDeferral();
-			//TODO: Save application state and stop any background activity
-			if (AppObjects.Instance.Device != null)
-			{
-				AppObjects.Instance.Device.Dispose();
-				AppObjects.Instance.Device = null;
-			}
 
 			deferral.Complete();
 		}
 
-        // ---------- for connection to Brodge WFP ------ 
+        // ---------- for connection to Bridge WFP ------ 
         public async Task SendNowAsync(string mode)
         {
             if (_appServiceConnection == null)
