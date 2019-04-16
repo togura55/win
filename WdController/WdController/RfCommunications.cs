@@ -16,11 +16,11 @@ namespace WdController
     public class RfCommunications
     {
         private BluetoothDevice bluetoothDevice = null;
-        private DataWriter chatWriter = null;
-        private RfcommDeviceService chatService = null;
-        public string BleServiceName = string.Empty;
-        public string BleDeviceName = string.Empty;
-        private StreamSocket chatSocket = null;
+        private DataWriter dataWriter = null;
+        private RfcommDeviceService rfcommDeviceService = null;
+        public string BtServiceName = string.Empty;
+        public string BtDeviceName = string.Empty;
+        private StreamSocket streamSocket = null;
 
         public RfCommunications()
         {
@@ -93,7 +93,7 @@ namespace WdController
 
             if (rfcommServices.Services.Count > 0)
             {
-                chatService = rfcommServices.Services[0];
+                rfcommDeviceService = rfcommServices.Services[0];
             }
             else
             {
@@ -104,7 +104,7 @@ namespace WdController
             }
 
             // Do various checks of the SDP record to make sure you are talking to a device that actually supports the Bluetooth Rfcomm Chat Service
-            var attributes = await chatService.GetSdpRawAttributesAsync();
+            var attributes = await rfcommDeviceService.GetSdpRawAttributesAsync();
             if (!attributes.ContainsKey(Constants.SdpServiceNameAttributeId))
             {
                 MessageEvent(
@@ -132,20 +132,20 @@ namespace WdController
 
             lock (this)
             {
-                chatSocket = new StreamSocket();
+                streamSocket = new StreamSocket();
             }
             try
             {
-                await chatSocket.ConnectAsync(chatService.ConnectionHostName, chatService.ConnectionServiceName);
+                await streamSocket.ConnectAsync(rfcommDeviceService.ConnectionHostName, rfcommDeviceService.ConnectionServiceName);
 
-                BleDeviceName = bluetoothDevice.Name;
-                BleServiceName = attributeReader.ReadString(serviceNameLength);
-                ActionEvent("EnableControlUI"); //  SetChatUI(BleServiceName, BleDeviceName);
-                chatWriter = new DataWriter(chatSocket.OutputStream);
+                BtDeviceName = bluetoothDevice.Name;
+                BtServiceName = attributeReader.ReadString(serviceNameLength);
+                ActionEvent("EnableControlUI"); //  SetChatUI(BtServiceName, BtDeviceName);
+                dataWriter = new DataWriter(streamSocket.OutputStream);
 
-                DataReader chatReader = new DataReader(chatSocket.InputStream);
+                DataReader dataReader = new DataReader(streamSocket.InputStream);
                 MessageEvent("RfConnect: Connection established. Set the receive message loop.");
-                ReceiveStringLoop(chatReader);
+                ReceiveStringLoop(dataReader);
             }
             catch (Exception ex) when ((uint)ex.HResult == 0x80070490) // ERROR_ELEMENT_NOT_FOUND
             {
@@ -165,23 +165,23 @@ namespace WdController
         /// <param name="disconnectReason"></param>
         public void RfDisconnect(string disconnectReason)
         {
-            if (chatWriter != null)
+            if (dataWriter != null)
             {
-                chatWriter.DetachStream();
-                chatWriter = null;
+                dataWriter.DetachStream();
+                dataWriter = null;
             }
 
-            if (chatService != null)
+            if (rfcommDeviceService != null)
             {
-                chatService.Dispose();
-                chatService = null;
+                rfcommDeviceService.Dispose();
+                rfcommDeviceService = null;
             }
             lock (this)
             {
-                if (chatSocket != null)
+                if (streamSocket != null)
                 {
-                    chatSocket.Dispose();
-                    chatSocket = null;
+                    streamSocket.Dispose();
+                    streamSocket = null;
                 }
             }
 
@@ -211,13 +211,13 @@ namespace WdController
             {
                 if (command.Length != 0)
                 {
-                    chatWriter.WriteUInt32((uint)command.Length);
-                    chatWriter.WriteString(command);
+                    dataWriter.WriteUInt32((uint)command.Length);
+                    dataWriter.WriteString(command);
 
                     //                    ConversationList.Items.Add("Sent: " + MessageTextBox.Text);
                     MessageEvent("Sent: " + command);
                     //                    TextBox_Message.Text = "";
-                    await chatWriter.StoreAsync();
+                    await dataWriter.StoreAsync();
 
                 }
             }
@@ -229,39 +229,39 @@ namespace WdController
         }
         #endregion
 
-        private async void ReceiveStringLoop(DataReader chatReader)
+        private async void ReceiveStringLoop(DataReader dataReader)
         {
             try
             {
-                uint size = await chatReader.LoadAsync(sizeof(uint));
+                uint size = await dataReader.LoadAsync(sizeof(uint));
                 if (size < sizeof(uint))
                 {
                     RfDisconnect("Remote device terminated connection - make sure only one instance of server is running on remote device");
                     return;
                 }
 
-                uint stringLength = chatReader.ReadUInt32();
-                uint actualStringLength = await chatReader.LoadAsync(stringLength);
+                uint stringLength = dataReader.ReadUInt32();
+                uint actualStringLength = await dataReader.LoadAsync(stringLength);
                 if (actualStringLength != stringLength)
                 {
                     // The underlying socket was closed before we were able to read the whole data
                     return;
                 }
 
-                string readString = chatReader.ReadString(stringLength);
-                //                ConversationList.Items.Add("Received: " + chatReader.ReadString(stringLength));
+                string readString = dataReader.ReadString(stringLength);
+                //                ConversationList.Items.Add("Received: " + dataReader.ReadString(stringLength));
                 MessageEvent("Received: " + readString);
 
                 // handle responses sent by BLE server
                 ResponseDispatcher(readString);
 
-                ReceiveStringLoop(chatReader);
+                ReceiveStringLoop(dataReader);
             }
             catch (Exception ex)
             {
                 lock (this)
                 {
-                    if (chatSocket == null)
+                    if (streamSocket == null)
                     {
                         // Do not print anything here -  the user closed the socket.
                         if ((uint)ex.HResult == 0x80072745)

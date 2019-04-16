@@ -105,8 +105,8 @@ namespace WdController
 
             if (rfComm != null)
             {
-                rfComm.BleDeviceName = string.Empty;
-                rfComm.BleServiceName = string.Empty;
+                rfComm.BtDeviceName = string.Empty;
+                rfComm.BtServiceName = string.Empty;
             }
         }
 

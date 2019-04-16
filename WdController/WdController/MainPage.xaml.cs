@@ -194,8 +194,8 @@ namespace WdController
             TextBox_IP.Text = wdController.ServerIpAddress;
             TextBox_Port.Text = wdController.ServerPortNumberBase;
             TextBlock_DeviceVersion.Text = wdController.DeviceVersionNumber;
-            TextBlock_ServiceName.Text = wdController.rfComm.BleServiceName;
-            TextBlock_DeviceName.Text = wdController.rfComm.BleDeviceName;
+            TextBlock_ServiceName.Text = wdController.rfComm.BtServiceName;
+            TextBlock_DeviceName.Text = wdController.rfComm.BtDeviceName;
             TextBlock_ClientIpAddress.Text = wdController.ClientIpAddress;
 
             if (wdController.State == wdController.STATE_NEUTRAL)
