@@ -1,0 +1,48 @@
+まず、FileTransferを開始するStartAsyncの第2引数を「true」に変更してください。
+第2引数が生データを送るかどうかのフラグになっています。
+ 
+await service.StartAsync(StrokesReceivedAsync, true, m_cts.Token);
+ 
+inkDocument.Rootに生データが追加されるようになりますが、Rootは以下のような構造になっています。
+ 
+InkGroup (Root)
+  -> InkGroup
+    -> InkStroke
+    -> InkStroke ...
+    
+私の方では以下のようなメソッドを作っておいて読み込んでいます。
+ 
+// ストロークデータの読み込み開始
+ReadInkNode(inkDocument.Root)
+ 
+// InkNodeの読み込み用メソッド
+public void ReadInkNode(InkNode node)
+{
+    if (node.GetType() == typeof(InkGroup))
+    {
+        // InkGroup
+        InkGroup g = node as InkGroup;
+        int count = g.NodesCount;
+ 
+        for (int i = 0; i < count; i++)
+        {
+            ReadInkNode(g.GetNodeAt(i));
+        }
+    }
+    else if (node.GetType() == typeof(InkStroke))
+    {
+        // InkStroke.RawData.Pointsに生データが入っているので読み込む
+        InkStroke s = node as InkStroke;
+        
+        // PointsはSmartPadPoint型になっています
+        foreach (Wacom.Devices.SmartPadPoint po in s.RawData.Points)
+        {
+                      // SmartPadPoint.X : X座標
+                      // SmartPadPoint.Y : Y座標
+                      // SmartPadPoint.Pressure : 筆圧
+        }
+    }
+}
+ 
+一点注意ですが、生データは「Bamboo Slateのボタンの位置を右下にした向き（BAMBOOロゴの向きが正しくなる向き）の左上からの座標」です。
+おそらく実際に生データの座標を見ていただければわかるかと思います。
