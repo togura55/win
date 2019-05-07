@@ -97,7 +97,7 @@ namespace WillDevicesSampleApp
 
         private async Task<bool> MessagePublisherControl(string message)
         {
-            bool responce = true;
+            bool response = true;
 
             Publisher pub = AppObjects.Instance.Publisher;
 
@@ -112,10 +112,10 @@ namespace WillDevicesSampleApp
             }
             else
             {
-                responce = false;
+                response = false;
             }
 
-            return responce;
+            return response;
         }
         #endregion
         
@@ -392,46 +392,54 @@ namespace WillDevicesSampleApp
         private const string CMD_POWEROFF = "poweroff";
         private const string CMD_GETBARCODE = "getbarcode";
         private const string CMD_GETLOGS = "getlogs";
+        private const string CMD_GETSTATUS = "getstatus";   // added 1.1.17
 
         private const string RES_ACK = "ack";
         private const string RES_NAK = "nak";
 
         private string ExecuteGetConfig()
         {
-            string responce = string.Empty;
+            string response = string.Empty;
             string sep = ",";
             try
             {
-                WacomDevices.DeviceAttributes devAttr = AppObjects.Instance.WacomDevice.Attribute;
-                Publisher pub = AppObjects.Instance.Publisher;
+                if (AppObjects.Instance.WacomDevice == null)
+                {
+                    response = RES_NAK;
+                }
+                else
+                {
+                    WacomDevices.DeviceAttributes devAttr = AppObjects.Instance.WacomDevice.Attribute;
+                    Publisher pub = AppObjects.Instance.Publisher;
 
-                responce +=
-                    devAttr.Width + sep +
-                    devAttr.Height + sep +
-                    devAttr.PointSize + sep +
-                    devAttr.Name + sep +
-                    devAttr.ESN + sep +
-                    devAttr.Battery + sep +
-                    devAttr.FirmwareVersion + sep +  // added 1.1
-                    devAttr.DeviceType + sep +
-                    devAttr.TransferMode + sep +
-                    devAttr.Barcode + sep +  // added 1.1
-                    pub.HostNameString + sep +
-                    pub.PortNumberString + sep +
-                    pub.CurrentState.ToString() + sep +
-                    pub.ClientIpAddress;   // added at WdController 1.0.2
+                    response +=
+                        devAttr.Width + sep +
+                        devAttr.Height + sep +
+                        devAttr.PointSize + sep +
+                        devAttr.Name + sep +
+                        devAttr.ESN + sep +
+                        devAttr.Battery + sep +
+                        devAttr.FirmwareVersion + sep +  // added 1.1
+                        devAttr.DeviceType + sep +
+                        devAttr.TransferMode + sep +
+                        devAttr.Barcode + sep +  // added 1.1
+                        pub.HostNameString + sep +
+                        pub.PortNumberString + sep +
+                        pub.CurrentState.ToString() + sep +
+                        pub.ClientIpAddress;   // added at WdController 1.0.2
+                }
             }
             catch (Exception ex)
             {
                 MessageEvent(string.Format("ExecuteGetConfig: Exception: {0}", ex.Message));
             }
 
-            return responce;
+            return response;
         }
 
         private string ExecuteSetConfig(string message)
         {
-            string responce = string.Empty;
+            string response = string.Empty;
             try
             {
                 Publisher pub = AppObjects.Instance.Publisher;
@@ -444,7 +452,7 @@ namespace WillDevicesSampleApp
                 // decode
                 if (list.Count != 4)
                 {
-                    responce = RES_NAK;
+                    response = RES_NAK;
                     throw new Exception("ExecuteSetConfig: Number of parameters are wrong.");
                 }
                 else
@@ -476,7 +484,7 @@ namespace WillDevicesSampleApp
                     }
 
                     MessageUpdateUi();
-                    responce = RES_ACK;
+                    response = RES_ACK;
                 }
             }
             catch (Exception ex)
@@ -484,16 +492,16 @@ namespace WillDevicesSampleApp
                 MessageEvent(string.Format("ExecuteSetConfig: Exception: {0}", ex.Message));
             }
 
-            return responce;
+            return response;
         }
 
         private string ExecuteGetVersion()
         {
-            string responce = string.Empty;
+            string response = string.Empty;
             try
             {
                 var versionInfo = Windows.ApplicationModel.Package.Current.Id.Version;
-                responce = string.Format(
+                response = string.Format(
                                    "{0}.{1}.{2}.{3}",
                                    versionInfo.Major, versionInfo.Minor,
                                    versionInfo.Build, versionInfo.Revision);
@@ -503,12 +511,12 @@ namespace WillDevicesSampleApp
                 MessageEvent(string.Format("ExecuteGetVersion: Exception: {0}", ex.Message));
             }
 
-            return responce;
+            return response;
         }
 
         private async Task<string> ExecuteDeviceStart()
         {
-            string responce = string.Empty;
+            string response = string.Empty;
             try
             {
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -516,19 +524,19 @@ namespace WillDevicesSampleApp
                     this.PublisherControl?.Invoke(this, "DeviceStart");
                 });
 
-                responce = RES_ACK;
+                response = RES_ACK;
             }
             catch (Exception ex)
             {
                 MessageEvent(string.Format("ExecuteDeviceStart: Exception: {0}", ex.Message));
             }
 
-            return responce;
+            return response;
         }
 
         private async Task<string> ExecuteDeviceStop()
         {
-            string responce = string.Empty;
+            string response = string.Empty;
             try
             {
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -536,19 +544,19 @@ namespace WillDevicesSampleApp
                     this.PublisherControl?.Invoke(this, "DeviceStop");
                 });
 
-                responce = RES_ACK;
+                response = RES_ACK;
             }
             catch (Exception ex)
             {
                 MessageEvent(string.Format("ExecuteDeviceStop: Exception: {0}", ex.Message));
             }
 
-            return responce;
+            return response;
         }
 
         private async Task<string> ExecuteDeviceSuspend()
         {
-            string responce = string.Empty;
+            string response = string.Empty;
             try
             {
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -556,19 +564,19 @@ namespace WillDevicesSampleApp
                     this.PublisherControl?.Invoke(this, "DeviceSuspend");
                 });
 
-                responce = RES_ACK;
+                response = RES_ACK;
             }
             catch (Exception ex)
             {
                 MessageEvent(string.Format("ExecuteDeviceSuspend: Exception: {0}", ex.Message));
             }
 
-            return responce;
+            return response;
         }
 
         private async Task<string> ExecuteDeviceResume()
         {
-            string responce = string.Empty;
+            string response = string.Empty;
             try
             {
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -576,73 +584,73 @@ namespace WillDevicesSampleApp
                     this.PublisherControl?.Invoke(this, "DeviceResume");
                 });
 
-                responce = RES_ACK;
+                response = RES_ACK;
             }
             catch (Exception ex)
             {
                 MessageEvent(string.Format("ExecuteDeviceResume: Exception: {0}", ex.Message));
             }
 
-            return responce;
+            return response;
         }
 
         private async Task<string> ExecuteRestart()
         {
-            string responce = string.Empty;
+            string response = string.Empty;
             try
             {
                 await App.Current.SendNowAsync("restart");
-                responce = RES_ACK;
+                response = RES_ACK;
             }
             catch (Exception ex)
             {
                 MessageEvent(string.Format("ExecuteRestart: Exception: {0}", ex.Message));
             }
 
-            return responce;
+            return response;
         }
 
         private async Task<string> ExecutePoweroff()
         {
-            string responce = string.Empty;
+            string response = string.Empty;
             try
             {
                 await App.Current.SendNowAsync("shutdown");
-                responce = RES_ACK;
+                response = RES_ACK;
             }
             catch (Exception ex)
             {
                 MessageEvent(string.Format("ExecutePoweroff: Exception: {0}", ex.Message));
             }
 
-            return responce;
+            return response;
         }
 
         private string GetBarcode()
         {
-            string responce = string.Empty;
+            string response = string.Empty;
             try
             {
-                responce = AppObjects.Instance.WacomDevice.Attribute.Barcode;
+                response = AppObjects.Instance.WacomDevice.Attribute.Barcode;
              }
             catch (Exception ex)
             {
                 MessageEvent(string.Format("GetBarcode: Exception: {0}", ex.Message));
             }
 
-            return responce;
+            return response;
         }
 
         private async Task<string> GetLogs()
         {
-            string responce = string.Empty;
+            string response = string.Empty;
             try
             {
                 await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
  //                   this.PublisherControl?.Invoke(this, "GetLogs");
 
-                    responce = MainPage.Current.GetLogs();
+                    response = MainPage.Current.GetLogs();
                 });
 
             }
@@ -651,7 +659,22 @@ namespace WillDevicesSampleApp
                 MessageEvent(string.Format("GetLogs: Exception: {0}", ex.Message));
             }
 
-            return responce;
+            return response;
+        }
+
+        private string GetStatus()
+        {
+            string response = string.Empty;
+            try
+            {
+                response = AppObjects.Instance.Publisher.CurrentState.ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageEvent(string.Format("GetStatus: Exception: {0}", ex.Message));
+            }
+
+            return response;
         }
 
         private async void ConfigCommandsDispatcher(string message)
@@ -719,6 +742,11 @@ namespace WillDevicesSampleApp
                         string logs = await GetLogs();
                         SendResponce(
                             string.IsNullOrEmpty(logs) ? RES_NAK : logs);
+                        break;
+                    case CMD_GETSTATUS:
+                        string status = GetStatus();
+                        SendResponce(
+                            string.IsNullOrEmpty(status) ? RES_NAK : status);
                         break;
 
                     default:

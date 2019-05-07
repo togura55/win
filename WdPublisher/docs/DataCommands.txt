@@ -89,6 +89,7 @@ z: Z座標バイト：８ byte
 データ：バーコード文字列
 レスポンス：ACK/NAK
 
+
 ===========================
 書式（Format)
 message = PublisherID,Command,data1,data2,....,dataN
