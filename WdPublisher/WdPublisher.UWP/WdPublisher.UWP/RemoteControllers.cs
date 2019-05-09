@@ -744,7 +744,7 @@ namespace WillDevicesSampleApp
                             string.IsNullOrEmpty(logs) ? RES_NAK : logs);
                         break;
                     case CMD_GETSTATUS:
-                        string status = GetStatus();
+                          string status = GetStatus();
                         SendResponce(
                             string.IsNullOrEmpty(status) ? RES_NAK : status);
                         break;
