@@ -11,6 +11,7 @@ using Windows.UI.Xaml.Navigation;
 using Wacom.SmartPadCommunication;
 using Wacom.UX.ViewModels;
 using Windows.Foundation;
+using Windows.UI.Xaml.Input;
 
 namespace WillDevicesSampleApp
 {
@@ -19,6 +20,8 @@ namespace WillDevicesSampleApp
 		static string s_fileTransferPromptMessage = "Write a note on your Wacom device and press the device's central button to synchronize with the app.";
 		CancellationTokenSource m_cts = new CancellationTokenSource();
 		int m_retryCounter = 0;
+
+        InkDocument selectedInkDocument = null;
 
 		public FileTransferPage()
 		{
@@ -160,7 +163,7 @@ namespace WillDevicesSampleApp
             //   ->InkGroup
             //     ->InkStroke
             //     ->InkStroke...
-            ReadInkNode(inkDocument.Root);
+//            ReadInkNode(inkDocument.Root);
 
             return FileTransferControlOptions.Continue;
 		}
@@ -171,7 +174,9 @@ namespace WillDevicesSampleApp
 
 			if (item != null)
 			{
-				inkCanvas.InkCanvasDocument = InkCanvasDocument.FromInkDocument(item.Document);
+                selectedInkDocument = item.Document;
+            
+                inkCanvas.InkCanvasDocument = InkCanvasDocument.FromInkDocument(item.Document);
 			}
 		}
 
@@ -232,12 +237,12 @@ namespace WillDevicesSampleApp
 		}
 
 
-
         // InkNodeの読み込み用メソッド
         // 一点注意ですが、生データは「Bamboo Slateのボタンの位置を右下にした向き
         //    （BAMBOOロゴの向きが正しくなる向き）の左上からの座標」です。
         // おそらく実際に生データの座標を見ていただければわかるかと思います。
-        private void ReadInkNode(InkNode node)
+        private void ReadInkNode(InkNode node, ref string output)
+//         private string ReadInkNode(InkNode node)
         {
             if (node.GetType() == typeof(InkGroup))
             {
@@ -247,21 +252,77 @@ namespace WillDevicesSampleApp
 
                 for (int i = 0; i < count; i++)
                 {
-                    ReadInkNode(g.GetNodeAt(i));
+                    ReadInkNode(g.GetNodeAt(i), ref output);
                 }
             }
             else if (node.GetType() == typeof(InkStroke))
             {
                 // InkStroke.RawData.Pointsに生データが入っているので読み込む
                 InkStroke s = node as InkStroke;
-
                 // PointsはSmartPadPoint型になっています
                 foreach (Wacom.Devices.SmartPadPoint po in s.RawData.Points)
                 {
                     // SmartPadPoint.X : X座標
                     // SmartPadPoint.Y : Y座標
                     // SmartPadPoint.Pressure : 筆圧
+                    
+                    output += string.Format("{0},{1},{2}{3}", po.X, po.Y, po.Pressure, System.Environment.NewLine);
+                }         
+            }
+        }
+
+        private void ListView_RightTapped(object sender, RightTappedRoutedEventArgs e)
+        {
+            ListView listView = (ListView)sender;
+            allContactsMenuFlyout.ShowAt(listView, e.GetPosition(listView));
+            var a = ((FrameworkElement)e.OriginalSource).DataContext as InkDocumentDisplayItem; // TransferedFiles; // List;
+//            var content = a.Field1; //  a.text;
+        }
+
+        private void ContextMenu_Export_Click(object sender, RoutedEventArgs e)
+        {
+            string output = string.Empty;
+            ReadInkNode(selectedInkDocument.Root, ref output);
+            ExportInkData(output);
+        }
+
+        private async void ExportInkData(string s)
+        {
+            try
+            {
+                var folderPicker = new Windows.Storage.Pickers.FolderPicker();
+
+                folderPicker.FileTypeFilter.Add("*");
+                Windows.Storage.StorageFolder folder =
+                    await folderPicker.PickSingleFolderAsync();
+
+                if (folder == null)
+                {
+                    return;
                 }
+
+                string path = folder.Path.ToString();
+                string filename = "data.txt";
+
+                // Create a data stored file; replace if exists.
+                Windows.Storage.StorageFile dataFile =
+                    await folder.CreateFileAsync(filename,
+                        Windows.Storage.CreationCollisionOption.ReplaceExisting);
+
+                // string dataString = string.Empty;
+                //foreach (String item in ListBox_Messages.Items)
+                //{
+                //    dataString += item + System.Environment.NewLine;
+                //}
+
+                if (dataFile != null)
+                {
+                    await Windows.Storage.FileIO.WriteTextAsync(dataFile, s);
+                }
+            }
+            catch (Exception ex)
+            {
+
             }
         }
     }

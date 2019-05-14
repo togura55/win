@@ -21,7 +21,7 @@
 			<ColumnDefinition Width="*" />
 		</Grid.ColumnDefinitions>
 
-		<ListView x:Name="listView"
+        <ListView x:Name="listView"
 				  Grid.Row="0"
 				  Grid.Column="0"
 				  Grid.RowSpan="2"
@@ -30,7 +30,17 @@
 				  Background="AliceBlue"
 				  VerticalAlignment="Stretch"
 				  Width="224"
-				  SelectionChanged="listView_SelectionChanged" />
+				  SelectionChanged="listView_SelectionChanged"
+                  RightTapped="ListView_RightTapped">
+            <ListView.Resources>
+                <MenuFlyout x:Name="allContactsMenuFlyout">
+                    <MenuFlyout.Items>
+                        <MenuFlyoutItem x:Name="ContextMenu_Export"  
+                                        Text="Export" Click="ContextMenu_Export_Click"/>
+                    </MenuFlyout.Items>
+                </MenuFlyout>
+            </ListView.Resources>
+        </ListView>
 		<TextBlock x:Name="textBlockPrompt"
 				   Grid.Row="0"
 				   Grid.Column="1"
