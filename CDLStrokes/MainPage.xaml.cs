@@ -12,17 +12,48 @@ using Windows.UI.Xaml.Navigation;
 using Windows.Devices.Radios;
 using System.Collections.Generic;
 using Windows.ApplicationModel.Resources;
+using Wacom.SmartPadCommunication;
 
 namespace WillDevicesSampleApp
 {
-	public sealed partial class MainPage : Page
+    public static partial class EnumExtend
+    {
+        public static uint GetOperationMode(this DeviceModel param)
+        {
+            uint ret = 0;
+            switch (param)
+            {
+                case DeviceModel.Unknown:
+                    ret &= ~(MainPage.MODE_FILETRANSFER | MainPage.MODE_REALTIME_INK);
+                    break;
+                case DeviceModel.BambooSlate:
+                    ret |= (MainPage.MODE_FILETRANSFER | MainPage.MODE_REALTIME_INK);
+                    break;
+                case DeviceModel.BambooSpark:
+                case DeviceModel.IntuosPro:
+                case DeviceModel.SketchpadPro:
+                    break;
+                case DeviceModel.Phu111:
+                    ret |= (MainPage.MODE_REALTIME_INK);
+                    break;
+            }
+            return ret;
+        }
+    }
+
+    public sealed partial class MainPage : Page
 	{
         private ResourceLoader resourceLoader;
 
         CancellationTokenSource m_cts = new CancellationTokenSource();
 		ObservableCollection<DevicePropertyValuePair> m_propertiesCollection;
-		
-		public MainPage()
+
+        public const uint MODE_FILETRANSFER = 0b01;
+        public const uint MODE_REALTIME_INK = 0b10;
+
+        uint deviceSupportMode = 0;
+
+        public MainPage()
 		{
 			this.InitializeComponent();
 
@@ -30,7 +61,7 @@ namespace WillDevicesSampleApp
 
             Loaded += MainPage_Loaded;
 
-            buttonFileTransfer.Visibility = Visibility.Collapsed;
+//            buttonFileTransfer.Visibility = Visibility.Collapsed;
             buttonFileTransfer.IsEnabled = false;
 			buttonRealTime.IsEnabled = false;
 			buttonScan.IsEnabled = false;
@@ -97,9 +128,9 @@ namespace WillDevicesSampleApp
 			textBlockDeviceName.Text =
                 string.Format(resourceLoader.GetString("IDS_CurrentDevice"), inkDeviceInfo.DeviceName);
 
-            buttonFileTransfer.Visibility = Visibility.Collapsed;
+//            buttonFileTransfer.Visibility = Visibility.Collapsed;
             //			buttonFileTransfer.IsEnabled = true;
-            buttonRealTime.IsEnabled = true;
+//            buttonRealTime.IsEnabled = true;
 			buttonScan.IsEnabled = true;
 
 			textBlockStatus.Text = AppObjects.GetStringForDeviceStatus(AppObjects.Instance.Device.DeviceStatus);
@@ -126,7 +157,7 @@ namespace WillDevicesSampleApp
 			m_cts.Cancel();
 		}
 
-		private async Task DisplayDevicePropertiesAsync()
+        private async Task DisplayDevicePropertiesAsync()
 		{
 			IDigitalInkDevice device = AppObjects.Instance.Device;
 
@@ -138,7 +169,14 @@ namespace WillDevicesSampleApp
 				m_propertiesCollection[3].PropertyValue = ((uint)await device.GetPropertyAsync(SmartPadProperties.Height, m_cts.Token)).ToString();
 				m_propertiesCollection[4].PropertyValue = ((uint)await device.GetPropertyAsync(SmartPadProperties.PointSize, m_cts.Token)).ToString();
 				m_propertiesCollection[5].PropertyValue = ((int)await device.GetPropertyAsync(SmartPadProperties.BatteryLevel, m_cts.Token)).ToString() + "%";
-			}
+
+                // Enabule buttons in terms of the supporting mode
+                deviceSupportMode = device.DeviceModel.GetOperationMode();
+                if ((deviceSupportMode & MODE_FILETRANSFER) > 0)
+                    buttonFileTransfer.IsEnabled = true;
+                if ((deviceSupportMode & MODE_REALTIME_INK) > 0)
+                    buttonRealTime.IsEnabled = true;
+            }
 			catch (Exception ex)
 			{
 				textBlockStatus.Text = $"Exception: {ex.Message}";
@@ -172,7 +210,7 @@ namespace WillDevicesSampleApp
 					case DeviceStatus.Idle:
 						textBlockStatus.Text = AppObjects.GetStringForDeviceStatus(e.Status);
 //						buttonFileTransfer.IsEnabled = true;
-						buttonRealTime.IsEnabled = true;
+//						buttonRealTime.IsEnabled = true;
 						break;
 
 					case DeviceStatus.ExpectingConnectionConfirmation:
