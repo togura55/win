@@ -240,4 +240,37 @@
   <data name="IDS_Connect" xml:space="preserve">
     <value>Connect</value>
   </data>
+  <data name="IDS_FileTransferNotSupported" xml:space="preserve">
+    <value>The File Transfer service is not supported on this device.</value>
+  </data>
+  <data name="IDS_FileTransferPromptMessage" xml:space="preserve">
+    <value>Write a note on your Wacom device and press the device's central button to synchronize with the app.</value>
+  </data>
+  <data name="IDS_FileTransferExport" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="IDS_FileTransferDocument" xml:space="preserve">
+    <value>Document</value>
+  </data>
+  <data name="IDS_FileTransferStrokes" xml:space="preserve">
+    <value>strokes</value>
+  </data>
+  <data name="IDS_DevicePropertyBattery" xml:space="preserve">
+    <value>Battery</value>
+  </data>
+  <data name="IDS_DevicePropertyESN" xml:space="preserve">
+    <value>ESN</value>
+  </data>
+  <data name="IDS_DevicePropertyHeight" xml:space="preserve">
+    <value>Height</value>
+  </data>
+  <data name="IDS_DevicePropertyName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="IDS_DevicePropertyPoint" xml:space="preserve">
+    <value>Point</value>
+  </data>
+  <data name="IDS_DevicePropertyWidth" xml:space="preserve">
+    <value>Width</value>
+  </data>
 </root>

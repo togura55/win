@@ -10,20 +10,30 @@ using Windows.UI.Popups;
 using Windows.UI.Xaml.Navigation;
 using Wacom.SmartPadCommunication;
 using Windows.Foundation;
+using Windows.UI.Xaml.Input;
+using Wacom.UX.ViewModels;
+using Windows.ApplicationModel.Resources;
 
 namespace WillDevicesSampleApp
 {
 	public sealed partial class FileTransferPage : Page
 	{
-		static string s_fileTransferPromptMessage = "Write a note on your Wacom device and press the device's central button to synchronize with the app.";
+        private Windows.ApplicationModel.Resources.ResourceLoader resourceLoader;
+
+        static string s_fileTransferPromptMessage = string.Empty;
 		CancellationTokenSource m_cts = new CancellationTokenSource();
 		int m_retryCounter = 0;
 
-		public FileTransferPage()
+        InkDocument selectedInkDocument = null;
+        static int strokes = 0;    // stroke count in a document
+
+        public FileTransferPage()
 		{
 			this.InitializeComponent();
 
-			Loaded += FileTransferPage_Loaded;
+            resourceLoader = ResourceLoader.GetForCurrentView();
+
+            Loaded += FileTransferPage_Loaded;
 
 			NavigationCacheMode = NavigationCacheMode.Disabled;
 			Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested += FileTransferPage_BackRequested;
@@ -91,24 +101,27 @@ namespace WillDevicesSampleApp
 
 			if (service == null)
 			{
-				textBlockPrompt.Text = "The File Transfer service is not supported on this device";
+				textBlockPrompt.Text = resourceLoader.GetString("IDS_FileTransferNotSupported");
 				return;
 			}
 
-			try
-			{
-				textBlockPrompt.Text = s_fileTransferPromptMessage;
+            s_fileTransferPromptMessage = resourceLoader.GetString("IDS_FileTransferPromptMessage");
+            textBlockPrompt.Text = s_fileTransferPromptMessage;
+            ContextMenu_Export.Text = resourceLoader.GetString("IDS_FileTransferExport");
 
-				uint width = (uint)await device.GetPropertyAsync("Width", m_cts.Token);
+            try
+			{
+                uint width = (uint)await device.GetPropertyAsync("Width", m_cts.Token);
 				uint height = (uint)await device.GetPropertyAsync("Height", m_cts.Token);
 				uint ptSize = (uint)await device.GetPropertyAsync("PointSize", m_cts.Token);
 
-//				service.Transform = AppObjects.CalculateTransform(width, height, ptSize, scale);
+				service.Transform = AppObjects.CalculateTransform(width, height, ptSize, 1);
 
 				if (!service.IsStarted)
 				{
-					await service.StartAsync(StrokesReceivedAsync, false, m_cts.Token);
-				}
+                    //					await service.StartAsync(StrokesReceivedAsync, false, m_cts.Token);
+                    await service.StartAsync(StrokesReceivedAsync, true, m_cts.Token); // report raw data
+                }
 			}
 			catch (Exception)
 			{
@@ -144,7 +157,9 @@ namespace WillDevicesSampleApp
 			{
 				InkDocumentDisplayItem item = (inkDocument == null) ?
 					new InkDocumentDisplayItem(fileTransferException.Message) :
-					new InkDocumentDisplayItem(inkDocument);
+					new InkDocumentDisplayItem(inkDocument,
+                        resourceLoader.GetString("IDS_FileTransferDocument"),
+                        resourceLoader.GetString("IDS_FileTransferStrokes"));
 
 				listView.Items.Add(item);
 
@@ -160,8 +175,10 @@ namespace WillDevicesSampleApp
 
 			if (item != null)
 			{
-//				inkCanvas.InkCanvasDocument = InkCanvasDocument.FromInkDocument(item.Document);
-			}
+                selectedInkDocument = item.Document;
+
+                inkCanvas.InkCanvasDocument = InkCanvasDocument.FromInkDocument(item.Document);
+            }
 		}
 
 		private void OnDeviceStatusChanged(object sender, DeviceStatusChangedEventArgs e)
@@ -219,5 +236,98 @@ namespace WillDevicesSampleApp
 				Frame.Navigate(typeof(ScanAndConnectPage));
 			});
 		}
-	}
+
+
+        // Method of readoing the InkNode
+        // Raw data consists of the starting point of the upper right corner
+        //   by placing the device which locates the "BAMBOO" logo is valid direction.
+        private void ReadInkNode(InkNode node, ref string output)
+        //         private string ReadInkNode(InkNode node)
+        {
+            if (node.GetType() == typeof(InkGroup))
+            {
+                // InkGroup
+                InkGroup g = node as InkGroup;
+                int count = g.NodesCount;
+                
+                for (int i = 0; i < count; i++)
+                {
+                    ReadInkNode(g.GetNodeAt(i), ref output);
+                }
+            }
+            else if (node.GetType() == typeof(InkStroke))
+            {
+                strokes++;
+
+                // Reading raw data from InkStroke.RawData.Points
+                InkStroke s = node as InkStroke;
+                // Points is SmartPadPoint type
+                foreach (Wacom.Devices.SmartPadPoint po in s.RawData.Points)
+                {
+                    // SmartPadPoint.X : X cordinate
+                    // SmartPadPoint.Y : Y cordinate
+                    // SmartPadPoint.Pressure: pen pressure
+
+                    output += string.Format("{0},{1},{2},{3}{4}", strokes, po.X, po.Y, po.Pressure, System.Environment.NewLine);
+                }
+            }
+        }
+
+        private void ListView_RightTapped(object sender, RightTappedRoutedEventArgs e)
+        {
+            ListView listView = (ListView)sender;
+            allContactsMenuFlyout.ShowAt(listView, e.GetPosition(listView));
+            var a = ((FrameworkElement)e.OriginalSource).DataContext as InkDocumentDisplayItem; // TransferedFiles; // List;
+                                                                                                //            var content = a.Field1; //  a.text;
+        }
+
+        private void ContextMenu_Export_Click(object sender, RoutedEventArgs e)
+        {
+            string output = string.Empty;
+            strokes = 0;
+
+            ReadInkNode(selectedInkDocument.Root, ref output);
+            ExportInkData(output);
+        }
+
+        private async void ExportInkData(string s)
+        {
+            try
+            {
+                var folderPicker = new Windows.Storage.Pickers.FolderPicker();
+
+                folderPicker.FileTypeFilter.Add("*");
+                Windows.Storage.StorageFolder folder =
+                    await folderPicker.PickSingleFolderAsync();
+
+                if (folder == null)
+                {
+                    return;
+                }
+
+                string path = folder.Path.ToString();
+                string filename = "data.txt";
+
+                // Create a data stored file; replace if exists.
+                Windows.Storage.StorageFile dataFile =
+                    await folder.CreateFileAsync(filename,
+                        Windows.Storage.CreationCollisionOption.ReplaceExisting);
+
+                // string dataString = string.Empty;
+                //foreach (String item in ListBox_Messages.Items)
+                //{
+                //    dataString += item + System.Environment.NewLine;
+                //}
+
+                if (dataFile != null)
+                {
+                    await Windows.Storage.FileIO.WriteTextAsync(dataFile, s);
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+    }
 }

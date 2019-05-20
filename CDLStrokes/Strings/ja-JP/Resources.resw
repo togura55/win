@@ -240,4 +240,37 @@
   <data name="IDS_Connect" xml:space="preserve">
     <value>接続</value>
   </data>
+  <data name="IDS_FileTransferNotSupported" xml:space="preserve">
+    <value>このデバイスではファイル転送サービスはサポートされていません。</value>
+  </data>
+  <data name="IDS_FileTransferPromptMessage" xml:space="preserve">
+    <value>Wacomデバイスにメモを書き、デバイスの中央ボタンを押してアプリと同期します。</value>
+  </data>
+  <data name="IDS_FileTransferExport" xml:space="preserve">
+    <value>書き出し</value>
+  </data>
+  <data name="IDS_FileTransferDocument" xml:space="preserve">
+    <value>ドキュメント</value>
+  </data>
+  <data name="IDS_FileTransferStrokes" xml:space="preserve">
+    <value>ストローク</value>
+  </data>
+  <data name="IDS_DevicePropertyBattery" xml:space="preserve">
+    <value>バッテリ残</value>
+  </data>
+  <data name="IDS_DevicePropertyESN" xml:space="preserve">
+    <value>シリアル値</value>
+  </data>
+  <data name="IDS_DevicePropertyHeight" xml:space="preserve">
+    <value>高さ</value>
+  </data>
+  <data name="IDS_DevicePropertyName" xml:space="preserve">
+    <value>デバイス名</value>
+  </data>
+  <data name="IDS_DevicePropertyPoint" xml:space="preserve">
+    <value>点サイズ</value>
+  </data>
+  <data name="IDS_DevicePropertyWidth" xml:space="preserve">
+    <value>幅</value>
+  </data>
 </root>

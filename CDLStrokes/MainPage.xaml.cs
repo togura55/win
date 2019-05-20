@@ -13,6 +13,7 @@ using Windows.Devices.Radios;
 using System.Collections.Generic;
 using Windows.ApplicationModel.Resources;
 using Wacom.SmartPadCommunication;
+using Windows.UI.ViewManagement;
 
 namespace WillDevicesSampleApp
 {
@@ -66,21 +67,29 @@ namespace WillDevicesSampleApp
 			buttonRealTime.IsEnabled = false;
 			buttonScan.IsEnabled = false;
 
-			m_propertiesCollection = new ObservableCollection<DevicePropertyValuePair>()
-			{
-				new DevicePropertyValuePair("Name"),
-				new DevicePropertyValuePair("ESN"),
-				new DevicePropertyValuePair("Width"),
-				new DevicePropertyValuePair("Height"),
-				new DevicePropertyValuePair("Point"),
-				new DevicePropertyValuePair("Battery")
-			};
+            m_propertiesCollection = new ObservableCollection<DevicePropertyValuePair>()
+            {
+                new DevicePropertyValuePair(resourceLoader.GetString("IDS_DevicePropertyName")),
+                new DevicePropertyValuePair(resourceLoader.GetString("IDS_DevicePropertyESN")),
+                new DevicePropertyValuePair(resourceLoader.GetString("IDS_DevicePropertyWidth")),
+                new DevicePropertyValuePair(resourceLoader.GetString("IDS_DevicePropertyHeight")),
+                new DevicePropertyValuePair(resourceLoader.GetString("IDS_DevicePropertyPoint")),
+                new DevicePropertyValuePair(resourceLoader.GetString("IDS_DevicePropertyBattery"))
+            };
 
 			gridViewDeviceProperties.ItemsSource = m_propertiesCollection;
 		}
 
 		private async void MainPage_Loaded(object sender, RoutedEventArgs e)
 		{
+            var versionInfo = Windows.ApplicationModel.Package.Current.Id.Version;
+            string version = string.Format(
+                               "{0}.{1}.{2}.{3}",
+                               versionInfo.Major, versionInfo.Minor,
+                               versionInfo.Build, versionInfo.Revision);
+            ApplicationView appView = ApplicationView.GetForCurrentView();
+            appView.Title = version;
+
             buttonScan.Content = resourceLoader.GetString("IDS_ScanDevices");
             buttonFileTransfer.Content = resourceLoader.GetString("IDS_FileTransfer");
             buttonRealTime.Content = resourceLoader.GetString("IDS_RealTime");
