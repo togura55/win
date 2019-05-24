@@ -9,9 +9,14 @@ using System.Threading.Tasks;
 using Wacom;
 using Wacom.Devices;
 using Wacom.SmartPadCommunication;
-using Windows.UI.Xaml;
+using Windows.ApplicationModel.Resources;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
+using Windows.UI.Popups;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Navigation;
+
 using Windows.Storage.Streams;
 
 namespace WillDevicesSampleApp
@@ -417,21 +422,51 @@ namespace WillDevicesSampleApp
         }
         #endregion
 
+        //private void OnDeviceStatusChanged(object sender, DeviceStatusChangedEventArgs e)
+        //{
+        //    //var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+        //    //{
+        //        switch (e.Status)
+        //    {
+        //        case DeviceStatus.NotAuthorizedConnectionNotConfirmed:
+        //            //await new MessageDialog(AppObjects.GetStringForDeviceStatus(e.Status)).ShowAsync();
+        //            //						Frame.Navigate(typeof(ScanAndConnectPage));
+        //            break;
+
+        //        default:
+        //            //textBlockPrompt.Text = AppObjects.GetStringForDeviceStatus(e.Status);
+        //            break;
+        //    }
+        //    //});
+        //}
+
         private void OnDeviceStatusChanged(object sender, DeviceStatusChangedEventArgs e)
         {
-            //var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
-            //{
-                switch (e.Status)
+            IDigitalInkDevice device = sender as IDigitalInkDevice;
+
+            if (device == null)
+                return;
+
+//            TextBlock textBlock = null;
+
+            switch (device.TransportProtocol)
             {
-                case DeviceStatus.NotAuthorizedConnectionNotConfirmed:
-                    //await new MessageDialog(AppObjects.GetStringForDeviceStatus(e.Status)).ShowAsync();
-                    //						Frame.Navigate(typeof(ScanAndConnectPage));
+                case TransportProtocol.BLE:
+//                   textBlock = tbBle;
                     break;
 
-                default:
-                    //textBlockPrompt.Text = AppObjects.GetStringForDeviceStatus(e.Status);
+                case TransportProtocol.USB:
+//                    textBlock = tbUsb;
+                    break;
+
+                case TransportProtocol.BTC:
+//                    textBlock = tbBtc;
                     break;
             }
+
+            //var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            //{
+            //    textBlock.Text = AppObjects.GetStringForDeviceStatus(e.Status);
             //});
         }
 
@@ -542,20 +577,21 @@ namespace WillDevicesSampleApp
             m_watcherUSB.Stop();
         }
 
-        private async Task ConnectInkDevice()
+        private async Task ConnectInkDevice(InkDeviceInfo info)
         {
             //           int index = listView.SelectedIndex;
-            int index = 0;  // assumed to be connected a deviceat default
+            //int index = 0;  // assumed to be connected a deviceat default
 
-            if ((index < 0) || (index >= m_deviceInfos.Count))
-                return;
+            //if ((index < 0) || (index >= m_deviceInfos.Count))
+            //    return;
 
             IDigitalInkDevice device = null;
-            m_connectingDeviceInfo = m_deviceInfos[index];
+//            m_connectingDeviceInfo = m_deviceInfos[index];
+            m_connectingDeviceInfo = info;
 
             //btnConnect.IsEnabled = false;
 
-            //           StopScanning();
+            StopScanning();
 
             //SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
 
@@ -581,19 +617,19 @@ namespace WillDevicesSampleApp
 
             try
             {
-                device = InkDeviceFactory.Instance.CreateDeviceAsync(
+                device = await InkDeviceFactory.Instance.CreateDeviceAsync(
                     m_connectingDeviceInfo,
                     AppObjects.Instance.AppId,
                     true,
                     false,
 //                    OnDeviceStatusChanged_ScanAndConnect).Result;
-                OnDeviceStatusChanged).Result;
+                OnDeviceStatusChanged);
 
             }
             catch (Exception ex)
             {
                 await MessageEvent(string.Format($"ConnectInkDevice: Device creation failed: {0}", ex.Message));
-                return;
+//                return;
             }
 
             if (device == null)
@@ -689,11 +725,11 @@ namespace WillDevicesSampleApp
         {
             await MessageEvent("OnDeviceAdded: Device is added");
 
-            //var ignore = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            //var ignore = DependencyObject.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             //{
-            m_deviceInfos.Add(info);
-
-            await ConnectInkDevice();
+            //    m_deviceInfos.Add(info);
+            //});
+            await ConnectInkDevice(info);
         }
 
         private async void OnDeviceRemoved(object sender, InkDeviceInfo info)
