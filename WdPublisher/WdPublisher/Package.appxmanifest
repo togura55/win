@@ -38,5 +38,22 @@
     <Capability Name="privateNetworkClientServer" />
     <rescap:Capability Name="runFullTrust" />
     <DeviceCapability Name="bluetooth" />
+    <DeviceCapability Name="usb">
+      <!-- Viper M -->
+      <Device Id="vidpid:056A 0357">
+        <Function Type="classId:ff * *" />
+      </Device>
+      <!-- Viper L -->
+      <Device Id="vidpid:056A 0358">
+        <Function Type="classId:ff * *" />
+      </Device>
+      <!-- Barbera -->
+      <Device Id="vidpid:056A 035C">
+        <Function Type="classId:ff * *" />
+      </Device>
+      <Device Id="any">
+        <Function Type="winUsbId:72B0FDFE-53C5-46CE-AFEF-5B3558E3AFB4" />
+      </Device>
+    </DeviceCapability>
   </Capabilities>
 </Package>
