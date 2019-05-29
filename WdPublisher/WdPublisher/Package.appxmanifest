@@ -38,6 +38,20 @@
     <Capability Name="privateNetworkClientServer" />
     <rescap:Capability Name="runFullTrust" />
     <DeviceCapability Name="bluetooth" />
+    <DeviceCapability Name="bluetooth.genericAttributeProfile">
+      <Device Id="any">
+        <Function Type="serviceId:00001523-1212-efde-1523-785feabcd123" />
+        <Function Type="serviceId:ffee0001-bbaa-9988-7766-554433221100" />
+        <Function Type="serviceId:0000180f-0000-1000-8000-00805f9b34fb" />
+        <Function Type="serviceId:0000180a-0000-1000-8000-00805f9b34fb" />
+        <Function Type="serviceId:6e400001-b5a3-f393-e0a9-e50e24dcca9e" />
+      </Device>
+    </DeviceCapability>
+    <DeviceCapability Name="bluetooth.rfcomm">
+      <Device Id="any">
+        <Function Type="name:serialPort" />
+      </Device>
+    </DeviceCapability>
     <DeviceCapability Name="usb">
       <!-- Viper M -->
       <Device Id="vidpid:056A 0357">

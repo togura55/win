@@ -676,7 +676,7 @@ namespace WillDevicesSampleApp
             Attribute.Name = (string)await device.GetPropertyAsync(SmartPadProperties.DeviceName, m_cts.Token);
             Attribute.ESN = (string)await device.GetPropertyAsync(SmartPadProperties.SerialNumber, m_cts.Token);
             Attribute.Battery = ((int)await device.GetPropertyAsync(SmartPadProperties.BatteryLevel, m_cts.Token)).ToString();
-            Attribute.FirmwareVersion = ((int)await device.GetPropertyAsync(SmartPadProperties.FirmwareVersion, m_cts.Token)).ToString();
+//            Attribute.FirmwareVersion = (string)await device.GetPropertyAsync(SmartPadProperties.FirmwareVersion, m_cts.Token);
             Attribute.TransferMode = "LiveMode";
             Attribute.DeviceType = "PHU-111";
         }
