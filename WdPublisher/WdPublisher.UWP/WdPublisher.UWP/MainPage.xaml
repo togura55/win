@@ -10,15 +10,15 @@
 
     <Grid>
         <ListBox x:Name="clientListBox" HorizontalAlignment="Left" Height="349" Margin="124,249,0,0" VerticalAlignment="Top" Width="646" FontSize="12"/>
-        <Button x:Name="Pbtn_Exec" Content="Button" HorizontalAlignment="Left" Margin="124,142,0,0" VerticalAlignment="Top" Click="Pbtn_Exec_Click" Width="86"/>
-        <Button x:Name="Pbtn_Resume" Content="Button" HorizontalAlignment="Left" Margin="124,191,0,0" VerticalAlignment="Top" Click="Pbtn_Resume_Click" Width="87"/>
+        <Button x:Name="Pbtn_Exec" Content="Button" Visibility="Collapsed" HorizontalAlignment="Left" Margin="124,142,0,0" VerticalAlignment="Top" Click="Pbtn_Exec_Click" Width="86"/>
+        <Button x:Name="Pbtn_Resume" Content="Button" Visibility="Collapsed" HorizontalAlignment="Left" Margin="124,191,0,0" VerticalAlignment="Top" Click="Pbtn_Resume_Click" Width="87"/>
         <TextBox x:Name="TextBox_HostName" HorizontalAlignment="Left" Margin="227,38,0,0" Text="TextBox" VerticalAlignment="Top" Width="139"/>
         <TextBlock x:Name="TextBlock_IPAddr" HorizontalAlignment="Left" Margin="124,44,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
         <TextBox x:Name="TextBox_PortNumber" HorizontalAlignment="Left" Margin="227,84,0,0" Text="TextBox" VerticalAlignment="Top" Width="139"/>
         <TextBlock x:Name="TextBlock_PortNumber" HorizontalAlignment="Left" Margin="124,90,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
-        <CheckBox x:Name="CB_Debug" Content="CheckBox" HorizontalAlignment="Left" Margin="279,144,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="Pbtn_SaveLog" Content="Button" HorizontalAlignment="Left" Margin="279,191,0,0" VerticalAlignment="Top" Width="87" Click="Pbtn_SaveLog_Click"/>
-        <Button x:Name="Pbtn_Test" Content="Button" HorizontalAlignment="Left" Margin="447,90,0,0" VerticalAlignment="Top" Click="Pbtn_Test_Click"/>
+        <CheckBox x:Name="CB_Debug" Content="CheckBox" Visibility="Collapsed" HorizontalAlignment="Left" Margin="279,144,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="Pbtn_SaveLog" Content="Button" Visibility="Collapsed" HorizontalAlignment="Left" Margin="279,191,0,0" VerticalAlignment="Top" Width="87" Click="Pbtn_SaveLog_Click"/>
+        <Button x:Name="Pbtn_Test" Content="Button" Visibility="Collapsed" HorizontalAlignment="Left" Margin="447,90,0,0" VerticalAlignment="Top" Click="Pbtn_Test_Click"/>
 
     </Grid>
 </Page>

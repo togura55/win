@@ -17,7 +17,7 @@ namespace WillDevicesSampleApp
     {
         //        CancellationTokenSource m_cts = new CancellationTokenSource();
 
-        ResourceLoader resourceLoader;
+        ResourceLoader resourceLoader = null;
         public static MainPage Current { get; private set; }
 
         public MainPage()
@@ -51,6 +51,11 @@ namespace WillDevicesSampleApp
 
                 StartRemoteControllerTask();
             }
+
+            // ScanAndConnect
+            AppObjects.Instance.WacomDevice = new WacomDevices();     // stored for using this app 
+            AppObjects.Instance.WacomDevice.WacomDevicesMessage += ReceivedMessage; // set the message delegate
+            AppObjects.Instance.Publisher.Open();
         }
 
         private async void LaunchBridgeAppAsync()
@@ -84,19 +89,22 @@ namespace WillDevicesSampleApp
 
         private void SetUiState()
         {
+            if (resourceLoader == null)
+            {
+                return;
+            }
+
             Publisher pub = AppObjects.Instance.Publisher;
 
             this.TextBox_HostName.Text = pub.HostNameString;
             this.TextBox_PortNumber.Text = pub.PortNumberString;
 
-            this.CB_Debug.Content = resourceLoader.GetString("IDC_Debug");
             this.CB_Debug.IsChecked = pub.Debug;
-
-            this.Pbtn_SaveLog.Content = resourceLoader.GetString("IDC_SaveLog");
 
             // swich UI correspond to the current state of Publisher
             if (pub.CurrentState == pub.STATE_NEUTRAL)
             {
+                this.Pbtn_Exec.Visibility = Visibility.Visible;
                 this.Pbtn_Exec.Content = resourceLoader.GetString("IDC_Exec");
                 this.Pbtn_Resume.Visibility = Visibility.Collapsed;    // hide
             }
@@ -131,6 +139,13 @@ namespace WillDevicesSampleApp
             ApplicationView appView = ApplicationView.GetForCurrentView();
             appView.Title = version;
 
+            // fixed UI contents
+            this.Pbtn_SaveLog.Visibility = Visibility.Visible;
+            this.Pbtn_SaveLog.Content = resourceLoader.GetString("IDC_SaveLog");
+            this.CB_Debug.Visibility = Visibility.Visible;
+            this.CB_Debug.Content = resourceLoader.GetString("IDC_Debug");
+
+            // dynamic changes of UI contents
             SetUiState();
 
             this.Pbtn_Test.Visibility = Visibility.Collapsed;    // hide
@@ -148,6 +163,10 @@ namespace WillDevicesSampleApp
                 //case "Discard":
                 //    StopPublisher();
                 //    break;
+
+                case "PublisherOpen":
+                    SetUiState();
+                    break;
 
                 case "DeviceStart":
                     RunPublisher();
@@ -238,9 +257,6 @@ namespace WillDevicesSampleApp
             if (pub.CurrentState == pub.STATE_NEUTRAL ||
                 pub.CurrentState == pub.STATE_IDLE)
             {
-                AppObjects.Instance.WacomDevice = new WacomDevices();     // stored for using this app 
-                AppObjects.Instance.WacomDevice.WacomDevicesMessage += ReceivedMessage; // set the message delegate
-
                 AppObjects.Instance.CommandSocketService = new SocketServices();
                 AppObjects.Instance.CommandSocketService.SocketMessage += ReceivedMessage; // 
 
@@ -248,7 +264,7 @@ namespace WillDevicesSampleApp
                 AppObjects.Instance.DataSocketService.SocketMessage += ReceivedMessage; // 
 
                 pub.InitializationCompletedNotification += PublisherInitialization_Completed;
-                pub.Start();
+                pub.Run();
             }
             else
             {

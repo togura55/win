@@ -121,7 +121,7 @@
     <value>Enable debug mode</value>
   </data>
   <data name="IDC_Exec" xml:space="preserve">
-    <value>Execute</value>
+    <value>Run</value>
   </data>
   <data name="IDC_HostName" xml:space="preserve">
     <value>Host IP Address</value>

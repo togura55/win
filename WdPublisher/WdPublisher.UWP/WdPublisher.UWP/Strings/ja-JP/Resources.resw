@@ -121,7 +121,7 @@
     <value>Debugモード有効</value>
   </data>
   <data name="IDC_Exec" xml:space="preserve">
-    <value>実行</value>
+    <value>開始</value>
   </data>
   <data name="IDC_HostName" xml:space="preserve">
     <value>ホストIPアドレス</value>

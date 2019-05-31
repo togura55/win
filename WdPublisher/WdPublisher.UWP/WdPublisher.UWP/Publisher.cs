@@ -27,9 +27,10 @@ namespace WillDevicesSampleApp
         public string ClientIpAddress;
         public int CurrentState;  // State of Publisher 
 
-        public readonly int STATE_NEUTRAL = 0;
-        public readonly int STATE_ACTIVE = 1;
-        public readonly int STATE_IDLE = 2;
+        public readonly int STATE_START = 0;
+        public readonly int STATE_NEUTRAL = 1;
+        public readonly int STATE_ACTIVE = 2;
+        public readonly int STATE_IDLE = 3;
 
         // Delegate handlers
         public delegate void MessageEventHandler(object sender, string message);
@@ -46,7 +47,7 @@ namespace WillDevicesSampleApp
             PublisherId = 0;
             HostNameString = "192.168.0.7"; // for temporary
             PortNumberString = "1337";
-            CurrentState = STATE_NEUTRAL;
+            CurrentState = STATE_START;
             ClientIpAddress = GetIpAddress();
         }
 
@@ -68,6 +69,13 @@ namespace WillDevicesSampleApp
             await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 this.PublisherMessage?.Invoke(this, message);
+            });
+        }
+        private async void ControlEvent(string message)
+        {
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                 this.PublisherControl?.Invoke(this, message);
             });
         }
 
@@ -119,6 +127,32 @@ namespace WillDevicesSampleApp
         }
 
         #region Services
+        public void Open()
+        {
+            try
+            {
+                WacomDevices wacomDevice = AppObjects.Instance.WacomDevice;
+
+                if (wacomDevice != null)
+                {
+                    wacomDevice.ScanAndConnectCompletedNotification += ScanAndConnect_Completed;
+
+                    // try to detect a device
+                    wacomDevice.StartScanAndConnect();
+
+                    CurrentState = STATE_START;
+
+                }
+                else
+                    throw new Exception(string.Format("WacomDevice was not created."));
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Open: Exception: {0}", ex.Message));
+            }
+        }
+
         public void Close()
         {
             try
@@ -151,28 +185,50 @@ namespace WillDevicesSampleApp
             }
         }
 
-        public void Start()
+
+        public void Run()
         {
             try
             {
-                MessageEvent("Start");
+                MessageEvent("Run");
 
                 // Set task completion delegation 
                 WacomDevices wacomDevice = AppObjects.Instance.WacomDevice;
-                wacomDevice.ScanAndConnectCompletedNotification += ScanAndConnect_Completed;
-                wacomDevice.StartRealTimeInkCompletedNotification += StartRealTimeInk_Completed;
-                wacomDevice.DeviceEventNotification += ReceivedDeviceEvent;
 
-                // At first, try to detect a device
-                wacomDevice.StartScanAndConnect();
+                if (wacomDevice != null)
+                {
+                    wacomDevice.StartRealTimeInkCompletedNotification += StartRealTimeInk_Completed;
+                    wacomDevice.DeviceEventNotification += ReceivedDeviceEvent;
 
-                CurrentState = STATE_ACTIVE;
+                    // For debug
+                    if (!Debug)
+                    {
+                        // Initialize the command path to Broker
+                        InitCommandCommunication(HostNameString, PortNumberString);
+                    }
 
-                UpdateUiEvent(null);    // Update UI 
+                    // For Release
+                    else
+                    {
+                        int msDelay = 0;
+                        MessageEvent(string.Format("Run: Go to StartRealTimeInk after {0} ms delay.", msDelay));
+                        //                       await Task.Delay(msDelay);
+
+                        AppObjects.Instance.WacomDevice.StartRealTimeInk();
+                    }
+                    // End For debug
+
+                    CurrentState = STATE_ACTIVE;
+
+                    UpdateUiEvent(null);    // Update UI 
+                }
+                else
+                    throw new Exception(string.Format("WacomDevice was not created."));
+
             }
             catch (Exception ex)
             {
-                MessageEvent(string.Format("Start: Exception: {0}", ex.Message));
+                MessageEvent(string.Format("Run: Exception: {0}", ex.Message));
             }
         }
 
@@ -312,28 +368,14 @@ namespace WillDevicesSampleApp
             {
                 if (result || AppObjects.Instance.Device != null)
                 {
-                    // For debug
-                    if (!Debug)
-                    {
-                        MessageEvent("ScanAndConnect_Completed: Go Socket initialization");
+                    CurrentState = STATE_NEUTRAL;
 
-                        // Second, initialize the command path to Broker
-                        InitCommandCommunication(HostNameString, PortNumberString);
-                    }
-                    else
-                    {
-                        int msDelay = 0;
-                        MessageEvent(string.Format("ScanAndConnect_Completed: Go to StartRealTimeInk after {0} ms delay.", msDelay));
- //                       await Task.Delay(msDelay);
-
-                        AppObjects.Instance.WacomDevice.StartRealTimeInk();
-                    }
-                    // End For debug
+                    ControlEvent("PublisherOpen");
                 }
                 else
                 {
                     CurrentState = STATE_NEUTRAL;
-                    UpdateUiEvent(null);
+ //                   UpdateUiEvent(null);
                     MessageEvent("ScanAndConnect_Completed: Could not be detected devices.");
                 }
             }
