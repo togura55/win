@@ -33,15 +33,6 @@ namespace WillDevicesSampleApp
             AppObjects.Instance.Publisher.UpdateUi += ReceivedUpdateUi;
             AppObjects.Instance.Publisher.PublisherControl += ReceivedPublisherControl;
 
-            // For debug
-            if (!AppObjects.Instance.Publisher.Debug)
-            // End for debug
-            {
-                AppObjects.Instance.RemoteController = new RemoteControllers();
-                AppObjects.Instance.RemoteController.RCMessage += ReceivedMessage; // 
-                AppObjects.Instance.RemoteController.UpdateUi += ReceivedUpdateUi;
-                AppObjects.Instance.RemoteController.PublisherControl += ReceivedPublisherControl;
-            }
 
             // For debug
             if (!AppObjects.Instance.Publisher.Debug)
@@ -73,11 +64,35 @@ namespace WillDevicesSampleApp
 
         private void StartRemoteControllerTask()
         {
-            // Background Task Registration
-            AppObjects.Instance.RemoteController.RegisterBackgroundTask();
+            try
+            {
+                AppObjects.Instance.RemoteController = new RemoteControllers();
+                AppObjects.Instance.RemoteController.RCMessage += ReceivedMessage; // 
+                AppObjects.Instance.RemoteController.UpdateUi += ReceivedUpdateUi;
+                AppObjects.Instance.RemoteController.PublisherControl += ReceivedPublisherControl;
 
-            // Start Remote Controller services
-            AppObjects.Instance.RemoteController.StartListen();
+                // Background Task Registration
+                AppObjects.Instance.RemoteController.RegisterBackgroundTask();
+
+                // Start Remote Controller services
+                AppObjects.Instance.RemoteController.StartListen();
+            }
+            catch (Exception ex)
+            {
+                ReceivedMessage(this, string.Format("StartRemoteControllerTask: Exception: {0}", ex.Message));
+            }
+        }
+
+        private void DiscardRemoteControllerTask()
+        {
+            if (AppObjects.Instance.RemoteController != null)
+            {
+                AppObjects.Instance.RemoteController.PublisherControl -= ReceivedPublisherControl;
+                AppObjects.Instance.RemoteController.UpdateUi -= ReceivedUpdateUi;
+                AppObjects.Instance.RemoteController.RCMessage -= ReceivedMessage; // 
+
+                AppObjects.Instance.RemoteController = null;
+            }
         }
 
         private void GetUiState()
@@ -205,6 +220,11 @@ namespace WillDevicesSampleApp
                     AppObjects.Instance.WacomDevice = null;
                     break;
 
+                case "UnregisterBackgroundWatcher":
+                    DiscardRemoteControllerTask();
+                    StartRemoteControllerTask();
+                    break;
+
                 //case "GetLogs":
                 //    AppObjects.Instance.RemoteController.NotifyEvent("SendLogs", GetLogsItems(clientListBox.Items));
                 //    break;
@@ -243,11 +263,7 @@ namespace WillDevicesSampleApp
                 AppObjects.Instance.Publisher.UpdateUi -= ReceivedUpdateUi;
                 AppObjects.Instance.Publisher.PublisherMessage -= ReceivedMessage;
             }
-            if (AppObjects.Instance.RemoteController != null)
-            {
-                AppObjects.Instance.RemoteController.PublisherControl -= ReceivedPublisherControl;
-                AppObjects.Instance.RemoteController.UpdateUi -= ReceivedUpdateUi;
-            }
+            DiscardRemoteControllerTask();
         }
 
         private void RunPublisher()

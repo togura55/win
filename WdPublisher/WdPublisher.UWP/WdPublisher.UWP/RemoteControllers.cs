@@ -152,7 +152,7 @@ namespace WillDevicesSampleApp
 
             if (taskRegistration != null)
             {
-                MessageEvent("Background watcher already registered.");
+                MessageEvent("StartListen: Background watcher already registered.");
                 return;
             }
             else
@@ -186,11 +186,11 @@ namespace WillDevicesSampleApp
                     // Even though the trigger is registered successfully, it might be blocked. Notify the user if that is the case.
                     if ((backgroundAccessStatus == BackgroundAccessStatus.AlwaysAllowed) || (backgroundAccessStatus == BackgroundAccessStatus.AllowedSubjectToSystemPolicy))
                     {
-                        MessageEvent("Background watcher registered.");
+                        MessageEvent("StartListen: Background watcher registered.");
                     }
                     else
                     {
-                        MessageEvent("Background tasks may be disabled for this app");
+                        MessageEvent("StartListen: Background tasks may be disabled for this app");
                     }
                 }
                 catch (Exception ex)
@@ -314,7 +314,10 @@ namespace WillDevicesSampleApp
                     taskRegistration.Unregister(true);
                     taskRegistration = null;
                     //                   rootPage.NotifyUser("Background watcher unregistered.", NotifyType.StatusMessage);
-                    MessageEvent("Disconnect: Background watcher unregistered.");
+ //                   MessageEvent("Disconnect: Background watcher unregistered.");
+                    this.RCMessage?.Invoke(this, "Disconnect: Background watcher unregistered.");
+
+                    this.PublisherControl?.Invoke(this, "UnregisterBackgroundWatcher");
                 }
                 else
                 {
