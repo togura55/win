@@ -265,6 +265,24 @@ namespace WillDevicesSampleApp
                 MessageEvent(string.Format("Stop: Exception: {0}", ex.Message));
             }
         }
+
+        public void Suspend()
+        {
+            // request Broker stop the communication
+            CommandResponseState = CMD_SUSPEND_PUBLISHER;
+            this.SendCommandStrings(CMD_SUSPEND_PUBLISHER);
+
+            CurrentState = STATE_IDLE;
+        }
+
+        public void Resume()
+        {
+            // request Broker stop the communication
+            CommandResponseState = CMD_RESUME_PUBLISHER;
+            this.SendCommandStrings(CMD_RESUME_PUBLISHER);
+
+            CurrentState = STATE_ACTIVE;
+        }
         #endregion
 
         const float CMD_NEUTRAL = 0x0000;
@@ -600,7 +618,7 @@ namespace WillDevicesSampleApp
 
                     case CMD_RESUME_PUBLISHER:
                         // ACK/NAK
-                        msg = string.Format("CMD_SUSPEND_PUBLISHER returns {0}", response);
+                        msg = string.Format("CMD_RESUME_PUBLISHER returns {0}", response);
                         switch (response)
                         {
                             case RES_ACK:

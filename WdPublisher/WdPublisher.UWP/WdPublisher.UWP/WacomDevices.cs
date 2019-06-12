@@ -185,8 +185,8 @@ namespace WillDevicesSampleApp
 
                 //// Register private events for getting stroke data /////
                 service.StrokeStarted += Service_BeginStroke;
-                //service.StrokeUpdated += Service_MiddleStroke;
-                //service.StrokeEnded += Service_EndStroke;
+                service.StrokeUpdated += Service_MiddleStroke;
+                service.StrokeEnded += Service_EndStroke;
 
                 //            service.HoverPointReceived += OnHoverPointReceived;
                 /////////////////////////////////////////////////////////////
@@ -241,34 +241,31 @@ namespace WillDevicesSampleApp
                 //m_addNewStrokeToModel = true;
                 StrokeCount++;
 
-                // for debug
-                //                MessageEvent("BeginStroke");
-
-                //await Task.Run(() => 
-                //{
-                //    this.WacomDevicesMessage?.Invoke(this, "BeginStroke");
-                //});
-
-
-                var ignore = CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                {
-                    this.WacomDevicesMessage?.Invoke(this, "BeginStroke");
-                });
-
                 //// For debug
                 if (!AppObjects.Instance.Publisher.Debug)
+                {
                     // End For debug
                     if (AppObjects.Instance.DataSocketService != null)
+                    {
                         AppObjects.Instance.DataSocketService.StreamSocket_SendData(CreateBuffer(null, m_StrokeOrder));
+                    }
+                }
+                else
+                {
+                    var ignore = CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        this.WacomDevicesMessage?.Invoke(this, "BeginStroke");
+                    });
+                }
             }
             catch (Exception ex)
             {
-//                await MessageEvent(string.Format("Service_BeginStroke: Exception: {0}", ex.Message));
+//                MessageEvent(string.Format("Service_BeginStroke: Exception: {0}", ex.Message));
             }
         }
 
-//        private async void Service_MiddleStroke(object sender, StrokeUpdatedEventArgs e)
-        private async Task Service_MiddleStroke(object sender, StrokeUpdatedEventArgs e)
+        private void Service_MiddleStroke(object sender, StrokeUpdatedEventArgs e)
+//        private async Task Service_MiddleStroke(object sender, StrokeUpdatedEventArgs e)
         {
             try
             {
@@ -291,12 +288,12 @@ namespace WillDevicesSampleApp
             }
             catch (Exception ex)
             {
-                await MessageEvent(string.Format("Service_MiddleStroke: Exception: {0}", ex.Message));
+ //               MessageEvent(string.Format("Service_MiddleStroke: Exception: {0}", ex.Message));
             }
         }
 
-//        private async void Service_EndStroke(object sender, StrokeEndedEventArgs e)
-        private async Task Service_EndStroke(object sender, StrokeEndedEventArgs e)
+        private void Service_EndStroke(object sender, StrokeEndedEventArgs e)
+//        private async Task Service_EndStroke(object sender, StrokeEndedEventArgs e)
         {
             try
             {
@@ -312,7 +309,7 @@ namespace WillDevicesSampleApp
             }
             catch (Exception ex)
             {
-                await MessageEvent(string.Format("Service_EndStroke: Exception: {0}", ex.Message));
+//                MessageEvent(string.Format("Service_EndStroke: Exception: {0}", ex.Message));
             }
         }
 

@@ -296,12 +296,12 @@ namespace WillDevicesSampleApp
 
         private void SuspendPublisher()
         {
-
+           AppObjects.Instance.Publisher.Suspend();
         }
 
         private void ResumePublisher()
         {
-
+            AppObjects.Instance.Publisher.Resume();
         }
 
         private void Pbtn_Exec_Click(object sender, RoutedEventArgs e)
@@ -311,14 +311,27 @@ namespace WillDevicesSampleApp
             RunPublisher();  // Start/Stop
         }
 
-        private void Pbtn_Suspend_Click(object sender, RoutedEventArgs e)
-        {
-            SuspendPublisher();
-        }
+        //private void Pbtn_Suspend_Click(object sender, RoutedEventArgs e)
+        //{
+        //    SuspendPublisher();
+        //    SetUiState();
+        //}
 
+        /// <summary>
+        /// Suspend/Resume button handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Pbtn_Resume_Click(object sender, RoutedEventArgs e)
         {
-            ResumePublisher();
+            Publisher pub = AppObjects.Instance.Publisher;
+
+            if (pub.CurrentState == pub.STATE_IDLE)
+                ResumePublisher();
+            else if (pub.CurrentState == pub.STATE_ACTIVE)
+                SuspendPublisher();
+
+            SetUiState();
         }
 
         private async void Pbtn_Test_Click(object sender, RoutedEventArgs e)

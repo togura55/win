@@ -130,7 +130,7 @@
     <value>ホストポート番号</value>
   </data>
   <data name="IDC_Resume" xml:space="preserve">
-    <value>復帰</value>
+    <value>再開</value>
   </data>
   <data name="IDC_SaveLog" xml:space="preserve">
     <value>ログ保存</value>
