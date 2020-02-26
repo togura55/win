@@ -11,8 +11,10 @@
     <Grid>
         <Button x:Name="Ptn_ReadFile" Content="Button" HorizontalAlignment="Left" Margin="292,211,0,0" VerticalAlignment="Top" Click="Ptn_ReadFile_Click"/>
         <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="146,217,0,0" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Top"/>
-        <ListBox x:Name="ListBox_Messages" HorizontalAlignment="Left" Height="313" VerticalAlignment="Top" Width="790" Margin="423,227,0,0"
-                 ScrollViewer.HorizontalScrollBarVisibility="Auto"/>
+        <ListBox x:Name="ListBox_Messages" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" Height="313" VerticalAlignment="Top" Width="790" Margin="423,227,0,0"
+                 ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible"/>
+        <Button x:Name="Pbtn_Copy" Content="Button" HorizontalAlignment="Left" Height="31" Margin="423,567,0,0" VerticalAlignment="Top" Width="106" Click="Pbtn_Copy_Click"/>
+        <Button x:Name="Pbtn_Clear" Content="Button" HorizontalAlignment="Left" Margin="591,567,0,0" VerticalAlignment="Top" Height="31" Width="99" Click="Pbtn_Clear_Click"/>
 
     </Grid>
 </Page>
