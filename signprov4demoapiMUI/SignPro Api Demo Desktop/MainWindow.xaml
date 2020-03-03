@@ -1,0 +1,26 @@
+﻿<Window x:Class="SignPro_Api_Demo_Desktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SignPro_Api_Demo_Desktop"
+        mc:Ignorable="d"
+        Title="Will Trust Bank" Height="759.612" Width="1024.514" Background="#FFD4D4D4" WindowStartupLocation="CenterScreen" Foreground="White" Loaded="Window_Loaded" ResizeMode="CanMinimize">
+
+    <Grid Margin="0,0,0,0">
+
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Image x:Name="imgLeft"  RenderTransformOrigin="0.505,0.542" Source="img/banner.png" Height="124" HorizontalAlignment="Left" VerticalAlignment="Top" MouseDown="Logo_MouseDown"/>
+        <Image x:Name="imgRight"  RenderTransformOrigin="0.505,0.542" Source="img/WfB_logo_s.png" HorizontalAlignment="Right" MouseDown="Logo_MouseDown" Width="272" Margin="0,10,10.4,700.4"/>
+        <Image x:Name="imgCenter"  RenderTransformOrigin="0.505,0.542" Source="img/WillBankLogo.png" Height="92" HorizontalAlignment="Center" VerticalAlignment="Top" MouseDown="Logo_MouseDown" Width="186" Margin="419,10,413.4,0"/>
+        <Rectangle Fill="White" Height="120" Margin="35,137,45,0" Stroke="Black" VerticalAlignment="Top" RadiusX="10" RadiusY="10" StrokeThickness="0"/>
+        <Image HorizontalAlignment="Left" Height="90" Margin="77,151,0,0" VerticalAlignment="Top" Width="93" Source="img/Mr_Smith.jpg"/>
+        <Label x:Name="Label_Consultant" Content="C O N S U L T A N T   P A U L   S M I T H" HorizontalAlignment="Left" Height="50" Margin="215,137,0,0" VerticalAlignment="Top" Width="581" FontFamily="Cambria" FontSize="30" FontWeight="Bold"/>
+        <Label x:Name ="Label_CompanyName" Content="W I L L  T R U S T  B A N K" HorizontalAlignment="Left" Height="40" Margin="210,214,0,0" VerticalAlignment="Top" Width="395" FontFamily="Sitka Banner" FontSize="24"/>
+        <Frame x:Name="FrmMainContainer" Content="Frame" Height="420" Margin="35,276,45.5,0" VerticalAlignment="Top" NavigationUIVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" />
+        <Label Margin="44,691,44,0" Height="30" Content="demo Wacom »Sign PRO PDF« ::: v.1.0 ::: More human | More Digital" HorizontalContentAlignment="Center" VerticalAlignment="Top" FontSize="12" Foreground="White"/>
+
+    </Grid>
+</Window>

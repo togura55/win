@@ -1,0 +1,6 @@
+
+ToDo
+- PdfTransitフォルダが無ければ作成する -> Build scriptでフォルダをbinにコピーするように変更
+- Error Starting API Syntax Error in API Text Fields -> Fixed
+- Show Version number
+- Localize PDF contents

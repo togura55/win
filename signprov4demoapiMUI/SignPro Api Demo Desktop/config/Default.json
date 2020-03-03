@@ -1,0 +1,111 @@
+{
+  "file": {
+    "input": {
+      "filesystem": null,
+      "http_get": null
+    },
+    "output": {
+      "filesystem": null,
+      "http_post": null
+    },
+    "authentication": {
+      "pdf_user_password": null,
+      "http_user": null,
+      "http_password": null
+    }
+  },
+  "configuration": {
+    "api_key": null,
+    "show_annotate": true,
+    "show_manual_signature": false,
+    "error_handler_url": null,
+    "required_signatures": 0,
+    "process_text_tags": false
+  },
+  "signatures": [
+    {
+      "signer": "Marco Zanardo",
+      "name": "Signer1",
+      "biometric": true,
+      "required": true,
+      "reason": "Approval",
+      "location": {
+        "Page": "1",
+        "X": 460,
+        "Y": 70,
+        "W": 550,
+        "H": 130
+      }
+    }
+  ],
+  "initials": null,
+  "checkboxes": [
+    {
+      "name": "check1",
+      "value": false,
+      "location": {
+        "Page": "1",
+        "X": 530,
+        "Y": 770,
+        "W": 40,
+        "H": 35
+      }
+    },
+    {
+      "name": "check",
+      "value": true,
+      "location": {
+        "Page": "1",
+        "X": 760,
+        "Y": 770,
+        "W": 40,
+        "H": 35
+      }
+    }
+  ],
+  "radiobuttons": null,
+  "textfields":
+  [
+    {
+      "name": "notes",
+      "value": "",
+      "required": false,
+      "location": {
+        "Page": "1",
+        "X": 150,
+        "Y": 555,
+        "W": 700,
+        "H": 45
+      }
+    },
+	{
+      "name": "notes2",
+      "value": "",
+      "required": false,
+      "location": {
+        "Page": "1",
+        "X": 150,
+        "Y": 500,
+        "W": 700,
+        "H": 45
+      }
+    }
+  ],
+
+  "dates":   
+  [
+    {
+      "name": "DtReg",
+      "value": "",
+      "required": true,
+      "format": "dd/mm/yyyy",
+      "location": {
+        "Page": "1",
+        "X": 100,
+        "Y": 600,
+        "W": 100,
+        "H": 50
+      }
+    }
+  ]
+}

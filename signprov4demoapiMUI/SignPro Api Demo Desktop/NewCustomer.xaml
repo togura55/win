@@ -1,0 +1,42 @@
+﻿<Page x:Class="SignPro_Api_Demo_Desktop.NewCustomer"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:SignPro_Api_Demo_Desktop"
+      mc:Ignorable="d"
+      Title="NewCustomer"       
+      d:DesignHeight="440"
+       Width="930" >
+    <Grid MinHeight="440" MinWidth="930" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="440"/>
+
+        </Grid.RowDefinitions>
+        <Label x:Name="Label_NewCustomerRegistration" Margin="0,10,0,0" Height="50"  Width="930" VerticalContentAlignment="Center" Content="New Customer Registration" Background="#FFFFFF" HorizontalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24"/>
+        <Label Margin="835,10,19,380"  Height="50" x:Name="LblDate" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Content="11/10/2019" RenderTransformOrigin="4.754,0.352"/>
+        <ScrollViewer Name="svMain" BorderThickness="0" VerticalScrollBarVisibility="Visible" Margin="0,70,0,98">
+            <StackPanel Width="auto" Height="470" Background="#FFFFFF" >
+                <Label x:Name="Label_FirstName" Height="25" Margin="1" Content="First Name" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <TextBox x:Name="txtFirstName" Height="20" Margin="5,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Background="#F7F7F7"  />
+                <Label x:Name="Label_SurName" Content="Surname" HorizontalAlignment="Left" Height="25" Margin="1" VerticalAlignment="Top"/>
+                <TextBox x:Name="txtSurName" Height="20" Margin="5,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Background="#F7F7F7"  />
+                <Label x:Name="Label_Street" Content="Street" HorizontalAlignment="Left" Height="25" Margin="1" VerticalAlignment="Top"/>
+                <TextBox x:Name="txtStreet"  Height="20" Margin="5,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Background="#F7F7F7"  />
+                <Label x:Name="Label_City" Content="City " HorizontalAlignment="Left" Height="25" Margin="1" VerticalAlignment="Top"/>
+                <TextBox x:Name="txtCity" Height="20" Margin="5,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Background="#F7F7F7"  />
+                <Label x:Name="Label_Country" Content="Country " HorizontalAlignment="Left" Height="25" Margin="1" VerticalAlignment="Top"/>
+                <TextBox x:Name="txtCountry" Height="20" Margin="5,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Background="#F7F7F7"  />
+                <Label x:Name="Label_Phone" Content="Phone " HorizontalAlignment="Left" Height="25" Margin="1" VerticalAlignment="Top"/>
+                <TextBox x:Name="txtPhone"  Height="20" Margin="5,0,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Background="#F7F7F7"  />
+                <CheckBox x:Name="chkAnnotation" Content="Allow Annotation" Margin="5,10,50,0" IsChecked="True" />
+                <CheckBox x:Name="chkSignature" Content="Allow Manual Signatures" Margin="5,10,50,0" IsChecked="True" />
+                <CheckBox x:Name="chkTextTags" Content="Process Text Tags" Margin="5,10,50,0" IsChecked="True" />
+                <CheckBox x:Name="chkUploadResult" Content="Upload Result" Margin="5,10,50,0" IsChecked="False" />
+                <Button x:Name="btnNewCustomer" Style="{StaticResource btnDefaul}" Content="NEW CUSTOMER" HorizontalAlignment="Center" VerticalAlignment="Top" Width="205" Height="48" Click="BtnNewCustomer_Click"/>
+            </StackPanel>
+        </ScrollViewer>
+        <Button x:Name="btnShowRegistration" Visibility="{Binding Path=ShowRegistration, Converter={StaticResource Converter}}" Style="{StaticResource btnDefaul}" Content="SHOW CUSTOMER" HorizontalAlignment="Center" VerticalAlignment="Top" Width="205" Height="48" Margin="353,354,372,0" Click="BtnShowRegistration_Click" />
+        <Label  Margin="759,10,95,380"  Height="50" x:Name="LblCity" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Content="Düsseldorf" RenderTransformOrigin="4.754,0.352"/>
+    </Grid>
+</Page>

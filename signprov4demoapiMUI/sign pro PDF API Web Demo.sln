@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignPro Api Demo Desktop", "SignPro Api Demo Desktop\SignPro Api Demo Desktop.csproj", "{F28B182D-1EB5-4AE9-BD70-DDC00DCDE0EA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F28B182D-1EB5-4AE9-BD70-DDC00DCDE0EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F28B182D-1EB5-4AE9-BD70-DDC00DCDE0EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F28B182D-1EB5-4AE9-BD70-DDC00DCDE0EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F28B182D-1EB5-4AE9-BD70-DDC00DCDE0EA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {391C9D66-A4F9-4C68-A687-AC5D6E8B6E69}
+	EndGlobalSection
+EndGlobal

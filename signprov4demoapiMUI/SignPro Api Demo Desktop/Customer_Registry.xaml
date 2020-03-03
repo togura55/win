@@ -1,0 +1,70 @@
+﻿<Page x:Class="SignPro_Api_Demo_Desktop.Customer_Registry"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:SignPro_Api_Demo_Desktop"
+      mc:Ignorable="d"
+      Title="Customer Registry"
+       Width="930" Height="358.343">
+    <Grid MinHeight="440" MinWidth="930" Margin="0,0,0,0" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="440"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50*"  />
+            <ColumnDefinition Width="50*" />
+        </Grid.ColumnDefinitions>
+        <Label x:Name="Label_CustomerRegistration" Margin="0,0,0,0" Grid.ColumnSpan="2" Height="50"  Width="930" Content="Customer Registration" Background="#FFFFFF" HorizontalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24"/>
+
+        <ScrollViewer Name="svMain" BorderThickness="0" VerticalScrollBarVisibility="Visible" Margin="0,60,0,82" RenderTransformOrigin="0.5,0.505" Grid.Column="0">
+            <StackPanel   Height="387" Background="#FFFFFF" >
+                <Label x:Name="Label_FirstName" Height="25" Margin="1" Content="First Name" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <TextBox x:Name="txtFirstName1" Height="20" Margin="5,0,28,0" TextWrapping="Wrap" Text="Kate" VerticalAlignment="Top" Background="#F7F7F7"  />
+                <Label x:Name="Label_Surname" Content="Surname" HorizontalAlignment="Left" Height="25" Margin="1" VerticalAlignment="Top"/>
+                <TextBox x:Name="txtSurname1" Height="20" Margin="5,0,29,0" TextWrapping="Wrap" Text="Smith" VerticalAlignment="Top" Background="#F7F7F7"  />
+                <Label x:Name="Label_Street" Content="Street" HorizontalAlignment="Left" Height="25" Margin="1" VerticalAlignment="Top"/>
+                <TextBox x:Name="txtStreet1" Height="20" Margin="5,0,32,0" TextWrapping="Wrap" Text="8-17-1 Nishi-Shinjuku" VerticalAlignment="Top" Background="#F7F7F7"  />
+                <Label x:Name="Label_City" Content="City " HorizontalAlignment="Left" Height="25" Margin="1" VerticalAlignment="Top"/>
+                <TextBox x:Name="txtCity1" Height="20" Margin="5,0,33,0" TextWrapping="Wrap" Text="Tokio" VerticalAlignment="Top" Background="#F7F7F7"  />
+                <Label x:Name="Label_Country" Content="Country " HorizontalAlignment="Left" Height="25" Margin="1" VerticalAlignment="Top"/>
+                <TextBox x:Name="txtCountry1" Height="20" Margin="5,0,37,0" TextWrapping="Wrap" Text="Japan" VerticalAlignment="Top" Background="#F7F7F7"  />
+                <Label x:Name="Label_Phone" Content="Phone " HorizontalAlignment="Left" Height="25" Margin="1,1,0,1" VerticalAlignment="Top" Width="475"/>
+                <TextBox x:Name="txtPhone1" Height="20" Margin="5,0,38,0" TextWrapping="Wrap" Text="(+81)-3-5337-6502" VerticalAlignment="Top" Background="#F7F7F7"  />
+            </StackPanel>
+        </ScrollViewer>
+        <StackPanel  Grid.Column="1"  Background="#FFFFFF" Margin="0,60,0,83" AutomationProperties.IsColumnHeader="True">
+            <DataGrid AutoGenerateColumns="False" HorizontalAlignment="Left" Margin="0,0,0,0" Name="DataGridPdf" VerticalAlignment="Top"  >
+                <DataGrid.Columns>
+                    <DataGridTextColumn x:Name="DGTC_Files" Header="FileName" Binding="{Binding Path=FileName}" />
+                    <DataGridTemplateColumn >
+                        <DataGridTemplateColumn.CellTemplate >
+                        <DataTemplate >
+                                <Button Click = "DeletePdf" >
+                                    <Button.ContentTemplate>
+                                        <DataTemplate>
+                                            <Image Source="../img/delete.png" Width="32" />
+                                        </DataTemplate>
+                                    </Button.ContentTemplate>
+                                </Button>
+                        </DataTemplate >
+                    </DataGridTemplateColumn.CellTemplate >
+                    </DataGridTemplateColumn >
+                    <DataGridTemplateColumn >
+                        <DataGridTemplateColumn.CellTemplate >
+                            <DataTemplate >
+                                <Button Click = "ShowPdf" >
+                                    <Button.ContentTemplate>
+                                        <DataTemplate>
+                                            <Image Source="../img/pdf.png" Width="32" />
+                                        </DataTemplate>
+                                    </Button.ContentTemplate>
+                                </Button>
+                            </DataTemplate >
+                        </DataGridTemplateColumn.CellTemplate >
+                    </DataGridTemplateColumn >
+                </DataGrid.Columns>
+            </DataGrid>
+        </StackPanel>
+    </Grid>
+</Page>
