@@ -31,8 +31,12 @@ namespace ReadFss
             this.InitializeComponent();
             ResetUI();
 
-            byte[] byteArray = { 0, 1 };
-            ushort i = BitConverter.ToUInt16(byteArray, 0);
+            byte[] byteArray = { 0, 1 , 2, 3};
+            ushort data = BitConverter.ToUInt16(byteArray, 0);
+
+            int i = 0;
+            data = (ushort)(byteArray[i] << 8 | byteArray[i+1]);
+
         }
 
         private void Ptn_ReadFile_Click(object sender, RoutedEventArgs e)

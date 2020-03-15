@@ -6,9 +6,15 @@ using System.Threading.Tasks;
 
 namespace ReadFss
 {
+    public struct ByteStreamParts
+    {
+        public byte byteID;
+        public byte numBytes;
+        public byte[] rawDataBytes;
+    }
+
     class FssStream
     {
-//        byte[] buffBytes = null;
         public byte[] byteStream = null;
 
         public int size = 0;
@@ -30,11 +36,48 @@ namespace ReadFss
         public byte[] unknown_4 = new byte[4];
         public byte[] unknown_5 = null; // strings and data, indefinite length, EOF
 
+        public byte[] key_19 = { 0x19 };
+
+        public ByteStreamParts key_30;
+
+
+//        public byte[] key_30 = { 0x30, 0 };      // 2bytes
+
+        public byte[] key_2F = { 0x2F, 0, 0, 0 };
+        public byte[] key_17 = { 0x17, 0, 0 };  // who separater
+        public byte[] key_16 = { 0x16, 0, 0 };  // why separater
+        public byte[] key_54 = { 0x54, 0, 0 };  // 5-parts-digit
+
+        public byte[] key_05 = { 0x05, 0 };      // 2bytes
+        public byte[] key_07 = { 0x07, 0 };      // 2bytes
+        public byte[] key_09 = { 0x09, 0 };      // 2bytes
+
+        public byte[] key_0A = { 0x0A, 0 };      // 2bytes
+        public byte[] key_03 = { 0x03, 0 };      // 2bytes
+        public byte[] key_06 = { 0x06, 0 };      // 2bytes
+        public byte[] key_08 = { 0x08, 0 };      // 2bytes
+        public byte[] key_04 = { 0x04, 0 };      // 2bytes
+        public byte[] key_0D = { 0x0D, 0 };      // 2bytes
+
+        public byte[] key_0C = { 0x0C, 0 };     // 2bytes
+        public byte[] key_4F = { 0x4F, 0, 0 };  // 3bytes
+        public byte[] key_14 = { 0x14, 0};      // 2bytes
+        public byte[] key_1D = { 0x1A, 0, 0 };  // 3bytes
+        public byte[] key_1C = { 0x1C, 0, 0 };  // 3bytes
+        public byte[] key_1A = { 0x1A, 0, 0 };  // 3bytes
+        public byte[] key_1B = { 0x1B, 0, 0 };  // 3bytes
+        public byte[] key_18 = { 0x18, 0};      // 2bytes
+        public byte[] key_15 = { 0x15, 0};      // 2bytes
+
+
+
         public List<UInt16> strokeList = null;
 
         public FssStream()
         {
             strokeList = new List<UInt16>();
+
+            key_30.byteID = 0x30;
         }
 
         public void Read()
@@ -148,6 +191,7 @@ namespace ReadFss
                 current = current + unknown_5.Length;
 
                 DecodeStrokePart();
+ //               DecodeStrokePart2();
             }
 
             catch (Exception ex)
@@ -207,6 +251,21 @@ namespace ReadFss
                 for (int i = 0; i < num; i++)
                 {
                     strokeList.Add(BitConverter.ToUInt16(stroke_packets, i * unit));
+                }
+            }
+        }
+
+        private void DecodeStrokePart2()
+        {
+            if (stroke_packets != null)
+            {
+                int unit = 2;
+                int num = stroke_packets.Length / unit;
+
+                for (int i = 0; i < num; i++)
+                {
+                    //                    strokeList.Add(BitConverter.ToUInt16(stroke_packets, i * unit));
+                    strokeList.Add((ushort)(stroke_packets[i*unit] << 8 | stroke_packets[i*unit + 1]));
                 }
             }
         }
