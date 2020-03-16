@@ -95,6 +95,18 @@ namespace ReadFss
                 buff = string.Format("1st data({0}): {1},{2}({3}), 0x{1:X},0x{2:X} ",
                     fs.first_data.Length, fs.first_data[0], fs.first_data[1], BitConverter.ToUInt16(fs.first_data, 0));
                 ListBox_Messages.Items.Add(buff);
+                
+                
+                foreach (ByteStreamPart bs in fs.byteStreamParts)
+                {
+ //                   buff = string.Empty;
+
+                    buff = string.Format("ID: {0:X2}({1})", bs.byteID, bs.numBytes);
+                    foreach (int data in bs.rawDataBytes)
+                        buff += string.Format(", {0:X2}", data);
+                    ListBox_Messages.Items.Add(buff);
+                }
+
  /*
                 SetStringToListBox("2nd label({0}): ", "{0},", fs.second_label);
                 SetStringToListBox("2nd data({0}): ", "{0},", fs.second_data);
@@ -111,11 +123,12 @@ namespace ReadFss
                 SetStringToListBox("unknown 3({0}): ", "{0:X2},", fs.unknown_3);
                 SetStringToListBox("unknown 4({0}): ", "{0:X2},", fs.unknown_4);
                 SetStringToListBox("unknown 5({0}): ", "{0:X2},", fs.unknown_5); // strings and data, indefinite length, EOF
-*/
+
                 buff = string.Format("StrokePart({0}): ", fs.strokeList.Count);
                 foreach (int data in fs.strokeList)
                     buff += string.Format("{0},", data);
                 ListBox_Messages.Items.Add(buff);
+                */
             }
             catch (Exception ex)
             {
