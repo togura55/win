@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage.FileProperties;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -25,6 +27,7 @@ namespace ReadFss
     {
         string error_message = string.Empty;
         FssStream fs = null;
+        string openFile = string.Empty;
 
         public MainPage()
         {
@@ -43,9 +46,12 @@ namespace ReadFss
         {
             // Open read file dialog
             // Read data stream
-            string s = string.Empty;
+
             ResetUI();
-            ImportInkData(s);
+            ImportInkData();
+
+ //           FileInfo fi = new FileInfo(openFile);
+ //           DateTime dt = fi.LastWriteTime;
         }
 
         private void Pbtn_Copy_Click(object sender, RoutedEventArgs e)
@@ -99,36 +105,32 @@ namespace ReadFss
                 
                 foreach (ByteStreamPart bs in fs.byteStreamParts)
                 {
- //                   buff = string.Empty;
-
-                    buff = string.Format("ID: {0:X2}({1})", bs.byteID, bs.numBytes);
-                    foreach (int data in bs.rawDataBytes)
-                        buff += string.Format(", {0:X2}", data);
+                    string twoDigit = "";
+                    if (bs.numBytes < 10)
+                        twoDigit = " ";
+                    string stringFormat = "ID: {0:X2}(" + twoDigit + "{1}), {2}: ";
+                    buff = string.Format(stringFormat, bs.byteID, bs.numBytes,bs.description);
+                    if (bs.isString)
+                    {
+                        int count = 0;
+                        byte[] tmp = new byte[bs.rawDataBytes.Length];
+                        foreach(byte b in bs.rawDataBytes)
+                        {
+                            tmp[count] = b;
+                            if (b < 0x20)
+                                tmp[count] = 0x20;
+                            count++;
+                        }
+                        buff += "\"" + System.Text.Encoding.UTF8.GetString(tmp) + "\"";
+                    }
+                    else
+                    {
+                        foreach (int data in bs.rawDataBytes)
+                            buff += string.Format(", {0:X2}", data);
+                    }
                     ListBox_Messages.Items.Add(buff);
                 }
 
- /*
-                SetStringToListBox("2nd label({0}): ", "{0},", fs.second_label);
-                SetStringToListBox("2nd data({0}): ", "{0},", fs.second_data);
-                SetStringToListBox("unknown 1({0}): ", "{0:X2},", fs.unknown_1);
-                SetStringToListBox("ExtraData_Key({0}): ", "{0:X2},", fs.extraData_Key); // strings, indefinite length
-                SetStringToListBox("ExtraData_Sep({0}): ", "{0:X2},", fs.extraData_Sep); // separater
-                SetStringToListBox("ExtraData_Value({0}): ", "{0:X2},", fs.extraData_Value);  // strings, indefinite length
-                SetStringToListBox("CaptureWho_Sep({0}): ", "{0:X2},", fs.captureWho_Sep); // separater
-                SetStringToListBox("CaptureWho({0}): ", "{0:X2},", fs.captureWho);// strings,  indefinite length
-                SetStringToListBox("CaptureWhy_Sep({0}): ", "{0:X2},", fs.captureWhy_Sep); // separater
-                SetStringToListBox("CaptureWhy({0}): ", "{0:X2},", fs.captureWhy);// strings,  indefinite length
-                SetStringToListBox("unknown 2({0}): ", "{0:X2},", fs.unknown_2); // data, indefinite length
-                SetStringToListBox("stroke packets({0}): ", "{0:X2},", fs.stroke_packets); // data, indefinite length
-                SetStringToListBox("unknown 3({0}): ", "{0:X2},", fs.unknown_3);
-                SetStringToListBox("unknown 4({0}): ", "{0:X2},", fs.unknown_4);
-                SetStringToListBox("unknown 5({0}): ", "{0:X2},", fs.unknown_5); // strings and data, indefinite length, EOF
-
-                buff = string.Format("StrokePart({0}): ", fs.strokeList.Count);
-                foreach (int data in fs.strokeList)
-                    buff += string.Format("{0},", data);
-                ListBox_Messages.Items.Add(buff);
-                */
             }
             catch (Exception ex)
             {
@@ -144,7 +146,12 @@ namespace ReadFss
             ListBox_Messages.Items.Add(buff);
         }
 
-        private async void ImportInkData(string s)
+        private void FileTimestamp()
+        {
+
+        }
+
+        private async void ImportInkData()
         {
             try
             {
@@ -158,6 +165,17 @@ namespace ReadFss
                 Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
                 if (file != null)
                 {
+                    //// ここでFile.IO. したらダメか？ -> ここでするなら Task.Run
+                    //await Task.Run(() =>
+                    //{
+                    //    DateTime dtUpdate = System.IO.File.GetLastWriteTime(file.Path.ToString());
+                    //});
+
+
+ //                   DateTimeOffset dto = file.DateCreated;
+
+                    openFile = file.Path.ToString();
+
                     // Application now has read/write access to the picked file
                     this.textBlock.Text = "Picked fss: " + file.Name;
 
@@ -173,16 +191,13 @@ namespace ReadFss
 
                         ShowFssData();
 
-                        //if (fs.Decode() < 0)
-                        //{
-                        //    Windows.UI.Popups.MessageDialog md = new Windows.UI.Popups.MessageDialog(error_message);
-                        //    await md.ShowAsync();
-                        //}
-                        //else
-                        //{
-                        //    ShowFssData();
-                        //}
+                        //FileInfo fi = new FileInfo(openFile);
+                        //while (!fi.Exists)
+                        //    await Task.Run(() => fi.Refresh());
+
+                        //DateTime dt = fi.LastAccessTime;
                     }
+
                 }
                 else
                 {

@@ -12,6 +12,75 @@ namespace ReadFss
         public byte byteID;
         public byte numBytes;
         public byte[] rawDataBytes;
+        public string description;
+        public Boolean isString;
+    }
+
+    public class ByteStreamIDs
+    {
+        public readonly byte[] byteID = { 0x30, 0x30, 0x2F, 0x17, 0x16, 0x54, 0x05, 0x07, 0x09, 0x0A,
+        0x03, 0x06, 0x08, 0x04, 0x0D, 0x0C, 0x4F, 0x14, 0x50, 0x1D, 0x1C,
+        0x1A, 0x1B, 0x18, 0x15};
+        public readonly Boolean[] isString =
+        {
+            false,  // 0x30
+            false,  // 0x30
+            true,   // 0x2F
+            true,   // 0x17
+            true,   // 0x16
+            true,  // 0x54
+            false,  // 0x05
+            false,  // 0x07
+            false,  // 0x09
+            false,  // 0x0A
+            false,  // 0x03
+            false,  // 0x06
+            false,  // 0x08
+            false,  // 0x04
+            false,  // 0x0D
+            false,  // 0x0C
+            false,  // 0x4F, STU
+            false,  // 0x14
+            false,  // 0x50, DTU
+            false,  // 0x1D
+            true,  // 0x1C
+            true,  // 0x1A
+            true,  // 0x1B
+            false,  // 0x18
+            false   // 0x15, STU
+        };
+        public readonly string[] description = {
+            "ID List",  // 0x30
+            "unknown",  // 0x30
+            "SigObj.ExtraData",     // 0x2F
+            "Signatory name",       // 0x17, DC.Capture_Who
+            "Reason for signing",   // 0x16, DC.Capture_Why
+            "Lic. UID", // 0x54, License key ID in jwt token
+            "unknown",  // 0x05
+            "unknown",  // 0x07
+            "unknown",  // 0x09
+            "unknown",  // 0x0A
+            "unknown",  // 0x03
+            "unknown",  // 0x06
+            "unknown",  // 0x08
+            "unknown",  // 0x04
+            "unknown",  // 0x0D
+            "unknown",  // 0x0C
+            "unknown_STU",  // 0x4F, STU
+            "unknown",  // 0x14
+            "unknown_DTU", // 0x50, DTU
+            "Network Interface Card",   // 0x1D
+            "Operating system", // 0x1C
+            "Digitizer type",   // 0x1A
+            "Digitizer driver", // 0x1B
+            "unknown",  // 0x18
+            "unknown_STU"   // 0x15, STU
+        };
+
+        public ByteStreamIDs()
+        {
+
+        }
     }
 
     class FssStream
@@ -23,59 +92,10 @@ namespace ReadFss
         public byte[] first_data = new byte[2];
         public byte[] second_label = new byte[4];
 
-        //public byte[] second_label = new byte[32];
-        //public byte[] second_data = new byte[16];
-        //public byte[] unknown_1 = new byte[4];
-        //public byte[] extraData_Key = null; // strings, indefinite length
-        //public byte[] extraData_Sep = new byte[1]; // separater
-        //public byte[] extraData_Value = null;  // strings, indefinite length
-        //public byte[] captureWho_Sep = new byte[3]; // separater
-        //public byte[] captureWho = null;// strings,  indefinite length
-        //public byte[] captureWhy_Sep = new byte[3]; // separater
-        //public byte[] captureWhy = null;// strings,  indefinite length
-        //public byte[] unknown_2 = null; // data, indefinite length
-        //public byte[] stroke_packets = null; // data, indefinite length
-        //public byte[] unknown_3 = new byte[13];
-        //public byte[] unknown_4 = new byte[4];
-        //public byte[] unknown_5 = null; // strings and data, indefinite length, EOF
 
         public byte[] key_19 = { 0x19 };
 
-        public ByteStreamPart key_30;
-
         public List<ByteStreamPart> byteStreamParts = null;
-
-
-
-        //        public byte[] key_30 = { 0x30, 0 };      // 2bytes
-
-        public byte[] key_2F = { 0x2F, 0, 0, 0 };
-        public byte[] key_17 = { 0x17, 0, 0 };  // who separater
-        public byte[] key_16 = { 0x16, 0, 0 };  // why separater
-        public byte[] key_54 = { 0x54, 0, 0 };  // 5-parts-digit
-
-        public byte[] key_05 = { 0x05, 0 };      // 2bytes
-        public byte[] key_07 = { 0x07, 0 };      // 2bytes
-        public byte[] key_09 = { 0x09, 0 };      // 2bytes
-
-        public byte[] key_0A = { 0x0A, 0 };      // 2bytes
-        public byte[] key_03 = { 0x03, 0 };      // 2bytes
-        public byte[] key_06 = { 0x06, 0 };      // 2bytes
-        public byte[] key_08 = { 0x08, 0 };      // 2bytes
-        public byte[] key_04 = { 0x04, 0 };      // 2bytes
-        public byte[] key_0D = { 0x0D, 0 };      // 2bytes
-
-        public byte[] key_0C = { 0x0C, 0 };     // 2bytes
-        public byte[] key_4F = { 0x4F, 0, 0 };  // 3bytes
-        public byte[] key_14 = { 0x14, 0 };      // 2bytes
-        public byte[] key_1D = { 0x1A, 0, 0 };  // 3bytes
-        public byte[] key_1C = { 0x1C, 0, 0 };  // 3bytes
-        public byte[] key_1A = { 0x1A, 0, 0 };  // 3bytes
-        public byte[] key_1B = { 0x1B, 0, 0 };  // 3bytes
-        public byte[] key_18 = { 0x18, 0 };      // 2bytes
-        public byte[] key_15 = { 0x15, 0 };      // 2bytes
-
-
 
         public List<UInt16> strokeList = null;
 
@@ -95,6 +115,35 @@ namespace ReadFss
         public void Write()
         {
 
+        }
+
+        public void Timestamp()
+        {
+            // 保存されているタイムスタンプがUnix timestampでHex 4byteとすると
+            // 4F
+            byte[] ts_array = new byte[8];
+            foreach (ByteStreamPart bsp in byteStreamParts)
+            {
+                if (bsp.byteID == 0x4F)
+                {
+                    for (int i = 0; i<4; i++)
+                    {
+                        ts_array[i] = bsp.rawDataBytes[i+1];
+                    }
+ //                   Array.Copy(bsp.rawDataBytes, 1, ts_array, 0, ts_array.Length - 1);
+                    break;
+                }
+            }
+            ulong unixTime = BitConverter.ToUInt64(ts_array, 0);
+            var dateTime = FromUnixTime((long)unixTime);
+
+//            DateTime dt = DateTime.Now;
+
+//            var timespan = DateTime.UtcNow;
+        }
+        private static DateTime FromUnixTime(long unixTime)
+        {
+            return DateTimeOffset.FromUnixTimeSeconds(unixTime).LocalDateTime;
         }
 
         public void Decode()
@@ -124,106 +173,31 @@ namespace ReadFss
                     Array.Copy(byteStream, current, bsp.rawDataBytes, 0, bsp.numBytes);
                     current += bsp.numBytes;
                 }
-                /*
-                                //Array.Copy(byteStream, 36, second_data, 0, 16);
-                                //Array.Copy(byteStream, 52, unknown_1, 0, 4);
 
-                                extraData_Sep[0] = (byte)0x19;
+                ByteStreamIDs id = new ByteStreamIDs();
+                foreach (ByteStreamPart bsp in byteStreamParts)
+                {
+                    for (int i = 0; i<id.byteID.Length; i++)
+                    {
+                        if (bsp.byteID == id.byteID[i])
+                        {
+                            bsp.description = id.description[i];
+                            bsp.isString = id.isString[i];
+                            break;
+                        }
+                    }
+                }
 
-                                index = Array.IndexOf(byteStream, (byte)0x19, 56);
-                                if (index > 0)
-                                {
-                                    extraData_Key = new byte[index - 56];
-                                    Array.Copy(byteStream, 56, extraData_Key, 0, index - 56);
-                                    current = index;
-                                }
-                                else
-                                {// error
-                                    throw new Exception(string.Format("Cannot find 0x{0:x}", 0x19));
-                                }
-
-                                index = Array.IndexOf(byteStream, (byte)0x17, current);
-                                if (index > 0)
-                                {
-                                    extraData_Value = new byte[index - current];
-                                    Array.Copy(byteStream, current, extraData_Value, 0, index - current);
-                                    current = index;
-                                }
-                                else
-                                {// error
-                                    throw new Exception(string.Format("Cannot find 0x{0:x}", 0x17));
-                                }
-
-                                Array.Copy(byteStream, current, captureWho_Sep, 0, captureWho_Sep.Length);
-                                current = current + captureWho_Sep.Length;
-
-                                captureWho = new byte[captureWho_Sep.Last()];
-                                Array.Copy(byteStream, current, captureWho, 0, captureWho_Sep.Last());
-                                current = current + captureWho.Length;
-
-                                Array.Copy(byteStream, current, captureWhy_Sep, 0, captureWhy_Sep.Length);
-                                current = current + captureWhy_Sep.Length;
-
-                                captureWhy = new byte[captureWhy_Sep.Last()];
-                                Array.Copy(byteStream, current, captureWhy, 0, captureWhy_Sep.Last());
-                                current = current + captureWhy.Length;
-
-                                // 最後が0A 09 02を探す
-                                byte[] searchBytes = { 0x0A, 0x09, 0x02 };
-                                index = SearchElementBlock(byteStream, searchBytes, current);
-                                if (index > 0)
-                                {
-                                    unknown_2 = new byte[index + searchBytes.Length - current];
-                                    Array.Copy(byteStream, current, unknown_2, 0, index + searchBytes.Length - current);
-                                    current = index + searchBytes.Length;
-                                }
-                                else
-                                {// error
-                                    string elements = string.Empty;
-                                    foreach (int b in searchBytes)
-                                        elements += string.Format("0x{0:X},", b);
-                                    throw new Exception(string.Format("Cannot find {0}", elements));
-                                }
-
-                                // 最初が0C 08 01 を探す
-                                byte[] searchBytes2 = { 0x0C, 0x08, 0x01 };
-                                index = SearchElementBlock(byteStream, searchBytes2, current);
-                                if (index > 0)
-                                {
-                                    stroke_packets = new byte[index - current];
-                                    Array.Copy(byteStream, current, stroke_packets, 0, index - current);
-                                    current = index;
-                                }
-                                else
-                                {// error
-                                    string elements = string.Empty;
-                                    foreach (int b in searchBytes2)
-                                        elements += string.Format("0x{0:X},", b);
-                                    throw new Exception(string.Format("Cannot find {0}", elements));
-                                }
-
-                                // 13バイト読み込む
-                                Array.Copy(byteStream, current, unknown_3, 0, unknown_3.Length);
-                                current = current + unknown_3.Length;
-
-                                // 4バイト読み込む
-                                Array.Copy(byteStream, current, unknown_4, 0, unknown_4.Length);
-                                current = current + unknown_4.Length;
-
-                                // 最後まで読み込む
-                                unknown_5 = new byte[size - current];
-                                Array.Copy(byteStream, current, unknown_5, 0, unknown_5.Length);
-                                current = current + unknown_5.Length;
-
-                                DecodeStrokePart();
-                 //               DecodeStrokePart2();
-                 */
+                current++;
+ 
             }
 
             catch (Exception ex)
             {
                 throw new Exception(string.Format("Exception: Decode: {0}", ex.Message));
             }
+
+            Timestamp();
         }
 
         public void Encode()
@@ -266,35 +240,5 @@ namespace ReadFss
             }
             return positions;
         }
-        /*
-                private void DecodeStrokePart()
-                {
-                    if (stroke_packets != null)
-                    {
-                        int unit = 2;
-                        int num = stroke_packets.Length / unit;
-
-                        for (int i = 0; i < num; i++)
-                        {
-                            strokeList.Add(BitConverter.ToUInt16(stroke_packets, i * unit));
-                        }
-                    }
-                }
-
-                private void DecodeStrokePart2()
-                {
-                    if (stroke_packets != null)
-                    {
-                        int unit = 2;
-                        int num = stroke_packets.Length / unit;
-
-                        for (int i = 0; i < num; i++)
-                        {
-                            //                    strokeList.Add(BitConverter.ToUInt16(stroke_packets, i * unit));
-                            strokeList.Add((ushort)(stroke_packets[i*unit] << 8 | stroke_packets[i*unit + 1]));
-                        }
-                    }
-                }
-                */
     }
 }
