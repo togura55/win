@@ -8,6 +8,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Collections;
+using System.Xml.Serialization;
 
 namespace ScoreScraping
 {
@@ -24,15 +25,25 @@ namespace ScoreScraping
         }
     }
 
-    class ScoreScraping
+    public class ScoreScraping
     {
-        public static CookieContainer cookieContainer;
-        public ArrayList holeList;
+        [XmlIgnore] public static CookieContainer cookieContainer;
+        [XmlIgnore] public ArrayList holeList;
+        [XmlIgnore] public string password; // plain text
+        public string loginUrl;
+        public string id;
+        public string pwd;      // encripted
+        public string website;
 
         public ScoreScraping()
         {
             cookieContainer = new CookieContainer();
             holeList = new ArrayList();
+            loginUrl = string.Empty;
+            id = string.Empty;
+            pwd = string.Empty;
+            password = string.Empty;
+            website = string.Empty;
         }
 
         /// <summary>

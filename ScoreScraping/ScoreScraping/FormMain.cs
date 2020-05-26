@@ -12,16 +12,27 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.Xml.Serialization;
+using System.Security.Cryptography;
 
 namespace ScoreScraping
 {
     public partial class FormMain : Form
     {
-        string website = string.Empty;
+
+        ScoreScraping scr;
 
         public FormMain()
         {
             InitializeComponent();
+
+            Application.ApplicationExit += new EventHandler(AppExit);
+
+            scr = new ScoreScraping();
+            DeSerialize();  // restore parameters
+            if (scr.pwd != string.Empty)
+                scr.password = Decrypt(scr.pwd, AES_IV, AES_Key);   // decript strings
+
 
             labelUrl.Text = Properties.Resources.IDC_LABEL_URL;
             pbtnStart.Text = Properties.Resources.IDC_PBTN_START;
@@ -32,13 +43,13 @@ namespace ScoreScraping
             labelPassword.Text = Properties.Resources.IDC_LABEL_PASSWORD;
             pbtnEditList.Text = Properties.Resources.IDC_PBTN_EDITLIST;
             pbtnShowResult.Text = Properties.Resources.IDC_PBTN_SHOWRESULT;
-            textBoxUrl.Text = Properties.Resources.IDC_TEXT_URL;
+            
 
             pbtnShowResult.Enabled = false;
 
-            // only for debug phase
-            textBoxID.Text = "";
-            textBoxPassword.Text = "";
+            textBoxUrl.Text = scr.loginUrl;
+            textBoxID.Text = scr.id;
+            textBoxPassword.Text = scr.password;
 
             InitializeComboBoxWebsites();
         }
@@ -46,7 +57,7 @@ namespace ScoreScraping
         // Initialize ComboBox.
         private void InitializeComboBoxWebsites()
         {
-            this.comboBoxWebsites.Text = "ShotNavi";
+            this.comboBoxWebsites.Text = scr.website;
             string[] installs = new string[] { "GDO", "ShotNavi"};
             comboBoxWebsites.Items.AddRange(installs);
             this.Controls.Add(this.comboBoxWebsites);
@@ -66,6 +77,61 @@ namespace ScoreScraping
             //    MessageBoxIcon.Information);
         }
 
+        private void AppExit(object sender, EventArgs e)
+        {
+            scr.pwd = Encrypt(scr.password, AES_IV, AES_Key); // encript for particular strings
+            Serialize();    // store parameters
+        }
+
+        //
+        // https://qiita.com/kz-rv04/items/62a56bd4cd149e36ca70
+        //
+        private const string AES_IV = @"pf69DL6GrWFyZcMK";
+        private const string AES_Key = @"9Fix4L4HB4PKeKWY";
+
+        private void DeSerialize()
+        {
+            try
+            {
+                //保存先のファイル名
+                string fileName = @"Serialize.xml";
+
+                //オブジェクトの型（今回はMemberinfo）を指定して、XmlSerializerを作成する。
+                XmlSerializer se = new XmlSerializer(typeof(ScoreScraping));
+
+                //ファイルを開く
+                StreamReader sr = new StreamReader(fileName, new UTF8Encoding(false));
+
+                //デシリアライズして復元
+                scr = (ScoreScraping)se.Deserialize(sr);
+
+                //ファイルを閉じる
+                sr.Close();
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        private void Serialize()
+        {
+            //保存先のファイル名
+            string fileName = @"Serialize.xml";
+
+            //オブジェクトの型（今回はMemberinfo）を指定して、XmlSerializerを作成する。
+            XmlSerializer se = new XmlSerializer(typeof(ScoreScraping));
+
+            //ファイルを開く
+            StreamWriter sw = new StreamWriter(fileName, false, new UTF8Encoding(false));
+
+            //シリアライズして保存
+            se.Serialize(sw, scr);
+
+            //ファイルを閉じる
+            sw.Close();
+        }
+
         private void pbtnStart_Click(object sender, EventArgs e)
         {
             // 処理中に「取得中」とラベル表示します。
@@ -75,23 +141,23 @@ namespace ScoreScraping
             labelView.Text = Properties.Resources.IDC_TEXT_RETRIEVE;// 「取得中」の文字列を表示することで処理中であることを明記します。
             labelView.BringToFront();         // Objectを最善面に移動します。
             labelView.Update();               // 表示を更新します。
-            website = comboBoxWebsites.SelectedItem.ToString();
+            scr.website = comboBoxWebsites.SelectedItem.ToString();
 
             try
             {
                 // 画面上からHTMLを取得するサイトの情報を取得します。
-                string url = textBoxUrl.Text;
-                string id =textBoxID.Text;
-                string pwd =textBoxPassword.Text;
+                scr.loginUrl = textBoxUrl.Text;
+                scr.id =textBoxID.Text;
+                scr.password =textBoxPassword.Text;
 
-                switch(website)
+                switch(scr.website)
                 {
                     case "ShotNavi":
-                        ShotNavi(url, id, pwd);
+                        ShotNavi(scr.loginUrl, scr.id, scr.password);
                         break;
 
                     case "GDO":
-                        Gdo(url, id, pwd);
+                        Gdo(scr.loginUrl, scr.id, scr.password);
                         break;
 
                     default:
@@ -138,9 +204,6 @@ namespace ScoreScraping
         // --- for ShotNavi ------------------------------
         private void ShotNavi(string url, string id, string pwd)
         {
-            // クラスをインスタンス化します。
-            var scr = new ScoreScraping();
-
             string htmlText = string.Empty;
 
             try
@@ -255,6 +318,80 @@ namespace ScoreScraping
                 throw new Exception(string.Format("GDO:{0}", ex.Message));
             }
 
+        }
+
+        /// <summary>
+        /// 対称鍵暗号を使って文字列を暗号化する
+        /// </summary>
+        /// <param name="text">暗号化する文字列</param>
+        /// <param name="iv">対称アルゴリズムの初期ベクター</param>
+        /// <param name="key">対称アルゴリズムの共有鍵</param>
+        /// <returns>暗号化された文字列</returns>
+        public static string Encrypt(string text, string iv, string key)
+        {
+
+            using (RijndaelManaged rijndael = new RijndaelManaged())
+            {
+                rijndael.BlockSize = 128;
+                rijndael.KeySize = 128;
+                rijndael.Mode = CipherMode.CBC;
+                rijndael.Padding = PaddingMode.PKCS7;
+
+                rijndael.IV = Encoding.UTF8.GetBytes(iv);
+                rijndael.Key = Encoding.UTF8.GetBytes(key);
+
+                ICryptoTransform encryptor = rijndael.CreateEncryptor(rijndael.Key, rijndael.IV);
+
+                byte[] encrypted;
+                using (MemoryStream mStream = new MemoryStream())
+                {
+                    using (CryptoStream ctStream = new CryptoStream(mStream, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter sw = new StreamWriter(ctStream))
+                        {
+                            sw.Write(text);
+                        }
+                        encrypted = mStream.ToArray();
+                    }
+                }
+                return (System.Convert.ToBase64String(encrypted));
+            }
+        }
+
+        /// <summary>
+        /// 対称鍵暗号を使って暗号文を復号する
+        /// </summary>
+        /// <param name="cipher">暗号化された文字列</param>
+        /// <param name="iv">対称アルゴリズムの初期ベクター</param>
+        /// <param name="key">対称アルゴリズムの共有鍵</param>
+        /// <returns>復号された文字列</returns>
+        public static string Decrypt(string cipher, string iv, string key)
+        {
+            using (RijndaelManaged rijndael = new RijndaelManaged())
+            {
+                rijndael.BlockSize = 128;
+                rijndael.KeySize = 128;
+                rijndael.Mode = CipherMode.CBC;
+                rijndael.Padding = PaddingMode.PKCS7;
+
+                rijndael.IV = Encoding.UTF8.GetBytes(iv);
+                rijndael.Key = Encoding.UTF8.GetBytes(key);
+
+                ICryptoTransform decryptor = rijndael.CreateDecryptor(rijndael.Key, rijndael.IV);
+
+                string plain = string.Empty;
+                using (MemoryStream mStream = new MemoryStream(System.Convert.FromBase64String(cipher)))
+                {
+                    using (CryptoStream ctStream = new CryptoStream(mStream, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader sr = new StreamReader(ctStream))
+                        {
+                            plain = sr.ReadLine();
+                        }
+                    }
+                }
+                return plain;
+            }
         }
     }
 }
