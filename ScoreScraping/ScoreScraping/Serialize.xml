@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScoreScraping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <loginUrl>https://shotnavi.jp/mypage/login.php</loginUrl>
-  <id></id>
-  <pwd></pwd>
   <website>ShotNavi</website>
+  <TargetWebsites>
+    <TargetWebsite>
+      <name>ShotNavi</name>
+      <loginUrl>https://shotnavi.jp/mypage/login.php</loginUrl>
+      <id>togura55@gmail.com</id>
+      <pwd></pwd>
+    </TargetWebsite>
+    <TargetWebsite>
+      <name>GDO</name>
+      <loginUrl>https://usr.golfdigest.co.jp/pg/frlogin.php?mm_rurl=https%3A%2F%2Fwww.golfdigest.co.jp%2F</loginUrl>
+      <id>togura55@gmail.com</id>
+      <pwd></pwd>
+    </TargetWebsite>
+  </TargetWebsites>
 </ScoreScraping>

@@ -9,157 +9,162 @@ using System.Net;
 using System.Net.Http;
 using System.Collections;
 using System.Xml.Serialization;
+using System.Security.Cryptography;
 
 namespace ScoreScraping
 {
-    class Hole
+
+
+    public class Hole
     {
         public string url;
         public string row;
-        public ArrayList yardList;
+        public List<string> yardList;
 
         public Hole()
         {
             url = string.Empty;
-            ArrayList yardList = new ArrayList();
+            List<string> yardList = new List<string>();
+        }
+    }
+
+    public class TargetWebsite
+    {
+        //
+        // https://qiita.com/kz-rv04/items/62a56bd4cd149e36ca70
+        //
+        private const string AES_IV = @"pf69DL6GrWFyZcM0";
+        private const string AES_Key = @"9Fix4L4HB4PKeKW0";
+
+        public string name;
+        public string loginUrl;
+        public string id;
+        [XmlElement("pwd")]public string Pwd   // encripted
+        {
+            get { return pPwd; }
+            set
+            {
+                pPwd = value;
+                pPassword = Decrypt(value, AES_IV, AES_Key);
+            }
+        }
+        [XmlIgnore] public string Password     // plain text
+        {
+            get { return pPassword; }
+            set
+            {
+                pPassword = value;
+                pPwd = Encrypt(value, AES_IV, AES_Key);
+            }
+        }
+
+        [XmlIgnore] private string pPassword;
+        [XmlIgnore] private string pPwd;
+
+        /// <summary>
+        /// 対称鍵暗号を使って文字列を暗号化する
+        /// </summary>
+        /// <param name="text">暗号化する文字列</param>
+        /// <param name="iv">対称アルゴリズムの初期ベクター</param>
+        /// <param name="key">対称アルゴリズムの共有鍵</param>
+        /// <returns>暗号化された文字列</returns>
+        private static string Encrypt(string text, string iv, string key)
+        {
+            using (RijndaelManaged rijndael = new RijndaelManaged())
+            {
+                rijndael.BlockSize = 128;
+                rijndael.KeySize = 128;
+                rijndael.Mode = CipherMode.CBC;
+                rijndael.Padding = PaddingMode.PKCS7;
+
+                rijndael.IV = Encoding.UTF8.GetBytes(iv);
+                rijndael.Key = Encoding.UTF8.GetBytes(key);
+
+                ICryptoTransform encryptor = rijndael.CreateEncryptor(rijndael.Key, rijndael.IV);
+
+                byte[] encrypted;
+                using (MemoryStream mStream = new MemoryStream())
+                {
+                    using (CryptoStream ctStream = new CryptoStream(mStream, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter sw = new StreamWriter(ctStream))
+                        {
+                            sw.Write(text);
+                        }
+                        encrypted = mStream.ToArray();
+                    }
+                }
+                return (System.Convert.ToBase64String(encrypted));
+            }
+        }
+
+        /// <summary>
+        /// 対称鍵暗号を使って暗号文を復号する
+        /// </summary>
+        /// <param name="cipher">暗号化された文字列</param>
+        /// <param name="iv">対称アルゴリズムの初期ベクター</param>
+        /// <param name="key">対称アルゴリズムの共有鍵</param>
+        /// <returns>復号された文字列</returns>
+        private static string Decrypt(string cipher, string iv, string key)
+        {
+            string plain = string.Empty;
+
+            try
+            {
+                using (RijndaelManaged rijndael = new RijndaelManaged())
+                {
+                    rijndael.BlockSize = 128;
+                    rijndael.KeySize = 128;
+                    rijndael.Mode = CipherMode.CBC;
+                    rijndael.Padding = PaddingMode.PKCS7;
+
+                    rijndael.IV = Encoding.UTF8.GetBytes(iv);
+                    rijndael.Key = Encoding.UTF8.GetBytes(key);
+
+                    ICryptoTransform decryptor = rijndael.CreateDecryptor(rijndael.Key, rijndael.IV);
+
+
+                    using (MemoryStream mStream = new MemoryStream(System.Convert.FromBase64String(cipher)))
+                    {
+                        using (CryptoStream ctStream = new CryptoStream(mStream, decryptor, CryptoStreamMode.Read))
+                        {
+                            using (StreamReader sr = new StreamReader(ctStream))
+                            {
+                                plain = sr.ReadLine();
+                            }
+                        }
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Decript:{0}", ex.Message));
+            }
+
+            return plain;
+
         }
     }
 
     public class ScoreScraping
     {
         [XmlIgnore] public static CookieContainer cookieContainer;
-        [XmlIgnore] public ArrayList holeList;
-        [XmlIgnore] public string password; // plain text
-        public string loginUrl;
-        public string id;
-        public string pwd;      // encripted
+        [XmlIgnore] public List<Hole> holeList;
+        [XmlIgnore] public int siteIndex;
         public string website;
+        public List<TargetWebsite> TargetWebsites { get; set; } // required type of accessor
 
         public ScoreScraping()
         {
             cookieContainer = new CookieContainer();
-            holeList = new ArrayList();
-            loginUrl = string.Empty;
-            id = string.Empty;
-            pwd = string.Empty;
-            password = string.Empty;
+            holeList = new List<Hole>();
+            siteIndex = 0;
             website = string.Empty;
+            TargetWebsites = new List<TargetWebsite>();
         }
 
-        /// <summary>
-        /// 引数urlにアクセスした際に取得できるHTMLを返します。
-        /// </summary>
-        /// <param name="url">URL(アドレス)</param>
-        /// <returns>取得したHTML</returns>
-        public string GetHtml(string url)
-        {
-            // html取得文字列
-            string html = "";
-
-            try
-            {
-                // 指定されたURLに対してのRequestを作成します。
-                var req = (HttpWebRequest)WebRequest.Create(url);
-
-                // 指定したURLに対してReqestを投げてResponseを取得します。
-                using (var res = (HttpWebResponse)req.GetResponse())
-                using (var resSt = res.GetResponseStream())
-                // 取得した文字列をUTF8でエンコードします。
-                using (var sr = new StreamReader(resSt, Encoding.UTF8))
-                //                using (var sr = new StreamReader(resSt, Encoding.Unicode))
-                {
-                    // HTMLを取得する。
-                    html = sr.ReadToEnd();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(string.Format("GetHtml: {0}", ex.Message));
-            }
-            return html;
-        }
-
-        /// <summary>
-        /// 正規化表現を使用してHTMLからタイトルを取得します。
-        /// </summary>
-        /// <param name="html">HTML文字列</param>
-        /// <returns>HTML文字列から取得したタイトル</returns>
-        public string GetTitle(string html)
-        {
-            string s = string.Empty;
-
-            try
-            {
-                // 正規化表現
-                // 大文字小文字区別なし       : RegexOptions.IgnoreCase
-                // 「.」を改行にも適応する設定: RegexOptions.Singleline
-                var reg = new Regex(@"<title>(?<title>.*?)</title>",
-                             RegexOptions.IgnoreCase | RegexOptions.Singleline);
-
-                // html文字列内から条件にマッチしたデータを抜き取ります。
-                var m = reg.Match(html);
-
-                // 条件にマッチした文字列内からKey("title部分")にマッチした値を抜き取ります。
-                s = m.Groups["title"].Value;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(string.Format("GetTitle: {0}", ex.Message));
-            }
-
-            return s;
-        }
-
-
-        public async Task<CookieContainer> LoginAsync(string Url, string Id, string Password)
-        {
-            CookieContainer cc;
-            using (var handler = new HttpClientHandler())
-            {
-                using (var client = new HttpClient(handler))
-                {
-                    //ログイン用のPOSTデータ生成
-                    var content = new FormUrlEncodedContent(new Dictionary<string, string>
-                    {
-                        {"qLoginName", Id },
-                        {"qPasswd", Password },
-                        {"qAutoLogin" , "1" },
-                        {"mm_sid","RFJlqsCACK7_" },
-                        {"mm_rurl","https://www.golfdigest.co.jp/" },
-                        {"qActionMode","login"},
-                        {"guid","ON" },
-                        {"mm_wsf","0"},
-                        {"qUrl","https%3A%2F%2Fwww.golfdigest.co.jp%2F" }
-                        //,
-//                        {"skip","1"}
-                    });
-
-                    //ログイン
-                    await client.PostAsync(Url, content);
-
-                    //クッキー保存
-                    cc = handler.CookieContainer;
-                }
-            }
-            CookieCollection cookies = cc.GetCookies(new Uri(Url));
-
-            foreach (Cookie c in cookies)
-            {
-                Console.WriteLine("クッキー名:" + c.Name.ToString());
-                Console.WriteLine("クッキーを使うサイトのドメイン名:" + c.Domain.ToString());
-                Console.WriteLine("クッキー発行日時:" + c.TimeStamp.ToString() + Environment.NewLine);
-            }
-
-            Console.WriteLine("ログイン処理完了！");
-
-            return cc;
-        }
-
-
-        //  ---- 他の方法 ----
-
-        //        static Encoding encoder = Encoding.GetEncoding("EUC-JP");
-        static Encoding encoder = Encoding.GetEncoding("utf-8");
+        static readonly Encoding encoder = Encoding.GetEncoding("utf-8");
 
         static string HttpGet(string url)
         {
@@ -309,5 +314,8 @@ namespace ScoreScraping
 
             return HttpPost(login, vals);
         }
+
+
+
     }
 }

@@ -61,7 +61,7 @@ namespace ScoreScraping.Properties {
         }
         
         /// <summary>
-        ///   HTML:  に類似しているローカライズされた文字列を検索します。
+        ///   Logs:  に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string IDC_LABEL_HTML {
             get {

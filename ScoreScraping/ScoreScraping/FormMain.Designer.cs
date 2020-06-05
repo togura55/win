@@ -31,10 +31,8 @@
             this.labelUrl = new System.Windows.Forms.Label();
             this.textBoxUrl = new System.Windows.Forms.TextBox();
             this.pbtnStart = new System.Windows.Forms.Button();
-            this.labelTitle = new System.Windows.Forms.Label();
-            this.textBoxTitle = new System.Windows.Forms.TextBox();
             this.labelHtml = new System.Windows.Forms.Label();
-            this.textBoxHtml = new System.Windows.Forms.TextBox();
+            this.textBoxLog = new System.Windows.Forms.TextBox();
             this.labelView = new System.Windows.Forms.Label();
             this.labelID = new System.Windows.Forms.Label();
             this.textBoxID = new System.Windows.Forms.TextBox();
@@ -69,23 +67,7 @@
             this.pbtnStart.TabIndex = 2;
             this.pbtnStart.Text = "button1";
             this.pbtnStart.UseVisualStyleBackColor = true;
-            this.pbtnStart.Click += new System.EventHandler(this.pbtnStart_Click);
-            // 
-            // labelTitle
-            // 
-            this.labelTitle.AutoSize = true;
-            this.labelTitle.Location = new System.Drawing.Point(33, 211);
-            this.labelTitle.Name = "labelTitle";
-            this.labelTitle.Size = new System.Drawing.Size(35, 12);
-            this.labelTitle.TabIndex = 3;
-            this.labelTitle.Text = "label2";
-            // 
-            // textBoxTitle
-            // 
-            this.textBoxTitle.Location = new System.Drawing.Point(36, 235);
-            this.textBoxTitle.Name = "textBoxTitle";
-            this.textBoxTitle.Size = new System.Drawing.Size(580, 19);
-            this.textBoxTitle.TabIndex = 4;
+            this.pbtnStart.Click += new System.EventHandler(this.PbtnStart_Click);
             // 
             // labelHtml
             // 
@@ -96,13 +78,13 @@
             this.labelHtml.TabIndex = 6;
             this.labelHtml.Text = "label3";
             // 
-            // textBoxHtml
+            // textBoxLog
             // 
-            this.textBoxHtml.Location = new System.Drawing.Point(36, 293);
-            this.textBoxHtml.Multiline = true;
-            this.textBoxHtml.Name = "textBoxHtml";
-            this.textBoxHtml.Size = new System.Drawing.Size(578, 123);
-            this.textBoxHtml.TabIndex = 7;
+            this.textBoxLog.Location = new System.Drawing.Point(36, 293);
+            this.textBoxLog.Multiline = true;
+            this.textBoxLog.Name = "textBoxLog";
+            this.textBoxLog.Size = new System.Drawing.Size(578, 123);
+            this.textBoxLog.TabIndex = 7;
             // 
             // labelView
             // 
@@ -154,7 +136,7 @@
             this.pbtnShowResult.TabIndex = 13;
             this.pbtnShowResult.Text = "button1";
             this.pbtnShowResult.UseVisualStyleBackColor = true;
-            this.pbtnShowResult.Click += new System.EventHandler(this.pbtnShowResult_Click);
+            this.pbtnShowResult.Click += new System.EventHandler(this.PbtnShowResult_Click);
             // 
             // pbtnEditList
             // 
@@ -164,7 +146,7 @@
             this.pbtnEditList.TabIndex = 14;
             this.pbtnEditList.Text = "button2";
             this.pbtnEditList.UseVisualStyleBackColor = true;
-            this.pbtnEditList.Click += new System.EventHandler(this.pbtnEditList_Click);
+            this.pbtnEditList.Click += new System.EventHandler(this.PbtnEditList_Click);
             // 
             // comboBoxWebsites
             // 
@@ -173,8 +155,9 @@
             this.comboBoxWebsites.Name = "comboBoxWebsites";
             this.comboBoxWebsites.Size = new System.Drawing.Size(134, 20);
             this.comboBoxWebsites.TabIndex = 15;
+            this.comboBoxWebsites.SelectedIndexChanged += new System.EventHandler(this.ComboBoxWebsites_SelectedIndexChanged);
             // 
-            // Form1
+            // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -187,15 +170,15 @@
             this.Controls.Add(this.textBoxID);
             this.Controls.Add(this.labelID);
             this.Controls.Add(this.labelView);
-            this.Controls.Add(this.textBoxHtml);
+            this.Controls.Add(this.textBoxLog);
             this.Controls.Add(this.labelHtml);
-            this.Controls.Add(this.textBoxTitle);
-            this.Controls.Add(this.labelTitle);
             this.Controls.Add(this.pbtnStart);
             this.Controls.Add(this.textBoxUrl);
             this.Controls.Add(this.labelUrl);
-            this.Name = "Form1";
+            this.Name = "FormMain";
             this.Text = "Form1";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
+            this.Load += new System.EventHandler(this.FormMain_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -206,10 +189,8 @@
         private System.Windows.Forms.Label labelUrl;
         private System.Windows.Forms.TextBox textBoxUrl;
         private System.Windows.Forms.Button pbtnStart;
-        private System.Windows.Forms.Label labelTitle;
-        private System.Windows.Forms.TextBox textBoxTitle;
         private System.Windows.Forms.Label labelHtml;
-        private System.Windows.Forms.TextBox textBoxHtml;
+        private System.Windows.Forms.TextBox textBoxLog;
         private System.Windows.Forms.Label labelView;
         private System.Windows.Forms.Label labelID;
         private System.Windows.Forms.TextBox textBoxID;
