@@ -195,8 +195,8 @@ namespace ScoreScraping
 
                 // 「取得中」の文言を不可視にします。
                 labelView.Visible = false;
-
                 pbtnShowResult.Enabled = true;
+                WriteLog(Properties.Resources.IDC_TEXT_COMPLETED);
             }
             catch (Exception ex)
             {
@@ -253,9 +253,12 @@ namespace ScoreScraping
                 {
                     while ((line = sr.ReadLine()) != null)
                     {
-                        Hole hh = new Hole();
-                        scr.holeList.Add(hh);
-                        ((Hole)scr.holeList[scr.holeList.Count - 1]).url = line;
+                        if (line.Length != 0)
+                        {
+                            Hole hh = new Hole();
+                            scr.holeList.Add(hh);
+                            ((Hole)scr.holeList[scr.holeList.Count - 1]).url = line;
+                        }
                     }
                     sr.Close();
                 }
@@ -278,19 +281,18 @@ namespace ScoreScraping
                 {
                     //"打目"が何回出現するかでカウント
                     //"打目"のすぐ後が"－"の場合はyardが入っていないと見なす
-                    // そうでなければ、
-                    // "打目"と"Y"の間がヤード数
+                    // そうでなければ、"打目"と"Y"の間がヤード数
                     string[] arr = h.row.Split(sep_dame, StringSplitOptions.None);
                     h.yardList = new List<string>();
-                    for (int i = 0; i < arr.Length - 1; i++)
+                    for (int i = 0; i < arr.Length; i++)
                     {
                         string y = string.Empty;
                         int pos = arr[i].IndexOf(sep_Y);
                         if (pos > 0)
                         {
                             y = arr[i].Substring(0, pos);
+                            h.yardList.Add(y);
                         }
-                        h.yardList.Add(y);
                     }
                 }
 
@@ -307,6 +309,9 @@ namespace ScoreScraping
                             output += s + ',';
                         }
                         output.Substring(0, output.Length - 1); // delete a last ','
+                        output += Environment.NewLine;
+
+                        output += Environment.NewLine;
                         output += Environment.NewLine;
                     }
                     // テキストを書き込む

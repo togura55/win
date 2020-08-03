@@ -142,6 +142,15 @@ namespace ScoreScraping.Properties {
         }
         
         /// <summary>
+        ///   Completed に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string IDC_TEXT_COMPLETED {
+            get {
+                return ResourceManager.GetString("IDC_TEXT_COMPLETED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Retrieving に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string IDC_TEXT_RETRIEVE {

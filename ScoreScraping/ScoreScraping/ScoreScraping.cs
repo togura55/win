@@ -45,7 +45,8 @@ namespace ScoreScraping
             set
             {
                 pPwd = value;
-                pPassword = Decrypt(value, AES_IV, AES_Key);
+                if (value != string.Empty)
+                    pPassword = Decrypt(value, AES_IV, AES_Key);
             }
         }
         [XmlIgnore] public string Password     // plain text

@@ -145,6 +145,9 @@
   <data name="IDC_PBTN_START" xml:space="preserve">
     <value>Start</value>
   </data>
+  <data name="IDC_TEXT_COMPLETED" xml:space="preserve">
+    <value>Completed</value>
+  </data>
   <data name="IDC_TEXT_RETRIEVE" xml:space="preserve">
     <value>Retrieving</value>
   </data>
