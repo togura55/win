@@ -442,12 +442,6 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_53771416717D6A16AC36CCA0876C9D85"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_2CDB5C10F1474A158EFDD79FB7768EDE"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -775,6 +769,12 @@
         "OwnerKey" = "8:_50DCE82170CCAD765F69F242D44466C4"
         "MsmSig" = "8:_UNDEFINED"
         }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_53771416717D6A16AC36CCA0876C9D85"
+        "MsmSig" = "8:_UNDEFINED"
+        }
     }
     "Configurations"
     {
@@ -793,6 +793,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -809,6 +817,22 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.6.1"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.6.1 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.6.1"
+                    }
+                }
+            }
         }
     }
     "Deployable"
@@ -2623,7 +2647,7 @@
             "{1525181F-901A-416C-8A58-119130FE478E}:_2D8DA2EC2ADC4686A486CD556238DFD7"
             {
             "Name" = "8:#1916"
-            "AlwaysCreate" = "11:TRUE"
+            "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Property" = "8:DesktopFolder"
@@ -2682,7 +2706,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ScoreScraping"
         "ProductCode" = "8:{71FFD3DB-1C02-4C39-B6D6-F82D936629D4}"
-        "PackageCode" = "8:{65E3A7E1-6BF4-405C-AB7D-81D3B12AB4FC}"
+        "PackageCode" = "8:{F45966EF-A4B7-4ADF-BBFC-BE4814C7296F}"
         "UpgradeCode" = "8:{01208535-DA36-4532-A996-BFE026B2D5D5}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
@@ -2802,17 +2826,17 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_335627C67E474FEEACB53F6D0872F5F8"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_552BF0CDEFAD4BA89E37B97E5D661485"
             {
-            "Name" = "8:ScoreScraping"
+            "Name" = "8:ScopreScraping"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_2D8DA2EC2ADC4686A486CD556238DFD7"
+            "Target" = "8:_2CDB5C10F1474A158EFDD79FB7768EDE"
             "Folder" = "8:_2D8DA2EC2ADC4686A486CD556238DFD7"
-            "WorkingFolder" = "8:_2D8DA2EC2ADC4686A486CD556238DFD7"
+            "WorkingFolder" = "8:_7B270FDA22C445419A61DF0E5FD17E84"
             "Icon" = "8:"
             "Feature" = "8:"
             }
@@ -2827,20 +2851,6 @@
             "Target" = "8:_2CDB5C10F1474A158EFDD79FB7768EDE"
             "Folder" = "8:_70567EB77644466780E0F1C408A90AAD"
             "WorkingFolder" = "8:_7B270FDA22C445419A61DF0E5FD17E84"
-            "Icon" = "8:"
-            "Feature" = "8:"
-            }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_B2420D41FC9B48EF8EE8224861C90BDB"
-            {
-            "Name" = "8:Shortcut to ScoreScraping"
-            "Arguments" = "8:"
-            "Description" = "8:"
-            "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
-            "Transitive" = "11:FALSE"
-            "Target" = "8:_70567EB77644466780E0F1C408A90AAD"
-            "Folder" = "8:_A6D2ECC2DFB34D10A2C7FECAF32BDB4E"
-            "WorkingFolder" = "8:_A6D2ECC2DFB34D10A2C7FECAF32BDB4E"
             "Icon" = "8:"
             "Feature" = "8:"
             }
