@@ -219,6 +219,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_6F5E5F7BBED84B7BAE65375955E717AD"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_73FD4275A9B947EF4F4FE94B9BB7E372"
         "OwnerKey" = "8:_2CDB5C10F1474A158EFDD79FB7768EDE"
         "MsmSig" = "8:_UNDEFINED"
@@ -239,6 +245,12 @@
         {
         "MsmKey" = "8:_7A041F7D8AFB8C6F3A7286446C83B7CA"
         "OwnerKey" = "8:_2CDB5C10F1474A158EFDD79FB7768EDE"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_80DB2DF51A9F4D41ACE91EF35F7E1997"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -383,6 +395,12 @@
         {
         "MsmKey" = "8:_C7842E772648A8483FE085B453C035BF"
         "OwnerKey" = "8:_2CDB5C10F1474A158EFDD79FB7768EDE"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_CA16334D412A4E9AB6BD1AF50C2B25D0"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -775,6 +793,12 @@
         "OwnerKey" = "8:_53771416717D6A16AC36CCA0876C9D85"
         "MsmSig" = "8:_UNDEFINED"
         }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_CA16334D412A4E9AB6BD1AF50C2B25D0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
     }
     "Configurations"
     {
@@ -800,6 +824,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.6.1"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.6.1 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.6.1"
+                    }
+                }
             }
         }
         "Release"
@@ -1719,6 +1751,26 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6F5E5F7BBED84B7BAE65375955E717AD"
+            {
+            "SourcePath" = "8:..\\ScoreScraping\\Serialize.xml"
+            "TargetName" = "8:Serialize.xml"
+            "Tag" = "8:"
+            "Folder" = "8:_A72AEC1D05D641AAA597CBC9408C6F3A"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_73FD4275A9B947EF4F4FE94B9BB7E372"
             {
             "AssemblyRegister" = "3:1"
@@ -1810,6 +1862,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_80DB2DF51A9F4D41ACE91EF35F7E1997"
+            {
+            "SourcePath" = "8:..\\ScoreScraping\\crawllist.txt"
+            "TargetName" = "8:crawllist.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_A72AEC1D05D641AAA597CBC9408C6F3A"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_844F841D7EB8CD02AC9E9E3E63B8D3EC"
@@ -2359,6 +2431,32 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_CA16334D412A4E9AB6BD1AF50C2B25D0"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:ScoreScraping.resources, Version=1.0.0.0, Culture=ja, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                }
+            "SourcePath" = "8:..\\ScoreScraping\\bin\\Release\\ja\\ScoreScraping.resources.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_CB72AF52A540496BB7349BCCB1687241"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_CD78942D17882C0F28B17900CB02DC66"
             {
             "AssemblyRegister" = "3:1"
@@ -2665,6 +2763,39 @@
             "Property" = "8:TARGETDIR"
                 "Folders"
                 {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_CB72AF52A540496BB7349BCCB1687241"
+                    {
+                    "Name" = "8:ja"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_E7775FCFCDB548E0BDE5CA906AB2CD98"
+                        "Folders"
+                        {
+                        }
+                    }
+                }
+            }
+            "{1525181F-901A-416C-8A58-119130FE478E}:_8A074244783247FCAE4860D5622D942A"
+            {
+            "Name" = "8:#1915"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:AppDataFolder"
+                "Folders"
+                {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_A72AEC1D05D641AAA597CBC9408C6F3A"
+                    {
+                    "Name" = "8:ScoreScraping"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_8206F58DB7994405AD4A32A4E9B26350"
+                        "Folders"
+                        {
+                        }
+                    }
                 }
             }
             "{1525181F-901A-416C-8A58-119130FE478E}:_A6D2ECC2DFB34D10A2C7FECAF32BDB4E"
@@ -2706,7 +2837,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ScoreScraping"
         "ProductCode" = "8:{71FFD3DB-1C02-4C39-B6D6-F82D936629D4}"
-        "PackageCode" = "8:{F45966EF-A4B7-4ADF-BBFC-BE4814C7296F}"
+        "PackageCode" = "8:{F4E32785-DDF1-48D7-90D1-42D7C585D411}"
         "UpgradeCode" = "8:{01208535-DA36-4532-A996-BFE026B2D5D5}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"

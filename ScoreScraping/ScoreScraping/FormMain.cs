@@ -20,6 +20,10 @@ namespace ScoreScraping
     {
         ScoreScraping scr;
         TargetWebsite tw;
+        string configFileName = @"Serialize.xml";   //保存先のファイル名
+        string crawllistFileName = @"crawllist.txt";
+        string outputShotNaviFileName = @"shotnavi.csv";
+        string appDataPath;
 
         public FormMain()
         {
@@ -29,9 +33,11 @@ namespace ScoreScraping
 
             scr = new ScoreScraping();  // create an object instance
 
+            appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\" + this.ProductName;
+
             try
             {
-                DeSerialize();  // restore parameters
+                DeSerialize(appDataPath + "\\" + configFileName);  // restore parameters
                 int cc = 0;
                 foreach (TargetWebsite tw in scr.TargetWebsites)
                 {
@@ -72,7 +78,7 @@ namespace ScoreScraping
             scr.TargetWebsites[scr.siteIndex].loginUrl = textBoxUrl.Text;
             scr.TargetWebsites[scr.siteIndex].id = textBoxID.Text;
             scr.TargetWebsites[scr.siteIndex].Password = textBoxPassword.Text;
-            Serialize();    // store parameters
+            Serialize(appDataPath + "\\" + configFileName);    // store parameters
         }
 
         private void UpdateTargetWebsiteSettings()
@@ -111,18 +117,15 @@ namespace ScoreScraping
 
         }
 
-        private void DeSerialize()
+        private void DeSerialize(string file)
         {
             try
             {
-                //保存先のファイル名
-                string fileName = @"Serialize.xml";
-
                 //オブジェクトの型（今回はMemberinfo）を指定して、XmlSerializerを作成する。
                 XmlSerializer se = new XmlSerializer(typeof(ScoreScraping));
 
                 //ファイルを開く
-                StreamReader sr = new StreamReader(fileName, new UTF8Encoding(false));
+                StreamReader sr = new StreamReader(file, new UTF8Encoding(false));
 
                 //デシリアライズして復元
                 scr = (ScoreScraping)se.Deserialize(sr);
@@ -136,18 +139,15 @@ namespace ScoreScraping
             }
         }
 
-        private void Serialize()
+        private void Serialize(string file)
         {
             try
             {
-                //保存先のファイル名
-                string fileName = @"Serialize.xml";
-
                 //オブジェクトの型（今回はMemberinfo）を指定して、XmlSerializerを作成する。
                 XmlSerializer se = new XmlSerializer(typeof(ScoreScraping));
 
                 //ファイルを開く
-                StreamWriter sw = new StreamWriter(fileName, false, new UTF8Encoding(false));
+                StreamWriter sw = new StreamWriter(file, false, new UTF8Encoding(false));
 
                 //シリアライズして保存
                 se.Serialize(sw, scr);
@@ -209,7 +209,7 @@ namespace ScoreScraping
             try
             {
                 //メモ帳を起動する
-                Process p = Process.Start("notepad.exe", "crawllist.txt"); //  crawllist.txt
+                Process p = Process.Start("notepad.exe", appDataPath + "\\" + crawllistFileName); //  crawllist.txt
             }
             catch (Exception ex)
             {
@@ -221,7 +221,7 @@ namespace ScoreScraping
         {
             try
             {
-                Process p = Process.Start("excel.exe", "shotnavi.csv"); //  shotnavi.csv
+                Process p = Process.Start("excel.exe", appDataPath + "\\" + outputShotNaviFileName); //  shotnavi.csv
             }
             catch (Exception ex)
             {
@@ -249,7 +249,7 @@ namespace ScoreScraping
                 // Read URL list
                 string line = string.Empty;
                 using (StreamReader sr = new StreamReader(
-                    "crawllist.txt", Encoding.GetEncoding("Shift_JIS")))
+                    appDataPath + "\\" + crawllistFileName, Encoding.GetEncoding("Shift_JIS")))
                 {
                     while ((line = sr.ReadLine()) != null)
                     {
@@ -298,7 +298,7 @@ namespace ScoreScraping
 
                 // 書き出し
                 using (StreamWriter sw = new StreamWriter(
-                    @"shotnavi.csv", false, Encoding.GetEncoding("Shift_JIS")))
+                    appDataPath + "\\" + outputShotNaviFileName, false, Encoding.GetEncoding("Shift_JIS")))
                 {
                     string output = string.Empty;
 
