@@ -23,6 +23,7 @@ namespace ScoreScraping
         string configFileName = @"Serialize.xml";   //保存先のファイル名
         string crawllistFileName = @"crawllist.txt";
         string outputShotNaviFileName = @"shotnavi.csv";
+        string outputShotNaviFileName1st = @"shotnavi1st.csv";
         string appDataPath;
 
         public FormMain()
@@ -222,6 +223,7 @@ namespace ScoreScraping
             try
             {
                 Process p = Process.Start("excel.exe", appDataPath + "\\" + outputShotNaviFileName); //  shotnavi.csv
+                p = Process.Start("excel.exe", appDataPath + "\\" + outputShotNaviFileName1st); //  shotnavi1st.csv
             }
             catch (Exception ex)
             {
@@ -296,7 +298,7 @@ namespace ScoreScraping
                     }
                 }
 
-                // 書き出し
+                // Export to file
                 using (StreamWriter sw = new StreamWriter(
                     appDataPath + "\\" + outputShotNaviFileName, false, Encoding.GetEncoding("Shift_JIS")))
                 {
@@ -313,6 +315,31 @@ namespace ScoreScraping
 
                         output += Environment.NewLine;
                         output += Environment.NewLine;
+                    }
+                    // テキストを書き込む
+                    sw.WriteLine(output);
+
+                    // ファイルを閉じる
+                    sw.Close();
+                }
+
+                using (StreamWriter sw = new StreamWriter(
+                    appDataPath + "\\" + outputShotNaviFileName1st, false, Encoding.GetEncoding("Shift_JIS")))
+                {
+                    string output = string.Empty;
+                    const int ignoreStrokes = 20; 
+
+                    foreach (Hole h in scr.holeList)
+                    {
+                        foreach (string s in h.yardList)
+                        {
+                            if(int.Parse(s) > ignoreStrokes)
+                            {
+                                output += s + Environment.NewLine;
+                                break;
+                            }
+                        }
+ //                       output.Substring(0, output.Length - 1); // delete a last ','
                     }
                     // テキストを書き込む
                     sw.WriteLine(output);
