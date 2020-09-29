@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更してください。
 [assembly: AssemblyTitle("ScoreScraping")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Scraping the golf score from the web page")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("ScoreScraping")]

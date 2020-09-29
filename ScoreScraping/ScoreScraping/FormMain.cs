@@ -94,7 +94,7 @@ namespace ScoreScraping
         // Initialize ComboBox.
         private void InitializeComboBoxWebsites()
         {
-            List<string> installs = new List<string>() ;
+            List<string> installs = new List<string>();
             foreach (TargetWebsite t in scr.TargetWebsites)
             {
                 installs.Add(t.name);
@@ -177,10 +177,10 @@ namespace ScoreScraping
             {
                 // 画面上からHTMLを取得するサイトの情報を取得します。
                 tw.loginUrl = textBoxUrl.Text;
-                tw.id =textBoxID.Text;
-                tw.Password =textBoxPassword.Text;
+                tw.id = textBoxID.Text;
+                tw.Password = textBoxPassword.Text;
 
-                switch(scr.website)
+                switch (scr.website)
                 {
                     case "ShotNavi":
                         ShotNavi(tw);
@@ -273,7 +273,8 @@ namespace ScoreScraping
                     var tableElements = htmlDocument.QuerySelectorAll("table");
 
                     // "\n飛距離番手風心拍歩数\n(ティー)－－ -001打目191 Y－－ -002打目156 Y－－ -003打目14 Y－－ -00"
-                    h.row = tableElements[0].TextContent;
+                    if (tableElements.Length != 0)
+                        h.row = tableElements[0].TextContent;
                 }
 
                 // 抽出
@@ -281,20 +282,25 @@ namespace ScoreScraping
                 string sep_Y = "Y";
                 foreach (Hole h in scr.holeList)
                 {
-                    //"打目"が何回出現するかでカウント
-                    //"打目"のすぐ後が"－"の場合はyardが入っていないと見なす
-                    // そうでなければ、"打目"と"Y"の間がヤード数
-                    string[] arr = h.row.Split(sep_dame, StringSplitOptions.None);
-                    h.yardList = new List<string>();
-                    for (int i = 0; i < arr.Length; i++)
+                    if (h.row != null)
                     {
-                        string y = string.Empty;
-                        int pos = arr[i].IndexOf(sep_Y);
-                        if (pos > 0)
+
+                        //"打目"が何回出現するかでカウント
+                        //"打目"のすぐ後が"－"の場合はyardが入っていないと見なす
+                        // そうでなければ、"打目"と"Y"の間がヤード数
+                        string[] arr = h.row.Split(sep_dame, StringSplitOptions.None);
+                        h.yardList = new List<string>();
+                        for (int i = 0; i < arr.Length; i++)
                         {
-                            y = arr[i].Substring(0, pos);
-                            h.yardList.Add(y);
+                            string y = string.Empty;
+                            int pos = arr[i].IndexOf(sep_Y);
+                            if (pos > 0)
+                            {
+                                y = arr[i].Substring(0, pos);
+                                h.yardList.Add(y);
+                            }
                         }
+
                     }
                 }
 
@@ -306,11 +312,17 @@ namespace ScoreScraping
 
                     foreach (Hole h in scr.holeList)
                     {
-                        foreach (string s in h.yardList)
+                        if (h.row != null)
                         {
-                            output += s + ',';
+                            foreach (string s in h.yardList)
+                            {
+                                output += s + ',';
+                            }
+                            output.Substring(0, output.Length - 1); // delete a last ','
                         }
-                        output.Substring(0, output.Length - 1); // delete a last ','
+                        else
+                            output += "-";
+
                         output += Environment.NewLine;
 
                         output += Environment.NewLine;
@@ -327,19 +339,23 @@ namespace ScoreScraping
                     appDataPath + "\\" + outputShotNaviFileName1st, false, Encoding.GetEncoding("Shift_JIS")))
                 {
                     string output = string.Empty;
-                    const int ignoreStrokes = 20; 
+                    const int ignoreStrokes = 20;
 
                     foreach (Hole h in scr.holeList)
                     {
-                        foreach (string s in h.yardList)
+                        if (h.row != null)
                         {
-                            if(int.Parse(s) > ignoreStrokes)
+                            foreach (string s in h.yardList)
                             {
-                                output += s + Environment.NewLine;
-                                break;
+                                if (int.Parse(s) > ignoreStrokes)
+                                {
+                                    output += s + Environment.NewLine;
+                                    break;
+                                }
                             }
                         }
- //                       output.Substring(0, output.Length - 1); // delete a last ','
+                        else
+                            output += "-" + Environment.NewLine;
                     }
                     // テキストを書き込む
                     sw.WriteLine(output);
@@ -350,7 +366,7 @@ namespace ScoreScraping
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format("ShotNavi:{0}", ex.Message));
+                throw new Exception(string.Format("ShotNavi: {0}", ex.Message));
             }
         }
 
