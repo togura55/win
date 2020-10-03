@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml.Shapes;
 
 // 空白ページの項目テンプレートについては、https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x411 を参照してください
 
@@ -24,6 +25,8 @@ namespace WinInkSample
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        Symbol UndoOps = (Symbol)0xE10E;    // Undo
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -141,6 +144,17 @@ namespace WinInkSample
             {
                 throw new NotImplementedException(ex.ToString());
             }
+        }
+
+        private void ToolButton_Undo(object sender, RoutedEventArgs e)
+        {
+            // By default, pen barrel button or right mouse button is processed for inking
+            // Set the configuration to instead allow processing these input on the UI thread
+            inkCanvas.InkPresenter.InputProcessingConfiguration.RightDragAction = InkInputRightDragAction.LeaveUnprocessed;
+
+            //inkCanvas.InkPresenter.UnprocessedInput.PointerPressed += UnprocessedInput_PointerPressed;
+            //inkCanvas.InkPresenter.UnprocessedInput.PointerMoved += UnprocessedInput_PointerMoved;
+            //inkCanvas.InkPresenter.UnprocessedInput.PointerReleased += UnprocessedInput_PointerReleased;
         }
 
     }
