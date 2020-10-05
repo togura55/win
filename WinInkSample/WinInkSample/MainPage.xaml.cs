@@ -146,16 +146,27 @@ namespace WinInkSample
             }
         }
 
+        /// <summary>
+        /// Undo toolbar button procedure
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ToolButton_Undo(object sender, RoutedEventArgs e)
         {
-            // By default, pen barrel button or right mouse button is processed for inking
-            // Set the configuration to instead allow processing these input on the UI thread
-            inkCanvas.InkPresenter.InputProcessingConfiguration.RightDragAction = InkInputRightDragAction.LeaveUnprocessed;
-
-            //inkCanvas.InkPresenter.UnprocessedInput.PointerPressed += UnprocessedInput_PointerPressed;
-            //inkCanvas.InkPresenter.UnprocessedInput.PointerMoved += UnprocessedInput_PointerMoved;
-            //inkCanvas.InkPresenter.UnprocessedInput.PointerReleased += UnprocessedInput_PointerReleased;
+            UndoLastStorke();
         }
 
+        /// <summary>
+        /// Delete a last stroke
+        /// </summary>
+        private void UndoLastStorke()
+        {
+            IReadOnlyList<InkStroke> strokes = inkCanvas.InkPresenter.StrokeContainer.GetStrokes();
+            if (strokes.Count > 0)
+            {
+                strokes[strokes.Count - 1].Selected = true;
+                inkCanvas.InkPresenter.StrokeContainer.DeleteSelected();
+            }
+        }
     }
 }
