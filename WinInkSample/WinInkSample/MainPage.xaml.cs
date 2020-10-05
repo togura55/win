@@ -73,10 +73,12 @@ namespace WinInkSample
                 InkPresenter_StrokesErased;
         }
 
-        private void OnSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            UpdateCanvasSize(RootGrid, outputGrid, inkCanvas);
-        }
+        // If you want to enable this service, insert SizeChanged="OnSizeChanged" in a xmls
+        //
+        //private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+        //{
+        //    UpdateCanvasSize(RootGrid, outputGrid, inkCanvas);
+        //}
 
         private static void UpdateCanvasSize(FrameworkElement root, FrameworkElement output, FrameworkElement inkCanvas)
         {

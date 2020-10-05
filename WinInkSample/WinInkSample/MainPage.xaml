@@ -5,35 +5,25 @@
     xmlns:local="using:WinInkSample"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    SizeChanged="OnSizeChanged"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Grid x:Name="RootGrid" Margin="12,10,12,12">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <ScrollViewer Grid.Row="1" VerticalScrollMode="Auto" VerticalScrollBarVisibility="Auto">
-                <Grid HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <InkToolbar Grid.Row="0" TargetInkCanvas="{x:Bind inkCanvas}">
-                        <InkToolbarCustomToolButton x:Name="toolButtonUndo" Click="ToolButton_Undo" ToolTipService.ToolTip="Undo" HorizontalAlignment="Stretch" Height="40" Margin="1,0,-1,0" VerticalAlignment="Stretch">
-                            <SymbolIcon Symbol="{x:Bind UndoOps}"/>
-                        </InkToolbarCustomToolButton>
-                    </InkToolbar>
-                    <ScrollViewer Grid.Row="1" x:Name="scrollViewer" ZoomMode="Enabled" MinZoomFactor="1" VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled" HorizontalScrollBarVisibility="Auto">
-                        <Grid x:Name="outputGrid" Background="{ThemeResource SystemControlBackgroundChromeWhiteBrush}" Height="Auto">
-                            <!-- Inking area -->
-                            <InkCanvas x:Name="inkCanvas" Height="Auto"/>
-                        </Grid>
-                    </ScrollViewer>
-                </Grid>
-            </ScrollViewer>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid HorizontalAlignment="Left" VerticalAlignment="Top">
+            <InkToolbar Grid.Row="0" TargetInkCanvas="{x:Bind inkCanvas}">
+                <InkToolbarCustomToolButton x:Name="toolButtonUndo" Click="ToolButton_Undo" ToolTipService.ToolTip="Undo" HorizontalAlignment="Stretch" Height="40" Margin="1,0,-1,0" VerticalAlignment="Stretch">
+                    <SymbolIcon Symbol="{x:Bind UndoOps}"/>
+                </InkToolbarCustomToolButton>
+            </InkToolbar>
+        </Grid>
+        <Grid x:Name="outputGrid" Grid.Row="1" Background="{ThemeResource SystemControlBackgroundChromeWhiteBrush}"
+              Margin="0,0,0,-960" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+            <!-- Inking area -->
+            <InkCanvas x:Name="inkCanvas" />
         </Grid>
     </Grid>
 </Page>
