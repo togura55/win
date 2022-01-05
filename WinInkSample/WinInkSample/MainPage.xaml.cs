@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Diagnostics;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Core;
@@ -15,6 +16,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Shapes;
+
 
 // 空白ページの項目テンプレートについては、https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x411 を参照してください
 
@@ -71,6 +73,10 @@ namespace WinInkSample
                 StrokeInput_StrokeStarted;
             inkCanvas.InkPresenter.StrokesErased +=
                 InkPresenter_StrokesErased;
+            inkCanvas.InkPresenter.StrokeInput.StrokeContinued +=
+                StrokeInput_StrokeContinued;
+            inkCanvas.InkPresenter.StrokeInput.StrokeEnded +=
+                StrokeInput_StrokeEnded;
         }
 
         // If you want to enable this service, insert SizeChanged="OnSizeChanged" in a xmls
@@ -92,7 +98,7 @@ namespace WinInkSample
         {
             try
             {
-                int i = 0;
+
             }
             catch(Exception ex)
             {
@@ -104,19 +110,50 @@ namespace WinInkSample
         {
             try
             {
-                int i = 0;
+                Debug.WriteLine("S: X=" + args.CurrentPoint.Position.X + ", Y=" + args.CurrentPoint.Position.Y);
             }
             catch (Exception ex)
             {
                 throw new NotImplementedException(ex.ToString());
             }
         }
+        private void StrokeInput_StrokeContinued(InkStrokeInput sender, PointerEventArgs args)
+        {
+            try
+            {
+                Debug.WriteLine("C: X=" + args.CurrentPoint.Position.X + ", Y=" + args.CurrentPoint.Position.Y);
+                //var strokes = inkCanvas.InkPresenter.StrokeContainer.GetStrokes();
+                //foreach (var stroke in strokes)
+                //{
+                //    var inkPoints = stroke.GetInkPoints();
+                //    foreach (var pt in inkPoints)
+                //    {
+                //        Debug.WriteLine("C: X=" + pt.Position.X + ", Y=" + pt.Position.Y);
+                //    }
 
+                //}
+            }
+            catch (Exception ex)
+            {
+                throw new NotImplementedException(ex.ToString());
+            }
+        }
+        private void StrokeInput_StrokeEnded(InkStrokeInput sender, PointerEventArgs args)
+        {
+            try
+            {
+                Debug.WriteLine("En: X=" + args.CurrentPoint.Position.X + ", Y=" + args.CurrentPoint.Position.Y);
+            }
+            catch (Exception ex)
+            {
+                throw new NotImplementedException(ex.ToString());
+            }
+        }
         private void UnprocessedInput_PointerReleased(InkUnprocessedInput sender, PointerEventArgs args)
         {
             try
             {
-                int i = 0;
+                Debug.WriteLine("UR: X=" + args.CurrentPoint.Position.X + ", Y=" + args.CurrentPoint.Position.Y);
             }
             catch (Exception ex)
             {
@@ -128,7 +165,7 @@ namespace WinInkSample
         {
             try
             {
-                int i = 0;
+                Debug.WriteLine("UM: X=" + args.CurrentPoint.Position.X + ", Y=" + args.CurrentPoint.Position.Y);
             }
             catch (Exception ex)
             {
@@ -140,7 +177,7 @@ namespace WinInkSample
         {
             try
             {
-                int i = 0;
+                Debug.WriteLine("UP: X=" + args.CurrentPoint.Position.X + ", Y=" + args.CurrentPoint.Position.Y);
             }
             catch (Exception ex)
             {
