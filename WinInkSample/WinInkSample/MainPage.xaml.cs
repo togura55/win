@@ -66,7 +66,7 @@ namespace WinInkSample
                 UnprocessedInput_PointerMoved;
             inkCanvas.InkPresenter.UnprocessedInput.PointerReleased +=
                 UnprocessedInput_PointerReleased;
-
+           
             // 新しいインクデータをリッスンするかストロークを消去して、
             // 選択UIをクリーンアップします。
             inkCanvas.InkPresenter.StrokeInput.StrokeStarted +=
